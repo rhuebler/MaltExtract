@@ -6,6 +6,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
@@ -16,24 +17,31 @@ import RMA6Processor.RMA6Processor;
 
 public class SummaryWriter {
 	private NCBI_MapReader mapReader;
-	private List<RMA6Processor> processedFiles;
+	private List<Future<RMA6Processor>> processedFiles;
 	private Set<Integer> processedIDs;
 	private List<String> summary;
 	private String outDir;
 	
-	public SummaryWriter(List<RMA6Processor> pFiles, Set<Integer> pIDs, NCBI_MapReader mReader, String oDir) throws IOException, InterruptedException, ExecutionException{
+	public SummaryWriter(List<Future<RMA6Processor>> pFiles, NCBI_MapReader mReader, String oDir) throws IOException, InterruptedException, ExecutionException{
 		this.processedFiles = pFiles;
-		this.processedIDs = pIDs;	
+		//this.processedIDs = pIDs;	
 		this.mapReader = mReader;
 		this.outDir = oDir;
+		setProcessedIds();
 		prepareOutput();
 	}
-
+	void setProcessedIds() throws InterruptedException, ExecutionException{
+		Set<Integer> pIDs = new HashSet<>();
+		for(Future<RMA6Processor> future : processedFiles)
+			pIDs.addAll(future.get().getContainedIDs());
+		this.processedIDs = pIDs;
+	}
 	private void prepareOutput() throws InterruptedException, ExecutionException{
 		   List<String> summary = new ArrayList<String>();
 		   String header ="Taxon"; // could and should be its own function 
 		   boolean first = true;	   
-		   for(RMA6Processor current : processedFiles){
+		   for(Future<RMA6Processor> future : processedFiles){
+			   RMA6Processor current = future.get();
 			   header+="\t"+current.getfileName();
 			   HashMap<Integer,Integer> fileResults = current.getSumLine();
 			   if(first ==true){

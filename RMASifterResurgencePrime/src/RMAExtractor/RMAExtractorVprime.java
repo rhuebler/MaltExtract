@@ -82,22 +82,22 @@ public class RMAExtractorVprime {
 	    // iterate over files
 	    
     	List<Integer> taxIDs= new  ArrayList<Integer>();
-    	List<RMA6Processor> processedFiles = new ArrayList<RMA6Processor>();
+    	List<Future<RMA6Processor>> processedFiles = new ArrayList<>();
     	for(String name : taxNames)
     		taxIDs.add(mapReader.getNcbiNameToIdMap().get(name));
-    	Set<Integer> processedIDs = new HashSet<Integer>();
+    	
     	executor=(ThreadPoolExecutor) Executors.newFixedThreadPool(numThreads);
 	    for(String fileName : fileNames){// make multi threaded here //TODO define as task maybe  divide input data set into parts for each core maybe 
 	    	ConcurrentRMA6Processor task = new ConcurrentRMA6Processor(inDir, fileName, outDir, mapReader, treeReader,taxIDs, topPercent); // should be implemented as callable 
 	    	Future<RMA6Processor> future=executor.submit(task);
-	    	RMA6Processor res = future.get();
-	    	processedIDs.addAll(res.getContainedIDs());//TODO synchronize
-	    	processedFiles.add(res);//TODO synchronize
+	    	//RMA6Processor res = future.get();
+	    	//processedIDs.addAll(res.getContainedIDs());//TODO synchronize
+	    	processedFiles.add(future);//TODO synchronize
 	    }//fileNames;
 	    // wait for all threads to finish here  synchronize system resources but how?
 	    destroy();
 
-	  SummaryWriter sumWriter = new SummaryWriter(processedFiles,processedIDs,mapReader,outDir); 
+	  SummaryWriter sumWriter = new SummaryWriter(processedFiles,mapReader,outDir); 
 	  sumWriter.writeSummary();
 	}//main
 }//class
