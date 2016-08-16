@@ -5,19 +5,17 @@ package RMAExtractor;
 import java.io.File;
 import java.io.FilenameFilter;
 import java.io.IOException;
-import java.nio.charset.Charset;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadPoolExecutor;
 
 import NCBI_MapReader.NCBI_MapReader;
 import NCBI_MapReader.NCBI_TreeReader;
 import RMA6Processor.RMA6Processor;
+import SummaryWriter.SummaryWriter;
 
 public class RMAExtractorVprime {
 	static FilenameFilter RMAFilter = new FilenameFilter() {
@@ -29,21 +27,17 @@ public class RMAExtractorVprime {
 	        }
 	    }
 	};// ToDo make parallel
-	public static void writeSummary(List<String> summary) throws IOException{
-		System.out.println("Writing Summary txt File");
-		Path file = Paths.get(outDir+"overallSummary"+".txt");
-		Files.write(file, summary, Charset.forName("UTF-8"));
-		System.out.println("Summary Done!");
-	}
-	
 	
 	private static double topPercent = 0.01; // initialize with standard value;	
 	private static List<String> fileNames = new ArrayList<String>();
 	private static List<String> taxNames = new ArrayList<String>();
 	private static String outDir;
 	private static String inDir;	
-	private static int threads = 1;
-	
+	private static int numThreads = 1;
+	private static ThreadPoolExecutor executor;
+	private static void destroy(){
+		executor.shutdown();
+	}
 	public static void main(String[] args) throws IOException {
 		System.out.println("Processing Input Paramenters");	
 		inDir = args[0].substring(1);
@@ -75,67 +69,32 @@ public class RMAExtractorVprime {
 				topPercent=Double.parseDouble(arg.substring(1));
 				System.out.println("Custom topPercent parameter detected: "+topPercent);
 				}else if (arg.matches("-\\d+")){
-				threads = Integer.parseInt(arg.substring(1));
+				numThreads = Integer.parseInt(arg.substring(1));
 			}
 		}
-		if(threads >= 32)
-			threads = 32; // only allow maximum of 32 threads /// how many cores do exist on cluster node?
-		System.out.println("Using " +threads+" threads");
-		NCBI_MapReader mapReader =new NCBI_MapReader();// shared read access
+		if(numThreads >Runtime.getRuntime().availableProcessors())
+			numThreads = Runtime.getRuntime().availableProcessors(); // enforce that not more processors than available to jvm should be used 
+		System.out.println("Using " + numThreads +" threads");
+		NCBI_MapReader mapReader = new NCBI_MapReader();// shared read access
 		NCBI_TreeReader treeReader = new NCBI_TreeReader();// shared read access
 		new File(outDir).mkdirs(); // create output directory if directory does not already exist
 	    // iterate over files
-	    List<String> summary = new ArrayList<String>();
+	    
     	List<Integer>taxIDs= new  ArrayList<Integer>();
     	List<RMA6Processor>processedFiles = new  ArrayList<RMA6Processor>();
     	for(String name : taxNames)
     		taxIDs.add(mapReader.getNcbiNameToIdMap().get(name));
     	Set<Integer> processedIDs = new HashSet<Integer>();
-	    for(String fileName : fileNames){// make multi threaded here
+    	executor=(ThreadPoolExecutor) Executors.newFixedThreadPool(numThreads);
+	    for(String fileName : fileNames){// make multi threaded here //TODO define as task maybe  divide input data set into parts for each core maybe 
 	    	RMA6Processor processor = new RMA6Processor(inDir, fileName, outDir, mapReader, treeReader);
 	    	processor.process(taxIDs, topPercent);// loop through file
 	    	processedIDs.addAll(processor.getContainedIDs());//TODO synchronize
 	    	processedFiles.add(processor);//TODO synchronize
 	    }//fileNames;
 	    // wait for all threads to finish here  synchronize system resources but how?
-	    
-	   String header ="Taxon";
-	   boolean first = true;
-	   for(RMA6Processor current : processedFiles){
-		   header+="\t"+current.getfileName();
-		   HashMap<Integer,Integer> fileResults = current.getSumLine();
-		   if(first ==true){
-		   for(int id : processedIDs){
-			   String line = mapReader.getNcbiIdToNameMap().get(id);
-			   if(fileResults.containsKey(id)){
-				   line+= "\t"+fileResults.get(id);
-				   summary.add(line);
-			   }else{
-				   line+= "\t"+0;
-				   summary.add(line);
-			   }
-			   first = false;
-		     }//for
-		   }else{
-			   int i = 0;
-			   
-			   for(int id : processedIDs){ 
-				   String line = summary.get(i);
-				   if(fileResults.containsKey(id)){
-					   line+= "\t"+fileResults.get(id);
-					   summary.set(i,line);
-				   }else{
-					   line+= "\t"+0;
-					   summary.set(i,line);
-				   		}
-			   i++;
-			   }//for
-		   }//else
-	   }// for outer   
-		   
-	   summary.add(0,header);
-	   writeSummary(summary);
-	    
+	    destroy();
+	  SummaryWriter sumWriter = new SummaryWriter(processedFiles,processedIDs,mapReader,outDir); 
+	  sumWriter.writeSummary();
 	}//main
-	
 }//class
