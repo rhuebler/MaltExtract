@@ -4,16 +4,17 @@ package RMAExtractor;
 // TODO great everything seems to be up and ready 
 import java.io.File;
 import java.io.FilenameFilter;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import java.util.concurrent.ThreadPoolExecutor;
 
 import NCBI_MapReader.NCBI_MapReader;
 import NCBI_MapReader.NCBI_TreeReader;
+import RMA6Processor.ConcurrentRMA6Processor;
 import RMA6Processor.RMA6Processor;
 import SummaryWriter.SummaryWriter;
 
@@ -38,7 +39,7 @@ public class RMAExtractorVprime {
 	private static void destroy(){
 		executor.shutdown();
 	}
-	public static void main(String[] args) throws IOException {
+	public static void main(String[] args) throws Exception {
 		System.out.println("Processing Input Paramenters");	
 		inDir = args[0].substring(1);
 		File dir = new File(inDir);
@@ -55,7 +56,7 @@ public class RMAExtractorVprime {
 			System.err.println("Expected Parameter order:");
 			System.err.println("-path/to/RMA6_files or RMA6_file (-outdir) -MeganID1 -MeganID2 -... (-topPercent)");
 		}
-		if(new File(args[1].substring(1)).isDirectory()){
+		if(args[1].substring(1).matches("[\\w\\d/]+")){
 			outDir=args[1].substring(1);}
 		else{
 			System.out.println("Use input directory as output directory!");
@@ -80,20 +81,22 @@ public class RMAExtractorVprime {
 		new File(outDir).mkdirs(); // create output directory if directory does not already exist
 	    // iterate over files
 	    
-    	List<Integer>taxIDs= new  ArrayList<Integer>();
-    	List<RMA6Processor>processedFiles = new  ArrayList<RMA6Processor>();
+    	List<Integer> taxIDs= new  ArrayList<Integer>();
+    	List<RMA6Processor> processedFiles = new ArrayList<RMA6Processor>();
     	for(String name : taxNames)
     		taxIDs.add(mapReader.getNcbiNameToIdMap().get(name));
     	Set<Integer> processedIDs = new HashSet<Integer>();
     	executor=(ThreadPoolExecutor) Executors.newFixedThreadPool(numThreads);
 	    for(String fileName : fileNames){// make multi threaded here //TODO define as task maybe  divide input data set into parts for each core maybe 
-	    	RMA6Processor processor = new RMA6Processor(inDir, fileName, outDir, mapReader, treeReader);
-	    	processor.process(taxIDs, topPercent);// loop through file
-	    	processedIDs.addAll(processor.getContainedIDs());//TODO synchronize
-	    	processedFiles.add(processor);//TODO synchronize
+	    	ConcurrentRMA6Processor task = new ConcurrentRMA6Processor(inDir, fileName, outDir, mapReader, treeReader,taxIDs, topPercent); // should be implemented as callable 
+	    	Future<RMA6Processor> future=executor.submit(task);
+	    	RMA6Processor res = future.get();
+	    	processedIDs.addAll(res.getContainedIDs());//TODO synchronize
+	    	processedFiles.add(res);//TODO synchronize
 	    }//fileNames;
 	    // wait for all threads to finish here  synchronize system resources but how?
 	    destroy();
+
 	  SummaryWriter sumWriter = new SummaryWriter(processedFiles,processedIDs,mapReader,outDir); 
 	  sumWriter.writeSummary();
 	}//main

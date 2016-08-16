@@ -40,7 +40,7 @@ public class RMA6Processor {
 		this.outDir = outDir;
 		this.fileName = fileName;
 		this.mapReader = mapReader;
-		this.treeReader = treeReader;
+		this.treeReader = new NCBI_TreeReader(treeReader);
 	}
 	
 	//setters
@@ -99,6 +99,7 @@ public void process(List<Integer>taxIDs, double topPercent) throws IOException{
 	ArrayList<String> readDistribution = new ArrayList<String>();
 	Set<Integer> keys = fileCon.getClassificationBlock("Taxonomy").getKeySet();// get all assigned IDs in a file 
 	Set<Integer> idsToProcess = new HashSet<Integer>();
+   // treeReader here to avoid synchronization issues 
 	for(int taxID : taxIDs){
 		idsToProcess.add(taxID);
 		for(int id :treeReader.getStrains(taxID, keys))

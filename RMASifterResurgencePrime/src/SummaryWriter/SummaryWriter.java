@@ -8,6 +8,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
 
 import NCBI_MapReader.NCBI_MapReader;
 import RMA6Processor.RMA6Processor;
@@ -19,14 +21,15 @@ public class SummaryWriter {
 	private List<String> summary;
 	private String outDir;
 	
-	public SummaryWriter(List<RMA6Processor> pFiles, Set<Integer> pIDs, NCBI_MapReader mReader, String oDir) throws IOException{
+	public SummaryWriter(List<RMA6Processor> pFiles, Set<Integer> pIDs, NCBI_MapReader mReader, String oDir) throws IOException, InterruptedException, ExecutionException{
 		this.processedFiles = pFiles;
 		this.processedIDs = pIDs;	
 		this.mapReader = mReader;
 		this.outDir = oDir;
 		prepareOutput();
 	}
-	private void prepareOutput(){
+
+	private void prepareOutput() throws InterruptedException, ExecutionException{
 		   List<String> summary = new ArrayList<String>();
 		   String header ="Taxon"; // could and should be its own function 
 		   boolean first = true;	   

@@ -14,17 +14,23 @@ import org.forester.phylogeny.PhylogenyNode;
  * @author huebler
  *
  */
+
 public class NCBI_TreeReader {
-	final static String treName= "/Users/huebler/Desktop/Project_RMASifter_The_RMAing/megan-ce-master/resources/files/ncbi.tre";// how to provide System resources
+	final static String treName= "resources/ncbi.tre";// how to provide System resources make relativistic
 	int target;
 	private Phylogeny ph;
-	
 	public NCBI_TreeReader() throws IOException{
 		System.out.println("Setting up Phylogenetic Tree");
 		Scanner in = new Scanner(new File(treName));
-		String nhx = in.nextLine();
+		String line = in.nextLine();
 		in.close();
-	    this.ph = Phylogeny.createInstanceFromNhxString(nhx);
+	    this.ph = Phylogeny.createInstanceFromNhxString(line);
+	}
+	public NCBI_TreeReader(NCBI_TreeReader copyInstance){
+		this.ph = copyInstance.getPhylogeny();
+	}
+	private Phylogeny getPhylogeny(){
+		return ph;
 	}
 	private ArrayList<Integer> getAssigned( ArrayList<Integer> children,Set<Integer> keys){
 		ArrayList<Integer> assigned = new ArrayList<Integer>();
