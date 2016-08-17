@@ -9,7 +9,7 @@ import java.util.List;
  */
 public class CompositionMap {
 	public CompositionMap(HashMap<Integer,ArrayList<Alignment>> map){
-		this.compositionMap=map;
+		setCompositionMap(map);
 	}
 private HashMap<Integer,ArrayList<Alignment>> compositionMap;// hashMap of ReferenceID to List of start positions
 //HashMap<Integer,Integer> taxonComposition; currently unused 
@@ -66,7 +66,7 @@ public int getMaxID(){
 public HashMap<Integer,ArrayList<Alignment>> getCompositionMap(){
 	return this.compositionMap;}
 
-public void setCompositionMap(HashMap<Integer,ArrayList<Alignment>> map){
+private void setCompositionMap(HashMap<Integer,ArrayList<Alignment>> map){// technically not rrequired
 	this.compositionMap = map;}
 
 private void setMaxID(int i){

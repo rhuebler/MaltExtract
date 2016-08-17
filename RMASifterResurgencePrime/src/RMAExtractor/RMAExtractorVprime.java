@@ -39,7 +39,7 @@ public class RMAExtractorVprime {
 	}
 	public static void main(String[] args) throws Exception {
 		System.out.println("Processing Input Paramenters");	
-		inDir = args[0].substring(1);
+		inDir = args[0];
 		File dir = new File(inDir);
 		if(dir.isDirectory())
 			{
@@ -55,24 +55,24 @@ public class RMAExtractorVprime {
 			System.err.println("-path/to/RMA6_files or RMA6_file (-outdir) -MeganID1 -MeganID2 -... (-topPercent)");
 		}
 		if(args[1].substring(1).matches("[\\w\\d/]+")){
-			outDir=args[1].substring(1);}
+			outDir=args[1];}
 		else{
 			System.out.println("Use input directory as output directory!");
 			outDir=inDir;
 		}
 		for( String arg : args ){
 			if(arg.endsWith("taxons.txt")){// should now match species Names but not threads species Names at least as more than 100 threads seem unreasonable characters long
-				Scanner in = new Scanner(new File(arg.substring(1)));
+				Scanner in = new Scanner(new File(arg));
 				while(in.hasNext()){
 					taxNames.add(in.nextLine().trim());
 				}
 				in.close();
-				}else if(arg.matches("-0\\.\\d+"))
+				}else if(arg.matches("0\\.\\d+"))
 				{
-				topPercent=Double.parseDouble(arg.substring(1));
+				topPercent=Double.parseDouble(arg);
 				System.out.println("Custom topPercent parameter detected: "+topPercent);
-				}else if (arg.matches("-\\d+")){
-				numThreads = Integer.parseInt(arg.substring(1));
+				}else if (arg.matches("\\d+")){
+				numThreads = Integer.parseInt(arg);
 			}
 		}
 		if(numThreads >Runtime.getRuntime().availableProcessors())

@@ -12,7 +12,7 @@ import java.util.Scanner;
  * and a map of name to ID
  */
 public class NCBI_MapReader {
-	final static String mapName= "resources/ncbi.map";
+	final static String mapName= "/Users/huebler/git/RMA6Sifter/RMASifterResurgencePrime/resources/ncbi.map";
 	 HashMap<String,Integer> ncbiNameToId;
 	 HashMap<Integer,String> ncbiIdToName;
 	public NCBI_MapReader() throws FileNotFoundException{

@@ -16,7 +16,7 @@ import org.forester.phylogeny.PhylogenyNode;
  */
 
 public class NCBI_TreeReader {
-	final static String treName= "resources/ncbi.tre";// how to provide System resources make relativistic
+	final static String treName= "/Users/huebler/git/RMA6Sifter/RMASifterResurgencePrime/resources/ncbi.tre";//TODO how to provide System resources make relativistic
 	int target;
 	private Phylogeny ph;
 	public NCBI_TreeReader() throws IOException{
