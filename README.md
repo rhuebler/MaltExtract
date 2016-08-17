@@ -17,7 +17,11 @@ to the jar.
 the program should be executed via the folowing steps
 Also use the mutithreaded_alpha branch
 
-java  -jar nameOfJar.jar -Path/To/Directory/containing/RMA6.files -Path/to/output/directory/ -Path/to/file/taxonlist (has to end with taxon.txt) -topPercent (value as double 0.1 not .1 or 1)  -Number_of_CoresAsInteger (eg 4 by default 1 at maximum all available to java runtime)
+java  -jar nameOfJar.jar Path/To/Directory/containing/RMA6.files 
+Path/to/output/directory/ 
+Path/to/file/taxonlist (has to end with taxon.txt) 
+topPercent(value as double 0.1 not .1 or 1) 
+Number_of_CoresAsInteger (eg 4 by default 1 at maximum all available to java runtime)
 
 it is highly advised to specify an output dir otherwise the output files will be written into the input directory!!!
 The summary for all files will be called overallSummary.txt
