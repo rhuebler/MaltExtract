@@ -15,6 +15,7 @@ currently located in the NCBI_MapReader folder to point to this location.
 Lastly you have to export the project as executable jar and give read and write permissions
 to the jar.
 the program should be executed via the folowing steps
+Also use the mutithreaded_alpha branch
 
 java  -jar nameOfJar.jar -Path/To/Directory/containing/RMA6.files -Path/to/output/directory/ -Path/to/file/taxonlist (has to end with taxon.txt) -topPercent (value as double 0.1 not .1 or 1)  -Number_of_CoresAsInteger (eg 4 by default 1 at maximum all available to java runtime)
 
