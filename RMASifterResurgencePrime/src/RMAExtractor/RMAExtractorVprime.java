@@ -1,13 +1,11 @@
 package RMAExtractor;
-// TODO how do I make you multi threaded also test every thing works on more than one file 
-// TODO how long is the shortest taxa Name 
-// TODO great everything seems to be up and ready 
+
+//TODO benchmark on more files and threads on single thread version and on concurrent version to see whether or not output is consistent
 import java.io.File;
 import java.io.FilenameFilter;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
+import java.util.Scanner;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -28,7 +26,7 @@ public class RMAExtractorVprime {
 	        }
 	    }
 	};// ToDo make parallel
-	
+	//implement taxname.file reader 
 	private static double topPercent = 0.01; // initialize with standard value;	
 	private static List<String> fileNames = new ArrayList<String>();
 	private static List<String> taxNames = new ArrayList<String>();
@@ -63,8 +61,12 @@ public class RMAExtractorVprime {
 			outDir=inDir;
 		}
 		for( String arg : args ){
-			if(arg.matches("-[\\w\\s\\d]{4,}")){// should now match species Names but not threads species Names at least as more than 100 threads seem unreasonable characters long
-				taxNames.add(arg.substring(1));
+			if(arg.matches("-resources/taxons.txt")){// should now match species Names but not threads species Names at least as more than 100 threads seem unreasonable characters long
+				Scanner in = new Scanner(new File(arg.substring(1)));
+				while(in.hasNext()){
+					taxNames.add(in.nextLine().trim());
+				}
+				in.close();
 				}else if(arg.matches("-0\\.\\d+"))
 				{
 				topPercent=Double.parseDouble(arg.substring(1));
@@ -83,16 +85,18 @@ public class RMAExtractorVprime {
 	    
     	List<Integer> taxIDs= new  ArrayList<Integer>();
     	List<Future<RMA6Processor>> processedFiles = new ArrayList<>();
-    	for(String name : taxNames)
-    		taxIDs.add(mapReader.getNcbiNameToIdMap().get(name));
+    	for(String name : taxNames){
+    		if(mapReader.getNcbiNameToIdMap().get(name) != null)// catch if there is a mistake
+    			taxIDs.add(mapReader.getNcbiNameToIdMap().get(name));
+    		else
+    			System.err.println(name + " has no assigned taxID and cannot be processed!");
+    	}
     	
     	executor=(ThreadPoolExecutor) Executors.newFixedThreadPool(numThreads);
-	    for(String fileName : fileNames){// make multi threaded here //TODO define as task maybe  divide input data set into parts for each core maybe 
-	    	ConcurrentRMA6Processor task = new ConcurrentRMA6Processor(inDir, fileName, outDir, mapReader, treeReader,taxIDs, topPercent); // should be implemented as callable 
+	    for(String fileName : fileNames){
+	    	ConcurrentRMA6Processor task = new ConcurrentRMA6Processor(inDir, fileName, outDir, mapReader, treeReader,taxIDs, topPercent); 
 	    	Future<RMA6Processor> future=executor.submit(task);
-	    	//RMA6Processor res = future.get();
-	    	//processedIDs.addAll(res.getContainedIDs());//TODO synchronize
-	    	processedFiles.add(future);//TODO synchronize
+	    	processedFiles.add(future);
 	    }//fileNames;
 	    // wait for all threads to finish here  synchronize system resources but how?
 	    destroy();
