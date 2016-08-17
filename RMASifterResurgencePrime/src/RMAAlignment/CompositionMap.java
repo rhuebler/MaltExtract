@@ -51,10 +51,9 @@ private ArrayList<OrientedRead> removeDuplicates(ArrayList<OrientedRead> inList)
 		&& inList.get(i).getEnd() == inList.get(i+1).getEnd()){
 			posToRemove.add(inList.get(i));
 			posToRemove.add(inList.get(i+1));
-			i+=2;
-		}else{
-			i++;
 		}
+			i++;
+		
 			
 			inList.removeAll(posToRemove);
 	}
@@ -134,7 +133,7 @@ public List<Double> getStatistics(){
 		unique+=soli;
 		i++;
 	}
-	unique /= list.size();
+	
 	double mean = getMean(distance);
 	double median = getMedian(distance);
 	double variance = getVariance(distance,mean);
@@ -143,7 +142,7 @@ public List<Double> getStatistics(){
 	results.add(median);
 	results.add(variance);
 	results.add(std);
-	results.add((unique/refLength)/(100.0/refLength));
+	results.add((unique/refLength)/(100.0*list.size())); //TODO consider taking actual average match length
 	results.add((double)list.size());
 	results.add((double) input.size());
 	results.add((double)input.get(0).getReferenceLength());

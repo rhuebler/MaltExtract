@@ -61,7 +61,7 @@ public class RMAExtractorVprime {
 			outDir=inDir;
 		}
 		for( String arg : args ){
-			if(arg.matches("-resources/taxons.txt")){// should now match species Names but not threads species Names at least as more than 100 threads seem unreasonable characters long
+			if(arg.endsWith("taxons.txt")){// should now match species Names but not threads species Names at least as more than 100 threads seem unreasonable characters long
 				Scanner in = new Scanner(new File(arg.substring(1)));
 				while(in.hasNext()){
 					taxNames.add(in.nextLine().trim());
