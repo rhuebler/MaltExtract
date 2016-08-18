@@ -13,16 +13,17 @@ import megan.data.IReadBlockIterator;
 import megan.rma6.RMA6Connector;
 /**
  * Extract all information from one Taxon and save the information in the specified slots to be retrieved
- * in RMA6Processor
+ * in RMA6Processor this taxon processor only processes reads that have at least one match that hints at c-> end substitutions 
+ * it will be used to replace the non filtering taxon processor within RMA6Processor when filtering for damaged Reads 
  * @author huebler
  *
  */
-public class RMA6TaxonProcessor {
+public class RMA6TaxonDamageFilter {
 private int numOfMatches;
 private String readDistribution;
 private ArrayList<String> supplemantary;
 
-private void setSupplemetary(ArrayList<String> s){
+private void setReadDistribution(ArrayList<String> s){
 	this.supplemantary=s;
 }
 private void setReadDistribution(String s){
@@ -75,9 +76,10 @@ public void process(RMA6Connector fileCon, int taxID, String fileName,NCBI_MapRe
 			double length = 0; 
 			int damage=0;
 			while(k<current.getNumberOfMatches() && current.getMatchBlock(k).getBitScore()/topScore >= 1-topPercent ){// only consider topscoring alignments
-					pIdent += current.getMatchBlock(k).getPercentIdentity();
 					Alignment al = new Alignment();
 					al.processText(current.getMatchBlock(k).getText().split("\n"));
+					if(al.getFivePrimeDamage()){
+					pIdent += current.getMatchBlock(k).getPercentIdentity();
 					length += al.getMlength();
 					if (!taxonMap.containsKey(current.getMatchBlock(k).getTaxonId())){
 						ArrayList<Alignment> entry =new ArrayList<Alignment>();
@@ -90,8 +92,10 @@ public void process(RMA6Connector fileCon, int taxID, String fileName,NCBI_MapRe
 						}
 						if(al.getFivePrimeDamage())// calculate number of damage Reads
 							damage++;
+					}	
 					k++;
 			 }
+				if(damage != 0){	
 				numReads++;
 				supplemantary.add(
 						current.getReadName()+"\t"
@@ -101,18 +105,19 @@ public void process(RMA6Connector fileCon, int taxID, String fileName,NCBI_MapRe
 						+ k +"\t"
 						+ damage+'\t'
 						+ df.format(getGcContent(current.getReadSequence()))+"\t"
-						+ mapReader.getNcbiIdToNameMap().get(taxID));
+						+ mapReader.getNcbiIdToNameMap().get(taxID));}
 		}else{
 			Alignment al = new Alignment();
 			al.processText(current.getMatchBlock(0).getText().split("\n"));	
-			if (!taxonMap.containsKey(current.getMatchBlock(0).getTaxonId())){
-				ArrayList<Alignment> l =new ArrayList<Alignment>();
-				l.add(al);
-				taxonMap.put(current.getMatchBlock(0).getTaxonId(), l  );
-				}else{
-					ArrayList<Alignment> l=taxonMap.get(current.getMatchBlock(0).getTaxonId());
-					l.add(al);
-					taxonMap.put(current.getMatchBlock(0).getTaxonId(),l );
+			if(al.getFivePrimeDamage()){
+				if (!taxonMap.containsKey(current.getMatchBlock(0).getTaxonId())){
+						ArrayList<Alignment> l =new ArrayList<Alignment>();
+						l.add(al);
+						taxonMap.put(current.getMatchBlock(0).getTaxonId(), l  );
+					}else{
+						ArrayList<Alignment> l=taxonMap.get(current.getMatchBlock(0).getTaxonId());
+						l.add(al);
+						taxonMap.put(current.getMatchBlock(0).getTaxonId(),l );
 				}
 			int damage = 0;
 			if(al.getFivePrimeDamage())// calculate number of damage Reads
@@ -127,8 +132,9 @@ public void process(RMA6Connector fileCon, int taxID, String fileName,NCBI_MapRe
 					+ df.format(getGcContent(current.getReadSequence()))+"\t"
 					+ mapReader.getNcbiIdToNameMap().get(taxID));
 			numReads++;
-		}
-	}
+			}//if
+		}//else
+	}//outer while
 	classIt.close();
 	CompositionMap map = new CompositionMap(taxonMap);
 	map.process();
@@ -137,7 +143,7 @@ public void process(RMA6Connector fileCon, int taxID, String fileName,NCBI_MapRe
 		s+="\t" + df.format(d);
 	setReadDistribution(s);
 	setNumberOfMatches(numReads);
-	setSupplemetary(supplemantary);
+	setReadDistribution(supplemantary);
 
  }// void 
 }// class 

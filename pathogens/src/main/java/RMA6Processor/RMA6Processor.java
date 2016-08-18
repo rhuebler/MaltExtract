@@ -16,9 +16,7 @@ import java.util.zip.GZIPOutputStream;
 
 import NCBI_MapReader.NCBI_MapReader;
 import NCBI_MapReader.NCBI_TreeReader;
-import RMA6TaxonProcessor.RMA6TaxonDamageFilter;
 import RMA6TaxonProcessor.RMA6TaxonProcessor;
-import behaviour.Behaviour;
 import megan.rma6.RMA6Connector;
 /**
  * Take care of extracting all the information for one RMA6 file and a List of taxons
@@ -36,15 +34,13 @@ public class RMA6Processor {
 	private NCBI_MapReader mapReader;
 	private NCBI_TreeReader treeReader;
 	private Set<Integer> containedIDs;
-	private Behaviour behave;
 	// constructor
-	public RMA6Processor(String inDir, String fileName, String outDir, NCBI_MapReader mapReader, NCBI_TreeReader treeReader, Behaviour b) {
+	public RMA6Processor(String inDir, String fileName, String outDir, NCBI_MapReader mapReader, NCBI_TreeReader treeReader) {
 		this.inDir = inDir;
 		this.outDir = outDir;
 		this.fileName = fileName;
 		this.mapReader = mapReader;
 		this.treeReader = new NCBI_TreeReader(treeReader);
-		this.behave = b;
 	}
 	
 	//setters
@@ -97,8 +93,7 @@ public class RMA6Processor {
 	}
 // processing 
 public void process(List<Integer>taxIDs, double topPercent) throws IOException{
-	try{RMA6Connector fileCon = new RMA6Connector(inDir+fileName);
-	
+	RMA6Connector fileCon = new RMA6Connector(inDir+fileName);
 	HashMap<Integer,Integer> overallSum = new HashMap<Integer,Integer>();
 	ArrayList<String> supplemantary = new ArrayList<String>();
 	ArrayList<String> readDistribution = new ArrayList<String>();
@@ -113,36 +108,19 @@ public void process(List<Integer>taxIDs, double topPercent) throws IOException{
 	}
 	setContainedIDs(idsToProcess);
 	for(int id : idsToProcess){
-		if(behave==Behaviour.ALL){	
-			RMA6TaxonProcessor taxProcessor = new RMA6TaxonProcessor();// could add new
-			taxProcessor.process(fileCon, id, fileName, mapReader, topPercent);
-			overallSum.put(id,taxProcessor.getNumberOfMatches());
-			readDistribution.add(taxProcessor.getReadDistribution());
-			for(String sup : taxProcessor.getSupplementary())
-				supplemantary.add(sup);
-			setSupplementaryData(supplemantary);	//save supplementary data at read resolution in adequate slot
-			setSumLine(overallSum); // set number of assigned Reads to overall file summary
-			setReadDistribution(readDistribution);// save ReadDist summary file
-			
-			writeReadDist(getReadDistribution(),fileName); // RMA6Processor now saves its own output 
-			writeSupplementary(getSupplementary(),fileName);
-		}else if(behave==Behaviour.ANCIENT){
-			RMA6TaxonDamageFilter damageProcessor = new RMA6TaxonDamageFilter();// could add new
-			damageProcessor.process(fileCon, id, fileName, mapReader, topPercent);
-			overallSum.put(id,damageProcessor.getNumberOfMatches());
-			//readDistribution.add(damageProcessor.getReadDistribution());
-			for(String sup : damageProcessor.getSupplementary())
-				supplemantary.add(sup);
-			setSupplementaryData(supplemantary);	//save supplementary data at read resolution in adequate slot
-			setSumLine(overallSum); // set number of assigned Reads to overall file summary
-			setReadDistribution(readDistribution);// save ReadDist summary file
-			
-			writeReadDist(getReadDistribution(),fileName); // RMA6Processor now saves its own output 
-			writeSupplementary(getSupplementary(),fileName);	
-		}
-	  }//TaxIDs
-	}catch(Exception e){
-		System.err.println("Unable to connect to File: "+fileName);
-	}
+	 RMA6TaxonProcessor taxProcessor = new RMA6TaxonProcessor();// could add new
+	 taxProcessor.process(fileCon, id, fileName, mapReader, topPercent);
+	 overallSum.put(id,taxProcessor.getNumberOfMatches());
+	 readDistribution.add(taxProcessor.getReadDistribution());
+	 for(String sup : taxProcessor.getSupplementary())
+		 supplemantary.add(sup);
+	}//TaxIDs
+	setSupplementaryData(supplemantary);	//save supplementary data at read resolution in adequate slot
+	setSumLine(overallSum); // set number of assigned Reads to overall file summary
+	setReadDistribution(readDistribution);// save ReadDist summary file
+	
+	writeReadDist(getReadDistribution(),fileName); // RMA6Processor now saves its own output 
+	writeSupplementary(getSupplementary(),fileName);
+	
  }
 }

@@ -1,6 +1,7 @@
 package RMAExtractor;
 
 //TODO benchmark on more files and threads on single thread version and on concurrent version to see whether or not output is consistent
+//TODO adress errors by try catch if no other way 
 import java.io.File;
 import java.io.FilenameFilter;
 import java.util.ArrayList;
@@ -9,14 +10,16 @@ import java.util.Scanner;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.ThreadPoolExecutor;
+import java.util.regex.Pattern;
 
 import NCBI_MapReader.NCBI_MapReader;
 import NCBI_MapReader.NCBI_TreeReader;
 import RMA6Processor.ConcurrentRMA6Processor;
 import RMA6Processor.RMA6Processor;
 import SummaryWriter.SummaryWriter;
+import behaviour.Behaviour;
 
-public class RMAExtractorVprime {
+public class RMAExtractor {
 	static FilenameFilter RMAFilter = new FilenameFilter() {
 	    public boolean accept(File file, String name) {
 	        if (name.endsWith(".rma6")) {
@@ -27,6 +30,7 @@ public class RMAExtractorVprime {
 	    }
 	};// ToDo make parallel
 	//implement taxname.file reader 
+	
 	private static double topPercent = 0.01; // initialize with standard value;	
 	private static List<String> fileNames = new ArrayList<String>();
 	private static List<String> taxNames = new ArrayList<String>();
@@ -34,6 +38,7 @@ public class RMAExtractorVprime {
 	private static String inDir;	
 	private static int numThreads = 1;
 	private static ThreadPoolExecutor executor;
+	private static Behaviour behave = Behaviour.ALL;
 	private static void destroy(){
 		executor.shutdown();
 	}
@@ -73,6 +78,10 @@ public class RMAExtractorVprime {
 				System.out.println("Custom topPercent parameter detected: "+topPercent);
 				}else if (arg.matches("\\d+")){
 				numThreads = Integer.parseInt(arg);
+			}else if (Pattern.compile(Pattern.quote("all"), Pattern.CASE_INSENSITIVE).matcher(arg).find()){
+				behave=Behaviour.ALL;
+			}else if (Pattern.compile(Pattern.quote("ancient"), Pattern.CASE_INSENSITIVE).matcher(arg).find()){
+				behave=Behaviour.ANCIENT;
 			}
 		}
 		if(numThreads >Runtime.getRuntime().availableProcessors())
@@ -94,7 +103,7 @@ public class RMAExtractorVprime {
     	
     	executor=(ThreadPoolExecutor) Executors.newFixedThreadPool(numThreads);
 	    for(String fileName : fileNames){
-	    	ConcurrentRMA6Processor task = new ConcurrentRMA6Processor(inDir, fileName, outDir, mapReader, treeReader,taxIDs, topPercent); 
+	    	ConcurrentRMA6Processor task = new ConcurrentRMA6Processor(inDir, fileName, outDir, mapReader, treeReader,taxIDs, topPercent, behave); 
 	    	Future<RMA6Processor> future=executor.submit(task);
 	    	processedFiles.add(future);
 	    }//fileNames;

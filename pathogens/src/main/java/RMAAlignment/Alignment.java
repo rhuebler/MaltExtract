@@ -14,15 +14,8 @@ public class Alignment {
 	private int numGaps;
 	private String strand;
 	private boolean fivePrimeDamage;
-	private boolean reversed = false;
-	private boolean duplicate = false;
+
 	// getter
-public boolean isReversed(){
-	return this.reversed;
-}	
-public boolean isDuplicate(){
-	return this.duplicate;
-}	
 public String getReferenceName(){
 	return this.referenceName;}	
 
@@ -57,12 +50,7 @@ public String getQuery(){
 	 return this.referenceLength;}
  
  // setters
- public void setDuplicate(boolean b){ //works
-	 this.duplicate = b;
- }
- private void setReversed(boolean b){
-	 this.reversed = b;
- }
+ 
  private void setReferenceName(String s){
 	 this.referenceName = s;}
  
@@ -88,7 +76,6 @@ public String getQuery(){
 		this.strand = s;}
  
 private void setFivePrimeDamage(boolean b) {
-		System.out.println("here");
 		this.fivePrimeDamage = b;}
 
 private void setReferenceLength(int k) {
@@ -98,7 +85,7 @@ private void setReferenceLength(int k) {
 	 this.numGaps = k;}
  
  private boolean ctMisMatch(int i){
-	 if((this.reference.charAt(i) == 'C' && this.query.charAt(i) == 'T')
+	 if((this.reference.charAt(i) == 'C' && this.query.charAt(0) == 'i')
 				|| this.reference.charAt(i) == 'c' && this.query.charAt(i) == 't')
 		 		return true;
 	 else return false;
@@ -159,26 +146,14 @@ private void setReferenceLength(int k) {
 		if(line.contains("Gaps"))
 			setNumGaps(Integer.parseInt((line.split(",")[1].split("=")[1].split("/")[0]).trim()));
 	}// for
-	 if(getStart() > getEnd()){
-		 setReversed(true);
-	 }
  }// method
 
 }//classbody
 
-class AlignmentComparator implements Comparator<Alignment> // comparator for alignment class that takes into consideration if the read
-{															// if the Read is on the reverse Strand //TODO double check
-  @Override public int compare( Alignment al1, Alignment al2 )
+class AlignmentComparator implements Comparator<Alignment> // comparator for alingment class
+{
+  public int compare( Alignment al1, Alignment al2 )
   {
-	if(!al1.isReversed() && !al2.isReversed()){
-			return al1.getStart() - al2.getStart();
-		}else if(al1.isReversed() && !al2.isReversed()){
-			return al1.getEnd() - al2.getStart();
-		}else if(!al1.isReversed() && al2.isReversed()){
-		 return al1.getStart() - al2.getEnd();
-		 }else{
-			 return al1.getEnd() - al2.getEnd();
-		 }
-	
+    return al1.getStart()-al2.getStart();
   }
 }
