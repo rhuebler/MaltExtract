@@ -88,7 +88,6 @@ public String getQuery(){
 		this.strand = s;}
  
 private void setFivePrimeDamage(boolean b) {
-		System.out.println("here");
 		this.fivePrimeDamage = b;}
 
 private void setReferenceLength(int k) {
