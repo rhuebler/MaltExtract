@@ -43,17 +43,20 @@ public class AlignmentStatistics {
 			if(!al.isDuplicate())
 				positionsToKeep.add(al);
 		}
-		return positionsToKeep;
+			return positionsToKeep;
+		
 	}
 	
 	// process best list of start positions
 	public List<Double> getStatistics(){
 		ArrayList<Alignment> input = removeDuplicates(this.currentList);
+		if(input.size()>=3){
 		ArrayList<Integer> distance = new ArrayList<Integer>();
-		List<Double> results= new ArrayList<Double>();
+		List<Double> results = new ArrayList<Double>();
 		
 		int i = 0;//TODO maybe there is a better solution also is there an logical error in here 
 		double unique = 0;
+		double possible = 0;
 		while(i<input.size()){
 			Alignment current = input.get(i);
 			int length = 0;
@@ -139,10 +142,10 @@ public class AlignmentStatistics {
 				
 			if(soli <= 0 || soli >= length)
 				soli = length;
-			unique+=soli;
+			unique += soli;
+			possible += length;
 			i++;
 		}
-		
 		double mean = getMean(distance);
 		double median = getMedian(distance);
 		double variance = getVariance(distance,mean);
@@ -151,10 +154,16 @@ public class AlignmentStatistics {
 		results.add(median);
 		results.add(variance);
 		results.add(std);
-		results.add(unique/(100.0*input.size())); //TODO consider taking actual average match length
+		results.add(unique/(possible)); //TODO consider taking actual average match length
 		results.add((double)input.size());
 		results.add((double) this.currentList.size());
 		results.add((double)input.get(0).getReferenceLength());
 		return results;
+		}else{
+		List<Double> results =	new ArrayList<Double>();
+		for(int i = 0; i<6;  i++)
+			results.add(0.0);
+		return results;
+		}
 	}
 }

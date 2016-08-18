@@ -63,6 +63,8 @@ public class RMA6Processor {
 	private void setReadDistribution(ArrayList<String>r){
 		String header = "Taxon\tReference\tMeanReadDistance\tMedianReadDistance\tVarianceReadDistance\tStandardDeviationReadDistance\tuniquePerReference\tnonDuplicatesonReference\tTotalReadsOnReference\tReferenceLength";
 		r.add(0,header);
+		for(String s: r)
+			System.out.println(s);
 		this.readDist = r;
 	}
 	// private utility functions
@@ -74,8 +76,8 @@ public class RMA6Processor {
 	}
 	private void writeSupplementary(List<String> supplement, String fileName) throws IOException{ 
 		OutputStreamWriter outer = new OutputStreamWriter(new GZIPOutputStream(new FileOutputStream(outDir+fileName+"_supplement"+ ".txt.gz")));
-		for(String line : supplement)
-			outer.write(line);
+		for(String line : supplement){
+			outer.write(line);}
 		outer.close();
 		System.out.println("Supplementary for File "+fileName+" done!");
 	}
@@ -97,8 +99,8 @@ public class RMA6Processor {
 	}
 // processing 
 public void process(List<Integer>taxIDs, double topPercent) throws IOException{
-	try{RMA6Connector fileCon = new RMA6Connector(inDir+fileName);
-	
+	//try{
+	RMA6Connector fileCon = new RMA6Connector(inDir+fileName);
 	HashMap<Integer,Integer> overallSum = new HashMap<Integer,Integer>();
 	ArrayList<String> supplemantary = new ArrayList<String>();
 	ArrayList<String> readDistribution = new ArrayList<String>();
@@ -120,29 +122,23 @@ public void process(List<Integer>taxIDs, double topPercent) throws IOException{
 			readDistribution.add(taxProcessor.getReadDistribution());
 			for(String sup : taxProcessor.getSupplementary())
 				supplemantary.add(sup);
-			setSupplementaryData(supplemantary);	//save supplementary data at read resolution in adequate slot
-			setSumLine(overallSum); // set number of assigned Reads to overall file summary
-			setReadDistribution(readDistribution);// save ReadDist summary file
-			
-			writeReadDist(getReadDistribution(),fileName); // RMA6Processor now saves its own output 
-			writeSupplementary(getSupplementary(),fileName);
 		}else if(behave==Behaviour.ANCIENT){
 			RMA6TaxonDamageFilter damageProcessor = new RMA6TaxonDamageFilter();// could add new
 			damageProcessor.process(fileCon, id, fileName, mapReader, topPercent);
 			overallSum.put(id,damageProcessor.getNumberOfMatches());
-			//readDistribution.add(damageProcessor.getReadDistribution());
+			readDistribution.add(damageProcessor.getReadDistribution());
 			for(String sup : damageProcessor.getSupplementary())
 				supplemantary.add(sup);
-			setSupplementaryData(supplemantary);	//save supplementary data at read resolution in adequate slot
-			setSumLine(overallSum); // set number of assigned Reads to overall file summary
-			setReadDistribution(readDistribution);// save ReadDist summary file
-			
-			writeReadDist(getReadDistribution(),fileName); // RMA6Processor now saves its own output 
-			writeSupplementary(getSupplementary(),fileName);	
 		}
 	  }//TaxIDs
-	}catch(Exception e){
-		System.err.println("Unable to connect to File: "+fileName);
-	}
+	
+	setSupplementaryData(supplemantary);	//save supplementary data at read resolution in adequate slot
+	setSumLine(overallSum); // set number of assigned Reads to overall file summary
+	setReadDistribution(readDistribution);// save ReadDist summary file
+	writeReadDist(getReadDistribution(),fileName); // RMA6Processor now saves its own output 
+	writeSupplementary(getSupplementary(),fileName);
+	//}catch(Exception e){
+		//System.err.println("Unable to connect to File: "+fileName);
+	//}
  }
 }

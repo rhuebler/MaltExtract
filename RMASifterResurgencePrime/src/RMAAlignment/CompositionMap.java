@@ -23,7 +23,7 @@ public int getMaxID(){
 public HashMap<Integer,ArrayList<Alignment>> getCompositionMap(){
 	return this.compositionMap;}
 
-private void setCompositionMap(HashMap<Integer,ArrayList<Alignment>> map){// technically not rrequired
+private void setCompositionMap(HashMap<Integer,ArrayList<Alignment>> map){// technically not required
 	this.compositionMap = map;}
 
 private void setMaxID(int i){

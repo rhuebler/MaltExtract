@@ -22,7 +22,7 @@ private int numOfMatches;
 private String readDistribution;
 private ArrayList<String> supplemantary;
 
-private void setSupplemetary(ArrayList<String> s){
+private void setSupplementary(ArrayList<String> s){
 	this.supplemantary=s;
 }
 private void setReadDistribution(String s){
@@ -137,7 +137,7 @@ public void process(RMA6Connector fileCon, int taxID, String fileName,NCBI_MapRe
 		s+="\t" + df.format(d);
 	setReadDistribution(s);
 	setNumberOfMatches(numReads);
-	setSupplemetary(supplemantary);
+	setSupplementary(supplemantary);
 
  }// void 
 }// class 

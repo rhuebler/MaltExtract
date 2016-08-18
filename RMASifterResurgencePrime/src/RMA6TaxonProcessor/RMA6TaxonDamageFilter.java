@@ -134,12 +134,12 @@ public void process(RMA6Connector fileCon, int taxID, String fileName,NCBI_MapRe
 	classIt.close();
 	CompositionMap map = new CompositionMap(taxonMap);
 	map.process();
-	String s =mapReader.getNcbiIdToNameMap().get(taxID)+"\t" + mapReader.getNcbiIdToNameMap().get(map.getMaxID());
+	String s = mapReader.getNcbiIdToNameMap().get(taxID)+"\t" + mapReader.getNcbiIdToNameMap().get(map.getMaxID());
+	map.getStatistics();
 	for(double d : map.getStatistics())
 		s+="\t" + df.format(d);
 	setReadDistribution(s);
 	setNumberOfMatches(numReads);
 	setSupplementary(supplemantary);
-
  }// void 
 }// class 
