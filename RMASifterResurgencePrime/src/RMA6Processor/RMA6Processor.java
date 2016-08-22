@@ -18,6 +18,7 @@ import NCBI_MapReader.NCBI_MapReader;
 import NCBI_MapReader.NCBI_TreeReader;
 import RMA6TaxonProcessor.RMA6TaxonDamageFilter;
 import RMA6TaxonProcessor.RMA6TaxonProcessor;
+import RMA6TaxonProcessor.RMA6LengthFilter;
 import behaviour.Behaviour;
 import megan.rma6.RMA6Connector;
 /**
@@ -37,8 +38,9 @@ public class RMA6Processor {
 	private NCBI_TreeReader treeReader;
 	private Set<Integer> containedIDs;
 	private Behaviour behave;
+	private int maxLength;
 	// constructor
-	public RMA6Processor(String inDir, String fileName, String outDir, NCBI_MapReader mapReader, NCBI_TreeReader treeReader, Behaviour b) {
+	public RMA6Processor(String inDir, String fileName, String outDir, NCBI_MapReader mapReader, NCBI_TreeReader treeReader, int maxLength, Behaviour b) {
 		this.inDir = inDir;
 		this.outDir = outDir;
 		this.fileName = fileName;
@@ -63,8 +65,6 @@ public class RMA6Processor {
 	private void setReadDistribution(ArrayList<String>r){
 		String header = "Taxon\tReference\tMeanReadDistance\tMedianReadDistance\tVarianceReadDistance\tStandardDeviationReadDistance\tuniquePerReference\tnonDuplicatesonReference\tTotalReadsOnReference\tReferenceLength";
 		r.add(0,header);
-		for(String s: r)
-			System.out.println(s);
 		this.readDist = r;
 	}
 	// private utility functions
@@ -116,8 +116,8 @@ public void process(List<Integer>taxIDs, double topPercent) throws IOException{
 	setContainedIDs(idsToProcess);
 	for(int id : idsToProcess){
 		if(behave==Behaviour.ALL){	
-			RMA6TaxonProcessor taxProcessor = new RMA6TaxonProcessor();// could add new
-			taxProcessor.process(fileCon, id, fileName, mapReader, topPercent);
+			RMA6LengthFilter taxProcessor = new RMA6LengthFilter();// could add new
+			taxProcessor.process(fileCon, id, fileName, mapReader, topPercent,120);
 			overallSum.put(id,taxProcessor.getNumberOfMatches());
 			readDistribution.add(taxProcessor.getReadDistribution());
 			for(String sup : taxProcessor.getSupplementary())

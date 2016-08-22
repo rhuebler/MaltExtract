@@ -17,7 +17,8 @@ public class ConcurrentRMA6Processor implements Callable<RMA6Processor>{
 	private List<Integer> taxIDs;
 	private double topPercent;
 	private Behaviour behave;
-	public ConcurrentRMA6Processor(String inDir, String fileName, String outDir, NCBI_MapReader mapReader, NCBI_TreeReader treeReader,List<Integer>taxIDs, double topPercent, Behaviour b) {
+	private int maxLength;
+	public ConcurrentRMA6Processor(String inDir, String fileName, String outDir, NCBI_MapReader mapReader, NCBI_TreeReader treeReader,List<Integer>taxIDs, double topPercent, int i, Behaviour b) {
 		this.inDir = inDir;
 		this.outDir = outDir;
 		this.fileName = fileName;
@@ -26,10 +27,11 @@ public class ConcurrentRMA6Processor implements Callable<RMA6Processor>{
 		this.taxIDs = taxIDs;
 		this.topPercent=topPercent;
 		this.behave = b;
+		this.maxLength = i;
 	}
 	@Override
 	public RMA6Processor call() throws Exception {
-		RMA6Processor processor = new RMA6Processor(inDir, fileName, outDir, mapReader, treeReader, behave); // should be implemented as callable 
+		RMA6Processor processor = new RMA6Processor(inDir, fileName, outDir, mapReader, treeReader,maxLength ,behave); // should be implemented as callable 
     	processor.process(taxIDs, topPercent);// loop through file
 		return processor;
 	}
