@@ -15,8 +15,19 @@ import RMA6Processor.ConcurrentRMA6Processor;
 import RMA6Processor.RMA6Processor;
 import utility.InputParameterProcessor;
 import utility.SummaryWriter;
-
+/**
+ * Essentially the Main Class of RMA Extractor is a concurrent Programm
+ * At start up passes all comandline arguments into InputProcessor
+ * Input Processor grabs all arguments from the specified flags
+ * and default values to unspecified arguments
+ * than initializes instances of NCBI_Map_Reader and NCBI_TreeReader 
+ * it creates Instances of RMA6Processor a class designed to Process one RMA6File 
+ * and passes future instances of these to summary writer to write summary output at the end
+ * @author huebler
+ *
+ */
 public class RMAExtractor {
+	
 	private static ThreadPoolExecutor executor;
 	
 	private static void destroy(){
@@ -45,7 +56,7 @@ public class RMAExtractor {
 	    	Future<RMA6Processor> future=executor.submit(task);
 	    	processedFiles.add(future);
 	    }//fileNames;
-	    // wait for all threads to finish here  synchronize system resources but how?
+	    // wait for all threads to finish here currently no conuccrency errors or deadlocks 
 	    destroy();
 
 	  SummaryWriter sumWriter = new SummaryWriter(processedFiles,mapReader,inProcessor.getOutDir()); 

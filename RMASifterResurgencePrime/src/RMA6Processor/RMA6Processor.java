@@ -17,12 +17,15 @@ import java.util.zip.GZIPOutputStream;
 import NCBI_MapReader.NCBI_MapReader;
 import NCBI_MapReader.NCBI_TreeReader;
 import RMA6TaxonProcessor.RMA6TaxonDamageFilter;
+import RMA6TaxonProcessor.RMA6TaxonNonDuplicateFilter;
 import RMA6TaxonProcessor.RMA6TaxonProcessor;
-import RMA6TaxonProcessor.RMA6LengthFilter;
 import behaviour.Behaviour;
 import megan.rma6.RMA6Connector;
 /**
- * Take care of extracting all the information for one RMA6 file and a List of taxons
+ * take care of extracting all the information for one RMA6 file and a List of taxons
+ * contains functions to write its own output for supplementary information
+ * uses several taxons processors to process RMAFiles in different ways to reflect 
+ * the user filter choice and make adding new filters more accessible 
  * @author huebler
  *
  */
@@ -47,6 +50,7 @@ public class RMA6Processor {
 		this.mapReader = mapReader;
 		this.treeReader = new NCBI_TreeReader(treeReader);
 		this.behave = b;
+		this.maxLength = maxLength;
 	}
 	
 	//setters
@@ -68,18 +72,27 @@ public class RMA6Processor {
 		this.readDist = r;
 	}
 	// private utility functions
-	private void writeReadDist(List<String> summary, String fileName) throws IOException{
-		System.out.println("Writing Read Distribution txt File");
-		Path file = Paths.get(outDir+fileName+"_readDist"+".txt");
-		Files.write(file, summary, Charset.forName("UTF-8"));
-		System.out.println("ReadDistribution for " + fileName +" Done!");
+	private void writeReadDist(List<String> summary, String fileName){
+		try{
+			System.out.println("Writing Read Distribution txt File");
+			Path file = Paths.get(outDir+fileName+"_readDist"+".txt");
+			Files.write(file, summary, Charset.forName("UTF-8"));
+			System.out.println("ReadDistribution for " + fileName +" Done!");
+		}catch(IOException io){
+			io.printStackTrace();
+		}
 	}
-	private void writeSupplementary(List<String> supplement, String fileName) throws IOException{ 
+	
+	private void writeSupplementary(List<String> supplement, String fileName){ 
+		try{
 		OutputStreamWriter outer = new OutputStreamWriter(new GZIPOutputStream(new FileOutputStream(outDir+fileName+"_supplement"+ ".txt.gz")));
 		for(String line : supplement){
 			outer.write(line);}
 		outer.close();
 		System.out.println("Supplementary for File "+fileName+" done!");
+		}catch(IOException io){
+			io.printStackTrace();
+		}
 	}
 	//getter
 	public ArrayList<String> getReadDistribution(){
@@ -98,8 +111,8 @@ public class RMA6Processor {
 		return this.fileName;
 	}
 // processing 
-public void process(List<Integer>taxIDs, double topPercent) throws IOException{
-	//try{
+public void process(List<Integer>taxIDs, double topPercent) {
+	try{
 	RMA6Connector fileCon = new RMA6Connector(inDir+fileName);
 	HashMap<Integer,Integer> overallSum = new HashMap<Integer,Integer>();
 	ArrayList<String> supplemantary = new ArrayList<String>();
@@ -116,18 +129,25 @@ public void process(List<Integer>taxIDs, double topPercent) throws IOException{
 	setContainedIDs(idsToProcess);
 	for(int id : idsToProcess){
 		if(behave==Behaviour.ALL){	
-			RMA6LengthFilter taxProcessor = new RMA6LengthFilter();// could add new
-			taxProcessor.process(fileCon, id, fileName, mapReader, topPercent,120);
+			RMA6TaxonProcessor taxProcessor = new RMA6TaxonProcessor();// could add new
+			taxProcessor.process(fileCon, id, fileName, mapReader, topPercent,maxLength);
 			overallSum.put(id,taxProcessor.getNumberOfMatches());
 			readDistribution.add(taxProcessor.getReadDistribution());
 			for(String sup : taxProcessor.getSupplementary())
 				supplemantary.add(sup);
 		}else if(behave==Behaviour.ANCIENT){
-			RMA6TaxonDamageFilter damageProcessor = new RMA6TaxonDamageFilter();// could add new
-			damageProcessor.process(fileCon, id, fileName, mapReader, topPercent);
+			RMA6TaxonDamageFilter damageProcessor = new RMA6TaxonDamageFilter();
+			damageProcessor.process(fileCon, id, fileName, mapReader, topPercent, maxLength);
 			overallSum.put(id,damageProcessor.getNumberOfMatches());
 			readDistribution.add(damageProcessor.getReadDistribution());
 			for(String sup : damageProcessor.getSupplementary())
+				supplemantary.add(sup);
+		}else if(behave == Behaviour.NONDUPLICATES){
+			RMA6TaxonNonDuplicateFilter nonDP = new RMA6TaxonNonDuplicateFilter();
+			nonDP.process(fileCon, id, fileName, mapReader, topPercent, maxLength);
+			overallSum.put(id,nonDP.getNumberOfMatches());
+			readDistribution.add(nonDP.getReadDistribution());
+			for(String sup : nonDP.getSupplementary())
 				supplemantary.add(sup);
 		}
 	  }//TaxIDs
@@ -137,8 +157,9 @@ public void process(List<Integer>taxIDs, double topPercent) throws IOException{
 	setReadDistribution(readDistribution);// save ReadDist summary file
 	writeReadDist(getReadDistribution(),fileName); // RMA6Processor now saves its own output 
 	writeSupplementary(getSupplementary(),fileName);
-	//}catch(Exception e){
-		//System.err.println("Unable to connect to File: "+fileName);
-	//}
+	}catch(IOException io){
+		System.err.println("Unable to connect to File: "+fileName);
+		io.printStackTrace();
+	}
  }
 }

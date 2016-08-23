@@ -1,5 +1,5 @@
 package behaviour;
 
 public enum Behaviour {
-    ALL, ANCIENT, NONDUPLICATES
+    ALL, ANCIENT, NONDUPLICATES,SCAN
 };

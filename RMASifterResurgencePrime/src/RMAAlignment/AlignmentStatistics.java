@@ -2,7 +2,11 @@ package RMAAlignment;
 
 import java.util.ArrayList;
 import java.util.List;
-
+/**
+ * This class is used to compute some Statistics from a List of Alignments. Alignments should come from CompositionMap and must have their duplicates marked
+ * @author huebler
+ *
+ */
 public class AlignmentStatistics {
 	private ArrayList<Alignment> currentList;
 	public AlignmentStatistics(ArrayList<Alignment> list){
@@ -50,7 +54,7 @@ public class AlignmentStatistics {
 	// process best list of start positions
 	public List<Double> getStatistics(){
 		ArrayList<Alignment> input = removeDuplicates(this.currentList);
-		if(input.size()>=3){
+		if(input.size() >= 2){
 		ArrayList<Integer> distance = new ArrayList<Integer>();
 		List<Double> results = new ArrayList<Double>();
 		
@@ -93,7 +97,7 @@ public class AlignmentStatistics {
 					soli = length;
 				distance.add(nStart-cStart);
 				
-			}else if(i<input.size()-1){
+			}else if(i < input.size() - 1){
 				int nStart = 0;
 				int pEnd = 0;
 				Alignment next = input.get(i+1);
@@ -161,7 +165,7 @@ public class AlignmentStatistics {
 		return results;
 		}else{
 		List<Double> results =	new ArrayList<Double>();
-		for(int i = 0; i<6;  i++)
+		for(int i = 0; i<8;  i++)
 			results.add(0.0);
 		return results;
 		}

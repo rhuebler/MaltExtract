@@ -1,8 +1,14 @@
 package RMAAlignment;
 
 import java.util.Comparator;
-
+/**
+ * This class Represents an MatchBlock from Megan but has more Slots available
+ * @author huebler
+ *
+ */
 public class Alignment {
+	private String readName;
+	private double pIdent;
 	private String query;
 	private String reference;
 	private String alignment;
@@ -17,6 +23,12 @@ public class Alignment {
 	private boolean reversed = false;
 	private boolean duplicate = false;
 	// getter
+public String getReadName(){
+	return this.readName;
+}	
+public double getPIdent(){
+	return this.pIdent;
+}
 public boolean isReversed(){
 	return this.reversed;
 }	
@@ -57,6 +69,12 @@ public String getQuery(){
 	 return this.referenceLength;}
  
  // setters
+ public void setReadName(String s){
+		this.readName = s;
+	}	
+	public void setPIdent(double d){
+		this.pIdent = d;
+	}
  public void setDuplicate(boolean b){ //works
 	 this.duplicate = b;
  }
