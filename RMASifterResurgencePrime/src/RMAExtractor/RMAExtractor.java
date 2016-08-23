@@ -45,7 +45,7 @@ public class RMAExtractor {
 	    	Future<RMA6Processor> future=executor.submit(task);
 	    	processedFiles.add(future);
 	    }//fileNames;
-	    // wait for all threads to finish here  synchronize system resources but how?
+	    // wait for all threads to finish here currently no conuccrency errors or deadlocks 
 	    destroy();
 
 	  SummaryWriter sumWriter = new SummaryWriter(processedFiles,mapReader,inProcessor.getOutDir()); 

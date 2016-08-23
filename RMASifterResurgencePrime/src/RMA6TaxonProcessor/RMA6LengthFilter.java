@@ -1,6 +1,5 @@
 package RMA6TaxonProcessor;
 
-import java.io.IOException;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -51,7 +50,7 @@ private double getGcContent(String sequence){
 	return gcContent;
 }
 
-public void process(RMA6Connector fileCon, int taxID, String fileName,NCBI_MapReader mapReader, double topPercent, int maxLength) throws IOException{ 
+public void process(RMA6Connector fileCon, int taxID, String fileName,NCBI_MapReader mapReader, double topPercent, int maxLength){ 
 	DecimalFormat df = new DecimalFormat("#.###");
 	ArrayList<String> supplemantary = new ArrayList<String>();
 	// use ReadsIterator to get all Reads assigned to MegantaxID and print top percent to file;
@@ -61,7 +60,9 @@ public void process(RMA6Connector fileCon, int taxID, String fileName,NCBI_MapRe
 		System.err.println("TaxID: " + taxID +  " not assigned in File " + fileName+"\n");
 		setNumberOfMatches(0);
 		}
-	System.out.println("Processing Taxon "+mapReader.getNcbiIdToNameMap().get(taxID)+" in File " +fileName); 
+	// only consider topscoring alignments
+
+	System.out.println("Processing Taxon "+mapReader.getNcbiIdToNameMap().get(taxID)+" in File " + fileName); 
 	HashMap<Integer, ArrayList<Alignment>> taxonMap = new HashMap<Integer,ArrayList<Alignment>>();
 	int numReads = 0;
 		while(classIt.hasNext()){
@@ -69,29 +70,33 @@ public void process(RMA6Connector fileCon, int taxID, String fileName,NCBI_MapRe
 			if(current.getReadLength()<= maxLength){
 				IMatchBlock[] blocks=current.getMatchBlocks();
 					int k=0;
-				float topScore = current.getMatchBlock(0).getBitScore();
+				float topScore = blocks[0].getBitScore();
 				double pIdent = 0;
 				double length = 0; 
 				int damage=0;
 				for(int i = 0; i< blocks.length;i++){
-					if(blocks[i].getBitScore()/topScore < 1-topPercent)
-						break;
-					pIdent += current.getMatchBlock(k).getPercentIdentity();
+					if(blocks[i].getBitScore()/topScore < 1-topPercent){
+						break;}
+					
 					Alignment al = new Alignment();
-					al.processText(current.getMatchBlock(k).getText().split("\n"));
-					length += al.getMlength();
-					if(!taxonMap.containsKey(current.getMatchBlock(k).getTaxonId())){
-						ArrayList<Alignment> entry =new ArrayList<Alignment>();
-						entry.add(al);
-						taxonMap.put(current.getMatchBlock(k).getTaxonId(), entry);
-					}else{
-						ArrayList<Alignment> entry = taxonMap.get(current.getMatchBlock(k).getTaxonId());
-						entry.add(al);
-						taxonMap.put(current.getMatchBlock(k).getTaxonId(),entry);
-					}
-					if(al.getFivePrimeDamage())// calculate number of damage Reads
+					al.processText(blocks[i].getText().split("\n"));
+					if(al.getFivePrimeDamage()){
+						
+						length += al.getMlength();
+						pIdent += blocks[i].getPercentIdentity();
+						if(!taxonMap.containsKey(current.getMatchBlock(i).getTaxonId())){
+							ArrayList<Alignment> entry =new ArrayList<Alignment>();
+							entry.add(al);
+							taxonMap.put(blocks[i].getTaxonId(), entry);
+						}else{
+							ArrayList<Alignment> entry = taxonMap.get(blocks[i].getTaxonId());
+							entry.add(al);
+							taxonMap.put(blocks[i].getTaxonId(),entry);
+						}
+					
 						damage++;
 					k++;
+					}
 				}
 					numReads++;
 					supplemantary.add(

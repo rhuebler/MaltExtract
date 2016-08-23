@@ -22,7 +22,7 @@ import behaviour.Behaviour;
 
 /**
  * This class is used To Parse Input Parameters for RMA Extractor to meke input more flexible and less error prone
- * uses the console parameters as input
+ * uses the console parameters as input and fill up all Parameter slots to control subsequent functions
  * @author huebler
  *
  */
@@ -65,15 +65,15 @@ public class InputParameterProcessor {
 		return this.maxLength;
 	}
     private void process(String[] parameters)
-    {	   FilenameFilter RMAFilter = new FilenameFilter() {
-	    public boolean accept(File file, String name) {
-	        if (name.endsWith(".rma6")) {
-	            return true;
-	        } else {
-	            return false;
-	        }
-	    }
-	};
+    {	FilenameFilter RMAFilter = new FilenameFilter() {
+	    	public boolean accept(File file, String name) {
+	    		if (name.endsWith(".rma6")) {
+	    			return true;
+	    		} else {
+	    			return false;
+	    		}
+	    	}
+    	};
     	 CommandLine commandLine;
     	 	// Short Flags
     	    Option option_Input = Option.builder("input").argName("inDir").hasArg().desc("Input Directory or file").build();
@@ -97,9 +97,9 @@ public class InputParameterProcessor {
     	    options.addOption(option_MaxLength);
     	    
     	    String header = "RMAExtractor concurrent alpha";
-    	    String footer = "In case you encoouter error drop an email to huebler@shh.mpg.de with useful description";
+    	    String footer = "In case you encounter an error drop an email to huebler@shh.mpg.de with useful description";
     	    HelpFormatter formatter = new HelpFormatter();
-    	    formatter.printHelp("CLIsample", header, options, footer, true);    
+    	    formatter.printHelp("RMAExtractor", header, options, footer, true);    
 
     	    try
     	    {
@@ -148,7 +148,7 @@ public class InputParameterProcessor {
     	        
     	        if (commandLine.hasOption("threads"))
     	        {
-    	            System.out.print("Custom Number of Threads set to");
+    	            System.out.print("Custom Number of Threads set to: ");
     	            System.out.println(commandLine.getOptionValue("threads"));
     	            this.numThreads=Integer.parseInt(commandLine.getOptionValue("threads"));
     	            if(this.numThreads > Runtime.getRuntime().availableProcessors())
