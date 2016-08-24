@@ -5,6 +5,7 @@ import java.util.List;
 /**
  * Save for a Megan Node all Blast hits stored as Alignment Objects these are kept as hashmap
  *  of the ID of the matching species and a List of the Hits 
+ *  Mainly serves as a Storage to identify the reference to calculate Read distribution and to mark duplicates 
  */
 public class CompositionMap {
 	public CompositionMap(HashMap<Integer,ArrayList<Alignment>> map){
