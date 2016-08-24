@@ -87,7 +87,8 @@ public class RMA6Processor {
 		try{
 		OutputStreamWriter outer = new OutputStreamWriter(new GZIPOutputStream(new FileOutputStream(outDir+fileName+"_supplement"+ ".txt.gz")));
 		for(String line : supplement){
-			outer.write(line);}
+			outer.write(line+"\n");
+		}
 		outer.close();
 		System.out.println("Supplementary for File "+fileName+" done!");
 		}catch(IOException io){

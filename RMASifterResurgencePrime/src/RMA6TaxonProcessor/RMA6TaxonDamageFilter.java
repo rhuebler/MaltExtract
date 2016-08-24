@@ -104,6 +104,7 @@ public void process(RMA6Connector fileCon, int taxID, String fileName,NCBI_MapRe
 					k++;
 					}
 				}
+				if(damage !=0){
 					numReads++;
 					supplemantary.add(
 						current.getReadName()+"\t"
@@ -113,7 +114,7 @@ public void process(RMA6Connector fileCon, int taxID, String fileName,NCBI_MapRe
 						+ k +"\t"
 						+ damage+'\t'
 						+ df.format(getGcContent(current.getReadSequence()))+"\t"
-						+ mapReader.getNcbiIdToNameMap().get(taxID));
+						+ mapReader.getNcbiIdToNameMap().get(taxID));}
 			}// if TODO should I add an else here and what to do 
 		}// while
 			classIt.close();

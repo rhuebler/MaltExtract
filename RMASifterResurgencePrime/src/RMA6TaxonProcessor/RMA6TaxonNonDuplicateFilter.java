@@ -15,6 +15,8 @@ import megan.data.IReadBlockIterator;
 import megan.rma6.RMA6Connector;
 /**
  * NonDuplicate Filter for RMA6 Files
+ * Due to technical constraints at the moment we only use the highest scoring BLast it when we remove duplicates at the moment
+ * Runtime should be longer for duplicate removal due to passing all data one additional time 
  * @author huebler
  *
  */
@@ -61,19 +63,18 @@ public class RMA6TaxonNonDuplicateFilter {
 		// use ReadsIterator to get all Reads assigned to MegantaxID and print top percent to file;
 		try{
 			IReadBlockIterator classIt  = fileCon.getReadsIterator("Taxonomy", taxID, (float) 1.0,(float) 100.00,true,true);
-			if(!classIt.hasNext()){ // check if reads are assigned to TaxID if not print to console and skip
+			if(!classIt.hasNext()){ // check if reads are assigned to TaxID if not print to console and skip could potentially only happen if some genus is unavailable 
 				System.err.println("TaxID: " + taxID +  " not assigned in File " + fileName+"\n");
 				setReadDistribution(mapReader.getNcbiIdToNameMap().get(taxID)+"\tNA\t0\t0\t0\t0\t0\t0\t0\t0");
 				setSupplementary(new ArrayList<String>(Arrays.asList("0\t0\t0\t0\t0\t0\t"+mapReader.getNcbiIdToNameMap().get(taxID))));// in case of taxID not being supported add empty Line
 				setNumberOfMatches(0);
 				}
 			System.out.println("Processing Taxon "+mapReader.getNcbiIdToNameMap().get(taxID)+" in File " + fileName); 
-			
+	
 			while(classIt.hasNext()){
 				IReadBlock current = classIt.next();
 				if(current.getReadLength()<= maxLength){
-					IMatchBlock[] blocks=current.getMatchBlocks();
-					for(IMatchBlock block : blocks){ // use refurbisched alignment class
+					IMatchBlock block=current.getMatchBlock(0);
 						Alignment al = new Alignment();
 						al.processText(block.getText().split("\n"));
 						al.setReadName(current.getReadName());
@@ -87,7 +88,6 @@ public class RMA6TaxonNonDuplicateFilter {
 							entry.add(al);
 							taxonMap.put(block.getTaxonId(),entry);
 						}
-					}//for	
 				}//if 
 			}//while
 		}catch(IOException io){
@@ -102,6 +102,7 @@ public class RMA6TaxonNonDuplicateFilter {
 			s+="\t" + df.format(d);
 		setReadDistribution(s);
 		taxonMap = map.getCompositionMap();
+		int numReads=0;
 		for(int key : taxonMap.keySet()){
 			for(Alignment entry : taxonMap.get(key)){
 				if(!entry.isDuplicate()){
@@ -115,9 +116,14 @@ public class RMA6TaxonNonDuplicateFilter {
 								+ 1 + "\t"
 								+ damage + "\t"
 								+ df.format(getGcContent(entry.getQuery()))+"\t"
-								+ mapReader.getNcbiIdToNameMap().get(entry.getReferenceName()));
+								+ mapReader.getNcbiIdToNameMap().get(taxID));
+					numReads++;
 				}
+				
 			}
+			
 		}
+		setSupplementary(supplementary);
+		setNumberOfMatches(numReads);
 	}	
 }

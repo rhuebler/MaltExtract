@@ -31,7 +31,6 @@ public class InputParameterProcessor {
 	private List<String> fileNames = new ArrayList<String>();
 	private List<String> taxNames = new ArrayList<String>();
 	private String outDir;
-	private String inDir;	
 	private int numThreads = 1;
 	private int maxLength = 300;
 	private Behaviour behave = Behaviour.ALL;
@@ -48,9 +47,6 @@ public class InputParameterProcessor {
 	}
 	public double getTopPercent(){
 		return this.topPercent;
-	}
-	public String getInDir(){
-		return this.inDir;
 	}
 	public String getOutDir(){
 		return this.outDir;
@@ -76,15 +72,15 @@ public class InputParameterProcessor {
     	};
     	 CommandLine commandLine;
     	 	// Short Flags
-    	    Option option_Input = Option.builder("input").argName("Path/to/inDir").hasArg().desc("Input Directory or file").build();
-    	    Option option_Output = Option.builder("output").argName("Path/to/outDir").hasArg().desc("Output Directory").build();
-    	    Option option_Taxons = Option.builder("taxons").argName("Path/to/tax").hasArg().desc("File with taxons to look up").build();
+    	    Option option_Input = Option.builder("input").argName("Path/to/inDir or RMA6Files").hasArgs().required().desc("Input Directory or file").build();
+    	    Option option_Output = Option.builder().longOpt("output").argName("Path/to/outDir").hasArg().required().desc("Output Directory").build();
+    	    Option option_Taxons = Option.builder("taxons").argName("Path/to/taxFile or Taxon in \"\"").hasArg().required().desc("File with taxons to look up").build();
     	    
     	    // long flags
-    	    Option option_Threads = Option.builder().longOpt("threads").argName("[1..maxNumberOfCOres]").hasArg().desc("Number of Cores to run on").build();		
+    	    Option option_Threads = Option.builder().longOpt("threads").argName("1..maxNumberOfCores").hasArg().optionalArg(true).desc("Number of Cores to run on").build();		
     	    Option option_TopPercent = Option.builder().longOpt("top").argName("0.0-0.99").hasArg().desc("Top Percent of Matches to Consider").build();
-    	    Option option_Behaviour = Option.builder().longOpt("behaviour").argName("all,ancient,nonduplicates").hasArg().desc("Specify the behaviour for run eg ancient").build();
-    	    Option option_MaxLength = Option.builder().longOpt("maxReadLength").argName("maxLength").hasArg().desc("Set Maximum ReadLength").build();
+    	    Option option_Behaviour = Option.builder().longOpt("behaviour").argName("all,ancient,nonduplicate, scan").optionalArg(true).hasArg().desc("Specify the behaviour for run eg ancient").build();
+    	    Option option_MaxLength = Option.builder().longOpt("maxReadLength").argName("maxLength").optionalArg(true).hasArg().desc("Set Maximum ReadLength").build();
     	    Options options = new Options();
     	    CommandLineParser parser = new DefaultParser();
 
@@ -109,15 +105,16 @@ public class InputParameterProcessor {
     	        if (commandLine.hasOption("input"))
     	        {
     	            System.out.print("Input Set to: ");
-    	            System.out.println(commandLine.getOptionValue("input"));
-    	            File inFile = new File(commandLine.getOptionValue("input"));
-    	            if(inFile.isDirectory()){
-    	            	this.inDir = commandLine.getOptionValue("input");
-    	            	for(String name : inFile.list(RMAFilter))
-    	            		this.fileNames.add(name);
-    	            }else if(inFile.isFile()){
-    	            	this.inDir = inFile.getAbsolutePath();
-    	            	this.fileNames.add(inFile.getName());
+    	            for(String arg :commandLine.getOptionValues("input")){
+    	            	File inFile = new File(arg);
+    	            	if(inFile.isDirectory()){
+    	            		  System.out.println(arg);
+    	            		for(String name : inFile.list(RMAFilter))
+    	            		this.fileNames.add(arg + name);
+    	            	}else if(inFile.isFile()){
+    	            		System.out.println(arg);
+    	            		this.fileNames.add(arg);
+    	            }
     	            }
     	        }
 
@@ -130,26 +127,33 @@ public class InputParameterProcessor {
     	        
     	        if (commandLine.hasOption("taxons"))
     	        {
-    	            System.out.println("Taxons File: ");
-    	            System.out.println(commandLine.getOptionValue("taxons"));
-    	            File taxons = new File(commandLine.getOptionValue("taxons"));
-					try {
-						Scanner	in = new Scanner(taxons);
-						while(in.hasNext()){
-	    	            	taxNames.add(in.nextLine().trim());
-	    	            }
-	    	            in.close();
-					} catch (FileNotFoundException e) {
-						e.printStackTrace();
-					}
-       	
+    	            for(String tax : commandLine.getOptionValues("taxons")){
+    	               System.out.println("Taxons File: ");
+        	           System.out.println(tax);
+    	        	   File f = new File(tax);
+    	        	   if(f.isFile()){
+    	        		   try {
+    	        			   Scanner	in = new Scanner(f);
+    	        			   while(in.hasNext()){
+    	        				   taxNames.add(in.nextLine().trim());
+    	        			   }
+    	        			   in.close();
+    	        		   }catch (FileNotFoundException e) {
+    	        		   e.printStackTrace();
+    	        		   }
+    	        	   }else{
+    	        	   System.out.print("Added Taxon: ");
+    	        	   System.out.println(tax +" to analysis");
+    	        	   taxNames.add(tax); 
+    	        	   }
+    	           }	   
     			}
     					        
     	        
     	        if (commandLine.hasOption("threads"))
     	        {
     	            System.out.print("Trying to use ");
-    	            System.out.println(commandLine.getOptionValue("threads")+" threafs");
+    	            System.out.println(commandLine.getOptionValue("threads")+" threads");
     	            this.numThreads=Integer.parseInt(commandLine.getOptionValue("threads"));
     	            if(this.numThreads > Runtime.getRuntime().availableProcessors()){
     	    			this.numThreads = Runtime.getRuntime().availableProcessors(); // enforce that not more processors than available to jvm should be used 
@@ -160,16 +164,22 @@ public class InputParameterProcessor {
 
     	        if (commandLine.hasOption("behaviour"))
     	        {
-    	            System.out.println("Custom Behaviour set to: ");
-    	            System.out.println(commandLine.getOptionValue("behaviour"));
     	            if(Pattern.compile(Pattern.quote("all"), Pattern.CASE_INSENSITIVE).matcher(commandLine.getOptionValue("behaviour")).find()){
     	            	this.behave = Behaviour.ALL;
+    	            	System.out.println("Custom Behaviour set to: ");
+        	            System.out.println(commandLine.getOptionValue("behaviour"));
     	            }else if(Pattern.compile(Pattern.quote("ancient"), Pattern.CASE_INSENSITIVE).matcher(commandLine.getOptionValue("behaviour")).find()){
     	            	this.behave = Behaviour.ANCIENT;
-    	            }else if(Pattern.compile(Pattern.quote("duplicates"), Pattern.CASE_INSENSITIVE).matcher(commandLine.getOptionValue("behaviour")).find()){
+    	            	System.out.println("Custom Behaviour set to: ");
+        	            System.out.println(commandLine.getOptionValue("behaviour"));
+    	            }else if(Pattern.compile(Pattern.quote("nonduplicate"), Pattern.CASE_INSENSITIVE).matcher(commandLine.getOptionValue("behaviour")).find()){
     	            	this.behave = Behaviour.NONDUPLICATES;
+    	            	System.out.println("Custom Behaviour set to: ");
+        	            System.out.println(commandLine.getOptionValue("behaviour"));
     	            }else if(Pattern.compile(Pattern.quote("scan"), Pattern.CASE_INSENSITIVE).matcher(commandLine.getOptionValue("behaviour")).find()){
     	            	this.behave = Behaviour.SCAN;
+    	            	System.out.println("Custom Behaviour set to: ");
+        	            System.out.println(commandLine.getOptionValue("behaviour"));
     	            }
     	            
     	        }

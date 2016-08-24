@@ -84,10 +84,14 @@ public class SummaryWriter {
 		   summary.add(0,header);
 		   this.summary =  summary;
 	}
-	public void writeSummary() throws IOException{
-		System.out.println("Writing Summary txt File");
-		Path file = Paths.get(outDir+"overallSummary"+".txt");
+	public void writeSummary() {
+		try{
+		System.out.println("Writing Overall Run Summary txt File");
+		Path file = Paths.get(outDir+"OverallRunSummary"+".txt");
 		Files.write(file, summary, Charset.forName("UTF-8"));
-		System.out.println("Summary Done!");
+		System.out.println("Overall Run Summary Done!");
+		}catch(IOException io){
+			io.printStackTrace();
+		}
 	}
 }
