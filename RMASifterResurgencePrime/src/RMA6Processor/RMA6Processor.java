@@ -19,7 +19,8 @@ import NCBI_MapReader.NCBI_TreeReader;
 import RMA6TaxonProcessor.RMA6TaxonDamageFilter;
 import RMA6TaxonProcessor.RMA6TaxonNonDuplicateFilter;
 import RMA6TaxonProcessor.RMA6TaxonProcessor;
-import behaviour.Behaviour;
+import behaviour.Filter;
+import behaviour.Taxas;
 import megan.rma6.RMA6Connector;
 /**
  * take care of extracting all the information for one RMA6 file and a List of taxons
@@ -40,10 +41,11 @@ public class RMA6Processor {
 	private NCBI_MapReader mapReader;
 	private NCBI_TreeReader treeReader;
 	private Set<Integer> containedIDs;
-	private Behaviour behave;
+	private Filter behave;
 	private int maxLength;
+	private Taxas taxas;
 	// constructor
-	public RMA6Processor(String inDir, String fileName, String outDir, NCBI_MapReader mapReader, NCBI_TreeReader treeReader, int maxLength, Behaviour b) {
+	public RMA6Processor(String inDir, String fileName, String outDir, NCBI_MapReader mapReader, NCBI_TreeReader treeReader, int maxLength, Filter b, Taxas t) {
 		this.inDir = inDir;
 		this.outDir = outDir;
 		this.fileName = fileName;
@@ -51,6 +53,7 @@ public class RMA6Processor {
 		this.treeReader = new NCBI_TreeReader(treeReader);
 		this.behave = b;
 		this.maxLength = maxLength;
+		this.taxas = t;
 	}
 	
 	//setters
@@ -121,29 +124,34 @@ public void process(List<Integer>taxIDs, double topPercent) {
 	Set<Integer> keys = fileCon.getClassificationBlock("Taxonomy").getKeySet();// get all assigned IDs in a file 
 	Set<Integer> idsToProcess = new HashSet<Integer>();
    // treeReader here to avoid synchronization issues 
-	for(int taxID : taxIDs){
-		idsToProcess.add(taxID);
-		for(int id :treeReader.getStrains(taxID, keys))
-			if(!taxIDs.contains(id))
-				idsToProcess.add(id);
+	if(taxas == Taxas.USER){
+		for(int taxID : taxIDs){
+			idsToProcess.add(taxID);
+			for(int id :treeReader.getStrains(taxID, keys))
+				if(!taxIDs.contains(id))
+					idsToProcess.add(id);
+		}
+	}
+	else if(taxas == Taxas.ALL){
+		idsToProcess.addAll(fileCon.getClassificationBlock("Taxonomy").getKeySet());
 	}
 	setContainedIDs(idsToProcess);
 	for(int id : idsToProcess){
-		if(behave==Behaviour.ALL){	
+		if(behave == Filter.NON){	
 			RMA6TaxonProcessor taxProcessor = new RMA6TaxonProcessor();// could add new
 			taxProcessor.process(fileCon, id, fileName, mapReader, topPercent,maxLength);
 			overallSum.put(id,taxProcessor.getNumberOfMatches());
 			readDistribution.add(taxProcessor.getReadDistribution());
 			for(String sup : taxProcessor.getSupplementary())
 				supplemantary.add(sup);
-		}else if(behave==Behaviour.ANCIENT){
+		}else if(behave == Filter.ANCIENT){
 			RMA6TaxonDamageFilter damageProcessor = new RMA6TaxonDamageFilter();
 			damageProcessor.process(fileCon, id, fileName, mapReader, topPercent, maxLength);
 			overallSum.put(id,damageProcessor.getNumberOfMatches());
 			readDistribution.add(damageProcessor.getReadDistribution());
 			for(String sup : damageProcessor.getSupplementary())
 				supplemantary.add(sup);
-		}else if(behave == Behaviour.NONDUPLICATES){
+		}else if(behave == Filter.NONDUPLICATES){
 			RMA6TaxonNonDuplicateFilter nonDP = new RMA6TaxonNonDuplicateFilter();
 			nonDP.process(fileCon, id, fileName, mapReader, topPercent, maxLength);
 			overallSum.put(id,nonDP.getNumberOfMatches());

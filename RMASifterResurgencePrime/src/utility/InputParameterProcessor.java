@@ -18,7 +18,8 @@ import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 
-import behaviour.Behaviour;
+import behaviour.Filter;
+import behaviour.Taxas;
 
 /**
  * This class is used To Parse Input Parameters for RMA Extractor to meke input more flexible and less error prone
@@ -33,7 +34,8 @@ public class InputParameterProcessor {
 	private String outDir;
 	private int numThreads = 1;
 	private int maxLength = 300;
-	private Behaviour behave = Behaviour.ALL;
+	private Filter behave = Filter.NON;
+	private Taxas taxas = Taxas.ALL;
 	// constructor
 	public InputParameterProcessor(String[] params){
 		process(params);
@@ -51,8 +53,11 @@ public class InputParameterProcessor {
 	public String getOutDir(){
 		return this.outDir;
 	}
-	public Behaviour getBehaviour(){
+	public Filter getFilter(){
 		return this.behave;
+	}
+	public Taxas getTaxas(){
+		return this.taxas;
 	}
 	public int getNumThreads(){
 		return this.numThreads;
@@ -74,13 +79,14 @@ public class InputParameterProcessor {
     	 	// Short Flags
     	    Option option_Input = Option.builder("input").argName("Path/to/inDir or RMA6Files").hasArgs().required().desc("Input Directory or file").build();
     	    Option option_Output = Option.builder().longOpt("output").argName("Path/to/outDir").hasArg().required().desc("Output Directory").build();
-    	    Option option_Taxons = Option.builder("taxons").argName("Path/to/taxFile or Taxon in \"\"").hasArg().required().desc("File with taxons to look up").build();
+    	    Option option_Taxons = Option.builder("taxons").argName("Path/to/taxFile or Taxon in \"\"").hasArg().desc("File with taxons to look up").build();
     	    
     	    // long flags
     	    Option option_Threads = Option.builder().longOpt("threads").argName("1..maxNumberOfCores").hasArg().optionalArg(true).desc("Number of Cores to run on").build();		
     	    Option option_TopPercent = Option.builder().longOpt("top").argName("0.0-0.99").hasArg().desc("Top Percent of Matches to Consider").build();
-    	    Option option_Behaviour = Option.builder().longOpt("behaviour").argName("all,ancient,nonduplicate, scan").optionalArg(true).hasArg().desc("Specify the behaviour for run eg ancient").build();
-    	    Option option_MaxLength = Option.builder().longOpt("maxReadLength").argName("maxLength").optionalArg(true).hasArg().desc("Set Maximum ReadLength").build();
+    	    Option option_Filter = Option.builder().longOpt("filter").argName("non,ancient,nonduplicate, scan").optionalArg(true).hasArg().desc("Specify the behaviour for run eg ancient").build();
+    	    Option option_MaxLength = Option.builder().longOpt("maxReadLength").argName("maxLength").hasArg().desc("Set Maximum ReadLength").build();
+    	    Option option_Nodes = Option.builder().longOpt("nodes").argName("all, user").hasArg().desc("Use all Nodes in File or look up User Input").build();
     	    Options options = new Options();
     	    CommandLineParser parser = new DefaultParser();
 
@@ -90,8 +96,9 @@ public class InputParameterProcessor {
     	    
     	    options.addOption(option_Threads);
     	    options.addOption(option_TopPercent);
-    	    options.addOption(option_Behaviour);
+    	    options.addOption(option_Filter);
     	    options.addOption(option_MaxLength);
+    	    options.addOption(option_Nodes);
     	    
     	    String header = "RMAExtractor concurrent alpha";
     	    String footer = "In case you encounter an error drop an email to huebler@shh.mpg.de with useful description";
@@ -162,24 +169,24 @@ public class InputParameterProcessor {
     	    		System.out.println("Using " + numThreads +" threads");
     	        }
 
-    	        if (commandLine.hasOption("behaviour"))
+    	        if (commandLine.hasOption("filter"))
     	        {
-    	            if(Pattern.compile(Pattern.quote("all"), Pattern.CASE_INSENSITIVE).matcher(commandLine.getOptionValue("behaviour")).find()){
-    	            	this.behave = Behaviour.ALL;
+    	            if(Pattern.compile(Pattern.quote("non"), Pattern.CASE_INSENSITIVE).matcher(commandLine.getOptionValue("filter")).find()){
+    	            	this.behave = Filter.NON;
     	            	System.out.println("Custom Behaviour set to: ");
-        	            System.out.println(commandLine.getOptionValue("behaviour"));
-    	            }else if(Pattern.compile(Pattern.quote("ancient"), Pattern.CASE_INSENSITIVE).matcher(commandLine.getOptionValue("behaviour")).find()){
-    	            	this.behave = Behaviour.ANCIENT;
+        	            System.out.println(commandLine.getOptionValue("filter"));
+    	            }else if(Pattern.compile(Pattern.quote("ancient"), Pattern.CASE_INSENSITIVE).matcher(commandLine.getOptionValue("filter")).find()){
+    	            	this.behave = Filter.ANCIENT;
     	            	System.out.println("Custom Behaviour set to: ");
-        	            System.out.println(commandLine.getOptionValue("behaviour"));
-    	            }else if(Pattern.compile(Pattern.quote("nonduplicate"), Pattern.CASE_INSENSITIVE).matcher(commandLine.getOptionValue("behaviour")).find()){
-    	            	this.behave = Behaviour.NONDUPLICATES;
+        	            System.out.println(commandLine.getOptionValue("filter"));
+    	            }else if(Pattern.compile(Pattern.quote("nonduplicate"), Pattern.CASE_INSENSITIVE).matcher(commandLine.getOptionValue("filter")).find()){
+    	            	this.behave = Filter.NONDUPLICATES;
     	            	System.out.println("Custom Behaviour set to: ");
-        	            System.out.println(commandLine.getOptionValue("behaviour"));
-    	            }else if(Pattern.compile(Pattern.quote("scan"), Pattern.CASE_INSENSITIVE).matcher(commandLine.getOptionValue("behaviour")).find()){
-    	            	this.behave = Behaviour.SCAN;
+        	            System.out.println(commandLine.getOptionValue("filter"));
+    	            }else if(Pattern.compile(Pattern.quote("scan"), Pattern.CASE_INSENSITIVE).matcher(commandLine.getOptionValue("filter")).find()){
+    	            	this.behave = Filter.SCAN;
     	            	System.out.println("Custom Behaviour set to: ");
-        	            System.out.println(commandLine.getOptionValue("behaviour"));
+        	            System.out.println(commandLine.getOptionValue("filter"));
     	            }
     	            
     	        }
@@ -198,6 +205,14 @@ public class InputParameterProcessor {
     	            this.maxLength = Integer.parseInt(commandLine.getOptionValue("maxReadLength"));
     	        }
     	        
+    	        if(commandLine.hasOption("nodes")){
+    	        	if(Pattern.compile(Pattern.quote("user"), Pattern.CASE_INSENSITIVE).matcher(commandLine.getOptionValue("nodes")).find()){
+    	        		this.taxas = Taxas.USER;
+    	        	}else if(Pattern.compile(Pattern.quote("all"), Pattern.CASE_INSENSITIVE).matcher(commandLine.getOptionValue("nodes")).find()){
+    	        		this.taxas = Taxas.ALL;
+    	        	}
+    	        }
+    	        
     	        {
     	            String[] remainder = commandLine.getArgs();
     	            System.out.print("Remaining arguments: ");
@@ -209,8 +224,9 @@ public class InputParameterProcessor {
 
     	            System.out.println();
     	        }
-
+    	       
     	    }
+    	    
     	    catch (ParseException exception)
     	    {
     	        System.out.print("Parse error: ");

@@ -16,7 +16,8 @@ import NCBI_MapReader.NCBI_TreeReader;
 import RMA6Processor.ConcurrentRMA6Processor;
 import RMA6Processor.RMA6Processor;
 import RMA6Processor.RMA6Scanner;
-import behaviour.Behaviour;
+import behaviour.Filter;
+import behaviour.Taxas;
 import utility.InputParameterProcessor;
 import utility.ScanSummaryWriter;
 import utility.SummaryWriter;
@@ -43,22 +44,23 @@ public class RMAExtractor {
 		NCBI_MapReader mapReader = new NCBI_MapReader();// shared read access
 		new File(inProcessor.getOutDir()).mkdirs(); // create output directory if directory does not already exist
 	    // iterate over files
-	    
-    	List<Integer> taxIDs= new  ArrayList<Integer>();
-    	List<Future<RMA6Processor>> processedFiles = new ArrayList<>();
-    	for(String name : inProcessor.getTaxNames()){
-    		if(mapReader.getNcbiNameToIdMap().get(name) != null)// catch if there is a mistake
-    			taxIDs.add(mapReader.getNcbiNameToIdMap().get(name));
-    		else
-    			System.err.println(name + " has no assigned taxID and cannot be processed!");
+		List<Future<RMA6Processor>> processedFiles = new ArrayList<>();
+		List<Integer> taxIDs= new  ArrayList<Integer>();
+		if(inProcessor.getTaxas() == Taxas.USER){
+			for(String name : inProcessor.getTaxNames()){
+				if(mapReader.getNcbiNameToIdMap().get(name) != null)// catch if there is a mistake
+					taxIDs.add(mapReader.getNcbiNameToIdMap().get(name));
+				else
+					System.err.println(name + " has no assigned taxID and cannot be processed!");
+			}
     	}
-    	if(inProcessor.getBehaviour() != Behaviour.SCAN){
+    	if(inProcessor.getFilter() != Filter.SCAN){
     		executor=(ThreadPoolExecutor) Executors.newFixedThreadPool(inProcessor.getNumThreads());
     		NCBI_TreeReader treeReader = new NCBI_TreeReader();// every tree has its own copy of this now to avoid concurrency issues
     		for(String fileName : inProcessor.getFileNames()){
     			File f = new File(fileName);
     			ConcurrentRMA6Processor task = new ConcurrentRMA6Processor(f.getParent()+"/", f.getName(), inProcessor.getOutDir(), 
-	    			mapReader, treeReader,taxIDs, inProcessor.getTopPercent(),inProcessor.getMaxLength(),inProcessor.getBehaviour()); 
+	    			mapReader, treeReader,taxIDs, inProcessor.getTopPercent(),inProcessor.getMaxLength(),inProcessor.getFilter(), inProcessor.getTaxas()); 
     			Future<RMA6Processor> future=executor.submit(task);
     			processedFiles.add(future);
     		}//fileNames;
