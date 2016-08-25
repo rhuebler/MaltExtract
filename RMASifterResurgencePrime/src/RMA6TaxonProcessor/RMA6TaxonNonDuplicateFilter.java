@@ -73,7 +73,7 @@ public class RMA6TaxonNonDuplicateFilter {
 	
 			while(classIt.hasNext()){
 				IReadBlock current = classIt.next();
-				if(current.getReadLength()<= maxLength){
+				if(current.getReadLength() <= maxLength || maxLength == 0){
 					IMatchBlock block=current.getMatchBlock(0);
 						Alignment al = new Alignment();
 						al.processText(block.getText().split("\n"));

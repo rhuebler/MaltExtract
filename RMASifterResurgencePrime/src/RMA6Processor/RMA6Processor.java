@@ -98,10 +98,12 @@ public class RMA6Processor {
 			io.printStackTrace();
 		}
 	}
+	
 	//getter
 	public ArrayList<String> getReadDistribution(){
 		return this.readDist;
 	}
+
 	public ArrayList<String> getSupplementary(){
 		return this.supplement;
 	}

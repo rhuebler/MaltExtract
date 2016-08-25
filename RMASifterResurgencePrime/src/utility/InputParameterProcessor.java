@@ -33,7 +33,7 @@ public class InputParameterProcessor {
 	private List<String> taxNames = new ArrayList<String>();
 	private String outDir;
 	private int numThreads = 1;
-	private int maxLength = 300;
+	private int maxLength = 0;
 	private Filter behave = Filter.NON;
 	private Taxas taxas = Taxas.ALL;
 	// constructor
@@ -86,7 +86,6 @@ public class InputParameterProcessor {
     	    Option option_TopPercent = Option.builder().longOpt("top").argName("0.0-0.99").hasArg().desc("Top Percent of Matches to Consider").build();
     	    Option option_Filter = Option.builder().longOpt("filter").argName("non,ancient,nonduplicate, scan").optionalArg(true).hasArg().desc("Specify the behaviour for run eg ancient").build();
     	    Option option_MaxLength = Option.builder().longOpt("maxReadLength").argName("maxLength").hasArg().desc("Set Maximum ReadLength").build();
-    	    Option option_Nodes = Option.builder().longOpt("nodes").argName("all, user").hasArg().desc("Use all Nodes in File or look up User Input").build();
     	    Options options = new Options();
     	    CommandLineParser parser = new DefaultParser();
 
@@ -98,7 +97,6 @@ public class InputParameterProcessor {
     	    options.addOption(option_TopPercent);
     	    options.addOption(option_Filter);
     	    options.addOption(option_MaxLength);
-    	    options.addOption(option_Nodes);
     	    
     	    String header = "RMAExtractor concurrent alpha";
     	    String footer = "In case you encounter an error drop an email to huebler@shh.mpg.de with useful description";
@@ -133,7 +131,7 @@ public class InputParameterProcessor {
     	        }
     	        
     	        if (commandLine.hasOption("taxons"))
-    	        {
+    	        {	this.taxas = Taxas.USER;
     	            for(String tax : commandLine.getOptionValues("taxons")){
     	               System.out.println("Taxons File: ");
         	           System.out.println(tax);
@@ -205,13 +203,6 @@ public class InputParameterProcessor {
     	            this.maxLength = Integer.parseInt(commandLine.getOptionValue("maxReadLength"));
     	        }
     	        
-    	        if(commandLine.hasOption("nodes")){
-    	        	if(Pattern.compile(Pattern.quote("user"), Pattern.CASE_INSENSITIVE).matcher(commandLine.getOptionValue("nodes")).find()){
-    	        		this.taxas = Taxas.USER;
-    	        	}else if(Pattern.compile(Pattern.quote("all"), Pattern.CASE_INSENSITIVE).matcher(commandLine.getOptionValue("nodes")).find()){
-    	        		this.taxas = Taxas.ALL;
-    	        	}
-    	        }
     	        
     	        {
     	            String[] remainder = commandLine.getArgs();
