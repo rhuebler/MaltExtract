@@ -22,7 +22,7 @@ import behaviour.Filter;
 import behaviour.Taxas;
 
 /**
- * This class is used To Parse Input Parameters for RMA Extractor to meke input more flexible and less error prone
+ * This class is used To Parse Input Parameters for RMA Extractor to make input more flexible and less error prone
  * uses the console parameters as input and fill up all Parameter slots to control subsequent functions
  * @author huebler
  *
