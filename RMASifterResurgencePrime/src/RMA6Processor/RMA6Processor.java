@@ -137,13 +137,18 @@ public void process(List<Integer>taxIDs, double topPercent) {
 	}
 	setContainedIDs(idsToProcess);
 	for(int id : idsToProcess){
-		if(behave == Filter.NON){	
+
+			
+
+		if(behave == Filter.NON){
 			RMA6TaxonProcessor taxProcessor = new RMA6TaxonProcessor();// could add new
 			taxProcessor.process(fileCon, id, fileName, mapReader, topPercent,maxLength);
 			overallSum.put(id,taxProcessor.getNumberOfMatches());
 			readDistribution.add(taxProcessor.getReadDistribution());
 			for(String sup : taxProcessor.getSupplementary())
 				supplemantary.add(sup);
+		
+
 		}else if(behave == Filter.ANCIENT){
 			RMA6TaxonDamageFilter damageProcessor = new RMA6TaxonDamageFilter();
 			damageProcessor.process(fileCon, id, fileName, mapReader, topPercent, maxLength);
@@ -159,6 +164,7 @@ public void process(List<Integer>taxIDs, double topPercent) {
 			for(String sup : nonDP.getSupplementary())
 				supplemantary.add(sup);
 		}
+		
 	  }//TaxIDs
 	
 	setSupplementaryData(supplemantary);	//save supplementary data at read resolution in adequate slot

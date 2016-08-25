@@ -54,6 +54,7 @@ public class RMAExtractor {
 					System.err.println(name + " has no assigned taxID and cannot be processed!");
 			}
     	}
+
     	if(inProcessor.getFilter() != Filter.SCAN){
     		executor=(ThreadPoolExecutor) Executors.newFixedThreadPool(inProcessor.getNumThreads());
     		NCBI_TreeReader treeReader = new NCBI_TreeReader();// every tree has its own copy of this now to avoid concurrency issues
