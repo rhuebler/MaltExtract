@@ -12,10 +12,14 @@ import java.util.Scanner;
  * and a map of name to ID
  */
 public class NCBI_MapReader {
-	final static String mapName= "/Users/huebler/git/RMA6Sifter/RMASifterResurgencePrime/resources/ncbi.map";
+	private String mapName= "/projects1/clusterhomes/huebler/RMASifter/RMA_Extractor_Resources/ncbi.map";
 	 HashMap<String,Integer> ncbiNameToId;
 	 HashMap<Integer,String> ncbiIdToName;
-	public NCBI_MapReader() throws FileNotFoundException{
+	public NCBI_MapReader(){
+		processNcbiMap(mapName);
+	}
+	public NCBI_MapReader(String path){
+		this.mapName = path + "ncbi.map";
 		processNcbiMap(mapName);
 	}
 	public HashMap<String,Integer>  getNcbiNameToIdMap(){
@@ -34,20 +38,24 @@ public class NCBI_MapReader {
 		this.ncbiIdToName = map;
 	}
 	
-	public void processNcbiMap(String fileName) throws FileNotFoundException {
-		System.out.println("Setting up Taxon Name and Taxon ID maps");
-		Scanner in = new Scanner(new File(fileName));
-		 HashMap<String,Integer> ncbiNameMap = new HashMap<String,Integer>();
-		 HashMap<Integer, String> ncbiIDMap = new HashMap<Integer, String>();
-		while (in.hasNext()) { // iterates each line in the file
-		    String line = in.nextLine();
-		     String[] frags = line.split("\\t");
-		     ncbiNameMap.put(frags[1], Integer.parseInt(frags[0]));
-		     ncbiIDMap.put(Integer.parseInt(frags[0]), frags[1]);
-		    // do something with line
+	public void processNcbiMap(String fileName) {
+		try{
+			System.out.println("Setting up Taxon Name and Taxon ID maps");
+			Scanner in = new Scanner(new File(fileName));
+			HashMap<String,Integer> ncbiNameMap = new HashMap<String,Integer>();
+			HashMap<Integer, String> ncbiIDMap = new HashMap<Integer, String>();
+			while (in.hasNext()) { // iterates each line in the file
+				String line = in.nextLine();
+				String[] frags = line.split("\\t");
+				ncbiNameMap.put(frags[1], Integer.parseInt(frags[0]));
+				ncbiIDMap.put(Integer.parseInt(frags[0]), frags[1]);
+				// do something with line
+				}
+			in.close();
+			setNcbiNameToIdMap(ncbiNameMap);
+			setNcbiIdToNameMap(ncbiIDMap);
+			}catch(FileNotFoundException ie){
+				ie.printStackTrace();
 			}
-		in.close();
-		setNcbiNameToIdMap(ncbiNameMap);
-		setNcbiIdToNameMap(ncbiIDMap);
 		}
 	}

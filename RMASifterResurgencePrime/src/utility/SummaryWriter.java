@@ -30,11 +30,17 @@ public class SummaryWriter {
 		setProcessedIds();
 		prepareOutput();
 	}
-	void setProcessedIds() throws InterruptedException, ExecutionException{
+	void setProcessedIds(){
 		Set<Integer> pIDs = new HashSet<>();
+		try{
 		for(Future<RMA6Processor> future : processedFiles)
 			pIDs.addAll(future.get().getContainedIDs());
 		this.processedIDs = pIDs;
+		}catch(InterruptedException ie){
+			ie.printStackTrace();
+		}catch(ExecutionException ee){
+			ee.printStackTrace();
+		}
 	}
 	private void prepareOutput() {
 		   List<String> summary = new ArrayList<String>();
@@ -48,7 +54,7 @@ public class SummaryWriter {
 				   HashMap<Integer,Integer> fileResults = current.getSumLine();
 				   if(first ==true){
 					   for(int id : processedIDs){
-						   String line = mapReader.getNcbiIdToNameMap().get(id);
+						   String line = mapReader.getNcbiIdToNameMap().get(id).replace(' ', '_');
 						   if(fileResults.containsKey(id)){
 							   line+= "\t"+fileResults.get(id);
 							   summary.add(line);

@@ -36,6 +36,7 @@ public class InputParameterProcessor {
 	private int maxLength = 0;
 	private Filter behave = Filter.NON;
 	private Taxas taxas = Taxas.ALL;
+	private String tree_Path = "/projects1/clusterhomes/huebler/RMASifter/RMA_Extractor_Resources/";
 	// constructor
 	public InputParameterProcessor(String[] params){
 		process(params);
@@ -65,6 +66,9 @@ public class InputParameterProcessor {
 	public int getMaxLength(){
 		return this.maxLength;
 	}
+	public String getTreePath(){
+		return this.tree_Path;
+	}
     private void process(String[] parameters)
     {	FilenameFilter RMAFilter = new FilenameFilter() {
 	    	public boolean accept(File file, String name) {
@@ -83,9 +87,11 @@ public class InputParameterProcessor {
     	    
     	    // long flags
     	    Option option_Threads = Option.builder().longOpt("threads").argName("1..maxNumberOfCores").hasArg().optionalArg(true).desc("Number of Cores to run on").build();		
-    	    Option option_TopPercent = Option.builder().longOpt("top").argName("0.0-0.99").hasArg().desc("Top Percent of Matches to Consider").build();
+    	    Option option_TopPercent = Option.builder().longOpt("top").argName("0.0-0.99").hasArg().optionalArg(true).desc("Top Percent of Matches to Consider").build();
     	    Option option_Filter = Option.builder().longOpt("filter").argName("non,ancient,nonduplicate, scan").optionalArg(true).hasArg().desc("Specify the behaviour for run eg ancient").build();
-    	    Option option_MaxLength = Option.builder().longOpt("maxReadLength").argName("maxLength").hasArg().desc("Set Maximum ReadLength").build();
+    	    Option option_MaxLength = Option.builder().longOpt("maxReadLength").argName("maxLength").hasArg().optionalArg(true).desc("Set Maximum ReadLength").build();
+    	    Option option_Help = Option.builder("h").optionalArg(true).desc("Print Usage and shutdown").build();
+    	    Option option_Path = Option.builder().longOpt("tree").hasArg().optionalArg(true).desc("Path to NCBI tre and map File").build();
     	    Options options = new Options();
     	    CommandLineParser parser = new DefaultParser();
 
@@ -97,11 +103,9 @@ public class InputParameterProcessor {
     	    options.addOption(option_TopPercent);
     	    options.addOption(option_Filter);
     	    options.addOption(option_MaxLength);
+    	    options.addOption(option_Help);
+    	    options.addOption(option_Path);
     	    
-    	    String header = "RMAExtractor concurrent alpha";
-    	    String footer = "In case you encounter an error drop an email to huebler@shh.mpg.de with useful description";
-    	    HelpFormatter formatter = new HelpFormatter();
-    	    formatter.printHelp("RMAExtractor", header, options, footer, true);    
 
     	    try
     	    {
@@ -203,6 +207,20 @@ public class InputParameterProcessor {
     	            this.maxLength = Integer.parseInt(commandLine.getOptionValue("maxReadLength"));
     	        }
     	        
+    	        if(commandLine.hasOption("tree")){
+    	        	File f = new File(commandLine.getOptionValue("tree"));
+    	        	if(f.isDirectory()){
+    	        		this.tree_Path = commandLine.getOptionValue("tree");
+    	        	}
+    	        }
+    	        
+    	        if(commandLine.hasOption("h")){
+    	        	String header = "RMAExtractor concurrent alpha";
+    	    	    String footer = "In case you encounter an error drop an email to huebler@shh.mpg.de with useful description";
+    	    	    HelpFormatter formatter = new HelpFormatter();
+    	    	    formatter.printHelp("RMAExtractor", header, options, footer, true);   
+    	    	    System.exit(0);
+    	        }
     	        
     	        {
     	            String[] remainder = commandLine.getArgs();

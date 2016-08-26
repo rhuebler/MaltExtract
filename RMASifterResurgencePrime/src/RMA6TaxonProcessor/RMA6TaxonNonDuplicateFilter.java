@@ -65,8 +65,8 @@ public class RMA6TaxonNonDuplicateFilter {
 			IReadBlockIterator classIt  = fileCon.getReadsIterator("Taxonomy", taxID, (float) 1.0,(float) 100.00,true,true);
 			if(!classIt.hasNext()){ // check if reads are assigned to TaxID if not print to console and skip could potentially only happen if some genus is unavailable 
 				System.err.println("TaxID: " + taxID +  " not assigned in File " + fileName+"\n");
-				setReadDistribution(mapReader.getNcbiIdToNameMap().get(taxID)+"\tNA\t0\t0\t0\t0\t0\t0\t0\t0");
-				setSupplementary(new ArrayList<String>(Arrays.asList("0\t0\t0\t0\t0\t0\t"+mapReader.getNcbiIdToNameMap().get(taxID))));// in case of taxID not being supported add empty Line
+				setReadDistribution(mapReader.getNcbiIdToNameMap().get(taxID).replace(' ', '_')+"\tNA\t0\t0\t0\t0\t0\t0\t0\t0");
+				setSupplementary(new ArrayList<String>(Arrays.asList("0\t0\t0\t0\t0\t0\t"+mapReader.getNcbiIdToNameMap().get(taxID).replace(' ', '_'))));// in case of taxID not being supported add empty Line
 				setNumberOfMatches(0);
 				}
 			System.out.println("Processing Taxon "+mapReader.getNcbiIdToNameMap().get(taxID)+" in File " + fileName); 
@@ -97,7 +97,8 @@ public class RMA6TaxonNonDuplicateFilter {
 		map.process();
 		map.markAllDuplicates();
 		// first set ReadDistribution on Maximum ID
-		String s = mapReader.getNcbiIdToNameMap().get(taxID)+"\t" + mapReader.getNcbiIdToNameMap().get(map.getMaxID());
+		String s = mapReader.getNcbiIdToNameMap().get(taxID).replace(' ', '_') + "\t" 
+					+ mapReader.getNcbiIdToNameMap().get(map.getMaxID()).replace(' ', '_');
 		for(double d : map.getStatistics())
 			s+="\t" + df.format(d);
 		setReadDistribution(s);
@@ -116,7 +117,7 @@ public class RMA6TaxonNonDuplicateFilter {
 								+ 1 + "\t"
 								+ damage + "\t"
 								+ df.format(getGcContent(entry.getQuery()))+"\t"
-								+ mapReader.getNcbiIdToNameMap().get(taxID));
+								+ mapReader.getNcbiIdToNameMap().get(taxID).replace(' ', '_'));
 					numReads++;
 				}
 				

@@ -41,7 +41,8 @@ public class RMAExtractor {
 	}
 	public static void main(String[] args) throws Exception {
 		InputParameterProcessor inProcessor = new InputParameterProcessor(args);
-		NCBI_MapReader mapReader = new NCBI_MapReader();// shared read access
+		
+		NCBI_MapReader mapReader = new NCBI_MapReader(inProcessor.getTreePath());// shared read access
 		new File(inProcessor.getOutDir()).mkdirs(); // create output directory if directory does not already exist
 	    // iterate over files
 		List<Future<RMA6Processor>> processedFiles = new ArrayList<>();
@@ -57,7 +58,7 @@ public class RMAExtractor {
 
     	if(inProcessor.getFilter() != Filter.SCAN){
     		executor=(ThreadPoolExecutor) Executors.newFixedThreadPool(inProcessor.getNumThreads());
-    		NCBI_TreeReader treeReader = new NCBI_TreeReader();// every tree has its own copy of this now to avoid concurrency issues
+    		NCBI_TreeReader treeReader = new NCBI_TreeReader(inProcessor.getTreePath());// every tree has its own copy of this now to avoid concurrency issues
     		for(String fileName : inProcessor.getFileNames()){
     			File f = new File(fileName);
     			ConcurrentRMA6Processor task = new ConcurrentRMA6Processor(f.getParent()+"/", f.getName(), inProcessor.getOutDir(), 

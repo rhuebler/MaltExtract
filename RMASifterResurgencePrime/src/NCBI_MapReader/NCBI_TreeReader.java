@@ -16,15 +16,31 @@ import org.forester.phylogeny.PhylogenyNode;
  */
 
 public class NCBI_TreeReader {
-	final static String treName= "/Users/huebler/git/RMA6Sifter/RMASifterResurgencePrime/resources/ncbi.tre";//TODO how to provide System resources make relativistic
+	private String treName= "/projects1/clusterhomes/huebler/RMASifter/RMA_Extractor_Resources/ncbi.tre";//TODO how to provide System resources make relativistic
 	int target;
 	private Phylogeny ph;
-	public NCBI_TreeReader() throws IOException{
+	public NCBI_TreeReader(){
+		try{
 		System.out.println("Setting up Phylogenetic Tree");
 		Scanner in = new Scanner(new File(treName));
 		String line = in.nextLine();
 		in.close();
 	    this.ph = Phylogeny.createInstanceFromNhxString(line);
+	    }catch(IOException io){
+	    	io.printStackTrace();
+	    }
+	}
+	public NCBI_TreeReader(String path){
+		this.treName = path + "ncbi.tre";
+		try{
+			System.out.println("Setting up Phylogenetic Tree");
+			Scanner in = new Scanner(new File(treName));
+			String line = in.nextLine();
+			in.close();
+		    this.ph = Phylogeny.createInstanceFromNhxString(line);
+		    }catch(IOException io){
+		    	io.printStackTrace();
+		    }
 	}
 	public NCBI_TreeReader(NCBI_TreeReader copyInstance){
 		this.ph = copyInstance.getPhylogeny();
@@ -38,7 +54,7 @@ public class NCBI_TreeReader {
 			if(children.contains(key))
 				assigned.add(key);
 		return assigned;
-	}
+	} 
 		public ArrayList<Integer> getStrains(int target, Set<Integer> keys){
 	    ArrayList<Integer> children = new  ArrayList<Integer>();
 	    for(PhylogenyNode test : ph.getNode(String.valueOf(target)).getDescendants()){ // works in principal but would have to analyze a lot of nodes for it to work.... is there a smaller tre file ?

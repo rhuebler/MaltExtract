@@ -107,13 +107,13 @@ public void process(RMA6Connector fileCon, int taxID, String fileName,NCBI_MapRe
 						+ k +"\t"
 						+ damage+'\t'
 						+ df.format(getGcContent(current.getReadSequence()))+"\t"
-						+ mapReader.getNcbiIdToNameMap().get(taxID));
+						+ mapReader.getNcbiIdToNameMap().get(taxID).replace(' ', '_'));
 			}// if TODO should I add an else here and what to do with it 
 		}// while
 			classIt.close();
 			CompositionMap map = new CompositionMap(taxonMap);
 			map.process();
-			String s = mapReader.getNcbiIdToNameMap().get(taxID)+"\t" + mapReader.getNcbiIdToNameMap().get(map.getMaxID());
+			String s = mapReader.getNcbiIdToNameMap().get(taxID).replace(' ', '_')+"\t" + mapReader.getNcbiIdToNameMap().get(map.getMaxID()).replace(' ', '_');
 			for(double d : map.getStatistics())
 				s+="\t" + df.format(d);
 			setReadDistribution(s);
