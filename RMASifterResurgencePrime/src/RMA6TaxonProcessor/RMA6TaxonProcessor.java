@@ -68,9 +68,14 @@ public void process(RMA6Connector fileCon, int taxID, String fileName,NCBI_MapRe
 		setSupplementary(new ArrayList<String>(Arrays.asList("0\t0\t0\t0\t0\t0\t"+mapReader.getNcbiIdToNameMap().get(taxID).replace(' ', '_'))));// in case of taxID not being supported add empty Line
 		setSupplementary(supplemantary);
 	}else{
-	 System.out.println("Processing Taxon "+mapReader.getNcbiIdToNameMap().get(taxID)+" in File " +fileName); 
-	 HashMap<Integer, ArrayList<Alignment>> taxonMap = new HashMap<Integer,ArrayList<Alignment>>();
-	 int numReads = 0;
+		String taxName;
+		if(mapReader.getNcbiIdToNameMap().get(taxID) != null)
+			taxName = mapReader.getNcbiIdToNameMap().get(taxID).replace(' ', '_');
+		else
+			taxName = "unassignedName";
+		System.out.println("Processing Taxon "+mapReader.getNcbiIdToNameMap().get(taxID)+" in File " +fileName); 
+		HashMap<Integer, ArrayList<Alignment>> taxonMap = new HashMap<Integer,ArrayList<Alignment>>();
+		int numReads = 0;
 		while(classIt.hasNext()){
 			IReadBlock current = classIt.next();
 			if(current.getReadLength() <= maxLength || maxLength == 0){
@@ -110,13 +115,19 @@ public void process(RMA6Connector fileCon, int taxID, String fileName,NCBI_MapRe
 						+ k +"\t"
 						+ damage+'\t'
 						+ df.format(getGcContent(current.getReadSequence()))+"\t"
-						+ mapReader.getNcbiIdToNameMap().get(taxID).replace(' ', '_'));
+						+ taxName);
 			}// if TODO should I add an else here and what to do with it 
 		}// while
 			classIt.close();
 			CompositionMap map = new CompositionMap(taxonMap);
 			map.process();
-			String s = mapReader.getNcbiIdToNameMap().get(taxID).replace(' ', '_')+"\t" + mapReader.getNcbiIdToNameMap().get(map.getMaxID()).replace(' ', '_');
+			
+			String maxReference;
+			if(mapReader.getNcbiIdToNameMap().get(map.getMaxID()) != null)
+				maxReference =  mapReader.getNcbiIdToNameMap().get(map.getMaxID()).replace(' ', '_');
+			else
+				maxReference = "unassinged_reference_name";
+			String s = taxName +"\t" + maxReference;;
 			for(double d : map.getStatistics())
 				s+="\t" + df.format(d);
 			setReadDistribution(s);
