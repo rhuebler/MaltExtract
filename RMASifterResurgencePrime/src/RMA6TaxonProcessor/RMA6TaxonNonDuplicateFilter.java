@@ -93,12 +93,23 @@ public class RMA6TaxonNonDuplicateFilter {
 		}catch(IOException io){
 			io.printStackTrace();
 		}
+		String taxName;
+		if(mapReader.getNcbiIdToNameMap().get(taxID) != null)
+			taxName = mapReader.getNcbiIdToNameMap().get(taxID).replace(' ', '_');
+		else
+			taxName = "unassingned name";
+		
 		CompositionMap map = new CompositionMap(taxonMap);
 		map.process();
 		map.markAllDuplicates();
 		// first set ReadDistribution on Maximum ID
-		String s = mapReader.getNcbiIdToNameMap().get(taxID).replace(' ', '_') + "\t" 
-					+ mapReader.getNcbiIdToNameMap().get(map.getMaxID()).replace(' ', '_');
+		String maxReference;
+		if(mapReader.getNcbiIdToNameMap().get(map.getMaxID()) != null)
+			maxReference =  mapReader.getNcbiIdToNameMap().get(map.getMaxID()).replace(' ', '_');
+		else
+			maxReference = "unassinged_reference_name";
+		String s = taxName + "\t" 
+					+ maxReference;
 		for(double d : map.getStatistics())
 			s+="\t" + df.format(d);
 		setReadDistribution(s);
@@ -117,7 +128,7 @@ public class RMA6TaxonNonDuplicateFilter {
 								+ 1 + "\t"
 								+ damage + "\t"
 								+ df.format(getGcContent(entry.getQuery()))+"\t"
-								+ mapReader.getNcbiIdToNameMap().get(taxID).replace(' ', '_'));
+								+ taxName);
 					numReads++;
 				}
 				

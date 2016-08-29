@@ -34,7 +34,12 @@ public class ScanSummaryWriter {
 			header += "\t" + scan.getFileName();
 			if(first){
 				for(int key : keys){
-					String s = reader.getNcbiIdToNameMap().get(key).replace(' ', '_');
+					String s;
+					if( reader.getNcbiIdToNameMap().get(key) != null){
+						s = reader.getNcbiIdToNameMap().get(key).replace(' ', '_');
+					}else{
+						s = "unasigned";
+					}
 					if(scan.getKeySet().contains(key)){
 						s += "\t"+scan.getAssignmentMap().get(key);
 					}else{

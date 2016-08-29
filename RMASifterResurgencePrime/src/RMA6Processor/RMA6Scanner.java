@@ -40,7 +40,8 @@ public class RMA6Scanner {
 	}
 	// process
 	private void process(){
-		try{Map<Integer,Integer> map = new HashMap<Integer,Integer>();
+		try{System.out.println("Scanning File: "+ fileName);
+			Map<Integer,Integer> map = new HashMap<Integer,Integer>();
 			RMA6Connector fileCon = new RMA6Connector(inDir+fileName);
 			this.keySet=fileCon.getClassificationBlock("Taxonomy").getKeySet();
 			for(int key : keySet){

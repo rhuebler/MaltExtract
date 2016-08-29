@@ -70,7 +70,8 @@ public class RMAExtractor {
 	    destroy();
 	    SummaryWriter sumWriter = new SummaryWriter(processedFiles,mapReader,inProcessor.getOutDir()); 
 	    sumWriter.writeSummary();
-	  }else{
+	  }else{// TODO make multi threaded at functionality to support abstract file paths and add the ability to read input from file
+		  // TODO adress empty node names 
 		  List<RMA6Scanner> scannerList = new ArrayList<RMA6Scanner>();
 		  Set<Integer> allKeys = new HashSet<Integer>();
 		  for(String fileName : inProcessor.getFileNames()){

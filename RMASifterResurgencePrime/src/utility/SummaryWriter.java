@@ -54,7 +54,12 @@ public class SummaryWriter {
 				   HashMap<Integer,Integer> fileResults = current.getSumLine();
 				   if(first ==true){
 					   for(int id : processedIDs){
-						   String line = mapReader.getNcbiIdToNameMap().get(id).replace(' ', '_');
+						   String line;
+							if( mapReader.getNcbiIdToNameMap().get(id) != null){
+								line = mapReader.getNcbiIdToNameMap().get(id).replace(' ', '_');
+							}else{
+								line = "unasigned";
+							}
 						   if(fileResults.containsKey(id)){
 							   line+= "\t"+fileResults.get(id);
 							   summary.add(line);

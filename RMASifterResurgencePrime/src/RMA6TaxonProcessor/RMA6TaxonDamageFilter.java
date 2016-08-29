@@ -118,17 +118,27 @@ public void process(RMA6Connector fileCon, int taxID, String fileName,NCBI_MapRe
 			}// if TODO should I add an else here and what to do 
 		}// while
 			classIt.close();
+			String taxName;
+			if(mapReader.getNcbiIdToNameMap().get(taxID) != null)
+				taxName = mapReader.getNcbiIdToNameMap().get(taxID).replace(' ', '_');
+			else
+				taxName = "unassingned name";
 			CompositionMap map = new CompositionMap(taxonMap);
 			map.process();
-			String s = mapReader.getNcbiIdToNameMap().get(taxID).replace(' ', '_') 
-						+"\t" + mapReader.getNcbiIdToNameMap().get(map.getMaxID()).replace(' ', '_');
+			String maxReference;
+			if(mapReader.getNcbiIdToNameMap().get(map.getMaxID()) != null)
+				maxReference =  mapReader.getNcbiIdToNameMap().get(map.getMaxID()).replace(' ', '_');
+			else
+				maxReference = "unassinged_reference_name";
+			String s = taxName + "\t" 
+						+ maxReference;
 			for(double d : map.getStatistics())
 				s += "\t" + df.format(d);
 			setReadDistribution(s);
 			setNumberOfMatches(numReads);
 			setSupplementary(supplemantary);
 		}catch(IOException io){
-		io.printStackTrace();
+			io.printStackTrace();
 		}
 	}// void 
 }// class 

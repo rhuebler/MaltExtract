@@ -81,8 +81,8 @@ public class InputParameterProcessor {
     	};
     	 CommandLine commandLine;
     	 	// Short Flags
-    	    Option option_Input = Option.builder("input").argName("Path/to/inDir or RMA6Files").hasArgs().required().desc("Input Directory or file").build();
-    	    Option option_Output = Option.builder().longOpt("output").argName("Path/to/outDir").hasArg().required().desc("Output Directory").build();
+    	    Option option_Input = Option.builder("input").argName("Path/to/inDir or RMA6Files").hasArgs().desc("Input Directory or file").build();
+    	    Option option_Output = Option.builder().longOpt("output").argName("Path/to/outDir").hasArg().desc("Output Directory").build();
     	    Option option_Taxons = Option.builder("taxons").argName("Path/to/taxFile or Taxon in \"\"").hasArg().desc("File with taxons to look up").build();
     	    
     	    // long flags
