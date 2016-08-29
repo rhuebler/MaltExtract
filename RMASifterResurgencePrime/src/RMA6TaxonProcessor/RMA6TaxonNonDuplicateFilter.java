@@ -24,7 +24,7 @@ public class RMA6TaxonNonDuplicateFilter {
 	private int numOfMatches;
 	private String readDistribution;
 	private ArrayList<String> supplemantary;
-
+	private NCBI_MapReader mapReader;
 	private void setSupplementary(ArrayList<String> s){
 		this.supplemantary=s;
 	}
@@ -56,43 +56,9 @@ public class RMA6TaxonNonDuplicateFilter {
 		}
 		return gcContent;
 	}
-	public void process(RMA6Connector fileCon, int taxID, String fileName,NCBI_MapReader mapReader, double topPercent, int maxLength){ 
-		DecimalFormat df = new DecimalFormat("#.###");
+	private void computeOutput(HashMap<Integer, ArrayList<Alignment>> taxonMap, int taxID){
 		ArrayList<String> supplementary = new ArrayList<String>();
-		HashMap<Integer, ArrayList<Alignment>> taxonMap = new HashMap<Integer,ArrayList<Alignment>>();
-		// use ReadsIterator to get all Reads assigned to MegantaxID and print top percent to file;
-		try{
-			IReadBlockIterator classIt  = fileCon.getReadsIterator("Taxonomy", taxID, (float) 1.0,(float) 100.00,true,true);
-			if(!classIt.hasNext()){ // check if reads are assigned to TaxID if not print to console and skip could potentially only happen if some genus is unavailable 
-				System.err.println("TaxID: " + taxID +  " not assigned in File " + fileName+"\n");
-				setReadDistribution(mapReader.getNcbiIdToNameMap().get(taxID).replace(' ', '_')+"\tNA\t0\t0\t0\t0\t0\t0\t0\t0");
-				setSupplementary(new ArrayList<String>(Arrays.asList("0\t0\t0\t0\t0\t0\t"+mapReader.getNcbiIdToNameMap().get(taxID).replace(' ', '_'))));// in case of taxID not being supported add empty Line
-				setNumberOfMatches(0);
-				}
-			System.out.println("Processing Taxon "+mapReader.getNcbiIdToNameMap().get(taxID)+" in File " + fileName); 
-	
-			while(classIt.hasNext()){
-				IReadBlock current = classIt.next();
-				if(current.getReadLength() <= maxLength || maxLength == 0){
-					IMatchBlock block=current.getMatchBlock(0);
-						Alignment al = new Alignment();
-						al.processText(block.getText().split("\n"));
-						al.setReadName(current.getReadName());
-						al.setPIdent(block.getPercentIdentity());
-						if(!taxonMap.containsKey(block.getTaxonId())){
-							ArrayList<Alignment> entry =new ArrayList<Alignment>();
-							entry.add(al);
-							taxonMap.put(block.getTaxonId(), entry);
-						}else{
-							ArrayList<Alignment> entry = taxonMap.get(block.getTaxonId());
-							entry.add(al);
-							taxonMap.put(block.getTaxonId(),entry);
-						}
-				}//if 
-			}//while
-		}catch(IOException io){
-			io.printStackTrace();
-		}
+		DecimalFormat df = new DecimalFormat("#.###");
 		String taxName;
 		if(mapReader.getNcbiIdToNameMap().get(taxID) != null)
 			taxName = mapReader.getNcbiIdToNameMap().get(taxID).replace(' ', '_');
@@ -137,5 +103,45 @@ public class RMA6TaxonNonDuplicateFilter {
 		}
 		setSupplementary(supplementary);
 		setNumberOfMatches(numReads);
+	}	
+	
+	public void process(RMA6Connector fileCon, int taxID, String fileName,NCBI_MapReader mapReader, double topPercent, int maxLength){ 
+		HashMap<Integer, ArrayList<Alignment>> taxonMap = new HashMap<Integer,ArrayList<Alignment>>();
+		// use ReadsIterator to get all Reads assigned to MegantaxID and print top percent to file;
+		try{
+			IReadBlockIterator classIt  = fileCon.getReadsIterator("Taxonomy", taxID, (float) 1.0,(float) 100.00,true,true);
+			if(!classIt.hasNext()){ // check if reads are assigned to TaxID if not print to console and skip could potentially only happen if some genus is unavailable 
+				System.err.println("TaxID: " + taxID +  " not assigned in File " + fileName+"\n");
+				setReadDistribution(mapReader.getNcbiIdToNameMap().get(taxID).replace(' ', '_')+"\tNA\t0\t0\t0\t0\t0\t0\t0\t0");
+				setSupplementary(new ArrayList<String>(Arrays.asList("0\t0\t0\t0\t0\t0\t"+mapReader.getNcbiIdToNameMap().get(taxID).replace(' ', '_'))));// in case of taxID not being supported add empty Line
+				setNumberOfMatches(0);
+				
+			}else{
+				System.out.println("Processing Taxon "+mapReader.getNcbiIdToNameMap().get(taxID)+" in File " + fileName); 
+	
+				while(classIt.hasNext()){
+				IReadBlock current = classIt.next();
+					if(current.getReadLength() <= maxLength || maxLength == 0){
+						IMatchBlock block=current.getMatchBlock(0);
+						Alignment al = new Alignment();
+						al.processText(block.getText().split("\n"));
+						al.setReadName(current.getReadName());
+						al.setPIdent(block.getPercentIdentity());
+						if(!taxonMap.containsKey(block.getTaxonId())){
+							ArrayList<Alignment> entry =new ArrayList<Alignment>();
+							entry.add(al);
+							taxonMap.put(block.getTaxonId(), entry);
+						}else{
+							ArrayList<Alignment> entry = taxonMap.get(block.getTaxonId());
+							entry.add(al);
+							taxonMap.put(block.getTaxonId(),entry);
+						}
+				}//if 
+			}//while
+				computeOutput(taxonMap, taxID);
+		  }//else		
+		}catch(IOException io){
+			io.printStackTrace();
+		}
 	}	
 }

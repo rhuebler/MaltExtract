@@ -3,6 +3,7 @@ package RMA6TaxonProcessor;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 
 import NCBI_MapReader.NCBI_MapReader;
@@ -63,11 +64,13 @@ public void process(RMA6Connector fileCon, int taxID, String fileName,NCBI_MapRe
 	IReadBlockIterator classIt  = fileCon.getReadsIterator("Taxonomy", taxID, (float) 1.0,(float) 100.00,true,true);
 	if(!classIt.hasNext()){ // check if reads are assigned to TaxID if not print to console and skip
 		System.err.println("TaxID: " + taxID +  " not assigned in File " + fileName+"\n");
-		setNumberOfMatches(0);
-		}
-	System.out.println("Processing Taxon "+mapReader.getNcbiIdToNameMap().get(taxID)+" in File " +fileName); 
-	HashMap<Integer, ArrayList<Alignment>> taxonMap = new HashMap<Integer,ArrayList<Alignment>>();
-	int numReads = 0;
+		setReadDistribution(mapReader.getNcbiIdToNameMap().get(taxID).replace(' ', '_')+"\tNA\t0\t0\t0\t0\t0\t0\t0\t0");
+		setSupplementary(new ArrayList<String>(Arrays.asList("0\t0\t0\t0\t0\t0\t"+mapReader.getNcbiIdToNameMap().get(taxID).replace(' ', '_'))));// in case of taxID not being supported add empty Line
+		setSupplementary(supplemantary);
+	}else{
+	 System.out.println("Processing Taxon "+mapReader.getNcbiIdToNameMap().get(taxID)+" in File " +fileName); 
+	 HashMap<Integer, ArrayList<Alignment>> taxonMap = new HashMap<Integer,ArrayList<Alignment>>();
+	 int numReads = 0;
 		while(classIt.hasNext()){
 			IReadBlock current = classIt.next();
 			if(current.getReadLength() <= maxLength || maxLength == 0){
@@ -119,6 +122,7 @@ public void process(RMA6Connector fileCon, int taxID, String fileName,NCBI_MapRe
 			setReadDistribution(s);
 			setNumberOfMatches(numReads);
 			setSupplementary(supplemantary);
+	     }//else
 		}catch(Exception e){
 		e.printStackTrace();
 		}
