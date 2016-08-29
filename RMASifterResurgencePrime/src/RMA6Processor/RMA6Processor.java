@@ -64,7 +64,7 @@ public class RMA6Processor {
 	{	this.overallSum = list;
 	}
 	private void setSupplementaryData(ArrayList<String> s){
-		String header = "readName\tmatchLength\tPercentIdent\tnumberOfMatches\tconsideredMatches\tdamage\tGC_Content\ttaxName";
+		String header = "ReadName\tMatchLength\tPercentIdent\tNumberOfMatches\tConsideredMatches\tNumberOfEndDamagedMatches\tGC_Content\tTaxName";
 		s.add(0, header);
 		this.supplement = s ;
 	}

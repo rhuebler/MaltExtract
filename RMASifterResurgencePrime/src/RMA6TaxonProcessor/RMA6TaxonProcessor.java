@@ -75,7 +75,7 @@ public void process(RMA6Connector fileCon, int taxID, String fileName,NCBI_MapRe
 			IReadBlock current = classIt.next();
 			if(current.getReadLength() <= maxLength || maxLength == 0){
 				IMatchBlock[] blocks=current.getMatchBlocks();
-					int k=0;
+				int k=0;
 				float topScore = current.getMatchBlock(0).getBitScore();
 				double pIdent = 0;
 				double length = 0; 
