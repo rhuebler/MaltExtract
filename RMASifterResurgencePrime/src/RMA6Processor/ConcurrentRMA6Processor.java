@@ -34,7 +34,7 @@ public class ConcurrentRMA6Processor implements Callable<RMA6Processor>{
 		this.t = t;
 	}
 	@Override
-	public RMA6Processor call() throws Exception {
+	public RMA6Processor call(){
 		RMA6Processor processor = new RMA6Processor(inDir, fileName, outDir, mapReader, treeReader,maxLength ,behave, t); // should be implemented as callable 
     	processor.process(taxIDs, topPercent);// loop through file
 		return processor;

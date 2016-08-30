@@ -22,7 +22,7 @@ public class SummaryWriter {
 	private List<String> summary;
 	private String outDir;
 	
-	public SummaryWriter(List<Future<RMA6Processor>> pFiles, NCBI_MapReader mReader, String oDir) throws IOException, InterruptedException, ExecutionException{
+	public SummaryWriter(List<Future<RMA6Processor>> pFiles, NCBI_MapReader mReader, String oDir){
 		this.processedFiles = pFiles;
 		//this.processedIDs = pIDs;	
 		this.mapReader = mReader;

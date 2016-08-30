@@ -4,9 +4,7 @@ package RMAExtractor;
 //TODO adress errors by try catch if no other way 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -14,6 +12,7 @@ import java.util.concurrent.ThreadPoolExecutor;
 import NCBI_MapReader.NCBI_MapReader;
 import NCBI_MapReader.NCBI_TreeReader;
 import RMA6Processor.ConcurrentRMA6Processor;
+import RMA6Processor.ConcurrentRMA6Scanner;
 import RMA6Processor.RMA6Processor;
 import RMA6Processor.RMA6Scanner;
 import behaviour.Filter;
@@ -39,13 +38,13 @@ public class RMAExtractor {
 	private static void destroy(){
 		executor.shutdown();
 	}
-	public static void main(String[] args) throws Exception {
+	public static void main(String[] args)  {
 		InputParameterProcessor inProcessor = new InputParameterProcessor(args);
 		
 		NCBI_MapReader mapReader = new NCBI_MapReader(inProcessor.getTreePath());// shared read access
 		new File(inProcessor.getOutDir()).mkdirs(); // create output directory if directory does not already exist
 	    // iterate over files
-		List<Future<RMA6Processor>> processedFiles = new ArrayList<>();
+		
 		List<Integer> taxIDs= new  ArrayList<Integer>();
 		if(inProcessor.getTaxas() == Taxas.USER){
 			for(String name : inProcessor.getTaxNames()){
@@ -55,9 +54,11 @@ public class RMAExtractor {
 					System.err.println(name + " has no assigned taxID and cannot be processed!");
 			}
     	}
-
-    	if(inProcessor.getFilter() != Filter.SCAN){
-    		executor=(ThreadPoolExecutor) Executors.newFixedThreadPool(inProcessor.getNumThreads());
+		
+		executor=(ThreadPoolExecutor) Executors.newFixedThreadPool(inProcessor.getNumThreads());//intialize concurrent thread executor 
+		
+		if(inProcessor.getFilter() != Filter.SCAN){
+			List<Future<RMA6Processor>> processedFiles = new ArrayList<>();
     		NCBI_TreeReader treeReader = new NCBI_TreeReader(inProcessor.getTreePath());// every tree has its own copy of this now to avoid concurrency issues
     		for(String fileName : inProcessor.getFileNames()){
     			File f = new File(fileName);
@@ -72,15 +73,14 @@ public class RMAExtractor {
 	    sumWriter.writeSummary();
 	  }else{// TODO make multi threaded at functionality to support abstract file paths and add the ability to read input from file
 		  // TODO adress empty node names 
-		  List<RMA6Scanner> scannerList = new ArrayList<RMA6Scanner>();
-		  Set<Integer> allKeys = new HashSet<Integer>();
+		  List<Future<RMA6Scanner>> scannerList = new ArrayList<Future<RMA6Scanner>>();
 		  for(String fileName : inProcessor.getFileNames()){
 			 File f = new File(fileName);
-			 RMA6Scanner scanner = new RMA6Scanner(f.getParent()+"/", f.getName());
-			 scannerList.add(scanner);
-			 allKeys.addAll(scanner.getKeySet());
+			 ConcurrentRMA6Scanner task = new ConcurrentRMA6Scanner(f.getParent()+"/", f.getName());
+			 Future<RMA6Scanner> future=executor.submit(task);
+			 scannerList.add(future);
 		  }
-		  ScanSummaryWriter writer = new ScanSummaryWriter(scannerList, allKeys, mapReader);
+		  ScanSummaryWriter writer = new ScanSummaryWriter(scannerList, mapReader);
 		  writer.write(inProcessor.getOutDir());
 	  }
 	}//main

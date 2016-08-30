@@ -81,17 +81,17 @@ public class InputParameterProcessor {
     	};
     	 CommandLine commandLine;
     	 	// Short Flags
-    	    Option option_Input = Option.builder("input").argName("Path/to/inDir or RMA6Files").hasArgs().desc("Input Directory or file").build();
-    	    Option option_Output = Option.builder().longOpt("output").argName("Path/to/outDir").hasArg().desc("Output Directory").build();
-    	    Option option_Taxons = Option.builder("taxons").argName("Path/to/taxFile or Taxon in \"\"").hasArg().desc("File with taxons to look up").build();
+    	    Option option_Input = Option.builder("i").longOpt("input").argName("Path/to/inDir or RMA6Files").hasArgs().desc("Input Directory or file").build();
+    	    Option option_Output = Option.builder("o").longOpt("output").argName("Path/to/outDir").hasArg().desc("Output Directory").build();
+    	    Option option_Taxons = Option.builder("t").longOpt("taxons").argName("Path/to/taxFile or Taxon in \"\"").hasArg().desc("File with taxons to look up").build();
     	    
     	    // long flags
-    	    Option option_Threads = Option.builder().longOpt("threads").argName("1..maxNumberOfCores").hasArg().optionalArg(true).desc("Number of Cores to run on").build();		
-    	    Option option_TopPercent = Option.builder().longOpt("top").argName("0.0-0.99").hasArg().optionalArg(true).desc("Top Percent of Matches to Consider").build();
-    	    Option option_Filter = Option.builder().longOpt("filter").argName("non,ancient,nonduplicate, scan").optionalArg(true).hasArg().desc("Specify the behaviour for run eg ancient").build();
-    	    Option option_MaxLength = Option.builder().longOpt("maxReadLength").argName("maxLength").hasArg().optionalArg(true).desc("Set Maximum ReadLength").build();
-    	    Option option_Help = Option.builder("h").optionalArg(true).desc("Print Usage and shutdown").build();
-    	    Option option_Path = Option.builder().longOpt("tree").hasArg().optionalArg(true).desc("Path to NCBI tre and map File").build();
+    	    Option option_Threads = Option.builder("p").longOpt("threads").argName("1..maxNumberOfCores").hasArg().optionalArg(true).desc("Number of Cores to run on").build();		
+    	    Option option_TopPercent = Option.builder("v").longOpt("top").argName("0.0-0.99").hasArg().optionalArg(true).desc("Top Percent of Matches to Consider").build();
+    	    Option option_Filter = Option.builder("f").longOpt("filter").argName("non,ancient,nonduplicate, scan").optionalArg(true).hasArg().desc("Specify the behaviour for run eg ancient").build();
+    	    Option option_MaxLength = Option.builder("l").longOpt("maxLength").argName("maxLength").hasArg().optionalArg(true).desc("Set Maximum ReadLength").build();
+    	    Option option_Help = Option.builder("h").longOpt("help").optionalArg(true).desc("Print Usage and shutdown").build();
+    	    Option option_Path = Option.builder("r").longOpt("resources").hasArg().optionalArg(true).desc("Path to NCBI tre and map File").build();
     	    Options options = new Options();
     	    CommandLineParser parser = new DefaultParser();
 
@@ -207,10 +207,10 @@ public class InputParameterProcessor {
     	            this.maxLength = Integer.parseInt(commandLine.getOptionValue("maxReadLength"));
     	        }
     	        
-    	        if(commandLine.hasOption("tree")){
-    	        	File f = new File(commandLine.getOptionValue("tree"));
+    	        if(commandLine.hasOption("resources")){
+    	        	File f = new File(commandLine.getOptionValue("resources"));
     	        	if(f.isDirectory()){
-    	        		this.tree_Path = commandLine.getOptionValue("tree");
+    	        		this.tree_Path = commandLine.getOptionValue("resources");
     	        	}
     	        }
     	        
