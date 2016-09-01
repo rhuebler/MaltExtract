@@ -9,10 +9,14 @@ import java.util.HashMap;
 import NCBI_MapReader.NCBI_MapReader;
 import RMAAlignment.Alignment;
 import RMAAlignment.CompositionMap;
+import jloda.util.ListOfLongs;
 import megan.data.IMatchBlock;
 import megan.data.IReadBlock;
 import megan.data.IReadBlockIterator;
-import megan.rma6.RMA6Connector;
+import megan.data.ReadBlockIterator;
+import megan.rma6.ClassificationBlockRMA6;
+import megan.rma6.RMA6File;
+import megan.rma6.ReadBlockGetterRMA6;
 /**
  * Extract all information from one Taxon and save the information in the specified slots to be retrieved
  * in RMA6Processor is parent class for all filtering Taxonprocessors
@@ -78,14 +82,22 @@ public ArrayList<String> getSupplementary(){
 	return this.supplemantary;
 }
 
-public void process(RMA6Connector fileCon, String fileName, double topPercent, int maxLength){ 
+public void process(RMA6File rma6File, String fileName, double topPercent, int maxLength){ 
 	DecimalFormat df = new DecimalFormat("#.###");
 	ArrayList<String> supplemantary = new ArrayList<String>();
-	// use ReadsIterator to get all Reads assigned to MegantaxID and print top percent to file;
+	// use ReadsIterator to get all Reads assigned to MegantaxID and print top percent to file
+	
 	try{
-	IReadBlockIterator classIt  = fileCon.getReadsIterator("Taxonomy", taxID, (float) 1.0,(float) 100.00,true,true);
+	ClassificationBlockRMA6 block = new ClassificationBlockRMA6("Taxonomy");
+    long start = rma6File.getFooterSectionRMA6().getStartClassification("Taxonomy");
+    block.read(start, rma6File.getReader());
+    ListOfLongs list = new ListOfLongs();
+        if (block.getSum(taxID) > 0) {
+            block.readLocations(start, rma6File.getReader(), taxID, list);
+        }
+	IReadBlockIterator classIt  = new ReadBlockIterator(list, new ReadBlockGetterRMA6(rma6File, true, true, (float) 1.0,(float) 100.00,false,true));
 	if(!classIt.hasNext()){ // check if reads are assigned to TaxID if not print to console and skip
-		System.err.println("TaxID: " + taxID +  " not assigned in File " + fileName+"\n");
+		//System.err.println("TaxID: " + taxID +  " not assigned in File " + fileName+"\n");
 		setReadDistribution(mapReader.getNcbiIdToNameMap().get(taxID).replace(' ', '_')+"\tNA\t0\t0\t0\t0\t0\t0\t0\t0");
 		setSupplementary(new ArrayList<String>(Arrays.asList("0\t0\t0\t0\t0\t0\t"+mapReader.getNcbiIdToNameMap().get(taxID).replace(' ', '_'))));// in case of taxID not being supported add empty Line
 		setSupplementary(supplemantary);
@@ -95,7 +107,7 @@ public void process(RMA6Connector fileCon, String fileName, double topPercent, i
 			taxName = mapReader.getNcbiIdToNameMap().get(taxID).replace(' ', '_');
 		else
 			taxName = "unassignedName";
-		System.out.println("Processing Taxon "+mapReader.getNcbiIdToNameMap().get(taxID)+" in File " +fileName); 
+		//System.out.println("Processing Taxon "+mapReader.getNcbiIdToNameMap().get(taxID)+" in File " +fileName); 
 		HashMap<Integer, ArrayList<Alignment>> taxonMap = new HashMap<Integer,ArrayList<Alignment>>();
 		int numReads = 0;
 		while(classIt.hasNext()){
@@ -155,6 +167,7 @@ public void process(RMA6Connector fileCon, String fileName, double topPercent, i
 			setReadDistribution(s);
 			setNumberOfMatches(numReads);
 			setSupplementary(supplemantary);
+			rma6File.close();
 	     }//else
 		}catch(Exception e){
 		e.printStackTrace();

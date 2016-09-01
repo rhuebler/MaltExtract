@@ -21,7 +21,8 @@ import RMA6TaxonProcessor.RMA6TaxonNonDuplicateFilter;
 import RMA6TaxonProcessor.RMA6TaxonProcessor;
 import behaviour.Filter;
 import behaviour.Taxas;
-import megan.rma6.RMA6Connector;
+import megan.rma6.ClassificationBlockRMA6;
+import megan.rma6.RMA6File;
 /**
  * take care of extracting all the information for one RMA6 file and a List of taxons
  * contains functions to write its own output for supplementary information
@@ -80,7 +81,7 @@ public class RMA6Processor {
 			System.out.println("Writing Read Distribution txt File");
 			Path file = Paths.get(outDir+fileName+"_readDist"+".txt");
 			Files.write(file, summary, Charset.forName("UTF-8"));
-			System.out.println("ReadDistribution for " + fileName +" Done!");
+			//System.out.println("ReadDistribution for " + fileName +" Done!");
 		}catch(IOException io){
 			io.printStackTrace();
 		}
@@ -93,7 +94,7 @@ public class RMA6Processor {
 			outer.write(line+"\n");
 		}
 		outer.close();
-		System.out.println("Supplementary for File "+fileName+" done!");
+		//System.out.println("Supplementary for File "+fileName+" done!");
 		}catch(IOException io){
 			io.printStackTrace();
 		}
@@ -119,11 +120,15 @@ public class RMA6Processor {
 // processing 
 public void process(List<Integer>taxIDs, double topPercent) {
 	try{
-	RMA6Connector fileCon = new RMA6Connector(inDir+fileName);
+	RMA6File rma6File = new RMA6File(inDir+fileName, RMA6File.READ_ONLY);
 	HashMap<Integer,Integer> overallSum = new HashMap<Integer,Integer>();
 	ArrayList<String> supplemantary = new ArrayList<String>();
 	ArrayList<String> readDistribution = new ArrayList<String>();
-	Set<Integer> keys = fileCon.getClassificationBlock("Taxonomy").getKeySet();// get all assigned IDs in a file 
+	Long location = rma6File.getFooterSectionRMA6().getStartClassification("Taxonomy");
+    if (location != null) {
+        ClassificationBlockRMA6 classificationBlockRMA6 = new ClassificationBlockRMA6("Taxonomy");
+        classificationBlockRMA6.read(location, rma6File.getReader());
+	Set<Integer> keys = classificationBlockRMA6.getKeySet();// get all assigned IDs in a file 
 	Set<Integer> idsToProcess = new HashSet<Integer>();
    // treeReader here to avoid synchronization issues 
 	if(taxas == Taxas.USER){
@@ -135,16 +140,13 @@ public void process(List<Integer>taxIDs, double topPercent) {
 		}
 	}
 	else if(taxas == Taxas.ALL){
-		idsToProcess.addAll(fileCon.getClassificationBlock("Taxonomy").getKeySet());
+		idsToProcess.addAll(keys);
 	}
 	setContainedIDs(idsToProcess);
 	for(int id : idsToProcess){
-
-			
-
 		if(behave == Filter.NON){
 			RMA6TaxonProcessor taxProcessor = new RMA6TaxonProcessor(id,mapReader);// could add new
-			taxProcessor.process(fileCon,  fileName,  topPercent,maxLength);
+			taxProcessor.process(rma6File,  fileName,  topPercent,maxLength);
 			overallSum.put(id,taxProcessor.getNumberOfMatches());
 			readDistribution.add(taxProcessor.getReadDistribution());
 			for(String sup : taxProcessor.getSupplementary())
@@ -153,14 +155,14 @@ public void process(List<Integer>taxIDs, double topPercent) {
 
 		}else if(behave == Filter.ANCIENT){
 			RMA6TaxonDamageFilter damageProcessor = new RMA6TaxonDamageFilter(id,mapReader);
-			damageProcessor.process(fileCon, fileName,  topPercent, maxLength);
+			damageProcessor.process(rma6File, fileName,  topPercent, maxLength);
 			overallSum.put(id,damageProcessor.getNumberOfMatches());
 			readDistribution.add(damageProcessor.getReadDistribution());
 			for(String sup : damageProcessor.getSupplementary())
 				supplemantary.add(sup);
 		}else if(behave == Filter.NONDUPLICATES){
 			RMA6TaxonNonDuplicateFilter nonDP = new RMA6TaxonNonDuplicateFilter(id,mapReader);
-			nonDP.process(fileCon,  fileName, topPercent, maxLength);
+			nonDP.process(rma6File,  fileName, topPercent, maxLength);
 			overallSum.put(id,nonDP.getNumberOfMatches());
 			readDistribution.add(nonDP.getReadDistribution());
 			for(String sup : nonDP.getSupplementary())
@@ -168,13 +170,15 @@ public void process(List<Integer>taxIDs, double topPercent) {
 		}
 		
 	  }//TaxIDs
-	
+	rma6File.close();
 	setSupplementaryData(supplemantary);	//save supplementary data at read resolution in adequate slot
 	setSumLine(overallSum); // set number of assigned Reads to overall file summary
 	setReadDistribution(readDistribution);// save ReadDist summary file
 	writeReadDist(getReadDistribution(),fileName); // RMA6Processor now saves its own output 
 	writeSupplementary(getSupplementary(),fileName);
-	}catch(IOException io){
+	System.gc();
+    }
+    }catch(IOException io){
 		System.err.println("Unable to connect to File: "+fileName);
 		io.printStackTrace();
 	}

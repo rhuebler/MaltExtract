@@ -61,17 +61,22 @@ public class RMAExtractor {
 			List<Future<RMA6Processor>> processedFiles = new ArrayList<>();
     		NCBI_TreeReader treeReader = new NCBI_TreeReader(inProcessor.getTreePath());// every tree has its own copy of this now to avoid concurrency issues
     		for(String fileName : inProcessor.getFileNames()){
+//    			  OperatingSystemMXBean os = ManagementFactory.getOperatingSystemMXBean();
+//    		        if(os instanceof UnixOperatingSystemMXBean){
+//    		            System.out.println("Number of open fd: " + ((UnixOperatingSystemMXBean) os).getOpenFileDescriptorCount());
+//    		        }
     			File f = new File(fileName);
     			ConcurrentRMA6Processor task = new ConcurrentRMA6Processor(f.getParent()+"/", f.getName(), inProcessor.getOutDir(), 
 	    			mapReader, treeReader,taxIDs, inProcessor.getTopPercent(),inProcessor.getMaxLength(),inProcessor.getFilter(), inProcessor.getTaxas());
     			Future<RMA6Processor> future=executor.submit(task);
     			processedFiles.add(future);
+    			
     		}//fileNames;
 	    // wait for all threads to finish here currently no concurrency errors or deadlocks but this would be the place where it would fall apart 
 	    destroy();
 	    SummaryWriter sumWriter = new SummaryWriter(processedFiles,mapReader,inProcessor.getOutDir()); 
 	    sumWriter.writeSummary();
-	  }else{// TODO add functionality to support abstract file paths and add the ability to read input from file 
+	  }else{// TODO add functionality to support abstract file paths 
 		  List<Future<RMA6Scanner>> scannerList = new ArrayList<Future<RMA6Scanner>>();
 		  for(String fileName : inProcessor.getFileNames()){
 			 File f = new File(fileName);

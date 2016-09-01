@@ -9,10 +9,14 @@ import java.util.HashMap;
 import NCBI_MapReader.NCBI_MapReader;
 import RMAAlignment.Alignment;
 import RMAAlignment.CompositionMap;
+import jloda.util.ListOfLongs;
 import megan.data.IMatchBlock;
 import megan.data.IReadBlock;
 import megan.data.IReadBlockIterator;
-import megan.rma6.RMA6Connector;
+import megan.data.ReadBlockIterator;
+import megan.rma6.ClassificationBlockRMA6;
+import megan.rma6.RMA6File;
+import megan.rma6.ReadBlockGetterRMA6;
 /**
  * Extract all information from one Taxon and save the information in the specified slots to be retrieved
  * in RMA6Processor this taxon processor only processes reads that have at least one match that hints at c-> end substitutions 
@@ -28,12 +32,18 @@ public RMA6TaxonDamageFilter(int id, NCBI_MapReader reader) {
 	}
 
 @Override
-public void process(RMA6Connector fileCon, String fileName, double topPercent, int maxLength){ 
+public void process(RMA6File rma6File, String fileName, double topPercent, int maxLength){ 
 	DecimalFormat df = new DecimalFormat("#.###");
 	ArrayList<String> supplemantary = new ArrayList<String>();
 	// use ReadsIterator to get all Reads assigned to MegantaxID and print top percent to file;
-	try{
-	IReadBlockIterator classIt  = fileCon.getReadsIterator("Taxonomy", taxID, (float) 1.0,(float) 100.00,true,true);
+	try{final ClassificationBlockRMA6 block = new ClassificationBlockRMA6("Taxonomy");
+    final long start = rma6File.getFooterSectionRMA6().getStartClassification("Taxonomy");
+    block.read(start, rma6File.getReader());
+    final ListOfLongs list = new ListOfLongs();
+        if (block.getSum(taxID) > 0) {
+            block.readLocations(start, rma6File.getReader(), taxID, list);
+        }
+	IReadBlockIterator classIt  = new ReadBlockIterator(list, new ReadBlockGetterRMA6(rma6File, true, true, (float) 1.0,(float) 100.00,false,true));
 	if(!classIt.hasNext()){ // check if reads are assigned to TaxID if not print to console and skip
 		System.err.println("TaxID: " + taxID +  " not assigned in File " + fileName+"\n");
 		setReadDistribution(mapReader.getNcbiIdToNameMap().get(taxID).replace(' ', '_')+"\tNA\t0\t0\t0\t0\t0\t0\t0\t0");
@@ -42,7 +52,7 @@ public void process(RMA6Connector fileCon, String fileName, double topPercent, i
 	}else{
 	// only consider topscoring alignments
 
-	System.out.println("Processing Taxon "+mapReader.getNcbiIdToNameMap().get(taxID)+" in File " + fileName); 
+	//System.out.println("Processing Taxon "+mapReader.getNcbiIdToNameMap().get(taxID)+" in File " + fileName); 
 	HashMap<Integer, ArrayList<Alignment>> taxonMap = new HashMap<Integer,ArrayList<Alignment>>();
 	int numReads = 0;
 		while(classIt.hasNext()){
