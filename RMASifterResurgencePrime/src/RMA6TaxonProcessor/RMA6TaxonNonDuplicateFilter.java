@@ -20,42 +20,14 @@ import megan.rma6.RMA6Connector;
  * @author huebler
  *
  */
-public class RMA6TaxonNonDuplicateFilter {
-	private int numOfMatches;
-	private String readDistribution;
-	private ArrayList<String> supplemantary;
+public class RMA6TaxonNonDuplicateFilter  extends RMA6TaxonProcessor{
+	
+	public RMA6TaxonNonDuplicateFilter(int id, NCBI_MapReader reader) {
+		super(id, reader);
+		// TODO Auto-generated constructor stub
+	}
 	private NCBI_MapReader mapReader;
-	private void setSupplementary(ArrayList<String> s){
-		this.supplemantary=s;
-	}
-	private void setReadDistribution(String s){
-		this.readDistribution=s;
-	}
-	private void setNumberOfMatches(int n){
-		this.numOfMatches=n;
-	}
-	public int getNumberOfMatches(){
-		return this.numOfMatches;
-	}
-	public String getReadDistribution(){
-		return this.readDistribution;
-	}
-	public ArrayList<String> getSupplementary(){
-		return this.supplemantary;
-	}
-
-	private double getGcContent(String sequence){
-		double gcContent = 0;
-		char[] chars=sequence.toCharArray();
-		for(char c : chars){
-			if(c=='g'||c=='G'||c=='c'||c=='C')
-				gcContent++;
-		}
-		if(gcContent !=0){
-			gcContent=gcContent/chars.length;
-		}
-		return gcContent;
-	}
+	
 	private void computeOutput(HashMap<Integer, ArrayList<Alignment>> taxonMap, int taxID){
 		ArrayList<String> supplementary = new ArrayList<String>();
 		DecimalFormat df = new DecimalFormat("#.###");
@@ -104,8 +76,8 @@ public class RMA6TaxonNonDuplicateFilter {
 		setSupplementary(supplementary);
 		setNumberOfMatches(numReads);
 	}	
-	
-	public void process(RMA6Connector fileCon, int taxID, String fileName,NCBI_MapReader mapReader, double topPercent, int maxLength){ 
+	@Override
+	public void process(RMA6Connector fileCon, String fileName, double topPercent, int maxLength){ 
 		HashMap<Integer, ArrayList<Alignment>> taxonMap = new HashMap<Integer,ArrayList<Alignment>>();
 		// use ReadsIterator to get all Reads assigned to MegantaxID and print top percent to file;
 		try{

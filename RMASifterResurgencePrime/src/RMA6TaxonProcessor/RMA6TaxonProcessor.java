@@ -15,35 +15,45 @@ import megan.data.IReadBlockIterator;
 import megan.rma6.RMA6Connector;
 /**
  * Extract all information from one Taxon and save the information in the specified slots to be retrieved
- * in RMA6Processor
+ * in RMA6Processor is parent class for all filtering Taxonprocessors
  * @author huebler
  *
  */
 public class RMA6TaxonProcessor {
-private int numOfMatches;
-private String readDistribution;
-private ArrayList<String> supplemantary;
+protected int numOfMatches;
+protected String readDistribution;
+protected ArrayList<String> supplemantary;
+protected NCBI_MapReader mapReader;
+protected int taxID;
 
-private void setSupplementary(ArrayList<String> s){
-	this.supplemantary=s;
+public RMA6TaxonProcessor(int id, NCBI_MapReader reader){
+	this.mapReader = reader;
+	this.taxID = id;
 }
-private void setReadDistribution(String s){
-	this.readDistribution=s;
+
+protected void setSupplementary(ArrayList<String> s){
+	if(s != null){
+		this.supplemantary = s;
+	}else{
+		ArrayList<String> list = new ArrayList<String>();
+		list.add("0\t0\t0\t0\t0\t0\t"+mapReader.getNcbiIdToNameMap().get(taxID).replace(' ', '_'));
+		this.supplemantary =list;
+	}
 }
-private void setNumberOfMatches(int n){
+
+protected void setReadDistribution(String s){
+	if(s != null){
+		this.readDistribution=s;
+	}else{
+		this.readDistribution = mapReader.getNcbiIdToNameMap().get(taxID).replace(' ', '_')+"\tNA\t0\t0\t0\t0\t0\t0\t0\t0";
+	}
+}
+
+protected void setNumberOfMatches(int n){
 	this.numOfMatches=n;
 }
-public int getNumberOfMatches(){
-	return this.numOfMatches;
-}
-public String getReadDistribution(){
-	return this.readDistribution;
-}
-public ArrayList<String> getSupplementary(){
-	return this.supplemantary;
-}
 
-private double getGcContent(String sequence){
+protected double getGcContent(String sequence){
 	double gcContent = 0;
 	char[] chars=sequence.toCharArray();
 	for(char c : chars){
@@ -56,7 +66,19 @@ private double getGcContent(String sequence){
 	return gcContent;
 }
 
-public void process(RMA6Connector fileCon, int taxID, String fileName,NCBI_MapReader mapReader, double topPercent, int maxLength){ 
+public int getNumberOfMatches(){
+	return this.numOfMatches;
+}
+
+public String getReadDistribution(){
+	return this.readDistribution;
+}
+
+public ArrayList<String> getSupplementary(){
+	return this.supplemantary;
+}
+
+public void process(RMA6Connector fileCon, String fileName, double topPercent, int maxLength){ 
 	DecimalFormat df = new DecimalFormat("#.###");
 	ArrayList<String> supplemantary = new ArrayList<String>();
 	// use ReadsIterator to get all Reads assigned to MegantaxID and print top percent to file;

@@ -24,9 +24,12 @@ public class ScanSummaryWriter {
 	private List<Future<RMA6Scanner>> list;
 	private NCBI_MapReader reader;
 	private Set<Integer> keySet;
+	private List<String> summary;
 	public ScanSummaryWriter(List<Future<RMA6Scanner>> scannerList, NCBI_MapReader reader){
 		this.list = scannerList;
 		this.reader = reader;
+		setProcessedIds();
+		prepareOutput();
 	}
 	void setProcessedIds(){
 		Set<Integer> keys = new HashSet<>();
@@ -40,7 +43,7 @@ public class ScanSummaryWriter {
 			ee.printStackTrace();
 		}
 	}
-	public void write(String outDir){
+	private void prepareOutput(){
 		List<String> summary = new ArrayList<String>();
 		try{
 			boolean first = true;
@@ -79,20 +82,23 @@ public class ScanSummaryWriter {
 				}
 			}
 			summary.add(0,header);
+			this.summary =  summary;
 		}catch (InterruptedException e) {
 			e.printStackTrace();
 		} catch (ExecutionException e) {
 			e.printStackTrace();
 		}
-		try{
-		System.out.println("Writing Scan_Summary txt File");
-		Path file = Paths.get(outDir+"ScanSummary"+".txt");
-		Files.write(file, summary, Charset.forName("UTF-8"));
-		System.out.println("Scan_Summary Done!");
-		}catch(IOException io){
-			io.printStackTrace();
+	}
+		public void write(String outDir){
+			try{
+				System.out.println("Writing Scan_Summary txt File");
+				Path file = Paths.get(outDir+"ScanSummary"+".txt");
+				Files.write(file, summary, Charset.forName("UTF-8"));
+				System.out.println("Scan_Summary Done!");
+			}catch(IOException io){
+				io.printStackTrace();
+			}
 		}
 	}
 	
-	
-}
+

@@ -143,8 +143,8 @@ public void process(List<Integer>taxIDs, double topPercent) {
 			
 
 		if(behave == Filter.NON){
-			RMA6TaxonProcessor taxProcessor = new RMA6TaxonProcessor();// could add new
-			taxProcessor.process(fileCon, id, fileName, mapReader, topPercent,maxLength);
+			RMA6TaxonProcessor taxProcessor = new RMA6TaxonProcessor(id,mapReader);// could add new
+			taxProcessor.process(fileCon,  fileName,  topPercent,maxLength);
 			overallSum.put(id,taxProcessor.getNumberOfMatches());
 			readDistribution.add(taxProcessor.getReadDistribution());
 			for(String sup : taxProcessor.getSupplementary())
@@ -152,15 +152,15 @@ public void process(List<Integer>taxIDs, double topPercent) {
 		
 
 		}else if(behave == Filter.ANCIENT){
-			RMA6TaxonDamageFilter damageProcessor = new RMA6TaxonDamageFilter();
-			damageProcessor.process(fileCon, id, fileName, mapReader, topPercent, maxLength);
+			RMA6TaxonDamageFilter damageProcessor = new RMA6TaxonDamageFilter(id,mapReader);
+			damageProcessor.process(fileCon, fileName,  topPercent, maxLength);
 			overallSum.put(id,damageProcessor.getNumberOfMatches());
 			readDistribution.add(damageProcessor.getReadDistribution());
 			for(String sup : damageProcessor.getSupplementary())
 				supplemantary.add(sup);
 		}else if(behave == Filter.NONDUPLICATES){
-			RMA6TaxonNonDuplicateFilter nonDP = new RMA6TaxonNonDuplicateFilter();
-			nonDP.process(fileCon, id, fileName, mapReader, topPercent, maxLength);
+			RMA6TaxonNonDuplicateFilter nonDP = new RMA6TaxonNonDuplicateFilter(id,mapReader);
+			nonDP.process(fileCon,  fileName, topPercent, maxLength);
 			overallSum.put(id,nonDP.getNumberOfMatches());
 			readDistribution.add(nonDP.getReadDistribution());
 			for(String sup : nonDP.getSupplementary())

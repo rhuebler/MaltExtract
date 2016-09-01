@@ -63,7 +63,7 @@ public class RMAExtractor {
     		for(String fileName : inProcessor.getFileNames()){
     			File f = new File(fileName);
     			ConcurrentRMA6Processor task = new ConcurrentRMA6Processor(f.getParent()+"/", f.getName(), inProcessor.getOutDir(), 
-	    			mapReader, treeReader,taxIDs, inProcessor.getTopPercent(),inProcessor.getMaxLength(),inProcessor.getFilter(), inProcessor.getTaxas()); 
+	    			mapReader, treeReader,taxIDs, inProcessor.getTopPercent(),inProcessor.getMaxLength(),inProcessor.getFilter(), inProcessor.getTaxas());
     			Future<RMA6Processor> future=executor.submit(task);
     			processedFiles.add(future);
     		}//fileNames;
@@ -71,15 +71,15 @@ public class RMAExtractor {
 	    destroy();
 	    SummaryWriter sumWriter = new SummaryWriter(processedFiles,mapReader,inProcessor.getOutDir()); 
 	    sumWriter.writeSummary();
-	  }else{// TODO make multi threaded at functionality to support abstract file paths and add the ability to read input from file
-		  // TODO adress empty node names 
+	  }else{// TODO add functionality to support abstract file paths and add the ability to read input from file 
 		  List<Future<RMA6Scanner>> scannerList = new ArrayList<Future<RMA6Scanner>>();
 		  for(String fileName : inProcessor.getFileNames()){
 			 File f = new File(fileName);
 			 ConcurrentRMA6Scanner task = new ConcurrentRMA6Scanner(f.getParent()+"/", f.getName());
-			 Future<RMA6Scanner> future=executor.submit(task);
+			 Future<RMA6Scanner> future = executor.submit(task);
 			 scannerList.add(future);
 		  }
+		  destroy();
 		  ScanSummaryWriter writer = new ScanSummaryWriter(scannerList, mapReader);
 		  writer.write(inProcessor.getOutDir());
 	  }

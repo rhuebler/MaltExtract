@@ -20,44 +20,15 @@ import megan.rma6.RMA6Connector;
  * @author huebler
  *
  */
-public class RMA6TaxonDamageFilter {
-private int numOfMatches;
-private String readDistribution;
-private ArrayList<String> supplemantary;
+public class RMA6TaxonDamageFilter extends RMA6TaxonProcessor{
 
-private void setSupplementary(ArrayList<String> s){
-	this.supplemantary=s;
-}
-private void setReadDistribution(String s){
-	this.readDistribution=s;
-}
-private void setNumberOfMatches(int n){
-	this.numOfMatches=n;
-}
-public int getNumberOfMatches(){
-	return this.numOfMatches;
-}
-public String getReadDistribution(){
-	return this.readDistribution;
-}
-public ArrayList<String> getSupplementary(){
-	return this.supplemantary;
-}
-
-private double getGcContent(String sequence){
-	double gcContent = 0;
-	char[] chars=sequence.toCharArray();
-	for(char c : chars){
-		if(c=='g'||c=='G'||c=='c'||c=='C')
-			gcContent++;
+public RMA6TaxonDamageFilter(int id, NCBI_MapReader reader) {
+		super(id, reader);
+		// TODO Auto-generated constructor stub
 	}
-	if(gcContent !=0){
-		gcContent=gcContent/chars.length;
-	}
-	return gcContent;
-}
 
-public void process(RMA6Connector fileCon, int taxID, String fileName,NCBI_MapReader mapReader, double topPercent, int maxLength){ 
+@Override
+public void process(RMA6Connector fileCon, String fileName, double topPercent, int maxLength){ 
 	DecimalFormat df = new DecimalFormat("#.###");
 	ArrayList<String> supplemantary = new ArrayList<String>();
 	// use ReadsIterator to get all Reads assigned to MegantaxID and print top percent to file;

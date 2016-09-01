@@ -221,7 +221,10 @@ public class InputParameterProcessor {
     	    	    formatter.printHelp("RMAExtractor", header, options, footer, true);   
     	    	    System.exit(0);
     	        }
-    	        
+    	        if(!commandLine.hasOption("h")  && (!commandLine.hasOption("output") || !commandLine.hasOption("input"))){
+    	        	System.err.println("Please, specifiy input files or input directories and output directory");
+    	        	System.exit(1);
+    	        }
     	        {
     	            String[] remainder = commandLine.getArgs();
     	            System.out.print("Remaining arguments: ");

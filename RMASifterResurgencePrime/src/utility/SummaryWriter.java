@@ -30,7 +30,7 @@ public class SummaryWriter {
 		setProcessedIds();
 		prepareOutput();
 	}
-	void setProcessedIds(){
+	private void setProcessedIds(){
 		Set<Integer> pIDs = new HashSet<>();
 		try{
 		for(Future<RMA6Processor> future : processedFiles)
