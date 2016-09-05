@@ -44,7 +44,7 @@ public class SummaryWriter {
 	}
 	private void prepareOutput() {
 		   List<String> summary = new ArrayList<String>();
-		   String header ="Taxon"; // could and should be its own function 
+		   String header ="Node"; // could and should be its own function 
 		   boolean first = true;	   
 		   for(Future<RMA6Processor> future : processedFiles){
 			   RMA6Processor current;

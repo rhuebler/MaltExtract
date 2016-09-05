@@ -14,7 +14,6 @@ import megan.data.IMatchBlock;
 import megan.data.IReadBlock;
 import megan.data.IReadBlockIterator;
 import megan.data.ReadBlockIterator;
-import megan.rma6.ClassificationBlockRMA6;
 import megan.rma6.RMA6File;
 import megan.rma6.ReadBlockGetterRMA6;
 /**
@@ -26,8 +25,8 @@ import megan.rma6.ReadBlockGetterRMA6;
  */
 public class RMA6TaxonNonDuplicateFilter  extends RMA6TaxonProcessor{
 	
-	public RMA6TaxonNonDuplicateFilter(int id, NCBI_MapReader reader) {
-		super(id, reader);
+	public RMA6TaxonNonDuplicateFilter(int id, NCBI_MapReader reader, ListOfLongs list) {
+		super(id, reader, list);
 		// TODO Auto-generated constructor stub
 	}
 	private NCBI_MapReader mapReader;
@@ -81,17 +80,11 @@ public class RMA6TaxonNonDuplicateFilter  extends RMA6TaxonProcessor{
 		setNumberOfMatches(numReads);
 	}	
 	@Override
-	public void process(RMA6File rma6File, String fileName, double topPercent, int maxLength){ 
+	public void process(String inDir, String fileName, double topPercent, int maxLength){ 
 		HashMap<Integer, ArrayList<Alignment>> taxonMap = new HashMap<Integer,ArrayList<Alignment>>();
 		// use ReadsIterator to get all Reads assigned to MegantaxID and print top percent to file;
 		try{
-		final ClassificationBlockRMA6 cBlock = new ClassificationBlockRMA6("Taxonomy");
-	    final long start = rma6File.getFooterSectionRMA6().getStartClassification("Taxonomy");
-	    cBlock.read(start, rma6File.getReader());
-	    final ListOfLongs list = new ListOfLongs();
-	        if (cBlock.getSum(taxID) > 0) {
-	        	cBlock.readLocations(start, rma6File.getReader(), taxID, list);
-	        }
+			RMA6File rma6File = new RMA6File(inDir+fileName, "r");	
 			IReadBlockIterator classIt  = new ReadBlockIterator(list, new ReadBlockGetterRMA6(rma6File, true, true, (float) 1.0,(float) 100.00,false,true));
 			if(!classIt.hasNext()){ // check if reads are assigned to TaxID if not print to console and skip could potentially only happen if some genus is unavailable 
 				System.err.println("TaxID: " + taxID +  " not assigned in File " + fileName+"\n");

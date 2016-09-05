@@ -14,7 +14,6 @@ import megan.data.IMatchBlock;
 import megan.data.IReadBlock;
 import megan.data.IReadBlockIterator;
 import megan.data.ReadBlockIterator;
-import megan.rma6.ClassificationBlockRMA6;
 import megan.rma6.RMA6File;
 import megan.rma6.ReadBlockGetterRMA6;
 /**
@@ -26,23 +25,18 @@ import megan.rma6.ReadBlockGetterRMA6;
  */
 public class RMA6TaxonDamageFilter extends RMA6TaxonProcessor{
 
-public RMA6TaxonDamageFilter(int id, NCBI_MapReader reader) {
-		super(id, reader);
+public RMA6TaxonDamageFilter(int id, NCBI_MapReader reader, ListOfLongs list) {
+		super(id, reader, list);
 		// TODO Auto-generated constructor stub
 	}
 
 @Override
-public void process(RMA6File rma6File, String fileName, double topPercent, int maxLength){ 
+public void process(String inDir, String fileName, double topPercent, int maxLength){ 
 	DecimalFormat df = new DecimalFormat("#.###");
 	ArrayList<String> supplemantary = new ArrayList<String>();
 	// use ReadsIterator to get all Reads assigned to MegantaxID and print top percent to file;
-	try{final ClassificationBlockRMA6 block = new ClassificationBlockRMA6("Taxonomy");
-    final long start = rma6File.getFooterSectionRMA6().getStartClassification("Taxonomy");
-    block.read(start, rma6File.getReader());
-    final ListOfLongs list = new ListOfLongs();
-        if (block.getSum(taxID) > 0) {
-            block.readLocations(start, rma6File.getReader(), taxID, list);
-        }
+	try{
+	RMA6File rma6File = new RMA6File(inDir+fileName, "r");	
 	IReadBlockIterator classIt  = new ReadBlockIterator(list, new ReadBlockGetterRMA6(rma6File, true, true, (float) 1.0,(float) 100.00,false,true));
 	if(!classIt.hasNext()){ // check if reads are assigned to TaxID if not print to console and skip
 		System.err.println("TaxID: " + taxID +  " not assigned in File " + fileName+"\n");
@@ -121,6 +115,7 @@ public void process(RMA6File rma6File, String fileName, double topPercent, int m
 			setReadDistribution(s);
 			setNumberOfMatches(numReads);
 			setSupplementary(supplemantary);
+			rma6File.close();
 		 }//else
 		}catch(IOException io){
 			io.printStackTrace();
