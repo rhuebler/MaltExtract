@@ -2,10 +2,15 @@ package RMA6Processor;
 
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import megan.rma6.RMA6Connector;
+import NCBI_MapReader.NCBI_TreeReader;
+import behaviour.Taxas;
+import megan.rma6.ClassificationBlockRMA6;
+import megan.rma6.RMA6File;
 
 /**
  * Class returns the keyset of a RMA6File
@@ -21,10 +26,16 @@ public class RMA6Scanner {
 	private String fileName;
 	private Set<Integer> keySet;
 	private Map<Integer,Integer> assignmentMap;
+	private Taxas tax;
+	private List<Integer> taxIDs;
+	private NCBI_TreeReader  treeReader;
 	// constructor
-	public RMA6Scanner(String inDir, String name){
+	public RMA6Scanner(String inDir, String name, Taxas tax, List<Integer> taxIds, NCBI_TreeReader tReader){
 		this.inDir = inDir;
 		this.fileName =  name;
+		this.taxIDs = taxIds;
+		this.tax =  tax;
+		this.treeReader = new NCBI_TreeReader(tReader);
 		process();
 		}
 	// getters
@@ -40,14 +51,36 @@ public class RMA6Scanner {
 	}
 	// process
 	private void process(){
-		try{System.out.println("Scanning File: "+ fileName);
+		try{
+			System.out.println("Scanning File: "+ fileName);
 			Map<Integer,Integer> map = new HashMap<Integer,Integer>();
-			RMA6Connector fileCon = new RMA6Connector(inDir+fileName);
-			this.keySet=fileCon.getClassificationBlock("Taxonomy").getKeySet();
-			for(int key : keySet){
-				map.put(key,fileCon.getClassificationBlock("Taxonomy").getSum(key));
-			}
+			RMA6File rma6File = new RMA6File(inDir+fileName, "r");
+			Long location = rma6File.getFooterSectionRMA6().getStartClassification("Taxonomy");
+		    if (location != null) {
+		        ClassificationBlockRMA6 cl = new ClassificationBlockRMA6("Taxonomy");
+		        cl.read(location, rma6File.getReader());
+		        if(tax == Taxas.USER){
+		        	Set<Integer> idsToProcess = new HashSet<Integer>();
+		        	for(Integer taxID : taxIDs){
+		        		idsToProcess.add(taxID);
+		        		for(Integer id : treeReader.getStrains(taxID, cl.getKeySet()))
+		        			if(!taxIDs.contains(id))
+		        				idsToProcess.add(id);
+		        	}
+		        	this.keySet =  idsToProcess;
+		        }else{
+		        	this.keySet = cl.getKeySet();
+				}
+		        for(int key : keySet){
+		        	map.put(key, cl.getSum(key));
+		        }
 			this.assignmentMap = map;
+		    }else{
+		    	System.err.println(fileName+" has no taxonomy block");
+		    map.put(0, 0);
+		    this.assignmentMap = map;
+		    }
+			rma6File.close();
 		}catch(IOException io){
 			io.printStackTrace();
 		}

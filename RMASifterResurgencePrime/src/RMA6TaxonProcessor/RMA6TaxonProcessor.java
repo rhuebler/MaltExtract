@@ -27,14 +27,75 @@ protected String readDistribution;
 protected ArrayList<String> supplemantary;
 protected NCBI_MapReader mapReader;
 protected Integer taxID;
+protected HashMap<Integer,Integer> editHistogram;
 ListOfLongs list;
-
+//constructor
 public RMA6TaxonProcessor(Integer id, NCBI_MapReader reader, ListOfLongs l){
 	this.mapReader = reader;
 	this.taxID = id;
 	this.list = l;
 }
-
+protected void setEditDistanceHistogram(ArrayList<Integer> list){
+	HashMap<Integer,Integer> histo = new HashMap<Integer,Integer> ();
+	for(int d : list){
+		if(histo.containsKey(d) && d<=5)
+		{	int value = histo.get(d);
+			histo.put(d, value++);
+		}else if(!histo.containsKey(d)&& d<=5){
+			histo.put(d, 1);
+		}else{
+			if(histo.containsKey(6)){
+				int value = histo.get(6);
+				histo.put(6, value++);
+			}else{
+				histo.put(6, 1);
+			}
+		}
+		
+	}
+	this.editHistogram = histo;
+}
+protected void setPercentIdentityHistogram(ArrayList<Double> list){
+	HashMap<Integer,Integer> histo = new HashMap<Integer,Integer> ();
+	for(double d: list){
+		if(77.5 <= d && d< 82.5){
+			if(histo.containsKey(0)){
+				int value = histo.get(0);
+				histo.put(0, value++);
+			}else{
+				histo.put(0, 1);
+			}
+		}else if(82.5 <= d && d< 87.5){
+			if(histo.containsKey(1)){
+				int value = histo.get(1);
+				histo.put(1, value++);
+			}else{
+				histo.put(1, 1);
+			}
+		}else if(87.5 <= d && d< 92.5){
+			if(histo.containsKey(2)){
+				int value = histo.get(2);
+				histo.put(2, value++);
+			}else{
+				histo.put(2, 1);
+			}
+		}else if(92.5 <= d && d< 97.5){
+			if(histo.containsKey(3)){
+				int value = histo.get(3);
+				histo.put(3, value++);
+			}else{
+				histo.put(3, 1);
+			}
+		}else if(97.5 <= d){
+			if(histo.containsKey(4)){
+				int value = histo.get(4);
+				histo.put(4, value++);
+			}else{
+				histo.put(4, 1);
+			}
+		}
+	}
+}
 protected void setSupplementary(ArrayList<String> s){
 	if(s != null){
 		this.supplemantary = s;
@@ -85,6 +146,8 @@ public ArrayList<String> getSupplementary(){
 public void process(String inDir, String fileName, double topPercent, int maxLength){ 
 	DecimalFormat df = new DecimalFormat("#.###");
 	ArrayList<String> supplemantary = new ArrayList<String>();
+	ArrayList<Integer> distances = new ArrayList<Integer>();
+	ArrayList<Double> pIdents = new ArrayList<Double>();
 	// use ReadsIterator to get all Reads assigned to MegantaxID and print top percent to file
 	
 	try{
@@ -113,14 +176,17 @@ public void process(String inDir, String fileName, double topPercent, int maxLen
 				double pIdent = 0;
 				double length = 0; 
 				int damage=0;
+				int editDistance=0;
 				for(int i = 0; i< blocks.length;i++){
 					if(blocks[i].getBitScore()/topScore < 1-topPercent){
 						break;}
 					
-					pIdent += blocks[i].getPercentIdentity();
 					Alignment al = new Alignment();
 					al.processText(blocks[i].getText().split("\n"));
 					length += al.getMlength();
+					al.setPIdent(blocks[i].getPercentIdentity());
+					pIdent += al.getPIdent();
+					editDistance += al.getEditInstance();
 					if(!taxonMap.containsKey(blocks[i].getTaxonId())){
 						ArrayList<Alignment> entry =new ArrayList<Alignment>();
 						entry.add(al);
@@ -135,15 +201,9 @@ public void process(String inDir, String fileName, double topPercent, int maxLen
 					k++;
 				}
 					numReads++;
-					supplemantary.add(
-						current.getReadName()+"\t"
-						+ (int)(length/k)+"\t"
-						+ df.format(pIdent/(k)) +"\t"
-						+ current.getNumberOfMatches()+"\t"
-						+ k +"\t"
-						+ damage+'\t'
-						+ df.format(getGcContent(current.getReadSequence()))+"\t"
-						+ taxName);
+					distances.add(editDistance/k);
+					pIdents.add(pIdent/k);
+					
 			}// if TODO should I add an else here and what to do with it 
 		}// while
 			classIt.close();

@@ -22,7 +22,11 @@ public class Alignment {
 	private boolean fivePrimeDamage;
 	private boolean reversed = false;
 	private boolean duplicate = false;
+	private int editDistance;
 	// getter
+public int getEditInstance(){
+	return this.editDistance;
+}
 public String getReadName(){
 	return this.readName;
 }	
@@ -120,6 +124,30 @@ private void setReferenceLength(int k) {
 		 		return true;
 	 else return false;
  }
+ private void calculateEditDistance(String sequence, String reference){
+		int len1 = sequence.length();
+		int len2 = sequence.length();
+		 int[][] d = new int[len1 + 1][len2 + 1];
+		 for(int i = 0; i <= len1; i++)
+			 d[i][0] = i;
+		 for(int j = 0; j <= len2; j++)
+			 d[0][j] = j;
+		 for(int i = 0; i < sequence.length(); i++){
+			 for(int j = 0; j < sequence.length(); j++){
+				 if(sequence.charAt(i) == reference.charAt(j)){
+					d[i+1][j+1] = d[i][j]; 
+				 }else{
+					int replace  = d[i][j]+1;
+					int insert = d[i + 1][j]+1;
+					int delete = d[i][j + 1] + 1;
+					d[i+1][j+1] = Math.min(replace, 
+									 Math.min(insert,
+									 delete));
+				 }
+			 }
+		 }
+	 this.editDistance = d[sequence.length()][reference.length()];
+ }
  
  // process matchblock and save information in Alignment object
  public void processText(String[] text){
@@ -149,7 +177,7 @@ private void setReferenceLength(int k) {
 		 if(line.contains("Sbjct")){
 			 int i =0;
 			 for(String frag:line.split("\\s")){
-				 if(frag.trim().matches("[ATGCatgc]+")){
+				 if(frag.trim().matches("[ATGCNatgcn-]+")){
 					 setReference(frag.trim());
 					if(ctMisMatch(0) || ctMisMatch(this.query.length()-1)) // set damage true if there is a C->T sub at eithter end
 						setFivePrimeDamage(true);
@@ -179,6 +207,7 @@ private void setReferenceLength(int k) {
 	 if(getStart() > getEnd()){
 		 setReversed(true);
 	 }
+	 calculateEditDistance(query, reference);
  }// method
 
 }//classbody

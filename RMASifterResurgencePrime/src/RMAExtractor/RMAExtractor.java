@@ -21,8 +21,8 @@ import utility.InputParameterProcessor;
 import utility.ScanSummaryWriter;
 import utility.SummaryWriter;
 /**
- * Essentially the Main Class of RMA Extractor is a concurrent Programm
- * At start up passes all comandline arguments into InputProcessor
+ * Essentially the Main Class of RMA Extractor is a concurrent Program
+ * At start up passes all command line arguments into InputProcessor
  * Input Processor grabs all arguments from the specified flags
  * and default values to unspecified arguments
  * than initializes instances of NCBI_Map_Reader and NCBI_TreeReader 
@@ -39,12 +39,10 @@ public class RMAExtractor {
 		executor.shutdown();
 	}
 	public static void main(String[] args)  {
+		long startTime = System.nanoTime();
 		InputParameterProcessor inProcessor = new InputParameterProcessor(args);
-		
-		NCBI_MapReader mapReader = new NCBI_MapReader(inProcessor.getTreePath());// shared read access
-		new File(inProcessor.getOutDir()).mkdirs(); // create output directory if directory does not already exist
-	    // iterate over files
-		
+		NCBI_MapReader mapReader = new NCBI_MapReader(inProcessor.getTreePath());
+		new File(inProcessor.getOutDir()).mkdirs();
 		List<Integer> taxIDs= new  ArrayList<Integer>();
 		if(inProcessor.getTaxas() == Taxas.USER){
 			for(String name : inProcessor.getTaxNames()){
@@ -59,15 +57,12 @@ public class RMAExtractor {
 		
 		if(inProcessor.getFilter() != Filter.SCAN){
 			List<Future<RMA6Processor>> processedFiles = new ArrayList<>();
-    		NCBI_TreeReader treeReader = new NCBI_TreeReader(inProcessor.getTreePath());// every tree has its own copy of this now to avoid concurrency issues
+			 NCBI_TreeReader treeReader = new NCBI_TreeReader(inProcessor.getTreePath());
     		for(String fileName : inProcessor.getFileNames()){
-//    			  OperatingSystemMXBean os = ManagementFactory.getOperatingSystemMXBean();
-//    		        if(os instanceof UnixOperatingSystemMXBean){
-//    		            System.out.println("Number of open fd: " + ((UnixOperatingSystemMXBean) os).getOpenFileDescriptorCount());
-//    		        }
     			File f = new File(fileName);
+    			 // every tree has its own copy of this now to avoid concurrency issues
     			ConcurrentRMA6Processor task = new ConcurrentRMA6Processor(f.getParent()+"/", f.getName(), inProcessor.getOutDir(), 
-	    			mapReader, treeReader,taxIDs, inProcessor.getTopPercent(),inProcessor.getMaxLength(),inProcessor.getFilter(), inProcessor.getTaxas());
+	    			mapReader, treeReader,taxIDs, inProcessor.getTopPercent(),inProcessor.getMaxLength(),inProcessor.getFilter(), inProcessor.getTaxas(), inProcessor.wantReadInf());
     			Future<RMA6Processor> future=executor.submit(task);
     			processedFiles.add(future);
     			
@@ -78,9 +73,12 @@ public class RMAExtractor {
 	    sumWriter.writeSummary();
 	  }else{// TODO add functionality to support abstract file paths 
 		  List<Future<RMA6Scanner>> scannerList = new ArrayList<Future<RMA6Scanner>>();
+		  NCBI_TreeReader treeReader = new NCBI_TreeReader(inProcessor.getTreePath());
+		  // every tree has its own copy of this now to avoid concurrency issues
 		  for(String fileName : inProcessor.getFileNames()){
+			 
 			 File f = new File(fileName);
-			 ConcurrentRMA6Scanner task = new ConcurrentRMA6Scanner(f.getParent()+"/", f.getName());
+			 ConcurrentRMA6Scanner task = new ConcurrentRMA6Scanner(f.getParent()+"/", f.getName(),inProcessor.getTaxas(),taxIDs, treeReader);
 			 Future<RMA6Scanner> future = executor.submit(task);
 			 scannerList.add(future);
 		  }
@@ -88,6 +86,8 @@ public class RMAExtractor {
 		  ScanSummaryWriter writer = new ScanSummaryWriter(scannerList, mapReader);
 		  writer.write(inProcessor.getOutDir());
 	  }
+		long endTime = System.nanoTime();
+		System.out.println("Runtime: "+ (endTime - startTime)/1000000000 +" Seconds");
 	}//main
 	
 }//class

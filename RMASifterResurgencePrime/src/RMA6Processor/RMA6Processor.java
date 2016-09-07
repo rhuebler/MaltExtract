@@ -32,6 +32,7 @@ import megan.rma6.RMA6File;
  * @author huebler
  *
  */
+//TODO output to directory with fileNames output of Editdistance and Percent ID Histogram
 public class RMA6Processor {
 	// attributes
 	private HashMap<Integer,Integer> overallSum;
@@ -157,7 +158,7 @@ public class RMA6Processor {
 		return this.fileName;
 	}
 // processing 
-public void process(List<Integer>taxIDs, double topPercent) {
+public void process(List<Integer>taxIDs, double topPercent, boolean readInf) {
 	System.out.println("Reading File: " +inDir+fileName);
 	HashMap<Integer,Integer> overallSum = new HashMap<Integer,Integer>();
 	ArrayList<String> supplemantary = new ArrayList<String>();
@@ -177,38 +178,47 @@ public void process(List<Integer>taxIDs, double topPercent) {
 		idsToProcess.addAll(keys);
 	}
 	setContainedIDs(idsToProcess);
-	for(Integer id : idsToProcess){
-		ListOfLongs list = getLongs(id);
-		if(behave == Filter.NON){
+	try{
+		OutputStreamWriter outer = new OutputStreamWriter(new GZIPOutputStream(new FileOutputStream(outDir+fileName+"_supplement"+ ".txt.gz")));
+		for(Integer id : idsToProcess){
+			ListOfLongs list = getLongs(id);
+			if(behave == Filter.NON){
 			
-			RMA6TaxonProcessor taxProcessor = new RMA6TaxonProcessor(id,mapReader,list);
-			taxProcessor.process(inDir,  fileName,  topPercent,maxLength);
-			overallSum.put(id,taxProcessor.getNumberOfMatches());
-			readDistribution.add(taxProcessor.getReadDistribution());
-			supplemantary.addAll(taxProcessor.getSupplementary());
-		
-
-		}else if(behave == Filter.ANCIENT){
+				RMA6TaxonProcessor taxProcessor = new RMA6TaxonProcessor(id,mapReader,list);
+				taxProcessor.process(inDir,  fileName,  topPercent,maxLength);
+				overallSum.put(id,taxProcessor.getNumberOfMatches());
+				readDistribution.add(taxProcessor.getReadDistribution());
+				//supplemantary.addAll(taxProcessor.getSupplementary());
+				for(String s : taxProcessor.getSupplementary())
+						outer.write(s);
+			}else if(behave == Filter.ANCIENT){
 			
-			RMA6TaxonDamageFilter damageProcessor = new RMA6TaxonDamageFilter(id,mapReader, list);
-			damageProcessor.process(inDir, fileName,  topPercent, maxLength);
-			overallSum.put(id,damageProcessor.getNumberOfMatches());
-			readDistribution.add(damageProcessor.getReadDistribution());
-			supplemantary.addAll(damageProcessor.getSupplementary());
-		
-		}else if(behave == Filter.NONDUPLICATES){
-			RMA6TaxonNonDuplicateFilter nonDP = new RMA6TaxonNonDuplicateFilter(id,mapReader, list);
-			nonDP.process(inDir,  fileName, topPercent, maxLength);
-			overallSum.put(id,nonDP.getNumberOfMatches());
-			readDistribution.add(nonDP.getReadDistribution());
-			supplemantary.addAll(nonDP.getSupplementary());
-		}
+				RMA6TaxonDamageFilter damageProcessor = new RMA6TaxonDamageFilter(id,mapReader, list);
+				damageProcessor.process(inDir, fileName,  topPercent, maxLength);
+				overallSum.put(id,damageProcessor.getNumberOfMatches());
+				readDistribution.add(damageProcessor.getReadDistribution());
+				//supplemantary.addAll(damageProcessor.getSupplementary());
+				for(String s : damageProcessor.getSupplementary())
+					outer.write(s);
+			}else if(behave == Filter.NONDUPLICATES){
+				RMA6TaxonNonDuplicateFilter nonDP = new RMA6TaxonNonDuplicateFilter(id,mapReader, list);
+				nonDP.process(inDir,  fileName, topPercent, maxLength);
+				overallSum.put(id,nonDP.getNumberOfMatches());
+				readDistribution.add(nonDP.getReadDistribution());
+				//supplemantary.addAll(nonDP.getSupplementary());
+				for(String s : nonDP.getSupplementary())
+					outer.write(s);
+			}
 		
 	  }//TaxIDs
-	setSupplementaryData(supplemantary);	//save supplementary data at read resolution in adequate slot
+	outer.close();	
+	}catch(IOException io){
+		io.printStackTrace();
+	}
+	//setSupplementaryData(supplemantary);	//save supplementary data at read resolution in adequate slot
 	setSumLine(overallSum); // set number of assigned Reads to overall file summary
 	setReadDistribution(readDistribution);// save ReadDist summary file
 	writeReadDist(getReadDistribution(),fileName); // RMA6Processor now saves its own output 
-	writeSupplementary(getSupplementary(),fileName);
+	//writeSupplementary(getSupplementary(),fileName);
     }
  }
