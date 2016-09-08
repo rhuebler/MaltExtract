@@ -32,16 +32,23 @@ public RMA6TaxonDamageFilter(int id, NCBI_MapReader reader, ListOfLongs list) {
 
 @Override
 public void process(String inDir, String fileName, double topPercent, int maxLength){ 
+	if(mapReader.getNcbiIdToNameMap().get(taxID) != null)
+		this.taxName = mapReader.getNcbiIdToNameMap().get(taxID).replace(' ', '_');
+	else
+		this.taxName = "unassingned name";
 	DecimalFormat df = new DecimalFormat("#.###");
 	ArrayList<String> supplemantary = new ArrayList<String>();
+	ArrayList<Integer> distances = new ArrayList<Integer>();
+	ArrayList<Double> pIdents = new ArrayList<Double>();
 	// use ReadsIterator to get all Reads assigned to MegantaxID and print top percent to file;
-	try{
-	RMA6File rma6File = new RMA6File(inDir+fileName, "r");	
+	try(RMA6File rma6File = new RMA6File(inDir+fileName, "r")){	
 	IReadBlockIterator classIt  = new ReadBlockIterator(list, new ReadBlockGetterRMA6(rma6File, true, true, (float) 1.0,(float) 100.00,false,true));
 	if(!classIt.hasNext()){ // check if reads are assigned to TaxID if not print to console and skip
 		System.err.println("TaxID: " + taxID +  " not assigned in File " + fileName+"\n");
-		setReadDistribution(mapReader.getNcbiIdToNameMap().get(taxID).replace(' ', '_')+"\tNA\t0\t0\t0\t0\t0\t0\t0\t0");
-		setSupplementary(new ArrayList<String>(Arrays.asList("0\t0\t0\t0\t0\t0\t"+mapReader.getNcbiIdToNameMap().get(taxID).replace(' ', '_'))));// in case of taxID not being supported add empty Line
+		setReadDistribution(taxName+"\tNA\t0\t0\t0\t0\t0\t0\t0\t0");
+		setSupplementary(new ArrayList<String>(Arrays.asList("0\t0\t0\t0\t0\t0\t"+taxName)));// in case of taxID not being supported add empty Line
+		setPercentIdentityHistogram(pIdents);
+		setEditDistanceHistogram(distances);
 		setNumberOfMatches(0);	
 	}else{
 	// only consider topscoring alignments
@@ -57,6 +64,7 @@ public void process(String inDir, String fileName, double topPercent, int maxLen
 				float topScore = blocks[0].getBitScore();
 				double pIdent = 0;
 				double length = 0; 
+				int editDistance = 0;
 				int damage=0;
 				for(int i = 0; i< blocks.length;i++){
 					if(blocks[i].getBitScore()/topScore <= 1 - topPercent){
@@ -64,6 +72,7 @@ public void process(String inDir, String fileName, double topPercent, int maxLen
 					
 					Alignment al = new Alignment();
 					al.processText(blocks[i].getText().split("\n"));
+					al.setPIdent(blocks[i].getPercentIdentity());
 					if(al.getFivePrimeDamage()){
 						
 						length += al.getMlength();
@@ -81,10 +90,12 @@ public void process(String inDir, String fileName, double topPercent, int maxLen
 						damage++;
 					k++;
 					}
+					editDistance += al.getEditInstance();
+					pIdent += al.getPIdent();
 				}
 				if(damage !=0){
 					numReads++;
-					supplemantary.add(
+					/*supplemantary.add(
 						current.getReadName()+"\t"
 						+ (int)(length/k)+"\t"
 						+ df.format(pIdent/(k)) +"\t"
@@ -92,15 +103,14 @@ public void process(String inDir, String fileName, double topPercent, int maxLen
 						+ k +"\t"
 						+ damage+'\t'
 						+ df.format(getGcContent(current.getReadSequence()))+"\t"
-						+ mapReader.getNcbiIdToNameMap().get(taxID).replace(' ', '_'));}
+						+ taxName);*/
+					distances.add(editDistance/k);
+					pIdents.add(pIdent/k);
+				}	
 			}// if TODO should I add an else here and what to do 
 		}// while
 			classIt.close();
-			String taxName;
-			if(mapReader.getNcbiIdToNameMap().get(taxID) != null)
-				taxName = mapReader.getNcbiIdToNameMap().get(taxID).replace(' ', '_');
-			else
-				taxName = "unassingned name";
+			
 			CompositionMap map = new CompositionMap(taxonMap);
 			map.process();
 			String maxReference;
@@ -114,7 +124,9 @@ public void process(String inDir, String fileName, double topPercent, int maxLen
 				s += "\t" + df.format(d);
 			setReadDistribution(s);
 			setNumberOfMatches(numReads);
-			setSupplementary(supplemantary);
+			setEditDistanceHistogram(distances);
+			setPercentIdentityHistogram(pIdents);
+			//setSupplementary(supplemantary);
 			rma6File.close();
 		 }//else
 		}catch(IOException io){

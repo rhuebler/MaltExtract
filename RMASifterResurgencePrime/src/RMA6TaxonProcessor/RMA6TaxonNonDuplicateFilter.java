@@ -33,6 +33,8 @@ public class RMA6TaxonNonDuplicateFilter  extends RMA6TaxonProcessor{
 	
 	private void computeOutput(HashMap<Integer, ArrayList<Alignment>> taxonMap, int taxID){
 		ArrayList<String> supplementary = new ArrayList<String>();
+		ArrayList<Integer> distances = new ArrayList<Integer>();
+		ArrayList<Double> pIdents = new ArrayList<Double>();
 		DecimalFormat df = new DecimalFormat("#.###");
 		String taxName;
 		if(mapReader.getNcbiIdToNameMap().get(taxID) != null)
@@ -59,7 +61,9 @@ public class RMA6TaxonNonDuplicateFilter  extends RMA6TaxonProcessor{
 		for(int key : taxonMap.keySet()){
 			for(Alignment entry : taxonMap.get(key)){
 				if(!entry.isDuplicate()){
-					int damage=0;
+					pIdents.add(entry.getPIdent());
+					distances.add(entry.getEditInstance());
+					/*int damage=0;
 					if(entry.getFivePrimeDamage())
 						damage=1;
 					supplementary.add(entry.getReadName()+"\t"
@@ -69,27 +73,32 @@ public class RMA6TaxonNonDuplicateFilter  extends RMA6TaxonProcessor{
 								+ 1 + "\t"
 								+ damage + "\t"
 								+ df.format(getGcContent(entry.getQuery()))+"\t"
-								+ taxName);
+								+ taxName);*/
 					numReads++;
 				}
 				
 			}
 			
 		}
-		setSupplementary(supplementary);
+		setEditDistanceHistogram(distances);
+		setPercentIdentityHistogram(pIdents);
+		//setSupplementary(supplementary);
 		setNumberOfMatches(numReads);
 	}	
 	@Override
 	public void process(String inDir, String fileName, double topPercent, int maxLength){ 
 		HashMap<Integer, ArrayList<Alignment>> taxonMap = new HashMap<Integer,ArrayList<Alignment>>();
 		// use ReadsIterator to get all Reads assigned to MegantaxID and print top percent to file;
-		try{
-			RMA6File rma6File = new RMA6File(inDir+fileName, "r");	
+		try(RMA6File rma6File = new RMA6File(inDir+fileName, "r")){
 			IReadBlockIterator classIt  = new ReadBlockIterator(list, new ReadBlockGetterRMA6(rma6File, true, true, (float) 1.0,(float) 100.00,false,true));
 			if(!classIt.hasNext()){ // check if reads are assigned to TaxID if not print to console and skip could potentially only happen if some genus is unavailable 
+				ArrayList<Integer> distances = new ArrayList<Integer>();
+				ArrayList<Double> pIdents = new ArrayList<Double>();
 				System.err.println("TaxID: " + taxID +  " not assigned in File " + fileName+"\n");
 				setReadDistribution(mapReader.getNcbiIdToNameMap().get(taxID).replace(' ', '_')+"\tNA\t0\t0\t0\t0\t0\t0\t0\t0");
 				setSupplementary(new ArrayList<String>(Arrays.asList("0\t0\t0\t0\t0\t0\t"+mapReader.getNcbiIdToNameMap().get(taxID).replace(' ', '_'))));// in case of taxID not being supported add empty Line
+				setPercentIdentityHistogram(pIdents);
+				setEditDistanceHistogram(distances);
 				setNumberOfMatches(0);
 				
 			}else{

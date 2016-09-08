@@ -39,9 +39,9 @@ public class NCBI_MapReader {
 	}
 	
 	public void processNcbiMap(String fileName) {
-		try{
+		try(Scanner in = new Scanner(new File(fileName))){
 			System.out.println("Setting up Taxon Name and Taxon ID maps");
-			Scanner in = new Scanner(new File(fileName));
+			
 			HashMap<String,Integer> ncbiNameMap = new HashMap<String,Integer>();
 			HashMap<Integer, String> ncbiIDMap = new HashMap<Integer, String>();
 			while (in.hasNext()) { // iterates each line in the file

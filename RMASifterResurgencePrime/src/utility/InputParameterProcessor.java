@@ -38,6 +38,7 @@ public class InputParameterProcessor {
 	private Taxas taxas = Taxas.ALL;
 	private String tree_Path = "/projects1/clusterhomes/huebler/RMASifter/RMA_Extractor_Resources/";
 	private  boolean readInf = false; 
+	private boolean verbose = false;
 	// constructor
 	public InputParameterProcessor(String[] params){
 		process(params);
@@ -73,6 +74,9 @@ public class InputParameterProcessor {
 	public String getTreePath(){
 		return this.tree_Path;
 	}
+	public boolean isVerbose(){
+		return this.verbose;
+	}
     private void process(String[] parameters)
     {	FilenameFilter RMAFilter = new FilenameFilter() {
 	    	public boolean accept(File file, String name) {
@@ -97,7 +101,8 @@ public class InputParameterProcessor {
     	    Option option_MaxLength = Option.builder("l").longOpt("maxLength").argName("maxLength").hasArg().optionalArg(true).desc("Set Maximum ReadLength").build();
     	    Option option_Help = Option.builder("h").longOpt("help").optionalArg(true).desc("Print Usage and shutdown").build();
     	    Option option_Path = Option.builder("r").longOpt("resources").hasArg().optionalArg(true).desc("Path to NCBI tre and map File").build();
-    	    Option option_Read = Option.builder().longOpt("read").optionalArg(true).desc("Turn on Read Information Output").build();
+    	    Option option_Read = Option.builder().longOpt("histo").optionalArg(true).desc("Turn on Read Information Output").build();
+    	    Option option_Verbose = Option.builder("v").longOpt("verbose").optionalArg(true).desc("How much output should be printed to screen").build();
     	    Options options = new Options();
     	    CommandLineParser parser = new DefaultParser();
 
@@ -112,6 +117,7 @@ public class InputParameterProcessor {
     	    options.addOption(option_Help);
     	    options.addOption(option_Path);
     	    options.addOption(option_Read);
+    	    options.addOption(option_Verbose);
 
     	    try
     	    {
@@ -219,8 +225,11 @@ public class InputParameterProcessor {
     	        		this.tree_Path = commandLine.getOptionValue("resources");
     	        	}
     	        }
-    	        if(commandLine.hasOption("read")){
+    	        if(commandLine.hasOption("histo")){
     	        	this.readInf = true;
+    	        }
+    	        if(commandLine.hasOption('v')){
+    	        	this.verbose = true;
     	        }
     	        if(commandLine.hasOption("h")){
     	        	String header = "RMAExtractor concurrent alpha";

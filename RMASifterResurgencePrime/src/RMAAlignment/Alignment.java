@@ -125,15 +125,15 @@ private void setReferenceLength(int k) {
 	 else return false;
  }
  private void calculateEditDistance(String sequence, String reference){
-		int len1 = sequence.length();
-		int len2 = sequence.length();
+	 int len1 = sequence.length();
+		int len2 = reference.length();
 		 int[][] d = new int[len1 + 1][len2 + 1];
 		 for(int i = 0; i <= len1; i++)
 			 d[i][0] = i;
 		 for(int j = 0; j <= len2; j++)
 			 d[0][j] = j;
-		 for(int i = 0; i < sequence.length(); i++){
-			 for(int j = 0; j < sequence.length(); j++){
+		 for(int i = 0; i < len1; i++)
+			 for(int j = 0; j < len2; j++){
 				 if(sequence.charAt(i) == reference.charAt(j)){
 					d[i+1][j+1] = d[i][j]; 
 				 }else{
@@ -144,8 +144,7 @@ private void setReferenceLength(int k) {
 									 Math.min(insert,
 									 delete));
 				 }
-			 }
-		 }
+			 }	 
 	 this.editDistance = d[sequence.length()][reference.length()];
  }
  

@@ -92,6 +92,7 @@ public class SummaryWriter {
 			}
 			   
 		   }//for
+		   summary.sort(null);
 		   summary.add(0,header);
 		   this.summary =  summary;
 	}

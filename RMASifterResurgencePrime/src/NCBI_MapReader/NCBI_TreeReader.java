@@ -20,9 +20,8 @@ public class NCBI_TreeReader {
 	int target;
 	private Phylogeny ph;
 	public NCBI_TreeReader(){
-		try{
+		try(Scanner in = new Scanner(new File(treName))){
 		System.out.println("Setting up Phylogenetic Tree");
-		Scanner in = new Scanner(new File(treName));
 		String line = in.nextLine();
 		in.close();
 	    this.ph = Phylogeny.createInstanceFromNhxString(line);

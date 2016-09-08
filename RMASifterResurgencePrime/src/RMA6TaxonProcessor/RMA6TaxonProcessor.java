@@ -22,12 +22,14 @@ import megan.rma6.ReadBlockGetterRMA6;
  *
  */
 public class RMA6TaxonProcessor {
+protected String taxName;	
 protected int numOfMatches;
 protected String readDistribution;
 protected ArrayList<String> supplemantary;
 protected NCBI_MapReader mapReader;
 protected Integer taxID;
 protected HashMap<Integer,Integer> editHistogram;
+protected HashMap<Integer,Integer> pIdentHistogram;
 ListOfLongs list;
 //constructor
 public RMA6TaxonProcessor(Integer id, NCBI_MapReader reader, ListOfLongs l){
@@ -37,19 +39,18 @@ public RMA6TaxonProcessor(Integer id, NCBI_MapReader reader, ListOfLongs l){
 }
 protected void setEditDistanceHistogram(ArrayList<Integer> list){
 	HashMap<Integer,Integer> histo = new HashMap<Integer,Integer> ();
+	for(int i = 0;i < 7;i++){
+		histo.put(i, 0);
+	}
 	for(int d : list){
-		if(histo.containsKey(d) && d<=5)
-		{	int value = histo.get(d);
-			histo.put(d, value++);
-		}else if(!histo.containsKey(d)&& d<=5){
-			histo.put(d, 1);
+		if(d<=5){
+				int value = histo.get(d);
+				value++;
+				histo.put(d, value);
 		}else{
-			if(histo.containsKey(6)){
 				int value = histo.get(6);
-				histo.put(6, value++);
-			}else{
-				histo.put(6, 1);
-			}
+				value++;
+				histo.put(6, value);
 		}
 		
 	}
@@ -57,51 +58,48 @@ protected void setEditDistanceHistogram(ArrayList<Integer> list){
 }
 protected void setPercentIdentityHistogram(ArrayList<Double> list){
 	HashMap<Integer,Integer> histo = new HashMap<Integer,Integer> ();
+	for(int i = 0;i < 5; i++){
+		histo.put(i, 0);
+	}
 	for(double d: list){
 		if(77.5 <= d && d< 82.5){
-			if(histo.containsKey(0)){
 				int value = histo.get(0);
-				histo.put(0, value++);
-			}else{
-				histo.put(0, 1);
-			}
+				value++;
+				histo.put(0, value);
 		}else if(82.5 <= d && d< 87.5){
-			if(histo.containsKey(1)){
 				int value = histo.get(1);
-				histo.put(1, value++);
-			}else{
-				histo.put(1, 1);
-			}
+				value++;
+				histo.put(1, value);
 		}else if(87.5 <= d && d< 92.5){
-			if(histo.containsKey(2)){
 				int value = histo.get(2);
-				histo.put(2, value++);
-			}else{
-				histo.put(2, 1);
-			}
+				value++;
+				histo.put(2, value);
 		}else if(92.5 <= d && d< 97.5){
-			if(histo.containsKey(3)){
 				int value = histo.get(3);
-				histo.put(3, value++);
-			}else{
-				histo.put(3, 1);
-			}
+				value++;
+				histo.put(3, value);
 		}else if(97.5 <= d){
-			if(histo.containsKey(4)){
 				int value = histo.get(4);
-				histo.put(4, value++);
-			}else{
-				histo.put(4, 1);
-			}
+				value++;
+				histo.put(4, value);
 		}
 	}
+	this.pIdentHistogram =  histo;
+}
+public String getEditDistanceHistogram(){
+	HashMap<Integer,Integer> histo = this.editHistogram;
+	return taxName+"\t"+ histo.get(0)+"\t"+histo.get(1)+"\t"+histo.get(2)+"\t"+histo.get(3)+"\t"+histo.get(4)+"\t"+histo.get(5)+"\t"+histo.get(6);
+}
+public String getPercentIdentityHistogram(){
+	HashMap<Integer,Integer> histo = this.pIdentHistogram;
+	return taxName+"\t"+histo.get(0)+"\t"+histo.get(1)+"\t"+histo.get(2)+"\t"+histo.get(3)+"\t"+histo.get(4)+"\t";
 }
 protected void setSupplementary(ArrayList<String> s){
 	if(s != null){
 		this.supplemantary = s;
 	}else{
 		ArrayList<String> list = new ArrayList<String>();
-		list.add("0\t0\t0\t0\t0\t0\t"+mapReader.getNcbiIdToNameMap().get(taxID).replace(' ', '_'));
+		list.add("0\t0\t0\t0\t0\t0\t");
 		this.supplemantary =list;
 	}
 }
@@ -148,23 +146,23 @@ public void process(String inDir, String fileName, double topPercent, int maxLen
 	ArrayList<String> supplemantary = new ArrayList<String>();
 	ArrayList<Integer> distances = new ArrayList<Integer>();
 	ArrayList<Double> pIdents = new ArrayList<Double>();
+	if(mapReader.getNcbiIdToNameMap().get(taxID) != null)
+		this.taxName = mapReader.getNcbiIdToNameMap().get(taxID).replace(' ', '_');
+	else
+		this.taxName = "unassignedName";
 	// use ReadsIterator to get all Reads assigned to MegantaxID and print top percent to file
-	
-	try{
-	RMA6File rma6File = new RMA6File(inDir+fileName, "r");
+	try(RMA6File rma6File = new RMA6File(inDir+fileName, "r")){
 	IReadBlockIterator classIt  = new ReadBlockIterator(list, new ReadBlockGetterRMA6(rma6File, true, true, (float) 1.0,(float) 100.00,false,true));
 	if(!classIt.hasNext()){ // check if reads are assigned to TaxID if not print to console and skip
 		//System.err.println("TaxID: " + taxID +  " not assigned in File " + fileName+"\n");
 		setReadDistribution(mapReader.getNcbiIdToNameMap().get(taxID).replace(' ', '_')+"\tNA\t0\t0\t0\t0\t0\t0\t0\t0");
-		setSupplementary(new ArrayList<String>(Arrays.asList("0\t0\t0\t0\t0\t0\t"+mapReader.getNcbiIdToNameMap().get(taxID).replace(' ', '_'))));// in case of taxID not being supported add empty Line
+		setPercentIdentityHistogram(pIdents);
+		setEditDistanceHistogram(distances);
+		setSupplementary(new ArrayList<String>(Arrays.asList("0\t0\t0\t0\t0\t0\t"+ taxName)));// in case of taxID not being supported add empty Line
 		setSupplementary(supplemantary);
 	}else{
-		String taxName;
-		if(mapReader.getNcbiIdToNameMap().get(taxID) != null)
-			taxName = mapReader.getNcbiIdToNameMap().get(taxID).replace(' ', '_');
-		else
-			taxName = "unassignedName";
-		System.out.println("Processing Taxon "+mapReader.getNcbiIdToNameMap().get(taxID)+" in File " +fileName); 
+		
+		//System.out.println("Processing Taxon "+mapReader.getNcbiIdToNameMap().get(taxID)+" in File " +fileName); 
 		HashMap<Integer, ArrayList<Alignment>> taxonMap = new HashMap<Integer,ArrayList<Alignment>>();
 		int numReads = 0;
 		while(classIt.hasNext()){
@@ -174,8 +172,8 @@ public void process(String inDir, String fileName, double topPercent, int maxLen
 				int k=0;
 				float topScore = current.getMatchBlock(0).getBitScore();
 				double pIdent = 0;
-				double length = 0; 
-				int damage=0;
+//				double length = 0; 
+//				int damage=0;
 				int editDistance=0;
 				for(int i = 0; i< blocks.length;i++){
 					if(blocks[i].getBitScore()/topScore < 1-topPercent){
@@ -183,7 +181,7 @@ public void process(String inDir, String fileName, double topPercent, int maxLen
 					
 					Alignment al = new Alignment();
 					al.processText(blocks[i].getText().split("\n"));
-					length += al.getMlength();
+					//length += al.getMlength();
 					al.setPIdent(blocks[i].getPercentIdentity());
 					pIdent += al.getPIdent();
 					editDistance += al.getEditInstance();
@@ -196,8 +194,8 @@ public void process(String inDir, String fileName, double topPercent, int maxLen
 						entry.add(al);
 						taxonMap.put(blocks[i].getTaxonId(),entry);
 					}
-					if(al.getFivePrimeDamage())// calculate number of damage Reads
-						damage++;
+					//if(al.getFivePrimeDamage())// calculate number of damage Reads
+						//damage++;
 					k++;
 				}
 					numReads++;
@@ -220,7 +218,8 @@ public void process(String inDir, String fileName, double topPercent, int maxLen
 				s+="\t" + df.format(d);
 			setReadDistribution(s);
 			setNumberOfMatches(numReads);
-			setSupplementary(supplemantary);
+			setEditDistanceHistogram(distances);
+			setPercentIdentityHistogram(pIdents);
 			rma6File.close();
 	     }//else
 		}catch(Exception e){

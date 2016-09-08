@@ -81,6 +81,7 @@ public class ScanSummaryWriter {
 					}
 				}
 			}
+			summary.sort(null);
 			summary.add(0,header);
 			this.summary =  summary;
 		}catch (InterruptedException e) {

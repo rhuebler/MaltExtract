@@ -43,6 +43,11 @@ public class RMAExtractor {
 		InputParameterProcessor inProcessor = new InputParameterProcessor(args);
 		NCBI_MapReader mapReader = new NCBI_MapReader(inProcessor.getTreePath());
 		new File(inProcessor.getOutDir()).mkdirs();
+		new File(inProcessor.getOutDir()+"/readDist/").mkdirs();
+		if(inProcessor.wantReadInf()){
+			new File(inProcessor.getOutDir()+"/editDistance/").mkdirs();
+			new File(inProcessor.getOutDir()+"/percentIdentity/").mkdirs();
+		}
 		List<Integer> taxIDs= new  ArrayList<Integer>();
 		if(inProcessor.getTaxas() == Taxas.USER){
 			for(String name : inProcessor.getTaxNames()){
