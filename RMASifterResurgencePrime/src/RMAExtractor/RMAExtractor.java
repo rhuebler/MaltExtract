@@ -3,6 +3,7 @@ package RMAExtractor;
 //TODO benchmark on more files and threads on single thread version and on concurrent version to see whether or not output is consistent
 //TODO adress errors by try catch if no other way 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Executors;
@@ -38,7 +39,7 @@ public class RMAExtractor {
 	private static void destroy(){
 		executor.shutdown();
 	}
-	public static void main(String[] args)  {
+	public static void main(String[] args) throws IOException  {
 		long startTime = System.nanoTime();
 		InputParameterProcessor inProcessor = new InputParameterProcessor(args);
 		NCBI_MapReader mapReader = new NCBI_MapReader(inProcessor.getTreePath());
@@ -66,8 +67,9 @@ public class RMAExtractor {
     		for(String fileName : inProcessor.getFileNames()){
     			File f = new File(fileName);
     			 // every tree has its own copy of this now to avoid concurrency issues
-    			ConcurrentRMA6Processor task = new ConcurrentRMA6Processor(f.getParent()+"/", f.getName(), inProcessor.getOutDir(), 
-	    			mapReader, treeReader,taxIDs, inProcessor.getTopPercent(),inProcessor.getMaxLength(),inProcessor.getFilter(), inProcessor.getTaxas(), inProcessor.wantReadInf());
+    			ConcurrentRMA6Processor task = new ConcurrentRMA6Processor(f.getParentFile().getCanonicalFile() + "/", f.getName(), inProcessor.getOutDir(), 
+	    			mapReader, treeReader,taxIDs, inProcessor.getTopPercent(),inProcessor.getMaxLength(),inProcessor.getFilter(), 
+	    			inProcessor.getTaxas(), inProcessor.wantReadInf(), inProcessor.isVerbose());
     			Future<RMA6Processor> future=executor.submit(task);
     			processedFiles.add(future);
     			

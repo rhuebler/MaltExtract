@@ -14,6 +14,7 @@ import megan.data.IMatchBlock;
 import megan.data.IReadBlock;
 import megan.data.IReadBlockIterator;
 import megan.data.ReadBlockIterator;
+import megan.rma6.ClassificationBlockRMA6;
 import megan.rma6.RMA6File;
 import megan.rma6.ReadBlockGetterRMA6;
 /**
@@ -25,14 +26,13 @@ import megan.rma6.ReadBlockGetterRMA6;
  */
 public class RMA6TaxonNonDuplicateFilter  extends RMA6TaxonProcessor{
 	
-	public RMA6TaxonNonDuplicateFilter(int id, NCBI_MapReader reader, ListOfLongs list) {
-		super(id, reader, list);
+	public RMA6TaxonNonDuplicateFilter(int id, NCBI_MapReader reader, boolean v) {
+		super(id, reader, v);
 		// TODO Auto-generated constructor stub
 	}
 	private NCBI_MapReader mapReader;
 	
 	private void computeOutput(HashMap<Integer, ArrayList<Alignment>> taxonMap, int taxID){
-		ArrayList<String> supplementary = new ArrayList<String>();
 		ArrayList<Integer> distances = new ArrayList<Integer>();
 		ArrayList<Double> pIdents = new ArrayList<Double>();
 		DecimalFormat df = new DecimalFormat("#.###");
@@ -63,17 +63,6 @@ public class RMA6TaxonNonDuplicateFilter  extends RMA6TaxonProcessor{
 				if(!entry.isDuplicate()){
 					pIdents.add(entry.getPIdent());
 					distances.add(entry.getEditInstance());
-					/*int damage=0;
-					if(entry.getFivePrimeDamage())
-						damage=1;
-					supplementary.add(entry.getReadName()+"\t"
-								+ entry.getPIdent()+"\t"
-								+ df.format(entry.getNumGaps()) +"\t"
-								+ 1 + "\t"
-								+ 1 + "\t"
-								+ damage + "\t"
-								+ df.format(getGcContent(entry.getQuery()))+"\t"
-								+ taxName);*/
 					numReads++;
 				}
 				
@@ -90,11 +79,21 @@ public class RMA6TaxonNonDuplicateFilter  extends RMA6TaxonProcessor{
 		HashMap<Integer, ArrayList<Alignment>> taxonMap = new HashMap<Integer,ArrayList<Alignment>>();
 		// use ReadsIterator to get all Reads assigned to MegantaxID and print top percent to file;
 		try(RMA6File rma6File = new RMA6File(inDir+fileName, "r")){
+			ListOfLongs list = new ListOfLongs();
+			Long location = rma6File.getFooterSectionRMA6().getStartClassification("Taxonomy");
+			if (location != null) {
+			   ClassificationBlockRMA6 classificationBlockRMA6 = new ClassificationBlockRMA6("Taxonomy");
+			   classificationBlockRMA6.read(location, rma6File.getReader());
+			   if (classificationBlockRMA6.getSum(taxID) > 0) {
+				   classificationBlockRMA6.readLocations(location, rma6File.getReader(), taxID, list);
+			   }
+			 }
 			IReadBlockIterator classIt  = new ReadBlockIterator(list, new ReadBlockGetterRMA6(rma6File, true, true, (float) 1.0,(float) 100.00,false,true));
 			if(!classIt.hasNext()){ // check if reads are assigned to TaxID if not print to console and skip could potentially only happen if some genus is unavailable 
 				ArrayList<Integer> distances = new ArrayList<Integer>();
 				ArrayList<Double> pIdents = new ArrayList<Double>();
-				System.err.println("TaxID: " + taxID +  " not assigned in File " + fileName+"\n");
+				if(verbose)
+					System.err.println("TaxID: " + taxID +  " not assigned in File " + fileName+"\n");
 				setReadDistribution(mapReader.getNcbiIdToNameMap().get(taxID).replace(' ', '_')+"\tNA\t0\t0\t0\t0\t0\t0\t0\t0");
 				setSupplementary(new ArrayList<String>(Arrays.asList("0\t0\t0\t0\t0\t0\t"+mapReader.getNcbiIdToNameMap().get(taxID).replace(' ', '_'))));// in case of taxID not being supported add empty Line
 				setPercentIdentityHistogram(pIdents);
@@ -102,7 +101,8 @@ public class RMA6TaxonNonDuplicateFilter  extends RMA6TaxonProcessor{
 				setNumberOfMatches(0);
 				
 			}else{
-				//System.out.println("Processing Taxon "+mapReader.getNcbiIdToNameMap().get(taxID)+" in File " + fileName); 
+				if(verbose)
+					System.out.println("Processing Taxon "+mapReader.getNcbiIdToNameMap().get(taxID)+" in File " + fileName); 
 	
 				while(classIt.hasNext()){
 				IReadBlock current = classIt.next();

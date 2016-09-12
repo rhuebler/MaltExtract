@@ -14,6 +14,7 @@ import megan.data.IMatchBlock;
 import megan.data.IReadBlock;
 import megan.data.IReadBlockIterator;
 import megan.data.ReadBlockIterator;
+import megan.rma6.ClassificationBlockRMA6;
 import megan.rma6.RMA6File;
 import megan.rma6.ReadBlockGetterRMA6;
 /**
@@ -25,8 +26,8 @@ import megan.rma6.ReadBlockGetterRMA6;
  */
 public class RMA6TaxonDamageFilter extends RMA6TaxonProcessor{
 
-public RMA6TaxonDamageFilter(int id, NCBI_MapReader reader, ListOfLongs list) {
-		super(id, reader, list);
+public RMA6TaxonDamageFilter(int id, NCBI_MapReader reader, boolean v) {
+		super(id, reader, v);
 		// TODO Auto-generated constructor stub
 	}
 
@@ -37,23 +38,32 @@ public void process(String inDir, String fileName, double topPercent, int maxLen
 	else
 		this.taxName = "unassingned name";
 	DecimalFormat df = new DecimalFormat("#.###");
-	ArrayList<String> supplemantary = new ArrayList<String>();
 	ArrayList<Integer> distances = new ArrayList<Integer>();
 	ArrayList<Double> pIdents = new ArrayList<Double>();
 	// use ReadsIterator to get all Reads assigned to MegantaxID and print top percent to file;
 	try(RMA6File rma6File = new RMA6File(inDir+fileName, "r")){	
-	IReadBlockIterator classIt  = new ReadBlockIterator(list, new ReadBlockGetterRMA6(rma6File, true, true, (float) 1.0,(float) 100.00,false,true));
-	if(!classIt.hasNext()){ // check if reads are assigned to TaxID if not print to console and skip
-		System.err.println("TaxID: " + taxID +  " not assigned in File " + fileName+"\n");
-		setReadDistribution(taxName+"\tNA\t0\t0\t0\t0\t0\t0\t0\t0");
-		setSupplementary(new ArrayList<String>(Arrays.asList("0\t0\t0\t0\t0\t0\t"+taxName)));// in case of taxID not being supported add empty Line
-		setPercentIdentityHistogram(pIdents);
-		setEditDistanceHistogram(distances);
-		setNumberOfMatches(0);	
-	}else{
-	// only consider topscoring alignments
-
-	//System.out.println("Processing Taxon "+mapReader.getNcbiIdToNameMap().get(taxID)+" in File " + fileName); 
+		ListOfLongs list = new ListOfLongs();
+		Long location = rma6File.getFooterSectionRMA6().getStartClassification("Taxonomy");
+		if (location != null) {
+		   ClassificationBlockRMA6 classificationBlockRMA6 = new ClassificationBlockRMA6("Taxonomy");
+		   classificationBlockRMA6.read(location, rma6File.getReader());
+		   if (classificationBlockRMA6.getSum(taxID) > 0) {
+			   classificationBlockRMA6.readLocations(location, rma6File.getReader(), taxID, list);
+		   }
+		 }
+		IReadBlockIterator classIt  = new ReadBlockIterator(list, new ReadBlockGetterRMA6(rma6File, true, true, (float) 1.0,(float) 100.00,false,true));
+		if(!classIt.hasNext()){ // check if reads are assigned to TaxID if not print to console and skip
+			if(verbose)
+				System.err.println("TaxID: " + taxID +  " not assigned in File " + fileName+"\n");
+			setReadDistribution(taxName+"\tNA\t0\t0\t0\t0\t0\t0\t0\t0");
+			setSupplementary(new ArrayList<String>(Arrays.asList("0\t0\t0\t0\t0\t0\t"+taxName)));// in case of taxID not being supported add empty Line
+			setPercentIdentityHistogram(pIdents);
+			setEditDistanceHistogram(distances);
+			setNumberOfMatches(0);	
+		}else{
+		
+			if(verbose)
+				System.out.println("Processing Taxon "+mapReader.getNcbiIdToNameMap().get(taxID)+" in File " + fileName); 
 	HashMap<Integer, ArrayList<Alignment>> taxonMap = new HashMap<Integer,ArrayList<Alignment>>();
 	int numReads = 0;
 		while(classIt.hasNext()){
@@ -63,7 +73,6 @@ public void process(String inDir, String fileName, double topPercent, int maxLen
 					int k=0;
 				float topScore = blocks[0].getBitScore();
 				double pIdent = 0;
-				double length = 0; 
 				int editDistance = 0;
 				int damage=0;
 				for(int i = 0; i< blocks.length;i++){
@@ -75,7 +84,6 @@ public void process(String inDir, String fileName, double topPercent, int maxLen
 					al.setPIdent(blocks[i].getPercentIdentity());
 					if(al.getFivePrimeDamage()){
 						
-						length += al.getMlength();
 						pIdent += blocks[i].getPercentIdentity();
 						if(!taxonMap.containsKey(blocks[i].getTaxonId())){
 							ArrayList<Alignment> entry =new ArrayList<Alignment>();
@@ -95,19 +103,10 @@ public void process(String inDir, String fileName, double topPercent, int maxLen
 				}
 				if(damage !=0){
 					numReads++;
-					/*supplemantary.add(
-						current.getReadName()+"\t"
-						+ (int)(length/k)+"\t"
-						+ df.format(pIdent/(k)) +"\t"
-						+ current.getNumberOfMatches()+"\t"
-						+ k +"\t"
-						+ damage+'\t'
-						+ df.format(getGcContent(current.getReadSequence()))+"\t"
-						+ taxName);*/
 					distances.add(editDistance/k);
 					pIdents.add(pIdent/k);
 				}	
-			}// if TODO should I add an else here and what to do 
+			}
 		}// while
 			classIt.close();
 			
@@ -126,7 +125,6 @@ public void process(String inDir, String fileName, double topPercent, int maxLen
 			setNumberOfMatches(numReads);
 			setEditDistanceHistogram(distances);
 			setPercentIdentityHistogram(pIdents);
-			//setSupplementary(supplemantary);
 			rma6File.close();
 		 }//else
 		}catch(IOException io){

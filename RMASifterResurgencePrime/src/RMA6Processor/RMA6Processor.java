@@ -1,8 +1,6 @@
 package RMA6Processor;
-//import java.io.BufferedOutputStream;
-import java.io.FileOutputStream;
+
 import java.io.IOException;
-import java.io.OutputStreamWriter;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -12,7 +10,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.zip.GZIPOutputStream;
 
 import NCBI_MapReader.NCBI_MapReader;
 import NCBI_MapReader.NCBI_TreeReader;
@@ -21,7 +18,6 @@ import RMA6TaxonProcessor.RMA6TaxonNonDuplicateFilter;
 import RMA6TaxonProcessor.RMA6TaxonProcessor;
 import behaviour.Filter;
 import behaviour.Taxas;
-import jloda.util.ListOfLongs;
 import megan.rma6.ClassificationBlockRMA6;
 import megan.rma6.RMA6File;
 /**
@@ -47,8 +43,9 @@ public class RMA6Processor {
 	private Filter behave;
 	private int maxLength;
 	private Taxas taxas;
+	private boolean verbose;
 	// constructor
-	public RMA6Processor(String inDir, String fileName, String outDir, NCBI_MapReader mapReader, NCBI_TreeReader treeReader, int maxLength, Filter b, Taxas t) {
+	public RMA6Processor(String inDir, String fileName, String outDir, NCBI_MapReader mapReader, NCBI_TreeReader treeReader, int maxLength, Filter b, Taxas t, boolean verbose) {
 		this.inDir = inDir;
 		this.outDir = outDir;
 		this.fileName = fileName;
@@ -57,6 +54,7 @@ public class RMA6Processor {
 		this.behave = b;
 		this.maxLength = maxLength;
 		this.taxas = t;
+		this.verbose = verbose;
 	}
 	
 	//setters
@@ -74,23 +72,6 @@ public class RMA6Processor {
 				io.printStackTrace();
 			}
 		return keys;
-	}
-	private ListOfLongs getLongs(Integer id){
-		ListOfLongs list = new ListOfLongs();
-		try(RMA6File rma6File = new RMA6File(inDir+fileName, "r")){
-			Long location = rma6File.getFooterSectionRMA6().getStartClassification("Taxonomy");
-			if (location != null) {
-		        ClassificationBlockRMA6 classificationBlockRMA6 = new ClassificationBlockRMA6("Taxonomy");
-		        classificationBlockRMA6.read(location, rma6File.getReader());
-		        if (classificationBlockRMA6.getSum(id) > 0) {
-					classificationBlockRMA6.readLocations(location, rma6File.getReader(), id, list);
-		        }
-		    }
-			rma6File.close();
-		}catch(IOException io){
-			io.printStackTrace();
-		}	
-			return list;
 	}
 	
 	private void setContainedIDs(Set<Integer> set){
@@ -136,21 +117,6 @@ public class RMA6Processor {
 			io.printStackTrace();
 		}
 	} 
-	private void writeSupplementary(List<String> supplement, String fileName){ 
-		try{
-		String header = "ReadName\tMatchLength\tPercentIdent\tNumberOfMatches\tConsideredMatches\tNumberOfEndDamagedMatches\tGC_Content\tTaxName";
-		supplement.add(0,header);
-		OutputStreamWriter outer = new OutputStreamWriter(new GZIPOutputStream(new FileOutputStream(outDir+fileName+"_supplement"+ ".txt.gz")));
-		for(String line : supplement){
-			outer.write(line+"\n");
-		}
-		outer.close();
-		//System.out.println("Supplementary for File "+fileName+" done!");
-		}catch(IOException io){
-			io.printStackTrace();
-		}
-		this.supplement = null; //delete data to save space after were done
-	}
 	
 	//getter
 	public ArrayList<String> getReadDistribution(){
@@ -191,60 +157,42 @@ public void process(List<Integer>taxIDs, double topPercent, boolean readInf) {
 		idsToProcess.addAll(keys);
 	}
 	setContainedIDs(idsToProcess);
-	//try{
-//		OutputStreamWriter outer = new OutputStreamWriter(new GZIPOutputStream(new FileOutputStream(outDir+fileName+"_supplement"+ ".txt.gz")));
 		for(Integer id : idsToProcess){
-			ListOfLongs list = getLongs(id);
 			if(behave == Filter.NON){
-				RMA6TaxonProcessor taxProcessor = new RMA6TaxonProcessor(id,mapReader,list);
+				RMA6TaxonProcessor taxProcessor = new RMA6TaxonProcessor(id,mapReader, verbose);
 				taxProcessor.process(inDir,  fileName,  topPercent,maxLength);
 				overallSum.put(id,taxProcessor.getNumberOfMatches());
 				readDistribution.add(taxProcessor.getReadDistribution());	
 				if(readInf){
 					editDistance.add(taxProcessor.getEditDistanceHistogram());
 					percentIdentity.add(taxProcessor.getPercentIdentityHistogram());
-					//supplemantary.addAll(taxProcessor.getSupplementary());
-//					for(String s : taxProcessor.getSupplementary())
-//						outer.write(s);
 				}
 			}else if(behave == Filter.ANCIENT){
-				RMA6TaxonDamageFilter damageProcessor = new RMA6TaxonDamageFilter(id,mapReader, list);
+				RMA6TaxonDamageFilter damageProcessor = new RMA6TaxonDamageFilter(id,mapReader, verbose);
 				damageProcessor.process(inDir, fileName,  topPercent, maxLength);
 				overallSum.put(id,damageProcessor.getNumberOfMatches());
 				readDistribution.add(damageProcessor.getReadDistribution());
 				if(readInf){
 					editDistance.add(damageProcessor.getEditDistanceHistogram());
 					percentIdentity.add(damageProcessor.getPercentIdentityHistogram());
-					//supplemantary.addAll(damageProcessor.getSupplementary());
-//					for(String s : damageProcessor.getSupplementary())
-//						outer.write(s);
 				}
 			}else if(behave == Filter.NONDUPLICATES){
-				RMA6TaxonNonDuplicateFilter nonDP = new RMA6TaxonNonDuplicateFilter(id,mapReader, list);
+				RMA6TaxonNonDuplicateFilter nonDP = new RMA6TaxonNonDuplicateFilter(id,mapReader, verbose);
 				nonDP.process(inDir,  fileName, topPercent, maxLength);
 				overallSum.put(id,nonDP.getNumberOfMatches());
 				readDistribution.add(nonDP.getReadDistribution());
 				if(readInf){
 					editDistance.add(nonDP.getEditDistanceHistogram());
 					percentIdentity.add(nonDP.getPercentIdentityHistogram());
-					//supplemantary.addAll(nonDP.getSupplementary());
-//					for(String s : nonDP.getSupplementary())
-//						outer.write(s);
 				}
 			}
-		System.gc();
 	  }//TaxIDs
-//	outer.close();	
-//	}catch(IOException io){
-//		io.printStackTrace();
-//	}
-	//setSupplementaryData(supplemantary);	//save supplementary data at read resolution in adequate slot
+		
 	setSumLine(overallSum); // set number of assigned Reads to overall file summary
 	writeReadDist(readDistribution,fileName); // RMA6Processor now saves its own output 
 	if(readInf){
 		writeEditDistance(editDistance);
 		writePercentIdentity(percentIdentity);
-	//writeSupplementary(supplemantary,fileName);
 	}
     }
  }

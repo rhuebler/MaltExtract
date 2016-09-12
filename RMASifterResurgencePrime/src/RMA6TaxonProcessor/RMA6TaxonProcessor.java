@@ -13,6 +13,7 @@ import megan.data.IMatchBlock;
 import megan.data.IReadBlock;
 import megan.data.IReadBlockIterator;
 import megan.data.ReadBlockIterator;
+import megan.rma6.ClassificationBlockRMA6;
 import megan.rma6.RMA6File;
 import megan.rma6.ReadBlockGetterRMA6;
 /**
@@ -30,12 +31,12 @@ protected NCBI_MapReader mapReader;
 protected Integer taxID;
 protected HashMap<Integer,Integer> editHistogram;
 protected HashMap<Integer,Integer> pIdentHistogram;
-ListOfLongs list;
+protected boolean verbose;
 //constructor
-public RMA6TaxonProcessor(Integer id, NCBI_MapReader reader, ListOfLongs l){
+public RMA6TaxonProcessor(Integer id, NCBI_MapReader reader, boolean v){
 	this.mapReader = reader;
 	this.taxID = id;
-	this.list = l;
+	this.verbose = v;
 }
 protected void setEditDistanceHistogram(ArrayList<Integer> list){
 	HashMap<Integer,Integer> histo = new HashMap<Integer,Integer> ();
@@ -152,17 +153,27 @@ public void process(String inDir, String fileName, double topPercent, int maxLen
 		this.taxName = "unassignedName";
 	// use ReadsIterator to get all Reads assigned to MegantaxID and print top percent to file
 	try(RMA6File rma6File = new RMA6File(inDir+fileName, "r")){
-	IReadBlockIterator classIt  = new ReadBlockIterator(list, new ReadBlockGetterRMA6(rma6File, true, true, (float) 1.0,(float) 100.00,false,true));
-	if(!classIt.hasNext()){ // check if reads are assigned to TaxID if not print to console and skip
-		//System.err.println("TaxID: " + taxID +  " not assigned in File " + fileName+"\n");
-		setReadDistribution(mapReader.getNcbiIdToNameMap().get(taxID).replace(' ', '_')+"\tNA\t0\t0\t0\t0\t0\t0\t0\t0");
-		setPercentIdentityHistogram(pIdents);
-		setEditDistanceHistogram(distances);
-		setSupplementary(new ArrayList<String>(Arrays.asList("0\t0\t0\t0\t0\t0\t"+ taxName)));// in case of taxID not being supported add empty Line
-		setSupplementary(supplemantary);
+		ListOfLongs list = new ListOfLongs();
+		Long location = rma6File.getFooterSectionRMA6().getStartClassification("Taxonomy");
+		if (location != null) {
+		   ClassificationBlockRMA6 classificationBlockRMA6 = new ClassificationBlockRMA6("Taxonomy");
+		   classificationBlockRMA6.read(location, rma6File.getReader());
+		   if (classificationBlockRMA6.getSum(taxID) > 0) {
+			   classificationBlockRMA6.readLocations(location, rma6File.getReader(), taxID, list);
+		   }
+		 }
+		IReadBlockIterator classIt  = new ReadBlockIterator(list, new ReadBlockGetterRMA6(rma6File, true, true, (float) 1.0,(float) 100.00,false,true));
+		if(!classIt.hasNext()){ // check if reads are assigned to TaxID if not print to console and skip
+			if(verbose)
+				System.err.println("TaxID: " + taxID +  " not assigned in File " + fileName+"\n");
+			setReadDistribution(mapReader.getNcbiIdToNameMap().get(taxID).replace(' ', '_')+"\tNA\t0\t0\t0\t0\t0\t0\t0\t0");
+			setPercentIdentityHistogram(pIdents);
+			setEditDistanceHistogram(distances);
+			setSupplementary(new ArrayList<String>(Arrays.asList("0\t0\t0\t0\t0\t0\t"+ taxName)));// in case of taxID not being supported add empty Line
+			setSupplementary(supplemantary);
 	}else{
-		
-		//System.out.println("Processing Taxon "+mapReader.getNcbiIdToNameMap().get(taxID)+" in File " +fileName); 
+		if(verbose)
+			System.out.println("Processing Taxon "+mapReader.getNcbiIdToNameMap().get(taxID)+" in File " +fileName); 
 		HashMap<Integer, ArrayList<Alignment>> taxonMap = new HashMap<Integer,ArrayList<Alignment>>();
 		int numReads = 0;
 		while(classIt.hasNext()){

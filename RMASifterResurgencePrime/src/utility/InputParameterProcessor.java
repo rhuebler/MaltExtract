@@ -4,6 +4,7 @@ package utility;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FilenameFilter;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
@@ -128,14 +129,18 @@ public class InputParameterProcessor {
     	            System.out.print("Input Set to: ");
     	            for(String arg :commandLine.getOptionValues("input")){
     	            	File inFile = new File(arg);
-    	            	if(inFile.isDirectory()){
-    	            		  System.out.println(arg);
-    	            		for(String name : inFile.list(RMAFilter))
-    	            		this.fileNames.add(arg + name);
-    	            	}else if(inFile.isFile()){
-    	            		System.out.println(arg);
-    	            		this.fileNames.add(arg);
-    	            }
+    	            	try{
+    	            		if(inFile.getCanonicalFile().isDirectory()){
+    	            			System.out.println(arg);
+    	            			for(String name : inFile.list(RMAFilter))
+    	            				this.fileNames.add(arg + name);
+    	            		}else if(inFile.isFile()){
+    	            			System.out.println(arg);
+    	            			this.fileNames.add(arg);
+    	            		}
+    	            	}catch(IOException io){
+    	            		io.printStackTrace();
+    	            	}	
     	            }
     	        }
 
