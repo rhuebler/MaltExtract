@@ -1,7 +1,5 @@
 package RMAExtractor;
 
-//TODO benchmark on more files and threads on single thread version and on concurrent version to see whether or not output is consistent
-//TODO adress errors by try catch if no other way 
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -44,7 +42,7 @@ public class RMAExtractor {
 		InputParameterProcessor inProcessor = new InputParameterProcessor(args);
 		NCBI_MapReader mapReader = new NCBI_MapReader(inProcessor.getTreePath());
 		new File(inProcessor.getOutDir()).mkdirs();
-		new File(inProcessor.getOutDir()+"/readDist/").mkdirs();
+		new File(inProcessor.getOutDir()+"/readDist/").mkdirs();//TODO could break potentially on Windows systems
 		if(inProcessor.wantReadInf()){
 			new File(inProcessor.getOutDir()+"/editDistance/").mkdirs();
 			new File(inProcessor.getOutDir()+"/percentIdentity/").mkdirs();
@@ -78,16 +76,17 @@ public class RMAExtractor {
 	    destroy();
 	    SummaryWriter sumWriter = new SummaryWriter(processedFiles,mapReader,inProcessor.getOutDir()); 
 	    sumWriter.writeSummary();
-	  }else{// TODO add functionality to support abstract file paths 
+	  }else{
 		  List<Future<RMA6Scanner>> scannerList = new ArrayList<Future<RMA6Scanner>>();
 		  NCBI_TreeReader treeReader = new NCBI_TreeReader(inProcessor.getTreePath());
 		  // every tree has its own copy of this now to avoid concurrency issues
 		  for(String fileName : inProcessor.getFileNames()){
 			 
 			 File f = new File(fileName);
-			 ConcurrentRMA6Scanner task = new ConcurrentRMA6Scanner(f.getParent()+"/", f.getName(),inProcessor.getTaxas(),taxIDs, treeReader);
+			 ConcurrentRMA6Scanner task = new ConcurrentRMA6Scanner(f.getParentFile().getCanonicalFile()+"/", f.getName(),inProcessor.getTaxas(),taxIDs, treeReader);
 			 Future<RMA6Scanner> future = executor.submit(task);
 			 scannerList.add(future);
+			 System.gc();
 		  }
 		  destroy();
 		  ScanSummaryWriter writer = new ScanSummaryWriter(scannerList, mapReader);

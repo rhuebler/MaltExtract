@@ -102,7 +102,7 @@ public class RMA6TaxonNonDuplicateFilter  extends RMA6TaxonProcessor{
 				
 			}else{
 				if(verbose)
-					System.out.println("Processing Taxon "+mapReader.getNcbiIdToNameMap().get(taxID)+" in File " + fileName); 
+					System.out.println("Processing Taxon "+ mapReader.getNcbiIdToNameMap().get(taxID) + " in File " + fileName); 
 	
 				while(classIt.hasNext()){
 				IReadBlock current = classIt.next();
