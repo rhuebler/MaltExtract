@@ -2,7 +2,6 @@ package RMA6TaxonProcessor;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 
 import NCBI_MapReader.NCBI_MapReader;
@@ -95,15 +94,6 @@ public String getPercentIdentityHistogram(){
 	HashMap<Integer,Integer> histo = this.pIdentHistogram;
 	return taxName+"\t"+histo.get(0)+"\t"+histo.get(1)+"\t"+histo.get(2)+"\t"+histo.get(3)+"\t"+histo.get(4)+"\t";
 }
-protected void setSupplementary(ArrayList<String> s){
-	if(s != null){
-		this.supplemantary = s;
-	}else{
-		ArrayList<String> list = new ArrayList<String>();
-		list.add("0\t0\t0\t0\t0\t0\t");
-		this.supplemantary =list;
-	}
-}
 
 protected void setReadDistribution(String s){
 	if(s != null){
@@ -144,7 +134,6 @@ public ArrayList<String> getSupplementary(){
 
 public void process(String inDir, String fileName, double topPercent, int maxLength){ 
 	DecimalFormat df = new DecimalFormat("#.###");
-	ArrayList<String> supplemantary = new ArrayList<String>();
 	ArrayList<Integer> distances = new ArrayList<Integer>();
 	ArrayList<Double> pIdents = new ArrayList<Double>();
 	if(mapReader.getNcbiIdToNameMap().get(taxID) != null)
@@ -169,8 +158,6 @@ public void process(String inDir, String fileName, double topPercent, int maxLen
 			setReadDistribution(mapReader.getNcbiIdToNameMap().get(taxID).replace(' ', '_')+"\tNA\t0\t0\t0\t0\t0\t0\t0\t0");
 			setPercentIdentityHistogram(pIdents);
 			setEditDistanceHistogram(distances);
-			setSupplementary(new ArrayList<String>(Arrays.asList("0\t0\t0\t0\t0\t0\t"+ taxName)));// in case of taxID not being supported add empty Line
-			setSupplementary(supplemantary);
 	}else{
 		if(verbose)
 			System.out.println("Processing Taxon "+mapReader.getNcbiIdToNameMap().get(taxID)+" in File " +fileName); 
@@ -213,7 +200,7 @@ public void process(String inDir, String fileName, double topPercent, int maxLen
 					distances.add(editDistance/k);
 					pIdents.add(pIdent/k);
 					
-			}// if TODO should I add an else here and what to do with it 
+			}// if  
 		}// while
 			classIt.close();
 			CompositionMap map = new CompositionMap(taxonMap);
@@ -226,7 +213,7 @@ public void process(String inDir, String fileName, double topPercent, int maxLen
 				maxReference = "unassinged_reference_name";
 			String s = taxName +"\t" + maxReference;;
 			for(double d : map.getStatistics())
-				s+="\t" + df.format(d);
+				s += "\t" + df.format(d);
 			setReadDistribution(s);
 			setNumberOfMatches(numReads);
 			setEditDistanceHistogram(distances);

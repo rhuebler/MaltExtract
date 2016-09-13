@@ -23,9 +23,9 @@ import megan.rma6.ReadBlockGetterRMA6;
  * @author huebler
  *
  */
-public class RMA6TaxonNonDuplicateFilter  extends RMA6TaxonProcessor{
+public class TaxonAncientNonStacked  extends RMA6TaxonProcessor{
 	
-	public RMA6TaxonNonDuplicateFilter(int id, NCBI_MapReader reader, boolean v) {
+	public TaxonAncientNonStacked(int id, NCBI_MapReader reader, boolean v) {
 		super(id, reader, v);
 	}
 	private NCBI_MapReader mapReader;
@@ -104,20 +104,24 @@ public class RMA6TaxonNonDuplicateFilter  extends RMA6TaxonProcessor{
 				while(classIt.hasNext()){
 				IReadBlock current = classIt.next();
 					if(current.getReadLength() <= maxLength || maxLength == 0){
-						IMatchBlock block=current.getMatchBlock(0);
-						Alignment al = new Alignment();
-						al.processText(block.getText().split("\n"));
-						al.setReadName(current.getReadName());
-						al.setPIdent(block.getPercentIdentity());
-						if(!taxonMap.containsKey(block.getTaxonId())){
-							ArrayList<Alignment> entry =new ArrayList<Alignment>();
-							entry.add(al);
-							taxonMap.put(block.getTaxonId(), entry);
-						}else{
-							ArrayList<Alignment> entry = taxonMap.get(block.getTaxonId());
-							entry.add(al);
-							taxonMap.put(block.getTaxonId(),entry);
-						}
+						IMatchBlock[] blocks=current.getMatchBlocks();
+						for(IMatchBlock block : blocks){
+							Alignment al = new Alignment();
+							al.processText(block.getText().split("\n"));
+							al.setReadName(current.getReadName());
+							al.setPIdent(block.getPercentIdentity());
+							if(al.getFivePrimeDamage()){
+								if(!taxonMap.containsKey(block.getTaxonId())){
+									ArrayList<Alignment> entry =new ArrayList<Alignment>();
+									entry.add(al);
+									taxonMap.put(block.getTaxonId(), entry);
+								}else{
+									ArrayList<Alignment> entry = taxonMap.get(block.getTaxonId());
+									entry.add(al);
+									taxonMap.put(block.getTaxonId(),entry);
+									}
+							}//5' damage	
+						}//for		
 				}//if 
 			}//while
 				classIt.close();

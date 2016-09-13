@@ -122,7 +122,8 @@ private void setReferenceLength(int k) {
 	 if((this.reference.charAt(i) == 'C' && this.query.charAt(i) == 'T')
 				|| this.reference.charAt(i) == 'c' && this.query.charAt(i) == 't')
 		 		return true;
-	 else return false;
+	 else 
+		 return false;
  }
  private void calculateEditDistance(String sequence, String reference){
 	 int len1 = sequence.length();
@@ -178,9 +179,13 @@ private void setReferenceLength(int k) {
 			 for(String frag:line.split("\\s")){
 				 if(frag.trim().matches("[ATGCNatgcn-]+")){
 					 setReference(frag.trim());
-					if(ctMisMatch(0) || ctMisMatch(this.query.length()-1)) // set damage true if there is a C->T sub at eithter end
-						setFivePrimeDamage(true);
-				 	}
+					 for(int k = 0; k < 5; k++ ){ //test first and last 5 positvions for g->c mismatch
+							if(ctMisMatch(0-k) || ctMisMatch(this.query.length()-k-1)){ // set damage true if there is a C->T sub at eithter end
+								setFivePrimeDamage(true);
+								break;// break out of loop
+							}
+					 	}
+				 }
 				 if(frag.trim().matches("\\d+")){
 					 if(i==0){
 						setStart(Integer.parseInt(frag.trim()));

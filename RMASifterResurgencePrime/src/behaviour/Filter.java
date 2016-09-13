@@ -1,5 +1,5 @@
 package behaviour;
 
 public enum Filter {
-    NON, ANCIENT, NONDUPLICATES,SCAN
+    NON, ANCIENT, NONDUPLICATES,SCAN, ALL
 };

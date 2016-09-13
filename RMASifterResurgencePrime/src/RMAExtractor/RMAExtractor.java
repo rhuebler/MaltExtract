@@ -42,7 +42,7 @@ public class RMAExtractor {
 		InputParameterProcessor inProcessor = new InputParameterProcessor(args);
 		NCBI_MapReader mapReader = new NCBI_MapReader(inProcessor.getTreePath());
 		new File(inProcessor.getOutDir()).mkdirs();
-		new File(inProcessor.getOutDir()+"/readDist/").mkdirs();//TODO could break potentially on Windows systems
+		new File(inProcessor.getOutDir()+"/readDist/").mkdirs(); //TODO could break potentially on Windows systems
 		if(inProcessor.wantReadInf()){
 			new File(inProcessor.getOutDir()+"/editDistance/").mkdirs();
 			new File(inProcessor.getOutDir()+"/percentIdentity/").mkdirs();

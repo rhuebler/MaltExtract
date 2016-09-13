@@ -3,7 +3,6 @@ package RMA6TaxonProcessor;
 import java.io.IOException;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 
 import NCBI_MapReader.NCBI_MapReader;
@@ -28,7 +27,6 @@ public class RMA6TaxonDamageFilter extends RMA6TaxonProcessor{
 
 public RMA6TaxonDamageFilter(int id, NCBI_MapReader reader, boolean v) {
 		super(id, reader, v);
-		// TODO Auto-generated constructor stub
 	}
 
 @Override
@@ -56,7 +54,6 @@ public void process(String inDir, String fileName, double topPercent, int maxLen
 			if(verbose)
 				System.err.println("TaxID: " + taxID +  " not assigned in File " + fileName+"\n");
 			setReadDistribution(taxName+"\tNA\t0\t0\t0\t0\t0\t0\t0\t0");
-			setSupplementary(new ArrayList<String>(Arrays.asList("0\t0\t0\t0\t0\t0\t"+taxName)));// in case of taxID not being supported add empty Line
 			setPercentIdentityHistogram(pIdents);
 			setEditDistanceHistogram(distances);
 			setNumberOfMatches(0);	

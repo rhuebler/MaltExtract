@@ -16,6 +16,7 @@ import NCBI_MapReader.NCBI_TreeReader;
 import RMA6TaxonProcessor.RMA6TaxonDamageFilter;
 import RMA6TaxonProcessor.RMA6TaxonNonDuplicateFilter;
 import RMA6TaxonProcessor.RMA6TaxonProcessor;
+import RMA6TaxonProcessor.TaxonAncientNonStacked;
 import behaviour.Filter;
 import behaviour.Taxas;
 import megan.rma6.ClassificationBlockRMA6;
@@ -28,7 +29,6 @@ import megan.rma6.RMA6File;
  * @author huebler
  *
  */
-//TODO output to directory with fileNames output of Editdistance and Percent ID Histogram
 public class RMA6Processor {
 	// attributes
 	private HashMap<Integer,Integer> overallSum;
@@ -158,7 +158,7 @@ public void process(List<Integer>taxIDs, double topPercent, boolean readInf) {
 	}
 	setContainedIDs(idsToProcess);
 		for(Integer id : idsToProcess){
-			if(behave == Filter.NON){
+			if(behave == Filter.NON){// change to all
 				RMA6TaxonProcessor taxProcessor = new RMA6TaxonProcessor(id,mapReader, verbose);
 				taxProcessor.process(inDir,  fileName,  topPercent,maxLength);
 				overallSum.put(id,taxProcessor.getNumberOfMatches());
@@ -184,15 +184,24 @@ public void process(List<Integer>taxIDs, double topPercent, boolean readInf) {
 				if(readInf){
 					editDistance.add(nonDP.getEditDistanceHistogram());
 					percentIdentity.add(nonDP.getPercentIdentityHistogram());
+				
+			}else if(behave == Filter.ALL){
+				TaxonAncientNonStacked all = new TaxonAncientNonStacked(id,mapReader, verbose);
+				all.process(inDir,  fileName, topPercent, maxLength);
+				overallSum.put(id,all.getNumberOfMatches());
+				readDistribution.add(all.getReadDistribution());
+				if(readInf){
+					editDistance.add(all.getEditDistanceHistogram());
+					percentIdentity.add(all.getPercentIdentityHistogram());
 				}
-			}
+			}	
+		}
 	  }//TaxIDs
-		
 	setSumLine(overallSum); // set number of assigned Reads to overall file summary
 	writeReadDist(readDistribution,fileName); // RMA6Processor now saves its own output 
 	if(readInf){
 		writeEditDistance(editDistance);
 		writePercentIdentity(percentIdentity);
-	}
+		}
     }
  }
