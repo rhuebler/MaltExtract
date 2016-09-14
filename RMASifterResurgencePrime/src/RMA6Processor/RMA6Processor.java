@@ -167,7 +167,7 @@ public void process(List<Integer>taxIDs, double topPercent, boolean readInf) {
 	setContainedIDs(idsToProcess);
 		for(Integer id : idsToProcess){
 			if(behave == Filter.NON){// change to all
-				RMA6TaxonProcessor taxProcessor = new RMA6TaxonProcessor(id,mapReader, verbose);
+				RMA6TaxonProcessor taxProcessor = new RMA6TaxonProcessor(id, mapReader, verbose,log, warning);
 				taxProcessor.process(inDir, fileName, topPercent, maxLength);
 				overallSum.put(id,taxProcessor.getNumberOfMatches());
 				readDistribution.add(taxProcessor.getReadDistribution());	
@@ -176,7 +176,7 @@ public void process(List<Integer>taxIDs, double topPercent, boolean readInf) {
 					percentIdentity.add(taxProcessor.getPercentIdentityHistogram());
 				}
 			}else if(behave == Filter.ANCIENT){
-				RMA6TaxonDamageFilter damageProcessor = new RMA6TaxonDamageFilter(id,mapReader, verbose);
+				RMA6TaxonDamageFilter damageProcessor = new RMA6TaxonDamageFilter(id, mapReader, verbose,log, warning);
 				damageProcessor.process(inDir, fileName, topPercent, maxLength);
 				overallSum.put(id,damageProcessor.getNumberOfMatches());
 				readDistribution.add(damageProcessor.getReadDistribution());
@@ -185,7 +185,7 @@ public void process(List<Integer>taxIDs, double topPercent, boolean readInf) {
 					percentIdentity.add(damageProcessor.getPercentIdentityHistogram());
 				}
 			}else if(behave == Filter.NONDUPLICATES){
-				RMA6TaxonNonDuplicateFilter nonDP = new RMA6TaxonNonDuplicateFilter(id,mapReader, verbose);
+				RMA6TaxonNonDuplicateFilter nonDP = new RMA6TaxonNonDuplicateFilter(id, mapReader, verbose, log, warning);
 				nonDP.process(inDir, fileName, topPercent, maxLength);
 				overallSum.put(id,nonDP.getNumberOfMatches());
 				readDistribution.add(nonDP.getReadDistribution());
@@ -194,7 +194,7 @@ public void process(List<Integer>taxIDs, double topPercent, boolean readInf) {
 					percentIdentity.add(nonDP.getPercentIdentityHistogram());
 				}
 			}else if(behave == Filter.ALL){
-				TaxonAncientNonStacked all = new TaxonAncientNonStacked(id, mapReader, verbose);
+				TaxonAncientNonStacked all = new TaxonAncientNonStacked(id, mapReader, verbose, log, warning);
 				all.process(inDir, fileName, topPercent, maxLength);
 				overallSum.put(id,all.getNumberOfMatches());
 				readDistribution.add(all.getReadDistribution());

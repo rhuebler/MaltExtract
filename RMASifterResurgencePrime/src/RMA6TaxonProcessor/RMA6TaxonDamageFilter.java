@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import NCBI_MapReader.NCBI_MapReader;
 import RMAAlignment.Alignment;
@@ -25,8 +27,8 @@ import megan.rma6.ReadBlockGetterRMA6;
  */
 public class RMA6TaxonDamageFilter extends RMA6TaxonProcessor{
 
-public RMA6TaxonDamageFilter(int id, NCBI_MapReader reader, boolean v) {
-		super(id, reader, v);
+public RMA6TaxonDamageFilter(int id, NCBI_MapReader reader, boolean v,Logger log, Logger warning) {
+		super(id, reader, v, log, warning);
 	}
 
 @Override
@@ -52,15 +54,14 @@ public void process(String inDir, String fileName, double topPercent, int maxLen
 		IReadBlockIterator classIt  = new ReadBlockIterator(list, new ReadBlockGetterRMA6(rma6File, true, true, (float) 1.0,(float) 100.00,false,true));
 		if(!classIt.hasNext()){ // check if reads are assigned to TaxID if not print to console and skip
 			if(verbose)
-				System.err.println("TaxID: " + taxID +  " not assigned in File " + fileName+"\n");
+				warning.log(Level.WARNING,"TaxID: " + taxID +  " not assigned in File " + fileName+"\n");
 			setReadDistribution(taxName+"\tNA\t0\t0\t0\t0\t0\t0\t0\t0");
 			setPercentIdentityHistogram(pIdents);
 			setEditDistanceHistogram(distances);
 			setNumberOfMatches(0);	
 		}else{
-		
 			if(verbose)
-				System.out.println("Processing Taxon "+mapReader.getNcbiIdToNameMap().get(taxID)+" in File " + fileName); 
+				log.log(Level.INFO,"Processing Taxon "+ taxName + " in File " + fileName); 
 	HashMap<Integer, ArrayList<Alignment>> taxonMap = new HashMap<Integer,ArrayList<Alignment>>();
 	int numReads = 0;
 		while(classIt.hasNext()){
@@ -125,7 +126,7 @@ public void process(String inDir, String fileName, double topPercent, int maxLen
 			rma6File.close();
 		 }//else
 		}catch(IOException io){
-			io.printStackTrace();
+			warning.log(Level.SEVERE,mapReader.getNcbiIdToNameMap().get(taxID), io);
 		}
 	}// void 
 }// class 

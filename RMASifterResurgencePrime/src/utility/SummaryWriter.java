@@ -11,6 +11,8 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import NCBI_MapReader.NCBI_MapReader;
 import RMA6Processor.RMA6Processor;
@@ -21,12 +23,13 @@ public class SummaryWriter {
 	private Set<Integer> processedIDs;
 	private List<String> summary;
 	private String outDir;
-	
-	public SummaryWriter(List<Future<RMA6Processor>> pFiles, NCBI_MapReader mReader, String oDir){
+	private Logger warning;
+	public SummaryWriter(List<Future<RMA6Processor>> pFiles, NCBI_MapReader mReader, String oDir, Logger warning){
 		this.processedFiles = pFiles;
 		//this.processedIDs = pIDs;	
 		this.mapReader = mReader;
 		this.outDir = oDir;
+		this.warning = warning;
 		setProcessedIds();
 		prepareOutput();
 	}
@@ -37,9 +40,9 @@ public class SummaryWriter {
 			pIDs.addAll(future.get().getContainedIDs());
 		this.processedIDs = pIDs;
 		}catch(InterruptedException ie){
-			ie.printStackTrace();
+			warning.log(Level.SEVERE, "Error", ie);
 		}catch(ExecutionException ee){
-			ee.printStackTrace();
+			warning.log(Level.SEVERE, "Error", ee);
 		}
 	}
 	private void prepareOutput() {
@@ -86,9 +89,9 @@ public class SummaryWriter {
 				   	}
 				  
 			}catch (InterruptedException e) {
-				e.printStackTrace();
+				warning.log(Level.SEVERE, "Error", e);
 			} catch (ExecutionException e) {
-				e.printStackTrace();
+				warning.log(Level.SEVERE, "Error", e);
 			}
 			   
 		   }//for
@@ -98,12 +101,10 @@ public class SummaryWriter {
 	}
 	public void writeSummary() {
 		try{
-		System.out.println("Writing Overall Run Summary txt File");
 		Path file = Paths.get(outDir+"OverallRunSummary"+".txt");
 		Files.write(file, summary, Charset.forName("UTF-8"));
-		System.out.println("Overall Run Summary Done!");
 		}catch(IOException io){
-			io.printStackTrace();
+			warning.log(Level.SEVERE, "Error", io);
 		}
 	}
 }

@@ -36,7 +36,7 @@ import utility.SummaryWriter;
  */
 public class RMAExtractor {
 	private static final Logger log = Logger.getLogger(RMAExtractor.class.getName());
-	private static final Logger warning = Logger.getLogger(RMAExtractor.class.getName());
+	private static final Logger warning = Logger.getLogger("Error");
 	private static ThreadPoolExecutor executor;
 	
 	private static void destroy(){
@@ -52,6 +52,7 @@ public class RMAExtractor {
 			e.printStackTrace();
 		}
 		log.addHandler(handler);
+		
 		Handler error = null;
 		try {
 			error = new FileHandler(inProcessor.getOutDir()+"error.txt");
@@ -91,13 +92,15 @@ public class RMAExtractor {
     						inProcessor.getTaxas(), inProcessor.wantReadInf(), inProcessor.isVerbose(), log, warning);
     				Future<RMA6Processor> future=executor.submit(task);
     				processedFiles.add(future);
+    				System.gc();
     			}catch(IOException io){
     				warning.log(Level.SEVERE,"File not found",io);
        				}
     		}//fileNames;
 	    // wait for all threads to finish here currently no concurrency errors or deadlocks but this would be the place where it would fall apart 
 	    destroy();
-	    SummaryWriter sumWriter = new SummaryWriter(processedFiles,mapReader,inProcessor.getOutDir()); 
+	    SummaryWriter sumWriter = new SummaryWriter(processedFiles,mapReader,inProcessor.getOutDir(), warning); 
+	    log.log(Level.INFO, "Writing Summary File");
 	    sumWriter.writeSummary();
 	  }else{
 		  List<Future<RMA6Scanner>> scannerList = new ArrayList<Future<RMA6Scanner>>();
@@ -109,13 +112,13 @@ public class RMAExtractor {
 					 f.getName(),inProcessor.getTaxas(),taxIDs, treeReader, log, warning);
 			 Future<RMA6Scanner> future = executor.submit(task);
 			 scannerList.add(future);
-			 System.gc();
 			 }catch(IOException io){
 				 warning.log(Level.SEVERE,"File not found",io);
 			 }
 		  }
 		  destroy();
-		  ScanSummaryWriter writer = new ScanSummaryWriter(scannerList, mapReader);
+		  ScanSummaryWriter writer = new ScanSummaryWriter(scannerList, mapReader, warning);
+		  log.log(Level.INFO, "Writing Scan Summary File");
 		  writer.write(inProcessor.getOutDir());
 	  }
 		long endTime = System.nanoTime();

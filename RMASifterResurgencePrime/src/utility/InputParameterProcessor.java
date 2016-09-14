@@ -254,7 +254,7 @@ public class InputParameterProcessor {
     	            	warning.log(Level.SEVERE,"Remaining arguments: ");
     	            for (String argument : remainder)
     	            {
-    	                log.log(Level.WARNING,argument);
+    	                warning.log(Level.WARNING,argument);
     	            }
     	        }
     	       

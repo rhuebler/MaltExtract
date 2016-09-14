@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import NCBI_MapReader.NCBI_MapReader;
 import RMAAlignment.Alignment;
@@ -25,8 +27,8 @@ import megan.rma6.ReadBlockGetterRMA6;
  */
 public class TaxonAncientNonStacked  extends RMA6TaxonProcessor{
 	
-	public TaxonAncientNonStacked(int id, NCBI_MapReader reader, boolean v) {
-		super(id, reader, v);
+	public TaxonAncientNonStacked(int id, NCBI_MapReader reader, boolean v,Logger log, Logger warning) {
+		super(id, reader, v, log, warning);
 	}
 	
 	private void computeOutput(HashMap<Integer, ArrayList<Alignment>> taxonMap, int taxID){
@@ -94,16 +96,16 @@ public class TaxonAncientNonStacked  extends RMA6TaxonProcessor{
 				ArrayList<Integer> distances = new ArrayList<Integer>();
 				ArrayList<Double> pIdents = new ArrayList<Double>();
 				if(verbose)
-					System.err.println("TaxID: " + taxID +  " not assigned in File " + fileName+"\n");
+					warning.log(Level.WARNING,"TaxID: " + taxID +  " not assigned in File " + fileName+"\n");
 				setReadDistribution(taxName + "\tNA\t0\t0\t0\t0\t0\t0\t0\t0");
 				setPercentIdentityHistogram(pIdents);
 				setEditDistanceHistogram(distances);
 				setNumberOfMatches(0);
 				
 			}else{
-				if(verbose){
-					System.out.println("Processing Taxon "+ taxName + " in File " + fileName); 
-				}
+				if(verbose)
+					log.log(Level.INFO,"Processing Taxon "+ taxName + " in File " + fileName); 
+			
 				while(classIt.hasNext()){
 					IReadBlock current = classIt.next();
 					if(current.getReadLength() <= maxLength || maxLength == 0){
@@ -129,7 +131,7 @@ public class TaxonAncientNonStacked  extends RMA6TaxonProcessor{
 				computeOutput(taxonMap, taxID);
 		  }//else		
 		}catch(IOException io){
-			io.printStackTrace();
+			warning.log(Level.SEVERE,mapReader.getNcbiIdToNameMap().get(taxID), io);
 		}
 	}	
 }
