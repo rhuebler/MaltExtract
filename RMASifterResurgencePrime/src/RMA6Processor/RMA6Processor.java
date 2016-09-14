@@ -10,6 +10,8 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import NCBI_MapReader.NCBI_MapReader;
 import NCBI_MapReader.NCBI_TreeReader;
@@ -44,8 +46,12 @@ public class RMA6Processor {
 	private int maxLength;
 	private Taxas taxas;
 	private boolean verbose;
+	private Logger log;
+	private Logger warning;
 	// constructor
-	public RMA6Processor(String inDir, String fileName, String outDir, NCBI_MapReader mapReader, NCBI_TreeReader treeReader, int maxLength, Filter b, Taxas t, boolean verbose) {
+	public RMA6Processor(String inDir, String fileName, String outDir, NCBI_MapReader mapReader,
+			NCBI_TreeReader treeReader, int maxLength, Filter b, Taxas t, boolean verbose,
+			Logger log, Logger warning) {
 		this.inDir = inDir;
 		this.outDir = outDir;
 		this.fileName = fileName;
@@ -55,6 +61,8 @@ public class RMA6Processor {
 		this.maxLength = maxLength;
 		this.taxas = t;
 		this.verbose = verbose;
+		this.log = log;
+		this.warning = warning; 
 	}
 	
 	//setters
@@ -86,12 +94,12 @@ public class RMA6Processor {
 			summary.sort(null);
 			String header = "Taxon\tReference\tMeanReadDistance\tMedianReadDistance\tVarianceReadDistance\tStandardDeviationReadDistance\tuniquePerReference\tnonDuplicatesonReference\tTotalReadsOnReference\tReferenceLength";
 			summary.add(0, header);
-			//System.out.println("Writing Read Distribution txt File");
+			//log.log(Level.INFO,"Writing Read Distribution txt File");
 			Path file = Paths.get(outDir+"/readDist/"+fileName+"_readDist"+".txt");
 			Files.write(file, summary, Charset.forName("UTF-8"));
 			//System.out.println("ReadDistribution for " + fileName +" Done!");
 		}catch(IOException io){
-			io.printStackTrace();
+			warning.log(Level.SEVERE,"Cannot write file", io);
 		}
 		this.readDist = null; //delete data to save space after were done potentially the gc should take of it
 	}
@@ -103,7 +111,7 @@ public class RMA6Processor {
 			Path file = Paths.get(outDir+"/editDistance/"+fileName+"_editDistance"+".txt");
 			Files.write(file, histo, Charset.forName("UTF-8"));
 		}catch(IOException io){
-			io.printStackTrace();
+			warning.log(Level.SEVERE,"Cannot write file", io);
 		}
 	}
 	private void writePercentIdentity(List<String> histo){
@@ -114,7 +122,7 @@ public class RMA6Processor {
 			Path file = Paths.get(outDir+"/percentIdentity/"+fileName+"_percentIdentity"+".txt");
 			Files.write(file, histo, Charset.forName("UTF-8"));
 		}catch(IOException io){
-			io.printStackTrace();
+			warning.log(Level.SEVERE,"Cannot write file", io);
 		}
 	} 
 	
@@ -137,7 +145,7 @@ public class RMA6Processor {
 	}
 // processing 
 public void process(List<Integer>taxIDs, double topPercent, boolean readInf) {
-	System.out.println("Reading File: " +inDir+fileName);
+	log.log(Level.INFO,"Reading File: " +inDir+fileName);
 	HashMap<Integer,Integer> overallSum = new HashMap<Integer,Integer>();
 	ArrayList<String> editDistance = new ArrayList<String>();
 	ArrayList<String> percentIdentity = new ArrayList<String>();
@@ -160,7 +168,7 @@ public void process(List<Integer>taxIDs, double topPercent, boolean readInf) {
 		for(Integer id : idsToProcess){
 			if(behave == Filter.NON){// change to all
 				RMA6TaxonProcessor taxProcessor = new RMA6TaxonProcessor(id,mapReader, verbose);
-				taxProcessor.process(inDir,  fileName,  topPercent,maxLength);
+				taxProcessor.process(inDir, fileName, topPercent, maxLength);
 				overallSum.put(id,taxProcessor.getNumberOfMatches());
 				readDistribution.add(taxProcessor.getReadDistribution());	
 				if(readInf){
@@ -169,7 +177,7 @@ public void process(List<Integer>taxIDs, double topPercent, boolean readInf) {
 				}
 			}else if(behave == Filter.ANCIENT){
 				RMA6TaxonDamageFilter damageProcessor = new RMA6TaxonDamageFilter(id,mapReader, verbose);
-				damageProcessor.process(inDir, fileName,  topPercent, maxLength);
+				damageProcessor.process(inDir, fileName, topPercent, maxLength);
 				overallSum.put(id,damageProcessor.getNumberOfMatches());
 				readDistribution.add(damageProcessor.getReadDistribution());
 				if(readInf){
@@ -178,24 +186,23 @@ public void process(List<Integer>taxIDs, double topPercent, boolean readInf) {
 				}
 			}else if(behave == Filter.NONDUPLICATES){
 				RMA6TaxonNonDuplicateFilter nonDP = new RMA6TaxonNonDuplicateFilter(id,mapReader, verbose);
-				nonDP.process(inDir,  fileName, topPercent, maxLength);
+				nonDP.process(inDir, fileName, topPercent, maxLength);
 				overallSum.put(id,nonDP.getNumberOfMatches());
 				readDistribution.add(nonDP.getReadDistribution());
 				if(readInf){
 					editDistance.add(nonDP.getEditDistanceHistogram());
 					percentIdentity.add(nonDP.getPercentIdentityHistogram());
-				
+				}
 			}else if(behave == Filter.ALL){
-				TaxonAncientNonStacked all = new TaxonAncientNonStacked(id,mapReader, verbose);
-				all.process(inDir,  fileName, topPercent, maxLength);
+				TaxonAncientNonStacked all = new TaxonAncientNonStacked(id, mapReader, verbose);
+				all.process(inDir, fileName, topPercent, maxLength);
 				overallSum.put(id,all.getNumberOfMatches());
 				readDistribution.add(all.getReadDistribution());
 				if(readInf){
 					editDistance.add(all.getEditDistanceHistogram());
 					percentIdentity.add(all.getPercentIdentityHistogram());
-				}
-			}	
-		}
+				}	
+			}
 	  }//TaxIDs
 	setSumLine(overallSum); // set number of assigned Reads to overall file summary
 	writeReadDist(readDistribution,fileName); // RMA6Processor now saves its own output 

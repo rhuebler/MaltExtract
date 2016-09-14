@@ -1,0 +1,180 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE log SYSTEM "logger.dtd">
+<log>
+<record>
+  <date>2016-09-14T11:20:14</date>
+  <millis>1473844814737</millis>
+  <sequence>0</sequence>
+  <logger>RMAExtractor.RMAExtractor</logger>
+  <level>INFO</level>
+  <class>utility.InputParameterProcessor</class>
+  <method>process</method>
+  <thread>1</thread>
+  <message>Input Set to: </message>
+</record>
+<record>
+  <date>2016-09-14T11:20:14</date>
+  <millis>1473844814784</millis>
+  <sequence>1</sequence>
+  <logger>RMAExtractor.RMAExtractor</logger>
+  <level>INFO</level>
+  <class>utility.InputParameterProcessor</class>
+  <method>process</method>
+  <thread>1</thread>
+  <message>/Users/huebler/Desktop/Project_RMASifter_The_RMAing/data/</message>
+</record>
+<record>
+  <date>2016-09-14T11:20:14</date>
+  <millis>1473844814785</millis>
+  <sequence>2</sequence>
+  <logger>RMAExtractor.RMAExtractor</logger>
+  <level>INFO</level>
+  <class>utility.InputParameterProcessor</class>
+  <method>process</method>
+  <thread>1</thread>
+  <message>Output Directory set to: /Users/huebler/Desktop/bs/</message>
+</record>
+<record>
+  <date>2016-09-14T11:20:14</date>
+  <millis>1473844814786</millis>
+  <sequence>3</sequence>
+  <logger>RMAExtractor.RMAExtractor</logger>
+  <level>INFO</level>
+  <class>utility.InputParameterProcessor</class>
+  <method>process</method>
+  <thread>1</thread>
+  <message>Taxons File: </message>
+</record>
+<record>
+  <date>2016-09-14T11:20:14</date>
+  <millis>1473844814787</millis>
+  <sequence>4</sequence>
+  <logger>RMAExtractor.RMAExtractor</logger>
+  <level>INFO</level>
+  <class>utility.InputParameterProcessor</class>
+  <method>process</method>
+  <thread>1</thread>
+  <message>Bordetella</message>
+</record>
+<record>
+  <date>2016-09-14T11:20:14</date>
+  <millis>1473844814787</millis>
+  <sequence>5</sequence>
+  <logger>RMAExtractor.RMAExtractor</logger>
+  <level>INFO</level>
+  <class>utility.InputParameterProcessor</class>
+  <method>process</method>
+  <thread>1</thread>
+  <message>Added Taxon: </message>
+</record>
+<record>
+  <date>2016-09-14T11:20:14</date>
+  <millis>1473844814789</millis>
+  <sequence>6</sequence>
+  <logger>RMAExtractor.RMAExtractor</logger>
+  <level>INFO</level>
+  <class>utility.InputParameterProcessor</class>
+  <method>process</method>
+  <thread>1</thread>
+  <message>Bordetella to analysis</message>
+</record>
+<record>
+  <date>2016-09-14T11:20:14</date>
+  <millis>1473844814790</millis>
+  <sequence>7</sequence>
+  <logger>RMAExtractor.RMAExtractor</logger>
+  <level>INFO</level>
+  <class>utility.InputParameterProcessor</class>
+  <method>process</method>
+  <thread>1</thread>
+  <message>Trying to use 4 threads</message>
+</record>
+<record>
+  <date>2016-09-14T11:20:14</date>
+  <millis>1473844814791</millis>
+  <sequence>8</sequence>
+  <logger>RMAExtractor.RMAExtractor</logger>
+  <level>INFO</level>
+  <class>utility.InputParameterProcessor</class>
+  <method>process</method>
+  <thread>1</thread>
+  <message>Using 4 threads</message>
+</record>
+<record>
+  <date>2016-09-14T11:20:14</date>
+  <millis>1473844814792</millis>
+  <sequence>9</sequence>
+  <logger>RMAExtractor.RMAExtractor</logger>
+  <level>INFO</level>
+  <class>utility.InputParameterProcessor</class>
+  <method>process</method>
+  <thread>1</thread>
+  <message>Custom Behaviour set to: all</message>
+</record>
+<record>
+  <date>2016-09-14T11:20:14</date>
+  <millis>1473844814793</millis>
+  <sequence>10</sequence>
+  <logger>RMAExtractor.RMAExtractor</logger>
+  <level>INFO</level>
+  <class>RMAExtractor.RMAExtractor</class>
+  <method>main</method>
+  <thread>1</thread>
+  <message>Setting up Taxon Name and Taxon ID maps</message>
+</record>
+<record>
+  <date>2016-09-14T11:20:22</date>
+  <millis>1473844822302</millis>
+  <sequence>11</sequence>
+  <logger>RMAExtractor.RMAExtractor</logger>
+  <level>INFO</level>
+  <class>RMAExtractor.RMAExtractor</class>
+  <method>main</method>
+  <thread>1</thread>
+  <message>Setting up Phylogenetic Tree</message>
+</record>
+<record>
+  <date>2016-09-14T11:20:30</date>
+  <millis>1473844830352</millis>
+  <sequence>14</sequence>
+  <logger>RMAExtractor.RMAExtractor</logger>
+  <level>INFO</level>
+  <class>RMA6Processor.RMA6Processor</class>
+  <method>process</method>
+  <thread>19</thread>
+  <message>Reading File: /Users/huebler/Desktop/Project_RMASifter_The_RMAing/data/241723_F_Plaque_SRR1804859_S0_L001_combined.rma6</message>
+</record>
+<record>
+  <date>2016-09-14T11:20:30</date>
+  <millis>1473844830352</millis>
+  <sequence>15</sequence>
+  <logger>RMAExtractor.RMAExtractor</logger>
+  <level>INFO</level>
+  <class>RMA6Processor.RMA6Processor</class>
+  <method>process</method>
+  <thread>18</thread>
+  <message>Reading File: /Users/huebler/Desktop/Project_RMASifter_The_RMAing/data/241723_F_Plaque_SRR1804616_S0_L001_combined.rma6</message>
+</record>
+<record>
+  <date>2016-09-14T11:20:30</date>
+  <millis>1473844830352</millis>
+  <sequence>12</sequence>
+  <logger>RMAExtractor.RMAExtractor</logger>
+  <level>INFO</level>
+  <class>RMA6Processor.RMA6Processor</class>
+  <method>process</method>
+  <thread>17</thread>
+  <message>Reading File: /Users/huebler/Desktop/Project_RMASifter_The_RMAing/data/241723_F_Plaque_SRR1804134_S0_L001_combined.rma6</message>
+</record>
+<record>
+  <date>2016-09-14T11:20:30</date>
+  <millis>1473844830352</millis>
+  <sequence>13</sequence>
+  <logger>RMAExtractor.RMAExtractor</logger>
+  <level>INFO</level>
+  <class>RMA6Processor.RMA6Processor</class>
+  <method>process</method>
+  <thread>16</thread>
+  <message>Reading File: /Users/huebler/Desktop/Project_RMASifter_The_RMAing/data/241723_F_Plaque_SRR1803347_S0_L001_combined.rma6</message>
+</record>
+</log>

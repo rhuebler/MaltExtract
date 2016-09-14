@@ -28,7 +28,6 @@ public class TaxonAncientNonStacked  extends RMA6TaxonProcessor{
 	public TaxonAncientNonStacked(int id, NCBI_MapReader reader, boolean v) {
 		super(id, reader, v);
 	}
-	private NCBI_MapReader mapReader;
 	
 	private void computeOutput(HashMap<Integer, ArrayList<Alignment>> taxonMap, int taxID){
 		ArrayList<Integer> distances = new ArrayList<Integer>();
@@ -74,6 +73,10 @@ public class TaxonAncientNonStacked  extends RMA6TaxonProcessor{
 	}	
 	@Override
 	public void process(String inDir, String fileName, double topPercent, int maxLength){ 
+		if(mapReader.getNcbiIdToNameMap().get(taxID) != null)
+			taxName = mapReader.getNcbiIdToNameMap().get(taxID).replace(' ', '_');
+		else
+			taxName = "unassingned name";
 		HashMap<Integer, ArrayList<Alignment>> taxonMap = new HashMap<Integer,ArrayList<Alignment>>();
 		// use ReadsIterator to get all Reads assigned to MegantaxID and print top percent to file;
 		try(RMA6File rma6File = new RMA6File(inDir+fileName, "r")){
@@ -92,20 +95,19 @@ public class TaxonAncientNonStacked  extends RMA6TaxonProcessor{
 				ArrayList<Double> pIdents = new ArrayList<Double>();
 				if(verbose)
 					System.err.println("TaxID: " + taxID +  " not assigned in File " + fileName+"\n");
-				setReadDistribution(mapReader.getNcbiIdToNameMap().get(taxID).replace(' ', '_')+"\tNA\t0\t0\t0\t0\t0\t0\t0\t0");
+				setReadDistribution(taxName + "\tNA\t0\t0\t0\t0\t0\t0\t0\t0");
 				setPercentIdentityHistogram(pIdents);
 				setEditDistanceHistogram(distances);
 				setNumberOfMatches(0);
 				
 			}else{
-				if(verbose)
-					System.out.println("Processing Taxon "+ mapReader.getNcbiIdToNameMap().get(taxID) + " in File " + fileName); 
-	
+				if(verbose){
+					System.out.println("Processing Taxon "+ taxName + " in File " + fileName); 
+				}
 				while(classIt.hasNext()){
-				IReadBlock current = classIt.next();
+					IReadBlock current = classIt.next();
 					if(current.getReadLength() <= maxLength || maxLength == 0){
-						IMatchBlock[] blocks=current.getMatchBlocks();
-						for(IMatchBlock block : blocks){
+						IMatchBlock block = current.getMatchBlock(0);
 							Alignment al = new Alignment();
 							al.processText(block.getText().split("\n"));
 							al.setReadName(current.getReadName());
@@ -121,8 +123,7 @@ public class TaxonAncientNonStacked  extends RMA6TaxonProcessor{
 									taxonMap.put(block.getTaxonId(),entry);
 									}
 							}//5' damage	
-						}//for		
-				}//if 
+					}//if 
 			}//while
 				classIt.close();
 				computeOutput(taxonMap, taxID);

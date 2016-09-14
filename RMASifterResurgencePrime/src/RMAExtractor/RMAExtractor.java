@@ -1,12 +1,16 @@
 package RMAExtractor;
 
-import java.io.File;
+import java.io.File; //TODO rethink how to adress diffferent filters
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.ThreadPoolExecutor;
+import java.util.logging.FileHandler;
+import java.util.logging.Handler;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import NCBI_MapReader.NCBI_MapReader;
 import NCBI_MapReader.NCBI_TreeReader;
@@ -31,15 +35,31 @@ import utility.SummaryWriter;
  *
  */
 public class RMAExtractor {
-	
+	private static final Logger log = Logger.getLogger(RMAExtractor.class.getName());
+	private static final Logger warning = Logger.getLogger(RMAExtractor.class.getName());
 	private static ThreadPoolExecutor executor;
 	
 	private static void destroy(){
 		executor.shutdown();
 	}
-	public static void main(String[] args) throws IOException  {
+	public static void main(String[] args){
 		long startTime = System.nanoTime();
-		InputParameterProcessor inProcessor = new InputParameterProcessor(args);
+		InputParameterProcessor inProcessor = new InputParameterProcessor(args ,log, warning);
+		Handler handler = null;
+		try {
+			handler = new FileHandler(inProcessor.getOutDir()+"log.txt");
+		} catch (SecurityException | IOException e) {
+			e.printStackTrace();
+		}
+		log.addHandler(handler);
+		Handler error = null;
+		try {
+			error = new FileHandler(inProcessor.getOutDir()+"error.txt");
+		} catch (SecurityException | IOException e) {
+			e.printStackTrace();
+		}
+		warning.addHandler(error);
+		log.log(Level.INFO, "Setting up Taxon Name and Taxon ID maps");
 		NCBI_MapReader mapReader = new NCBI_MapReader(inProcessor.getTreePath());
 		new File(inProcessor.getOutDir()).mkdirs();
 		new File(inProcessor.getOutDir()+"/readDist/").mkdirs(); //TODO could break potentially on Windows systems
@@ -52,25 +72,28 @@ public class RMAExtractor {
 			for(String name : inProcessor.getTaxNames()){
 				if(mapReader.getNcbiNameToIdMap().get(name) != null)// catch if there is a mistake
 					taxIDs.add(mapReader.getNcbiNameToIdMap().get(name));
-				else
-					System.err.println(name + " has no assigned taxID and cannot be processed!");
+				else{
+					warning.log(Level.SEVERE, name + " has no assigned taxID and cannot be processed!");
+				}
 			}
     	}
 		
 		executor=(ThreadPoolExecutor) Executors.newFixedThreadPool(inProcessor.getNumThreads());//intialize concurrent thread executor 
-		
+		log.log(Level.INFO, "Setting up Phylogenetic Tree");
+		NCBI_TreeReader treeReader = new NCBI_TreeReader(inProcessor.getTreePath());
 		if(inProcessor.getFilter() != Filter.SCAN){
 			List<Future<RMA6Processor>> processedFiles = new ArrayList<>();
-			 NCBI_TreeReader treeReader = new NCBI_TreeReader(inProcessor.getTreePath());
     		for(String fileName : inProcessor.getFileNames()){
-    			File f = new File(fileName);
-    			 // every tree has its own copy of this now to avoid concurrency issues
-    			ConcurrentRMA6Processor task = new ConcurrentRMA6Processor(f.getParentFile().getCanonicalFile() + "/", f.getName(), inProcessor.getOutDir(), 
-	    			mapReader, treeReader,taxIDs, inProcessor.getTopPercent(),inProcessor.getMaxLength(),inProcessor.getFilter(), 
-	    			inProcessor.getTaxas(), inProcessor.wantReadInf(), inProcessor.isVerbose());
-    			Future<RMA6Processor> future=executor.submit(task);
-    			processedFiles.add(future);
-    			
+    			try{
+    				File f = new File(fileName);
+    				ConcurrentRMA6Processor task = new ConcurrentRMA6Processor(f.getParentFile().getCanonicalFile() + "/", f.getName(), inProcessor.getOutDir(), 
+    						mapReader, treeReader,taxIDs, inProcessor.getTopPercent(),inProcessor.getMaxLength(),inProcessor.getFilter(), 
+    						inProcessor.getTaxas(), inProcessor.wantReadInf(), inProcessor.isVerbose(), log, warning);
+    				Future<RMA6Processor> future=executor.submit(task);
+    				processedFiles.add(future);
+    			}catch(IOException io){
+    				warning.log(Level.SEVERE,"File not found",io);
+       				}
     		}//fileNames;
 	    // wait for all threads to finish here currently no concurrency errors or deadlocks but this would be the place where it would fall apart 
 	    destroy();
@@ -78,22 +101,25 @@ public class RMAExtractor {
 	    sumWriter.writeSummary();
 	  }else{
 		  List<Future<RMA6Scanner>> scannerList = new ArrayList<Future<RMA6Scanner>>();
-		  NCBI_TreeReader treeReader = new NCBI_TreeReader(inProcessor.getTreePath());
 		  // every tree has its own copy of this now to avoid concurrency issues
 		  for(String fileName : inProcessor.getFileNames()){
-			 
+			 try{
 			 File f = new File(fileName);
-			 ConcurrentRMA6Scanner task = new ConcurrentRMA6Scanner(f.getParentFile().getCanonicalFile()+"/", f.getName(),inProcessor.getTaxas(),taxIDs, treeReader);
+			 ConcurrentRMA6Scanner task = new ConcurrentRMA6Scanner(f.getParentFile().getCanonicalFile()+"/",
+					 f.getName(),inProcessor.getTaxas(),taxIDs, treeReader, log, warning);
 			 Future<RMA6Scanner> future = executor.submit(task);
 			 scannerList.add(future);
 			 System.gc();
+			 }catch(IOException io){
+				 warning.log(Level.SEVERE,"File not found",io);
+			 }
 		  }
 		  destroy();
 		  ScanSummaryWriter writer = new ScanSummaryWriter(scannerList, mapReader);
 		  writer.write(inProcessor.getOutDir());
 	  }
 		long endTime = System.nanoTime();
-		System.out.println("Runtime: "+ (endTime - startTime)/1000000000 +" Seconds");
+		log.log(Level.INFO,"Runtime: "+ (endTime - startTime)/1000000000 +" Seconds");
 	}//main
 	
 }//class

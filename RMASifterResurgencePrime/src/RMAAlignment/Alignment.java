@@ -180,7 +180,7 @@ private void setReferenceLength(int k) {
 				 if(frag.trim().matches("[ATGCNatgcn-]+")){
 					 setReference(frag.trim());
 					 for(int k = 0; k < 5; k++ ){ //test first and last 5 positvions for g->c mismatch
-							if(ctMisMatch(0-k) || ctMisMatch(this.query.length()-k-1)){ // set damage true if there is a C->T sub at eithter end
+							if(ctMisMatch(k) || ctMisMatch(this.query.length()-k-1)){ // set damage true if there is a C->T sub at eithter end
 								setFivePrimeDamage(true);
 								break;// break out of loop
 							}

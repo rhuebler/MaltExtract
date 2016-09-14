@@ -21,7 +21,6 @@ public class NCBI_TreeReader {
 	private Phylogeny ph;
 	public NCBI_TreeReader(){
 		try(Scanner in = new Scanner(new File(treName))){
-		System.out.println("Setting up Phylogenetic Tree");
 		String line = in.nextLine();
 		in.close();
 	    this.ph = Phylogeny.createInstanceFromNhxString(line);
@@ -32,7 +31,6 @@ public class NCBI_TreeReader {
 	public NCBI_TreeReader(String path){
 		this.treName = path + "ncbi.tre";
 		try{
-			System.out.println("Setting up Phylogenetic Tree");
 			Scanner in = new Scanner(new File(treName));
 			String line = in.nextLine();
 			in.close();

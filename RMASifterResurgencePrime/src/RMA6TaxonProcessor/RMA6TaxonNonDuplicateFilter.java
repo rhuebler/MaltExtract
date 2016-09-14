@@ -28,8 +28,6 @@ public class RMA6TaxonNonDuplicateFilter  extends RMA6TaxonProcessor{
 	public RMA6TaxonNonDuplicateFilter(int id, NCBI_MapReader reader, boolean v) {
 		super(id, reader, v);
 	}
-	private NCBI_MapReader mapReader;
-	
 	private void computeOutput(HashMap<Integer, ArrayList<Alignment>> taxonMap, int taxID){
 		ArrayList<Integer> distances = new ArrayList<Integer>();
 		ArrayList<Double> pIdents = new ArrayList<Double>();

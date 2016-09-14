@@ -6,6 +6,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import NCBI_MapReader.NCBI_TreeReader;
 import behaviour.Taxas;
@@ -29,13 +31,18 @@ public class RMA6Scanner {
 	private Taxas tax;
 	private List<Integer> taxIDs;
 	private NCBI_TreeReader  treeReader;
+	private Logger log;
+	private Logger warning;
 	// constructor
-	public RMA6Scanner(String inDir, String name, Taxas tax, List<Integer> taxIds, NCBI_TreeReader tReader){
+	public RMA6Scanner(String inDir, String name, Taxas tax, List<Integer> taxIds, NCBI_TreeReader tReader,
+			Logger log, Logger warning){
 		this.inDir = inDir;
 		this.fileName =  name;
 		this.taxIDs = taxIds;
 		this.tax =  tax;
 		this.treeReader = new NCBI_TreeReader(tReader);
+		this.log = log;
+		this.warning = warning;
 		process();
 		}
 	// getters
@@ -52,7 +59,7 @@ public class RMA6Scanner {
 	// process
 	private void process(){
 		try{
-			System.out.println("Scanning File: "+ fileName);
+			log.log(Level.INFO, "Scanning File: "+ fileName);
 			Map<Integer,Integer> map = new HashMap<Integer,Integer>();
 			RMA6File rma6File = new RMA6File(inDir+fileName, "r");
 			Long location = rma6File.getFooterSectionRMA6().getStartClassification("Taxonomy");
@@ -76,13 +83,13 @@ public class RMA6Scanner {
 		        }
 			this.assignmentMap = map;
 		    }else{
-		    	System.err.println(fileName+" has no taxonomy block");
-		    map.put(0, 0);
-		    this.assignmentMap = map;
+		    	warning.log(Level.SEVERE,fileName+" has no taxonomy block");
+		    	map.put(0, 0);
+		    	this.assignmentMap = map;
 		    }
 			rma6File.close();
 		}catch(IOException io){
-			io.printStackTrace();
+			warning.log(Level.SEVERE,"Cannot open File",io);
 		}
 	}
 }

@@ -8,7 +8,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
-
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.regex.Pattern;
 
 import org.apache.commons.cli.CommandLine;
@@ -35,14 +36,18 @@ public class InputParameterProcessor {
 	private String outDir;
 	private int numThreads = 1;
 	private int maxLength = 0;
-	private Filter behave = Filter.NON;
+	private Filter behave = Filter.SCAN;
 	private Taxas taxas = Taxas.ALL;
 	private String tree_Path = "/projects1/clusterhomes/huebler/RMASifter/RMA_Extractor_Resources/";
 	private  boolean readInf = false; 
 	private boolean verbose = false;
+	private Logger log;
+	private Logger warning;
 	// constructor
-	public InputParameterProcessor(String[] params){
-		process(params);
+	public InputParameterProcessor(String[] params ,Logger log, Logger warning){
+		this.log = log;
+		this.warning =  warning;
+		process(params);	
 	}
 	// getters
 	public List<String> getTaxNames(){
@@ -126,36 +131,35 @@ public class InputParameterProcessor {
 
     	        if (commandLine.hasOption("input"))
     	        {
-    	            System.out.print("Input Set to: ");
+    	        	log.log(Level.INFO,"Input Set to: ");
     	            for(String arg :commandLine.getOptionValues("input")){
     	            	File inFile = new File(arg);
     	            	try{
     	            		if(inFile.getCanonicalFile().isDirectory()){
-    	            			System.out.println(arg);
+    	            			 log.info(arg);
     	            			for(String name : inFile.list(RMAFilter))
     	            				this.fileNames.add(arg + name);
     	            		}else if(inFile.isFile()){
-    	            			System.out.println(arg);
+    	            			log.info(arg);
     	            			this.fileNames.add(arg);
     	            		}
     	            	}catch(IOException io){
-    	            		io.printStackTrace();
+    	            		warning.log(Level.SEVERE,"Can't open File", io);
     	            	}	
     	            }
     	        }
 
     	        if (commandLine.hasOption("output"))
     	        {
-    	            System.out.print("Output Directory set to: ");
-    	            System.out.println(commandLine.getOptionValue("output"));
+    	        	log.log(Level.INFO,"Output Directory set to: "+commandLine.getOptionValue("output"));
     	            this.outDir = commandLine.getOptionValue("output");
     	        }
     	        
     	        if (commandLine.hasOption("taxons"))
     	        {	this.taxas = Taxas.USER;
     	            for(String tax : commandLine.getOptionValues("taxons")){
-    	               System.out.println("Taxons File: ");
-        	           System.out.println(tax);
+    	            	log.info("Taxons File: ");
+    	            	log.info(tax);
     	        	   File f = new File(tax);
     	        	   if(f.isFile()){
     	        		   try {
@@ -168,9 +172,9 @@ public class InputParameterProcessor {
     	        		   e.printStackTrace();
     	        		   }
     	        	   }else{
-    	        	   System.out.print("Added Taxon: ");
-    	        	   System.out.println(tax +" to analysis");
-    	        	   taxNames.add(tax); 
+    	        		   log.info("Added Taxon: ");
+    	        		   log.info(tax +" to analysis");
+    	        		   taxNames.add(tax); 
     	        	   }
     	           }	   
     			}
@@ -178,49 +182,46 @@ public class InputParameterProcessor {
     	        
     	        if (commandLine.hasOption("threads"))
     	        {
-    	            System.out.print("Trying to use ");
-    	            System.out.println(commandLine.getOptionValue("threads")+" threads");
+    	        	log.info("Trying to use "+commandLine.getOptionValue("threads")+" threads");
     	            this.numThreads=Integer.parseInt(commandLine.getOptionValue("threads"));
     	            if(this.numThreads > Runtime.getRuntime().availableProcessors()){
     	    			this.numThreads = Runtime.getRuntime().availableProcessors(); // enforce that not more processors than available to jvm should be used 
-    	    			System.err.println("The Number of Threads higher than than Number available to System");
+    	    			log.warning("The Number of Threads higher than than Number available to System");
     	            }
-    	    		System.out.println("Using " + numThreads +" threads");
+    	    		log.log(Level.INFO,"Using " + numThreads +" threads");
     	        }
 
     	        if (commandLine.hasOption("filter"))
     	        {
     	            if(Pattern.compile(Pattern.quote("non"), Pattern.CASE_INSENSITIVE).matcher(commandLine.getOptionValue("filter")).find()){
     	            	this.behave = Filter.NON;
-    	            	System.out.println("Custom Behaviour set to: ");
-        	            System.out.println(commandLine.getOptionValue("filter"));
+    	            	log.log(Level.INFO,commandLine.getOptionValue("Custom Behaviour set to: "+"filter"));
     	            }else if(Pattern.compile(Pattern.quote("ancient"), Pattern.CASE_INSENSITIVE).matcher(commandLine.getOptionValue("filter")).find()){
     	            	this.behave = Filter.ANCIENT;
-    	            	System.out.println("Custom Behaviour set to: ");
-        	            System.out.println(commandLine.getOptionValue("filter"));
+    	            	log.log(Level.INFO,"Custom Behaviour set to: "+commandLine.getOptionValue("filter"));
     	            }else if(Pattern.compile(Pattern.quote("nonduplicate"), Pattern.CASE_INSENSITIVE).matcher(commandLine.getOptionValue("filter")).find()){
     	            	this.behave = Filter.NONDUPLICATES;
-    	            	System.out.println("Custom Behaviour set to: ");
-        	            System.out.println(commandLine.getOptionValue("filter"));
+    	            	log.log(Level.INFO,"Custom Behaviour set to: "+commandLine.getOptionValue("filter"));
     	            }else if(Pattern.compile(Pattern.quote("scan"), Pattern.CASE_INSENSITIVE).matcher(commandLine.getOptionValue("filter")).find()){
     	            	this.behave = Filter.SCAN;
-    	            	System.out.println("Custom Behaviour set to: ");
-        	            System.out.println(commandLine.getOptionValue("filter"));
+    	            	log.log(Level.INFO,"Custom Behaviour set to: "+commandLine.getOptionValue("filter"));
+    	            }
+    	            else if(Pattern.compile(Pattern.quote("all"), Pattern.CASE_INSENSITIVE).matcher(commandLine.getOptionValue("filter")).find()){
+    	            	this.behave = Filter.ALL;
+    	            	log.log(Level.INFO,"Custom Behaviour set to: "+commandLine.getOptionValue("filter"));
     	            }
     	            
     	        }
 
     	        if (commandLine.hasOption("top"))
     	        {
-    	            System.out.println("Top Percent value set to: ");
-    	            System.out.println(commandLine.getOptionValue("top"));
+    	        	log.log(Level.INFO,"Top Percent value set to: "+commandLine.getOptionValue("top"));
     	            this.topPercent = Double.parseDouble(commandLine.getOptionValue("top"));
     	        }
     	        
     	        if (commandLine.hasOption("maxReadLength"))
     	        {
-    	            System.out.println("maximum Read Length set to: ");
-    	            System.out.println(commandLine.getOptionValue("maxReadLength"));
+    	        	log.log(Level.INFO,"maximum Read Length set to: " + commandLine.getOptionValue("maxReadLength"));
     	            this.maxLength = Integer.parseInt(commandLine.getOptionValue("maxReadLength"));
     	        }
     	        
@@ -244,27 +245,24 @@ public class InputParameterProcessor {
     	    	    System.exit(0);
     	        }
     	        if(!commandLine.hasOption("h")  && (!commandLine.hasOption("output") || !commandLine.hasOption("input"))){
-    	        	System.err.println("Please, specifiy input files or input directories and output directory");
+    	        	warning.log(Level.SEVERE,"Please, specifiy input files or input directories and output directory");
     	        	System.exit(1);
     	        }
     	        {
     	            String[] remainder = commandLine.getArgs();
-    	            System.out.print("Remaining arguments: ");
+    	            if(remainder.length != 0)
+    	            	warning.log(Level.SEVERE,"Remaining arguments: ");
     	            for (String argument : remainder)
     	            {
-    	                System.out.print(argument);
-    	                System.out.print(" ");
+    	                log.log(Level.WARNING,argument);
     	            }
-
-    	            System.out.println();
     	        }
     	       
     	    }
     	    
     	    catch (ParseException exception)
     	    {
-    	        System.out.print("Parse error: ");
-    	        System.out.println(exception.getMessage());
+    	    	warning.log(Level.SEVERE, "Parse error: " + exception);
     	    }
     }
   
