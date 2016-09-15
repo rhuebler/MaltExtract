@@ -6,8 +6,18 @@ import java.util.logging.Logger;
 
 import NCBI_MapReader.NCBI_TreeReader;
 import behaviour.Taxas;
-
+/**
+ * Concurrent version of RMA6Scanner that allows for one to run on each thread
+ * @author huebler
+ *
+ */
 public class ConcurrentRMA6Scanner implements Callable<RMA6Scanner>{
+	/**
+	 * @param String inDir, String FileName, String outDir, List<Integer> taxIDs
+	 * Taxas tax,TreeReader reader, Logger log, Logger warning
+	 * @return ap<Integer,Integer> assignmentMap
+	 * @throws none thrown all caughteName, Taxas enum, List<Intefer> UserIds, NCBI_TreeReader reader,Logger log, Logger warning
+	 */
 	private String inDir;
 	private String fileName;
 	private List<Integer> TaxIDs;

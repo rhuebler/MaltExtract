@@ -12,6 +12,11 @@ import java.util.Scanner;
  * and a map of name to ID
  */
 public class NCBI_MapReader {
+	/**
+	 * @param String directory/to/file
+	 * @throws none thrown all caught
+	 * @return return twwo hashmaps with IDs to name and Name to ID
+	 */
 	private String mapName= "/projects1/clusterhomes/huebler/RMASifter/RMA_Extractor_Resources/ncbi.map";
 	 HashMap<String,Integer> ncbiNameToId;
 	 HashMap<Integer,String> ncbiIdToName;

@@ -16,6 +16,11 @@ import org.forester.phylogeny.PhylogenyNode;
  */
 
 public class NCBI_TreeReader {
+	/**
+	 * @param String directory/to/file
+	 * @throws none thrown all caught
+	 * @return return phylogenetic tree object
+	 */
 	private String treName= "/projects1/clusterhomes/huebler/RMASifter/RMA_Extractor_Resources/ncbi.tre";//TODO how to provide System resources make relativistic
 	int target;
 	private Phylogeny ph;

@@ -35,6 +35,10 @@ import utility.SummaryWriter;
  *
  */
 public class RMAExtractor {
+	/**
+	 * @param String[] args all comandline parameters
+	 * @throws none thrown all caught
+	 */
 	private static final Logger log = Logger.getLogger(RMAExtractor.class.getName());
 	private static final Logger warning = Logger.getLogger("Error");
 	private static ThreadPoolExecutor executor;

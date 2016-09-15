@@ -9,8 +9,18 @@ import NCBI_MapReader.NCBI_TreeReader;
 import behaviour.Filter;
 import behaviour.Taxas;
 
-// should be a callable version to process a RMA6 File and return 
+/**
+ * Concurrent class of RMA6 Processor that allows for one RMA6Processor per thread
+ * @author huebler
+ *
+ */
 public class ConcurrentRMA6Processor implements Callable<RMA6Processor>{
+	/**
+	 * @param String indDir, String fileName, String outDir, NCBI_MapReader, NCBI_TreeReader, Set<Integer>, Filter behave,
+	 * Taxas taxas, boolean verbose, int maxLength, Logger log, Logger warning
+	 * @return RMA6Processor
+	 * @throws none thrown all caughteName, Taxas enum, List<Intefer> UserIds, NCBI_TreeReader reader,Logger log, Logger warning
+	 */
 	private String outDir;
 	private String fileName;
 	private String inDir;

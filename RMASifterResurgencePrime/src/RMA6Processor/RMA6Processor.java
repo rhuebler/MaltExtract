@@ -32,7 +32,12 @@ import megan.rma6.RMA6File;
  *
  */
 public class RMA6Processor {
-	// attributes
+	/**
+	 * @param String indDir, String fileName, String outDir, NCBI_MapReader, NCBI_TreeReader, Set<Integer>, Filter behave,
+	 * Taxas taxas, boolean verbose, int maxLength, Logger log, Logger warning
+	 * @return HashMap<Integer,Integer> HashMap<taxID,numOfMatches>
+	 * @throws none thrown all caught
+	 */
 	private HashMap<Integer,Integer> overallSum;
 	private ArrayList<String> readDist;
 	private ArrayList<String> supplement;

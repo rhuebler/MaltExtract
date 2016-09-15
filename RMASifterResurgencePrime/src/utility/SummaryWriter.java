@@ -16,8 +16,17 @@ import java.util.logging.Logger;
 
 import NCBI_MapReader.NCBI_MapReader;
 import RMA6Processor.RMA6Processor;
-
+/**
+ * Write overall Summy file from proceesed RMA6Files
+ * @author huebler
+ *
+ */
 public class SummaryWriter {
+	/**
+	 * @param List<Future<RMA6Processor>> processedFiles, NCBI_MapReader mapReader, Set<Integer> processedIDs,
+	 * String outDir Logger,Warning
+	 * @throws none thrown all caught
+	 */
 	private NCBI_MapReader mapReader;
 	private List<Future<RMA6Processor>> processedFiles;
 	private Set<Integer> processedIDs;
@@ -26,7 +35,6 @@ public class SummaryWriter {
 	private Logger warning;
 	public SummaryWriter(List<Future<RMA6Processor>> pFiles, NCBI_MapReader mReader, String oDir, Logger warning){
 		this.processedFiles = pFiles;
-		//this.processedIDs = pIDs;	
 		this.mapReader = mReader;
 		this.outDir = oDir;
 		this.warning = warning;

@@ -23,6 +23,10 @@ import RMA6Processor.RMA6Scanner;
  *
  */
 public class ScanSummaryWriter {
+	/**
+	 * @param List<Future<RMA6Scanner>>, NCBI_MapReader, Set<Integer>, Logger,Warning
+	 * @throws none thrown all caught
+	 */
 	private List<Future<RMA6Scanner>> list;
 	private NCBI_MapReader reader;
 	private Set<Integer> keySet;

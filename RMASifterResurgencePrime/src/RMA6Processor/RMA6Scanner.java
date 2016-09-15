@@ -23,6 +23,12 @@ import megan.rma6.RMA6File;
  *
  */
 public class RMA6Scanner {
+	/**
+	 * @param String inDir, String FileName, String outDir, List<Integer> taxIDs
+	 * Taxas tax,TreeReader reader, Logger log, Logger warning
+	 * @return ap<Integer,Integer> assignmentMap
+	 * @throws none thrown all caught
+	 */
 	// attributes
 	private String inDir;
 	private String fileName;
