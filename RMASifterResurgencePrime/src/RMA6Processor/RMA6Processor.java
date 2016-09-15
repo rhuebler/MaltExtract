@@ -110,7 +110,7 @@ public class RMA6Processor {
 	}
 	private void writeEditDistance(List<String> histo){
 		try{
-			String header = "Node\t0\t1\t2\t2\t3\t4\t5\thigher";
+			String header = "Node\t0\t1\t2\t3\t4\t5\thigher";
 			histo.sort(null);
 			histo.add(0,header);
 			Path file = Paths.get(outDir+"/editDistance/"+fileName+"_editDistance"+".txt");
