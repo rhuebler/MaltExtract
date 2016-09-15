@@ -26,7 +26,10 @@ import megan.rma6.ReadBlockGetterRMA6;
  *
  */
 public class TaxonAncientNonStacked  extends RMA6TaxonProcessor{
-	
+	/**
+	 * @param int ID, NCBI_MapReader reader, boolean verbose, Logger, log, Logger warning
+	 * @return int numMatches, String readDistribution, HashMap EditDistance, HashMap Percent Identity
+	 */ 
 	public TaxonAncientNonStacked(int id, NCBI_MapReader reader, boolean v,Logger log, Logger warning) {
 		super(id, reader, v, log, warning);
 	}

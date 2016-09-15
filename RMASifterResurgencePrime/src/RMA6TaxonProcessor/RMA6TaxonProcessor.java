@@ -24,6 +24,10 @@ import megan.rma6.ReadBlockGetterRMA6;
  *
  */
 public class RMA6TaxonProcessor {
+	/**
+	 * @param int ID, NCBI_MapReader reader, boolean verbose, Logger, log, Logger warning
+	 * @return int numMatches, String readDistribution, HashMap EditDistance, HashMap Percent Identity
+	 */ 
 protected String taxName;	
 protected int numOfMatches;
 protected String readDistribution;

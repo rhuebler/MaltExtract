@@ -26,7 +26,10 @@ import megan.rma6.ReadBlockGetterRMA6;
  *
  */
 public class RMA6TaxonDamageFilter extends RMA6TaxonProcessor{
-
+	/**
+	 * @param int ID, NCBI_MapReader reader, boolean verbose, Logger, log, Logger warning
+	 * @return int numMatches, String readDistribution, HashMap EditDistance, HashMap Percent Identity
+	 */ 
 public RMA6TaxonDamageFilter(int id, NCBI_MapReader reader, boolean v,Logger log, Logger warning) {
 		super(id, reader, v, log, warning);
 	}
