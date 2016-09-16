@@ -104,7 +104,7 @@ public String getEditDistanceHistogram(){
 }
 public String getPercentIdentityHistogram(){
 	HashMap<Integer,Integer> histo = this.pIdentHistogram;
-	return taxName+"\t"+histo.get(0)+"\t"+histo.get(1)+"\t"+histo.get(2)+"\t"+histo.get(3)+"\t"+histo.get(4)+"\t";
+	return taxName+"\t"+histo.get(0)+"\t"+histo.get(1)+"\t"+histo.get(2)+"\t"+histo.get(3)+"\t"+histo.get(4);
 }
 
 protected void setReadDistribution(String s){
