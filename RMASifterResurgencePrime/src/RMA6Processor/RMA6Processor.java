@@ -173,42 +173,22 @@ public void process(List<Integer>taxIDs, double topPercent, boolean readInf) {
 	}
 	setContainedIDs(idsToProcess);
 		for(Integer id : idsToProcess){
+			RMA6TaxonProcessor taxProcessor = null;
 			if(behave == Filter.NON){// change to all
-				RMA6TaxonProcessor taxProcessor = new RMA6TaxonProcessor(id, minPIdent, mapReader, verbose,log, warning);
-				taxProcessor.process(inDir, fileName, topPercent, maxLength);
-				overallSum.put(id,taxProcessor.getNumberOfMatches());
-				readDistribution.add(taxProcessor.getReadDistribution());	
-				if(readInf){
-					editDistance.add(taxProcessor.getEditDistanceHistogram());
-					percentIdentity.add(taxProcessor.getPercentIdentityHistogram());
-				}
+				taxProcessor = new RMA6TaxonProcessor(id, minPIdent, mapReader, verbose,log, warning);
 			}else if(behave == Filter.ANCIENT){
-				RMA6TaxonDamageFilter damageProcessor = new RMA6TaxonDamageFilter(id, minPIdent, mapReader, verbose,log, warning);
-				damageProcessor.process(inDir, fileName, topPercent, maxLength);
-				overallSum.put(id,damageProcessor.getNumberOfMatches());
-				readDistribution.add(damageProcessor.getReadDistribution());
-				if(readInf){
-					editDistance.add(damageProcessor.getEditDistanceHistogram());
-					percentIdentity.add(damageProcessor.getPercentIdentityHistogram());
-				}
+				 taxProcessor = new RMA6TaxonDamageFilter(id, minPIdent, mapReader, verbose,log, warning);
 			}else if(behave == Filter.NONDUPLICATES){
-				RMA6TaxonNonDuplicateFilter nonDP = new RMA6TaxonNonDuplicateFilter(id, minPIdent, mapReader, verbose, log, warning);
-				nonDP.process(inDir, fileName, topPercent, maxLength);
-				overallSum.put(id,nonDP.getNumberOfMatches());
-				readDistribution.add(nonDP.getReadDistribution());
-				if(readInf){
-					editDistance.add(nonDP.getEditDistanceHistogram());
-					percentIdentity.add(nonDP.getPercentIdentityHistogram());
-				}
+				 taxProcessor = new RMA6TaxonNonDuplicateFilter(id, minPIdent, mapReader, verbose, log, warning);
 			}else if(behave == Filter.ALL){
-				TaxonAncientNonStacked all = new TaxonAncientNonStacked(id, minPIdent, mapReader, verbose, log, warning);
-				all.process(inDir, fileName, topPercent, maxLength);
-				overallSum.put(id,all.getNumberOfMatches());
-				readDistribution.add(all.getReadDistribution());
-				if(readInf){
-					editDistance.add(all.getEditDistanceHistogram());
-					percentIdentity.add(all.getPercentIdentityHistogram());
-				}	
+				 taxProcessor = new TaxonAncientNonStacked(id, minPIdent, mapReader, verbose, log, warning);	
+			}
+			taxProcessor.process(inDir, fileName, topPercent, maxLength);
+			overallSum.put(id,taxProcessor.getNumberOfMatches());
+			readDistribution.add(taxProcessor.getReadDistribution());
+			if(readInf){
+				editDistance.add(taxProcessor.getEditDistanceHistogram());
+				percentIdentity.add(taxProcessor.getPercentIdentityHistogram());
 			}
 	  }//TaxIDs
 	setSumLine(overallSum); // set number of assigned Reads to overall file summary
