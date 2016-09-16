@@ -25,7 +25,7 @@ import megan.rma6.ReadBlockGetterRMA6;
  */
 public class RMA6TaxonProcessor {
 	/**
-	 * @param int ID, NCBI_MapReader reader, boolean verbose, Logger, log, Logger warning
+	 * @param int ID, NCBI_MapReader reader, boolean verbose, Logger, log, Logger warning, minPIdent
 	 * @return int numMatches, String readDistribution, HashMap EditDistance, HashMap Percent Identity
 	 */ 
 protected String taxName;	
@@ -34,14 +34,16 @@ protected String readDistribution;
 protected ArrayList<String> supplemantary;
 protected NCBI_MapReader mapReader;
 protected Integer taxID;
+protected double minPIdent;
 protected HashMap<Integer,Integer> editHistogram;
 protected HashMap<Integer,Integer> pIdentHistogram;
 protected boolean verbose;
 protected Logger log;
 protected Logger warning;
 //constructor
-public RMA6TaxonProcessor(Integer id, NCBI_MapReader reader, boolean v, Logger log, Logger warning){
+public RMA6TaxonProcessor(Integer id, double pID, NCBI_MapReader reader, boolean v, Logger log, Logger warning){
 	this.mapReader = reader;
+	this.minPIdent = pID;
 	this.taxID = id;
 	this.verbose = v;
 	this.log = log;
@@ -175,13 +177,12 @@ public void process(String inDir, String fileName, double topPercent, int maxLen
 		int numReads = 0;
 		while(classIt.hasNext()){
 			IReadBlock current = classIt.next();
+			boolean higher = false;
 			if(current.getReadLength() <= maxLength || maxLength == 0){
 				IMatchBlock[] blocks=current.getMatchBlocks();
 				int k=0;
 				float topScore = current.getMatchBlock(0).getBitScore();
 				double pIdent = 0;
-//				double length = 0; 
-//				int damage=0;
 				int editDistance=0;
 				for(int i = 0; i< blocks.length;i++){
 					if(blocks[i].getBitScore()/topScore < 1-topPercent){
@@ -189,26 +190,28 @@ public void process(String inDir, String fileName, double topPercent, int maxLen
 					
 					Alignment al = new Alignment();
 					al.processText(blocks[i].getText().split("\n"));
-					//length += al.getMlength();
 					al.setPIdent(blocks[i].getPercentIdentity());
-					pIdent += al.getPIdent();
-					editDistance += al.getEditInstance();
-					if(!taxonMap.containsKey(blocks[i].getTaxonId())){
-						ArrayList<Alignment> entry =new ArrayList<Alignment>();
-						entry.add(al);
-						taxonMap.put(blocks[i].getTaxonId(), entry);
-					}else{
-						ArrayList<Alignment> entry = taxonMap.get(blocks[i].getTaxonId());
-						entry.add(al);
-						taxonMap.put(blocks[i].getTaxonId(),entry);
+					if(minPIdent <= al.getPIdent()){ // check for minPercentIdentity
+						higher = true;
+						pIdent += al.getPIdent();
+						editDistance += al.getEditInstance();
+						if(!taxonMap.containsKey(blocks[i].getTaxonId())){
+							ArrayList<Alignment> entry =new ArrayList<Alignment>();
+							entry.add(al);
+							taxonMap.put(blocks[i].getTaxonId(), entry);
+						}else{
+							ArrayList<Alignment> entry = taxonMap.get(blocks[i].getTaxonId());
+							entry.add(al);
+							taxonMap.put(blocks[i].getTaxonId(),entry);
+						}
+						k++;
 					}
-					//if(al.getFivePrimeDamage())// calculate number of damage Reads
-						//damage++;
-					k++;
 				}
+				if(higher){
 					numReads++;
 					distances.add(editDistance/k);
 					pIdents.add(pIdent/k);
+				}
 					
 			}// if  
 		}// while

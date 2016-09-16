@@ -30,8 +30,8 @@ public class RMA6TaxonNonDuplicateFilter  extends RMA6TaxonProcessor{
 	 * @param int ID, NCBI_MapReader reader, boolean verbose, Logger, log, Logger warning
 	 * @return int numMatches, String readDistribution, HashMap EditDistance, HashMap Percent Identity
 	 */ 
-	public RMA6TaxonNonDuplicateFilter(int id, NCBI_MapReader reader, boolean v, Logger log, Logger warning) {
-		super(id, reader, v, log, warning);
+	public RMA6TaxonNonDuplicateFilter(int id ,double pID, NCBI_MapReader reader, boolean v,Logger log, Logger warning) {
+		super(id,pID, reader, v, log, warning);
 	}
 	private void computeOutput(HashMap<Integer, ArrayList<Alignment>> taxonMap, int taxID){
 		ArrayList<Integer> distances = new ArrayList<Integer>();
@@ -112,14 +112,16 @@ public class RMA6TaxonNonDuplicateFilter  extends RMA6TaxonProcessor{
 						al.processText(block.getText().split("\n"));
 						al.setReadName(current.getReadName());
 						al.setPIdent(block.getPercentIdentity());
-						if(!taxonMap.containsKey(block.getTaxonId())){
-							ArrayList<Alignment> entry =new ArrayList<Alignment>();
-							entry.add(al);
-							taxonMap.put(block.getTaxonId(), entry);
-						}else{
-							ArrayList<Alignment> entry = taxonMap.get(block.getTaxonId());
-							entry.add(al);
-							taxonMap.put(block.getTaxonId(),entry);
+						if(minPIdent <= al.getPIdent()){
+							if(!taxonMap.containsKey(block.getTaxonId())){
+								ArrayList<Alignment> entry =new ArrayList<Alignment>();
+								entry.add(al);
+								taxonMap.put(block.getTaxonId(), entry);
+							}else{
+								ArrayList<Alignment> entry = taxonMap.get(block.getTaxonId());
+								entry.add(al);
+								taxonMap.put(block.getTaxonId(),entry);
+							}
 						}
 				}//if 
 			}//while

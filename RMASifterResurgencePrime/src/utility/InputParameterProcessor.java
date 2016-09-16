@@ -41,6 +41,7 @@ public class InputParameterProcessor {
 	private String outDir;
 	private int numThreads = 1;
 	private int maxLength = 0;
+	private double minPIdent = 0;
 	private Filter behave = Filter.SCAN;
 	private Taxas taxas = Taxas.ALL;
 	private String tree_Path = "/projects1/clusterhomes/huebler/RMASifter/RMA_Extractor_Resources/";
@@ -55,6 +56,9 @@ public class InputParameterProcessor {
 		process(params);	
 	}
 	// getters
+	public double getMinPIdent(){
+		return this.minPIdent;
+	}
 	public List<String> getTaxNames(){
 		return this.taxNames;
 	}
@@ -109,7 +113,8 @@ public class InputParameterProcessor {
     	    Option option_Threads = Option.builder("p").longOpt("threads").argName("1..maxNumberOfCores").hasArg().optionalArg(true).desc("Number of Cores to run on").build();		
     	    Option option_TopPercent = Option.builder("a").longOpt("top").argName("0.0-0.99").hasArg().optionalArg(true).desc("Top Percent of Matches to Consider").build();
     	    Option option_Filter = Option.builder("f").longOpt("filter").argName("non,ancient,nonduplicate, scan").optionalArg(true).hasArg().desc("Specify the behaviour for run eg ancient").build();
-    	    Option option_MaxLength = Option.builder("l").longOpt("maxLength").argName("maxLength").hasArg().optionalArg(true).desc("Set Maximum ReadLength").build();
+    	    Option option_MaxLength = Option.builder().longOpt("maxLength").argName("maxLength").hasArg().optionalArg(true).desc("Set Maximum ReadLength").build();
+    	    Option option_minPercentIdent = Option.builder().longOpt("minPIdent").argName("minPIdent").hasArg().optionalArg(true).desc("Set Minumum Percent Identity").build(); 
     	    Option option_Help = Option.builder("h").longOpt("help").optionalArg(true).desc("Print Usage and shutdown").build();
     	    Option option_Path = Option.builder("r").longOpt("resources").hasArg().optionalArg(true).desc("Path to NCBI tre and map File").build();
     	    Option option_Read = Option.builder().longOpt("histo").optionalArg(true).desc("Turn on Read Information Output").build();
@@ -125,6 +130,8 @@ public class InputParameterProcessor {
     	    options.addOption(option_TopPercent);
     	    options.addOption(option_Filter);
     	    options.addOption(option_MaxLength);
+    	    options.addOption(option_minPercentIdent);
+    	    
     	    options.addOption(option_Help);
     	    options.addOption(option_Path);
     	    options.addOption(option_Read);
@@ -228,6 +235,10 @@ public class InputParameterProcessor {
     	        {
     	        	log.log(Level.INFO,"maximum Read Length set to: " + commandLine.getOptionValue("maxReadLength"));
     	            this.maxLength = Integer.parseInt(commandLine.getOptionValue("maxReadLength"));
+    	        }
+    	        
+    	        if(commandLine.hasOption("minPIdent")){
+    	        	this.minPIdent = Double.parseDouble(commandLine.getOptionValue("minPIdent"));
     	        }
     	        
     	        if(commandLine.hasOption("resources")){

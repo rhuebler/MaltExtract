@@ -30,8 +30,8 @@ public class RMA6TaxonDamageFilter extends RMA6TaxonProcessor{
 	 * @param int ID, NCBI_MapReader reader, boolean verbose, Logger, log, Logger warning
 	 * @return int numMatches, String readDistribution, HashMap EditDistance, HashMap Percent Identity
 	 */ 
-public RMA6TaxonDamageFilter(int id, NCBI_MapReader reader, boolean v,Logger log, Logger warning) {
-		super(id, reader, v, log, warning);
+public RMA6TaxonDamageFilter(int id ,double pID, NCBI_MapReader reader, boolean v,Logger log, Logger warning) {
+		super(id,pID, reader, v, log, warning);
 	}
 
 @Override
@@ -76,6 +76,7 @@ public void process(String inDir, String fileName, double topPercent, int maxLen
 				double pIdent = 0;
 				int editDistance = 0;
 				int damage=0;
+				boolean higher = false;
 				for(int i = 0; i< blocks.length;i++){
 					if(blocks[i].getBitScore()/topScore <= 1 - topPercent){
 						break;}
@@ -83,8 +84,8 @@ public void process(String inDir, String fileName, double topPercent, int maxLen
 					Alignment al = new Alignment();
 					al.processText(blocks[i].getText().split("\n"));
 					al.setPIdent(blocks[i].getPercentIdentity());
-					if(al.getFivePrimeDamage()){
-						
+					if(al.getFivePrimeDamage() && minPIdent <= al.getPIdent()){
+						higher = true;
 						pIdent += blocks[i].getPercentIdentity();
 						if(!taxonMap.containsKey(blocks[i].getTaxonId())){
 							ArrayList<Alignment> entry =new ArrayList<Alignment>();
@@ -95,14 +96,14 @@ public void process(String inDir, String fileName, double topPercent, int maxLen
 							entry.add(al);
 							taxonMap.put(blocks[i].getTaxonId(),entry);
 						}
-					
-						damage++;
-					k++;
-					}
 					editDistance += al.getEditInstance();
 					pIdent += al.getPIdent();
+					damage++;
+					k++;
+					}
+					
 				}
-				if(damage !=0){
+				if(damage !=0 && higher){
 					numReads++;
 					distances.add(editDistance/k);
 					pIdents.add(pIdent/k);

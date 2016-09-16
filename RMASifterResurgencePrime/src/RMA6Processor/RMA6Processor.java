@@ -49,13 +49,14 @@ public class RMA6Processor {
 	private Set<Integer> containedIDs;
 	private Filter behave;
 	private int maxLength;
+	private double minPIdent;
 	private Taxas taxas;
 	private boolean verbose;
 	private Logger log;
 	private Logger warning;
 	// constructor
 	public RMA6Processor(String inDir, String fileName, String outDir, NCBI_MapReader mapReader,
-			NCBI_TreeReader treeReader, int maxLength, Filter b, Taxas t, boolean verbose,
+			NCBI_TreeReader treeReader, int maxLength, double pIdent, Filter b, Taxas t, boolean verbose,
 			Logger log, Logger warning) {
 		this.inDir = inDir;
 		this.outDir = outDir;
@@ -64,6 +65,7 @@ public class RMA6Processor {
 		this.treeReader = new NCBI_TreeReader(treeReader);
 		this.behave = b;
 		this.maxLength = maxLength;
+		this.minPIdent = pIdent;
 		this.taxas = t;
 		this.verbose = verbose;
 		this.log = log;
@@ -172,7 +174,7 @@ public void process(List<Integer>taxIDs, double topPercent, boolean readInf) {
 	setContainedIDs(idsToProcess);
 		for(Integer id : idsToProcess){
 			if(behave == Filter.NON){// change to all
-				RMA6TaxonProcessor taxProcessor = new RMA6TaxonProcessor(id, mapReader, verbose,log, warning);
+				RMA6TaxonProcessor taxProcessor = new RMA6TaxonProcessor(id, minPIdent, mapReader, verbose,log, warning);
 				taxProcessor.process(inDir, fileName, topPercent, maxLength);
 				overallSum.put(id,taxProcessor.getNumberOfMatches());
 				readDistribution.add(taxProcessor.getReadDistribution());	
@@ -181,7 +183,7 @@ public void process(List<Integer>taxIDs, double topPercent, boolean readInf) {
 					percentIdentity.add(taxProcessor.getPercentIdentityHistogram());
 				}
 			}else if(behave == Filter.ANCIENT){
-				RMA6TaxonDamageFilter damageProcessor = new RMA6TaxonDamageFilter(id, mapReader, verbose,log, warning);
+				RMA6TaxonDamageFilter damageProcessor = new RMA6TaxonDamageFilter(id, minPIdent, mapReader, verbose,log, warning);
 				damageProcessor.process(inDir, fileName, topPercent, maxLength);
 				overallSum.put(id,damageProcessor.getNumberOfMatches());
 				readDistribution.add(damageProcessor.getReadDistribution());
@@ -190,7 +192,7 @@ public void process(List<Integer>taxIDs, double topPercent, boolean readInf) {
 					percentIdentity.add(damageProcessor.getPercentIdentityHistogram());
 				}
 			}else if(behave == Filter.NONDUPLICATES){
-				RMA6TaxonNonDuplicateFilter nonDP = new RMA6TaxonNonDuplicateFilter(id, mapReader, verbose, log, warning);
+				RMA6TaxonNonDuplicateFilter nonDP = new RMA6TaxonNonDuplicateFilter(id, minPIdent, mapReader, verbose, log, warning);
 				nonDP.process(inDir, fileName, topPercent, maxLength);
 				overallSum.put(id,nonDP.getNumberOfMatches());
 				readDistribution.add(nonDP.getReadDistribution());
@@ -199,7 +201,7 @@ public void process(List<Integer>taxIDs, double topPercent, boolean readInf) {
 					percentIdentity.add(nonDP.getPercentIdentityHistogram());
 				}
 			}else if(behave == Filter.ALL){
-				TaxonAncientNonStacked all = new TaxonAncientNonStacked(id, mapReader, verbose, log, warning);
+				TaxonAncientNonStacked all = new TaxonAncientNonStacked(id, minPIdent, mapReader, verbose, log, warning);
 				all.process(inDir, fileName, topPercent, maxLength);
 				overallSum.put(id,all.getNumberOfMatches());
 				readDistribution.add(all.getReadDistribution());

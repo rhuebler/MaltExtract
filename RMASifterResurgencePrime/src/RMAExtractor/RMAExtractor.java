@@ -91,9 +91,10 @@ public class RMAExtractor {
     		for(String fileName : inProcessor.getFileNames()){
     			try{
     				File f = new File(fileName);
-    				ConcurrentRMA6Processor task = new ConcurrentRMA6Processor(f.getParentFile().getCanonicalFile() + "/", f.getName(), inProcessor.getOutDir(), 
-    						mapReader, treeReader,taxIDs, inProcessor.getTopPercent(),inProcessor.getMaxLength(),inProcessor.getFilter(), 
-    						inProcessor.getTaxas(), inProcessor.wantReadInf(), inProcessor.isVerbose(), log, warning);
+    				ConcurrentRMA6Processor task = new ConcurrentRMA6Processor(f.getParentFile().getCanonicalFile() + "/", 
+    						f.getName(), inProcessor.getOutDir(), mapReader, treeReader,taxIDs, inProcessor.getTopPercent(),
+    						inProcessor.getMaxLength(),inProcessor.getMinPIdent(),inProcessor.getFilter(), inProcessor.getTaxas(),
+    						inProcessor.wantReadInf(), inProcessor.isVerbose(), log, warning);
     				Future<RMA6Processor> future=executor.submit(task);
     				processedFiles.add(future);
     				System.gc();
