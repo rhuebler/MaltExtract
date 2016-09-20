@@ -33,6 +33,8 @@ public class RMA6Scanner {
 	private String inDir;
 	private String fileName;
 	private Set<Integer> keySet;
+	private Set<Integer> allKeys;
+	private Integer readCount;
 	private Map<Integer,Integer> assignmentMap;
 	private Taxas tax;
 	private List<Integer> taxIDs;
@@ -52,6 +54,9 @@ public class RMA6Scanner {
 		process();
 		}
 	// getters
+	public int getTotalCount(){
+		return this.readCount;
+	}
 	public Set<Integer> getKeySet(){
 		return this.keySet;
 	}
@@ -81,13 +86,19 @@ public class RMA6Scanner {
 		        				idsToProcess.add(id);
 		        	}
 		        	this.keySet =  idsToProcess;
+		        	this.allKeys = cl.getKeySet();
 		        }else{
 		        	this.keySet = cl.getKeySet();
+		        	this.allKeys = cl.getKeySet();
 				}
-		        for(int key : keySet){
-		        	map.put(key, cl.getSum(key));
+		        int sum = 0;
+		        for(int key : allKeys){
+		        	if(keySet.contains(key))
+		        		map.put(key, cl.getSum(key));
+		        	sum += cl.getSum(key);
 		        }
 			this.assignmentMap = map;
+			this.readCount =  sum;
 		    }else{
 		    	warning.log(Level.SEVERE,fileName+" has no taxonomy block");
 		    	map.put(0, 0);
