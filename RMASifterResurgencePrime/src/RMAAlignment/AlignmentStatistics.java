@@ -148,8 +148,7 @@ public class AlignmentStatistics {
 						soli = length-1;
 					else if(a<0)
 						soli= length;
-			}
-				
+			}	
 			if(soli <= 0 || soli >= length)
 				soli = length;
 			unique += soli;
@@ -157,6 +156,8 @@ public class AlignmentStatistics {
 			i++;
 		}
 		distance.sort(null);
+//		for(int d : distance)
+//			System.out.println(d);
 		BigDecimal mean = getMean(distance);
 		BigDecimal median = getMedian(distance);
 		BigDecimal variance = getVariance(distance,mean);

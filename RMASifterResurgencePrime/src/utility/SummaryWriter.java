@@ -56,12 +56,14 @@ public class SummaryWriter {
 	private void prepareOutput() {
 		   List<String> summary = new ArrayList<String>();
 		   String header ="Node"; // could and should be its own function 
+		   String reads = "Total_Count";
 		   boolean first = true;	   
 		   for(Future<RMA6Processor> future : processedFiles){
 			   RMA6Processor current;
 			   try {
 				   current = future.get();
-				   header+="\t"+current.getfileName();
+				   header+="\t" + current.getfileName();
+				   reads += "\t" + current.getTotalCount();
 				   HashMap<Integer,Integer> fileResults = current.getSumLine();
 				   if(first ==true){
 					   for(int id : processedIDs){
@@ -104,6 +106,7 @@ public class SummaryWriter {
 			   
 		   }//for
 		   summary.sort(null);
+		   summary.add(0,reads);
 		   summary.add(0,header);
 		   this.summary =  summary;
 	}

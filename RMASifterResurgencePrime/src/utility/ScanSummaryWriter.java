@@ -56,7 +56,7 @@ public class ScanSummaryWriter {
 		try{
 			boolean first = true;
 			String header = "Node_Name";
-			String reads = "total_count";
+			String reads = "Total_Count";
 			for(Future<RMA6Scanner> future : list){
 				RMA6Scanner scan = future.get();
 				header += "\t" + scan.getFileName();

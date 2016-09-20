@@ -52,6 +52,7 @@ public class RMA6Processor {
 	private double minPIdent;
 	private Taxas taxas;
 	private boolean verbose;
+	private int totalCount;
 	private Logger log;
 	private Logger warning;
 	// constructor
@@ -69,11 +70,12 @@ public class RMA6Processor {
 		this.taxas = t;
 		this.verbose = verbose;
 		this.log = log;
-		this.warning = warning; 
+		this.warning = warning;
 	}
 	
 	//setters
 	private Set<Integer> getAllKeys(){
+		int sum = 0;
 		Set<Integer> keys = null;
 		try(RMA6File rma6File = new RMA6File(inDir+fileName, "r")){
 			Long location = rma6File.getFooterSectionRMA6().getStartClassification("Taxonomy");
@@ -81,11 +83,15 @@ public class RMA6Processor {
 		        ClassificationBlockRMA6 classificationBlockRMA6 = new ClassificationBlockRMA6("Taxonomy");
 		        classificationBlockRMA6.read(location, rma6File.getReader());
 		        keys = classificationBlockRMA6.getKeySet();// get all assigned IDs in a file 
-		    	}
+		        for(int key : keys){
+		        	sum += classificationBlockRMA6.getSum(key);
+			    }	
+		    }
 		    rma6File.close();
 		    }catch(IOException io){
 				io.printStackTrace();
 			}
+		this.totalCount += sum;
 		return keys;
 	}
 	
@@ -134,6 +140,10 @@ public class RMA6Processor {
 	} 
 	
 	//getter
+	public int getTotalCount(){
+		return this.totalCount;
+		
+	}
 	public ArrayList<String> getReadDistribution(){
 		return this.readDist;
 	}
