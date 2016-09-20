@@ -75,7 +75,6 @@ public class RMA6Processor {
 	
 	//setters
 	private Set<Integer> getAllKeys(){
-		int sum = 0;
 		Set<Integer> keys = null;
 		try(RMA6File rma6File = new RMA6File(inDir+fileName, "r")){
 			Long location = rma6File.getFooterSectionRMA6().getStartClassification("Taxonomy");
@@ -83,15 +82,13 @@ public class RMA6Processor {
 		        ClassificationBlockRMA6 classificationBlockRMA6 = new ClassificationBlockRMA6("Taxonomy");
 		        classificationBlockRMA6.read(location, rma6File.getReader());
 		        keys = classificationBlockRMA6.getKeySet();// get all assigned IDs in a file 
-		        for(int key : keys){
-		        	sum += classificationBlockRMA6.getSum(key);
-			    }	
 		    }
+		    this.totalCount = (int) rma6File.getFooterSectionRMA6().getNumberOfReads();
 		    rma6File.close();
 		    }catch(IOException io){
 				io.printStackTrace();
 			}
-		this.totalCount += sum;
+		
 		return keys;
 	}
 	

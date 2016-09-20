@@ -97,7 +97,7 @@ public class RMAExtractor {
     						inProcessor.wantReadInf(), inProcessor.isVerbose(), log, warning);
     				Future<RMA6Processor> future=executor.submit(task);
     				processedFiles.add(future);
-    				//System.gc();
+    				System.gc();
     			}catch(IOException io){
     				warning.log(Level.SEVERE,"File not found",io);
        				}

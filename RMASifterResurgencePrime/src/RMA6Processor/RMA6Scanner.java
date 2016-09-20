@@ -91,14 +91,14 @@ public class RMA6Scanner {
 		        	this.keySet = cl.getKeySet();
 		        	this.allKeys = cl.getKeySet();
 				}
-		        int sum = 0;
-		        for(int key : allKeys){
-		        	if(keySet.contains(key))
-		        		map.put(key, cl.getSum(key));
-		        	sum += cl.getSum(key);
+		        this.readCount = (int) rma6File.getFooterSectionRMA6().getNumberOfReads();
+		        for(int key : keySet){
+		        		if(allKeys.contains(key))
+		        			map.put(key, cl.getSum(key));
+		        		else
+		        			map.put(key, 0);
 		        }
 			this.assignmentMap = map;
-			this.readCount =  sum;
 		    }else{
 		    	warning.log(Level.SEVERE,fileName+" has no taxonomy block");
 		    	map.put(0, 0);
