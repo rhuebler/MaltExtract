@@ -56,9 +56,11 @@ public class ScanSummaryWriter {
 		try{
 			boolean first = true;
 			String header = "Node_Name";
+			String reads = "total_count";
 			for(Future<RMA6Scanner> future : list){
 				RMA6Scanner scan = future.get();
 				header += "\t" + scan.getFileName();
+				reads += "\t" + scan.getTotalCount();
 				if(first){
 					for(int key : keySet){
 						String s;
@@ -90,6 +92,7 @@ public class ScanSummaryWriter {
 				}
 			}
 			summary.sort(null);
+			summary.add(0,reads);
 			summary.add(0,header);
 			this.summary =  summary;
 		}catch(InterruptedException ie){
