@@ -45,7 +45,6 @@ public class InputParameterProcessor {
 	private Filter behave = Filter.SCAN;
 	private Taxas taxas = Taxas.ALL;
 	private String tree_Path = "/projects1/clusterhomes/huebler/RMASifter/RMA_Extractor_Resources/";
-	private  boolean readInf = false; 
 	private boolean verbose = false;
 	private Logger log;
 	private Logger warning;
@@ -62,9 +61,7 @@ public class InputParameterProcessor {
 	public List<String> getTaxNames(){
 		return this.taxNames;
 	}
-	public boolean wantReadInf(){
-		return this.readInf;
-	}
+	
 	public List<String> getFileNames(){
 		return this.fileNames;
 	}
@@ -117,7 +114,6 @@ public class InputParameterProcessor {
     	    Option option_minPercentIdent = Option.builder().longOpt("minPIdent").argName("minPIdent").hasArg().optionalArg(true).desc("Set Minumum Percent Identity").build(); 
     	    Option option_Help = Option.builder("h").longOpt("help").optionalArg(true).desc("Print Usage and shutdown").build();
     	    Option option_Path = Option.builder("r").longOpt("resources").hasArg().optionalArg(true).desc("Path to NCBI tre and map File").build();
-    	    Option option_Read = Option.builder().longOpt("histo").optionalArg(true).desc("Turn on Read Information Output").build();
     	    Option option_Verbose = Option.builder("v").longOpt("verbose").optionalArg(true).desc("How much output should be printed to screen").build();
     	    Options options = new Options();
     	    CommandLineParser parser = new DefaultParser();
@@ -134,7 +130,6 @@ public class InputParameterProcessor {
     	    
     	    options.addOption(option_Help);
     	    options.addOption(option_Path);
-    	    options.addOption(option_Read);
     	    options.addOption(option_Verbose);
 
     	    try
@@ -246,9 +241,6 @@ public class InputParameterProcessor {
     	        	if(f.isDirectory()){
     	        		this.tree_Path = commandLine.getOptionValue("resources");
     	        	}
-    	        }
-    	        if(commandLine.hasOption("histo")){
-    	        	this.readInf = true;
     	        }
     	        if(commandLine.hasOption('v')){
     	        	this.verbose = true;

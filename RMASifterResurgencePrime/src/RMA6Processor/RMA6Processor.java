@@ -158,7 +158,7 @@ public class RMA6Processor {
 		return this.fileName;
 	}
 // processing 
-public void process(List<Integer>taxIDs, double topPercent, boolean readInf) {
+public void process(List<Integer>taxIDs, double topPercent) {
 	log.log(Level.INFO,"Reading File: " +inDir+fileName);
 	HashMap<Integer,Integer> overallSum = new HashMap<Integer,Integer>();
 	ArrayList<String> editDistance = new ArrayList<String>();
@@ -193,16 +193,12 @@ public void process(List<Integer>taxIDs, double topPercent, boolean readInf) {
 			taxProcessor.process(inDir, fileName, topPercent, maxLength);
 			overallSum.put(id,taxProcessor.getNumberOfMatches());
 			readDistribution.add(taxProcessor.getReadDistribution());
-			if(readInf){
-				editDistance.add(taxProcessor.getEditDistanceHistogram());
-				percentIdentity.add(taxProcessor.getPercentIdentityHistogram());
-			}
+			editDistance.add(taxProcessor.getEditDistanceHistogram());
+			percentIdentity.add(taxProcessor.getPercentIdentityHistogram());
 	  }//TaxIDs
 	setSumLine(overallSum); // set number of assigned Reads to overall file summary
 	writeReadDist(readDistribution,fileName); // RMA6Processor now saves its own output 
-	if(readInf){
-		writeEditDistance(editDistance);
-		writePercentIdentity(percentIdentity);
-		}
+	writeEditDistance(editDistance);
+	writePercentIdentity(percentIdentity);
     }
  }

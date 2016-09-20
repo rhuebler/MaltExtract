@@ -65,14 +65,14 @@ public class RMAExtractor {
 		}
 		warning.addHandler(error);
 		log.log(Level.INFO, "Setting up Taxon Name and Taxon ID maps");
+		
 		NCBI_MapReader mapReader = new NCBI_MapReader(inProcessor.getTreePath());
 		new File(inProcessor.getOutDir()).mkdirs();
 		new File(inProcessor.getOutDir()+"/readDist/").mkdirs(); //TODO could break potentially on Windows systems
-		if(inProcessor.wantReadInf()){
-			new File(inProcessor.getOutDir()+"/editDistance/").mkdirs();
-			new File(inProcessor.getOutDir()+"/percentIdentity/").mkdirs();
-		}
+		new File(inProcessor.getOutDir()+"/editDistance/").mkdirs();
+		new File(inProcessor.getOutDir()+"/percentIdentity/").mkdirs();
 		List<Integer> taxIDs= new  ArrayList<Integer>();
+		
 		if(inProcessor.getTaxas() == Taxas.USER){
 			for(String name : inProcessor.getTaxNames()){
 				if(mapReader.getNcbiNameToIdMap().get(name) != null)// catch if there is a mistake
@@ -94,7 +94,7 @@ public class RMAExtractor {
     				ConcurrentRMA6Processor task = new ConcurrentRMA6Processor(f.getParentFile().getCanonicalFile() + "/", 
     						f.getName(), inProcessor.getOutDir(), mapReader, treeReader,taxIDs, inProcessor.getTopPercent(),
     						inProcessor.getMaxLength(),inProcessor.getMinPIdent(),inProcessor.getFilter(), inProcessor.getTaxas(),
-    						inProcessor.wantReadInf(), inProcessor.isVerbose(), log, warning);
+    						inProcessor.isVerbose(), log, warning);
     				Future<RMA6Processor> future=executor.submit(task);
     				processedFiles.add(future);
     				System.gc();
