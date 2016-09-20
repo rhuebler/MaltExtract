@@ -1,5 +1,7 @@
 package RMAAlignment;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.List;
 /**
@@ -13,31 +15,34 @@ public class AlignmentStatistics {
 		this.currentList = list;
 	}
 	//TODO add ALexanders moving window function 
-	private double getMean(ArrayList<Integer> data)
+	private static BigDecimal getMean(ArrayList<Integer> data)
 	{
-	    double sum = 0.0;
+	    float sum = 0;
 	    for(int a : data)
 	        sum += a;
-	    return (sum/data.size());
+	    return new BigDecimal(sum/data.size());
 	}
-	private double getVariance(ArrayList<Integer> data, double mean){
-	    double temp = 0;
-	    for(double a :data)
-	        temp += (mean-a)*(mean-a);
-	    return temp/data.size();}
+	private static BigDecimal getVariance(ArrayList<Integer> data, BigDecimal mean){;
+		BigDecimal temp = new BigDecimal(0);
+	    for(double d : data){
+	    	BigDecimal a=new BigDecimal(d);
+	    	temp = temp.add((a.subtract(mean).multiply(a.subtract(mean))));		
+	    }
+	    return temp.divide(new BigDecimal(data.size()-1), RoundingMode.HALF_EVEN);
+	    }
 
-	private double getStdDev(double variance)
+	private static BigDecimal getStdDev(BigDecimal variance)
 	{
-	    return Math.sqrt(variance);
+	    return new BigDecimal(Math.sqrt(variance.doubleValue()));
 	}
 
-	private double getMedian(ArrayList<Integer> data) 
+	private static BigDecimal getMedian(ArrayList<Integer> data) 
 	{	 double pos1 = Math.floor((data.size() - 1.0) / 2.0);
 	     double pos2 = Math.ceil((data.size() - 1.0) / 2.0);
 	     if (pos1 == pos2 ) {
-	        return data.get((int)pos1);
+	        return new BigDecimal(data.get((int)pos1));
 	     } else {
-	        return (data.get((int)pos1) + data.get((int)pos2)) / 2.0 ;
+	        return new BigDecimal(((data.get((int)pos1) + data.get((int)pos2)) / 2.0));
 	     }
 	}
 	
@@ -62,6 +67,7 @@ public class AlignmentStatistics {
 		double unique = 0;
 		double possible = 0;
 		while(i<input.size()){
+			//calculate unique positions per read plus average distance between current and next read
 			Alignment current = input.get(i);
 			int length = 0;
 			int cStart = 0;
@@ -150,15 +156,16 @@ public class AlignmentStatistics {
 			possible += length;
 			i++;
 		}
-		double mean = getMean(distance);
-		double median = getMedian(distance);
-		double variance = getVariance(distance,mean);
-		double std = getStdDev(variance);
-		results.add(mean);
-		results.add(median);
-		results.add(variance);
-		results.add(std);
-		results.add(unique/(possible)); //TODO consider taking actual average match length
+		distance.sort(null);
+		BigDecimal mean = getMean(distance);
+		BigDecimal median = getMedian(distance);
+		BigDecimal variance = getVariance(distance,mean);
+		BigDecimal std = getStdDev(variance);
+		results.add(mean.doubleValue());
+		results.add(median.doubleValue());
+		results.add(variance.doubleValue());
+		results.add(std.doubleValue());
+		results.add(unique/(possible)); //TODO consider taking actual average match length maybe calculate numbers without removing stacked reads 
 		results.add((double)input.size());
 		results.add((double) this.currentList.size());
 		results.add((double)input.get(0).getReferenceLength());
