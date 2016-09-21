@@ -233,7 +233,7 @@ public class InputParameterProcessor {
     	        }
     	        
     	        if(commandLine.hasOption("minPI")){
-    	        	this.minPIdent = Double.parseDouble(commandLine.getOptionValue("minp"));
+    	        	this.minPIdent = Double.parseDouble(commandLine.getOptionValue("minPI"));
     	        }
     	        
     	        if(commandLine.hasOption("resources")){
