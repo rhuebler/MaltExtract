@@ -112,7 +112,7 @@ public class SummaryWriter {
 	}
 	public void writeSummary() {
 		try{
-		Path file = Paths.get(outDir+"OverallRunSummary"+".txt");
+		Path file = Paths.get(outDir+"RunSummary"+".txt");
 		Files.write(file, summary, Charset.forName("UTF-8"));
 		}catch(IOException io){
 			warning.log(Level.SEVERE, "Error", io);

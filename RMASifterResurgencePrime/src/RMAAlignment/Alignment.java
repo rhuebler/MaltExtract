@@ -119,9 +119,14 @@ private void setReferenceLength(int k) {
 	 this.numGaps = k;}
  
  private boolean ctMisMatch(int i){
-	 if((this.reference.charAt(i) == 'C' && this.query.charAt(i) == 'T')
-				|| this.reference.charAt(i) == 'c' && this.query.charAt(i) == 't')
+	 if((reference.charAt(i) == 'C' && query.charAt(i) == 'T')||
+				 (reference.charAt(i) == 'c' && query.charAt(i) == 't'))
 		 		return true;
+	 else if((reference.charAt(i) == 'N'&& query.charAt(i) == 'T')||
+			 (reference.charAt(i) == '-'&& query.charAt(i) == 'T')||
+			 (reference.charAt(i) == 'n'&& query.charAt(i) == 't')||
+			 (reference.charAt(i) == '-'&& query.charAt(i) == 't'))
+		 return true;
 	 else 
 		 return false;
  }

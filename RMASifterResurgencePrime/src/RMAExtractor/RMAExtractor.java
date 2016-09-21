@@ -49,6 +49,7 @@ public class RMAExtractor {
 	public static void main(String[] args){
 		long startTime = System.nanoTime();
 		InputParameterProcessor inProcessor = new InputParameterProcessor(args ,log, warning);
+		new File(inProcessor.getOutDir()).mkdirs();// make outdir before
 		Handler handler = null;
 		try {
 			handler = new FileHandler(inProcessor.getOutDir()+"log.txt");
@@ -67,7 +68,6 @@ public class RMAExtractor {
 		log.log(Level.INFO, "Setting up Taxon Name and Taxon ID maps");
 		
 		NCBI_MapReader mapReader = new NCBI_MapReader(inProcessor.getTreePath());
-		new File(inProcessor.getOutDir()).mkdirs();
 		new File(inProcessor.getOutDir()+"/readDist/").mkdirs(); //TODO could break potentially on Windows systems
 		new File(inProcessor.getOutDir()+"/editDistance/").mkdirs();
 		new File(inProcessor.getOutDir()+"/percentIdentity/").mkdirs();
