@@ -100,12 +100,4 @@ public void process(){
 	//setTaxonCompositionMap(results);
   }
 
-//private void setTaxonCompositionMap(HashMap<Integer, Integer> results) {
-//	this.taxonComposition = results;
-//	
-//}	
-//public HashMap<Integer,Integer> getTaxonComposition(){
-//	return this.taxonComposition;
-//}
-
 }//class

@@ -47,19 +47,22 @@ public class AlignmentStatistics {
 	}
 	
 	private ArrayList<Alignment> removeDuplicates(ArrayList<Alignment> input){
-		ArrayList<Alignment> positionsToKeep = new ArrayList<Alignment>();
-		for(Alignment al : input){
-			if(!al.isDuplicate())
-				positionsToKeep.add(al);
-		}
+		if(input != null && input.size() > 2){
+			ArrayList<Alignment> positionsToKeep = new ArrayList<Alignment>();
+			for(Alignment al : input){
+				if(!al.isDuplicate())
+					positionsToKeep.add(al);
+			}
 			return positionsToKeep;
+			}
+		else return input;
 		
 	}
 	
 	// process best list of start positions
 	public List<Double> getStatistics(){
-		ArrayList<Alignment> input = removeDuplicates(this.currentList);
-		if(input.size() >= 2){
+		ArrayList<Alignment> input = removeDuplicates(currentList);
+		if(input != null && input.size() > 2){
 		ArrayList<Integer> distance = new ArrayList<Integer>();
 		List<Double> results = new ArrayList<Double>();
 		
@@ -168,7 +171,7 @@ public class AlignmentStatistics {
 		results.add(std.doubleValue());
 		results.add(unique/(possible)); //TODO consider taking actual average match length maybe calculate numbers without removing stacked reads 
 		results.add((double)input.size());
-		results.add((double) this.currentList.size());
+		results.add((double) currentList.size());
 		results.add((double)input.get(0).getReferenceLength());
 		return results;
 		}else{
