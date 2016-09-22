@@ -40,6 +40,7 @@ protected HashMap<Integer,Integer> pIdentHistogram;
 protected boolean verbose;
 protected Logger log;
 protected Logger warning;
+protected ArrayList<String> readList;
 //constructor
 public RMA6TaxonProcessor(Integer id, double pID, NCBI_MapReader reader, boolean v, Logger log, Logger warning){
 	this.mapReader = reader;
@@ -97,6 +98,9 @@ protected void setPercentIdentityHistogram(ArrayList<Double> list){
 		}
 	}
 	this.pIdentHistogram =  histo;
+}
+public ArrayList<String> getReads(){
+	return this.readList;
 }
 public String getEditDistanceHistogram(){
 	HashMap<Integer,Integer> histo = this.editHistogram;

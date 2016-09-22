@@ -55,6 +55,7 @@ public class RMA6Processor {
 	private int totalCount;
 	private Logger log;
 	private Logger warning;
+	private boolean reads;
 	// constructor
 	public RMA6Processor(String inDir, String fileName, String outDir, NCBI_MapReader mapReader,
 			NCBI_TreeReader treeReader, int maxLength, double pIdent, Filter b, Taxas t, boolean verbose,
@@ -195,6 +196,9 @@ public void process(List<Integer>taxIDs, double topPercent) {
 			readDistribution.add(taxProcessor.getReadDistribution());
 			editDistance.add(taxProcessor.getEditDistanceHistogram());
 			percentIdentity.add(taxProcessor.getPercentIdentityHistogram());
+			if((behave == Filter.ALL && reads )|| (behave == Filter.ANCIENT && reads)){
+				taxProcessor.getReads();
+			}
 	  }//TaxIDs
 	setSumLine(overallSum); // set number of assigned Reads to overall file summary
 	writeReadDist(readDistribution,fileName); // RMA6Processor now saves its own output 

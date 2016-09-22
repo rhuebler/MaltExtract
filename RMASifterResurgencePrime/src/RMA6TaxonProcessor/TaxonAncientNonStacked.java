@@ -25,7 +25,7 @@ import megan.rma6.ReadBlockGetterRMA6;
  * @author huebler
  *
  */
-public class TaxonAncientNonStacked  extends RMA6TaxonProcessor{
+public class TaxonAncientNonStacked  extends RMA6TaxonDamageFilter{
 	/**
 	 * @param int ID, NCBI_MapReader reader, boolean verbose, Logger, log, Logger warning
 	 * @return int numMatches, String readDistribution, HashMap EditDistance, HashMap Percent Identity
@@ -37,13 +37,14 @@ public class TaxonAncientNonStacked  extends RMA6TaxonProcessor{
 	private void computeOutput(HashMap<Integer, ArrayList<Alignment>> taxonMap, int taxID){
 		ArrayList<Integer> distances = new ArrayList<Integer>();
 		ArrayList<Double> pIdents = new ArrayList<Double>();
+		ArrayList<String> lines = new ArrayList<String>();
 		DecimalFormat df = new DecimalFormat("#.###");
 		String taxName;
 		if(mapReader.getNcbiIdToNameMap().get(taxID) != null)
 			taxName = mapReader.getNcbiIdToNameMap().get(taxID).replace(' ', '_');
 		else
 			taxName = "unassingned name";
-		
+		lines.add(taxName);
 		CompositionMap map = new CompositionMap(taxonMap);
 		map.process();
 		map.markAllDuplicates();
@@ -65,6 +66,12 @@ public class TaxonAncientNonStacked  extends RMA6TaxonProcessor{
 				if(!entry.isDuplicate()){
 					pIdents.add(entry.getPIdent());
 					distances.add(entry.getEditInstance());
+					lines.add(entry.getReadName()+ "\t" + maxReference +"\t"+
+					entry.getStart()+"\t" + entry.getEnd());
+					lines.add(entry.getQuery());
+					lines.add(entry.getAlignment());
+					lines.add(entry.getReference());
+					lines.add("");
 					numReads++;
 				}
 				
@@ -73,7 +80,6 @@ public class TaxonAncientNonStacked  extends RMA6TaxonProcessor{
 		}
 		setEditDistanceHistogram(distances);
 		setPercentIdentityHistogram(pIdents);
-		//setSupplementary(supplementary);
 		setNumberOfMatches(numReads);
 	}	
 	@Override
@@ -98,13 +104,15 @@ public class TaxonAncientNonStacked  extends RMA6TaxonProcessor{
 			if(!classIt.hasNext()){ // check if reads are assigned to TaxID if not print to console and skip could potentially only happen if some genus is unavailable 
 				ArrayList<Integer> distances = new ArrayList<Integer>();
 				ArrayList<Double> pIdents = new ArrayList<Double>();
+				ArrayList<String> lines = new ArrayList<String>();
+				lines.add(taxName);
 				if(verbose)
 					warning.log(Level.WARNING,"TaxID: " + taxID +  " not assigned in File " + fileName+"\n");
 				setReadDistribution(taxName + "\tNA\t0\t0\t0\t0\t0\t0\t0\t0");
 				setPercentIdentityHistogram(pIdents);
 				setEditDistanceHistogram(distances);
 				setNumberOfMatches(0);
-				
+				setReads(lines);
 			}else{
 				if(verbose)
 					log.log(Level.INFO,"Processing Taxon "+ taxName + " in File " + fileName); 
