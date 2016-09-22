@@ -91,12 +91,21 @@ public class RMAExtractor {
     		for(String fileName : inProcessor.getFileNames()){
     			try{
     				File f = new File(fileName);
-    				ConcurrentRMA6Processor task = new ConcurrentRMA6Processor(f.getParentFile().getCanonicalFile() + "/", 
+    				if(inProcessor.getBlastHits()){
+    					ConcurrentRMA6Processor task = new ConcurrentRMA6Processor(f.getParentFile().getCanonicalFile() + "/", 
+        						f.getName(), inProcessor.getOutDir(), mapReader, treeReader,taxIDs, inProcessor.getTopPercent(),
+        						inProcessor.getMaxLength(),inProcessor.getMinPIdent(),inProcessor.getFilter(), inProcessor.getTaxas(),
+        						inProcessor.isVerbose(), log, warning,inProcessor.getBlastHits());
+        					Future<RMA6Processor> future=executor.submit(task);
+        					processedFiles.add(future);
+    				}else{
+    					ConcurrentRMA6Processor task = new ConcurrentRMA6Processor(f.getParentFile().getCanonicalFile() + "/", 
     						f.getName(), inProcessor.getOutDir(), mapReader, treeReader,taxIDs, inProcessor.getTopPercent(),
     						inProcessor.getMaxLength(),inProcessor.getMinPIdent(),inProcessor.getFilter(), inProcessor.getTaxas(),
     						inProcessor.isVerbose(), log, warning);
-    				Future<RMA6Processor> future=executor.submit(task);
-    				processedFiles.add(future);
+    					Future<RMA6Processor> future=executor.submit(task);
+    					processedFiles.add(future);
+    				}
     				//System.gc();
     			}catch(IOException io){
     				warning.log(Level.SEVERE,"File not found",io);

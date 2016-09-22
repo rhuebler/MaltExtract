@@ -73,6 +73,23 @@ public class RMA6Processor {
 		this.log = log;
 		this.warning = warning;
 	}
+	public RMA6Processor(String inDir, String fileName, String outDir, NCBI_MapReader mapReader,
+			NCBI_TreeReader treeReader, int maxLength, double pIdent, Filter b, Taxas t, boolean verbose,
+			Logger log, Logger warning, boolean readInf) {
+		this.inDir = inDir;
+		this.outDir = outDir;
+		this.fileName = fileName;
+		this.mapReader = mapReader;
+		this.treeReader = new NCBI_TreeReader(treeReader);
+		this.behave = b;
+		this.maxLength = maxLength;
+		this.minPIdent = pIdent;
+		this.taxas = t;
+		this.verbose = verbose;
+		this.log = log;
+		this.warning = warning;
+		this.reads = readInf;
+	}
 	
 	//setters
 	private Set<Integer> getAllKeys(){
@@ -100,15 +117,21 @@ public class RMA6Processor {
 	{	this.overallSum = list;
 	}
 	// private utility functions
+	private void writeBlastHits(ArrayList<String> summary, String fileName){
+		try{
+			Path file = Paths.get(outDir+"/reads/"+fileName+"_readDist"+".txt");
+			Files.write(file, summary, Charset.forName("UTF-8"));
+		}catch(IOException io){
+			warning.log(Level.SEVERE,"Cannot write file", io);
+		}
+	}
 	private void writeReadDist(List<String> summary, String fileName){
 		try{
 			summary.sort(null);
 			String header = "Taxon\tReference\tMeanReadDistance\tMedianReadDistance\tVarianceReadDistance\tStandardDeviationReadDistance\tuniquePerReference\tnonDuplicatesonReference\tTotalReadsOnReference\tReferenceLength";
 			summary.add(0, header);
-			//log.log(Level.INFO,"Writing Read Distribution txt File");
 			Path file = Paths.get(outDir+"/readDist/"+fileName+"_readDist"+".txt");
 			Files.write(file, summary, Charset.forName("UTF-8"));
-			//System.out.println("ReadDistribution for " + fileName +" Done!");
 		}catch(IOException io){
 			warning.log(Level.SEVERE,"Cannot write file", io);
 		}
@@ -197,7 +220,7 @@ public void process(List<Integer>taxIDs, double topPercent) {
 			editDistance.add(taxProcessor.getEditDistanceHistogram());
 			percentIdentity.add(taxProcessor.getPercentIdentityHistogram());
 			if((behave == Filter.ALL && reads )|| (behave == Filter.ANCIENT && reads)){
-				taxProcessor.getReads();
+				writeBlastHits(taxProcessor.getReads(),fileName);
 			}
 	  }//TaxIDs
 	setSumLine(overallSum); // set number of assigned Reads to overall file summary

@@ -48,6 +48,7 @@ public class InputParameterProcessor {
 	private boolean verbose = false;
 	private Logger log;
 	private Logger warning;
+	private boolean reads = false;
 	// constructor
 	public InputParameterProcessor(String[] params ,Logger log, Logger warning){
 		this.log = log;
@@ -55,6 +56,9 @@ public class InputParameterProcessor {
 		process(params);	
 	}
 	// getters
+	public boolean getBlastHits(){
+		return reads;
+	}
 	public double getMinPIdent(){
 		return this.minPIdent;
 	}
@@ -115,6 +119,7 @@ public class InputParameterProcessor {
     	    Option option_Help = Option.builder("h").longOpt("help").optionalArg(true).desc("Print Usage and shutdown").build();
     	    Option option_Path = Option.builder("r").longOpt("resources").hasArg().optionalArg(true).desc("Path to NCBI tre and map File").build();
     	    Option option_Verbose = Option.builder("v").longOpt("verbose").optionalArg(true).desc("How much output should be printed to screen").build();
+    	    Option option_Reads = Option.builder().longOpt("reads").optionalArg(true).desc("Output Blas Hits when filtering for ancient Reads").build();
     	    Options options = new Options();
     	    CommandLineParser parser = new DefaultParser();
 
@@ -131,6 +136,7 @@ public class InputParameterProcessor {
     	    options.addOption(option_Help);
     	    options.addOption(option_Path);
     	    options.addOption(option_Verbose);
+    	    options.addOption(option_Reads);
 
     	    try
     	    {
@@ -244,6 +250,10 @@ public class InputParameterProcessor {
     	        }
     	        if(commandLine.hasOption('v')){
     	        	this.verbose = true;
+    	        }
+    	        if((commandLine.hasOption("reads") && behave == Filter.ANCIENT)||
+    	        	(commandLine.hasOption("reads") && behave == Filter.ALL)	){
+    	        	this.reads = true;
     	        }
     	        if(commandLine.hasOption("h")){
     	        	String header = "RMAExtractor concurrent alpha";

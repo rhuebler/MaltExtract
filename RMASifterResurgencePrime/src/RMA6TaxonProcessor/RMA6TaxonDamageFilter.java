@@ -32,9 +32,15 @@ public class RMA6TaxonDamageFilter extends RMA6TaxonProcessor{
 	 * @param int ID, NCBI_MapReader reader, boolean verbose, Logger, log, Logger warning
 	 * @return int numMatches, String readDistribution, HashMap EditDistance, HashMap Percent Identity
 	 */ 
-public RMA6TaxonDamageFilter(int id ,double pID, NCBI_MapReader reader, boolean v,Logger log, Logger warning) {
+public RMA6TaxonDamageFilter(int id ,double pID, NCBI_MapReader reader,
+		boolean v,Logger log, Logger warning) {
 		super(id,pID, reader, v, log, warning);
 	}
+public RMA6TaxonDamageFilter(int id ,double pID, NCBI_MapReader reader,
+		boolean v,Logger log, Logger warning, boolean reads) {
+	super(id,pID, reader, v, log, warning);
+	this.wantReads =reads;
+}
 protected void setReads(ArrayList<String> list){
 	this.readList = list;
 }

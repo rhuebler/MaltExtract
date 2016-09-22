@@ -33,6 +33,7 @@ public class ConcurrentRMA6Processor implements Callable<RMA6Processor>{
 	private double minPIdent;
 	private Taxas t;
 	private boolean verbose;
+	private boolean readInf = false;
 	private Logger log;
 	private Logger warning;
 	public ConcurrentRMA6Processor(String inDir, String fileName, String outDir, NCBI_MapReader mapReader, 
@@ -54,12 +55,39 @@ public class ConcurrentRMA6Processor implements Callable<RMA6Processor>{
 		this.log = log;
 		this.warning = warning;
 	}
+	public ConcurrentRMA6Processor(String inDir, String fileName, String outDir, NCBI_MapReader mapReader, 
+			NCBI_TreeReader treeReader,List<Integer>taxIDs,double topPercent, int i,double minPI, Filter b,
+			Taxas t, boolean verbose, Logger log, Logger warning, boolean reads) {
+		
+		this.inDir = inDir;
+		this.outDir = outDir;
+		this.fileName = fileName;
+		this.mapReader = mapReader;
+		this.treeReader = treeReader;
+		this.taxIDs = taxIDs;
+		this.topPercent=topPercent;
+		this.behave = b;
+		this.maxLength = i;
+		this.minPIdent = minPI;
+		this.t = t;
+		this.verbose = verbose;
+		this.log = log;
+		this.warning = warning;
+		this.readInf = reads;
+	}
 	@Override
 	public RMA6Processor call(){
+		if(readInf){
 		RMA6Processor processor = new RMA6Processor(inDir, fileName, outDir, mapReader,
-				treeReader,maxLength,minPIdent ,behave, t, verbose, log, warning); // should be implemented as callable 
+				treeReader,maxLength,minPIdent ,behave, t, verbose, log, warning, readInf); // should be implemented as callable 
     	processor.process(taxIDs, topPercent);// loop through file
 		return processor;
+		}else{
+			RMA6Processor processor = new RMA6Processor(inDir, fileName, outDir, mapReader,
+					treeReader,maxLength,minPIdent ,behave, t, verbose, log, warning); // should be implemented as callable 
+	    	processor.process(taxIDs, topPercent);// loop through file
+	    	return processor;
+		}
 	}
 
 }

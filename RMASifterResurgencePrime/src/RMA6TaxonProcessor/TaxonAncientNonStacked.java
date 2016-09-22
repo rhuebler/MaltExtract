@@ -30,8 +30,13 @@ public class TaxonAncientNonStacked  extends RMA6TaxonDamageFilter{
 	 * @param int ID, NCBI_MapReader reader, boolean verbose, Logger, log, Logger warning
 	 * @return int numMatches, String readDistribution, HashMap EditDistance, HashMap Percent Identity
 	 */ 
-	public TaxonAncientNonStacked(int id ,double pID, NCBI_MapReader reader, boolean v,Logger log, Logger warning) {
+	public TaxonAncientNonStacked(int id ,double pID, NCBI_MapReader reader,
+			boolean v,Logger log, Logger warning) {
 		super(id,pID, reader, v, log, warning);
+	}
+	public TaxonAncientNonStacked(int id ,double pID, NCBI_MapReader reader,
+			boolean v,Logger log, Logger warning, boolean reads) {
+		super(id,pID, reader, v, log, warning,reads);
 	}
 	
 	private void computeOutput(HashMap<Integer, ArrayList<Alignment>> taxonMap, int taxID){
