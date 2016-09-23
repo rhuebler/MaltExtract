@@ -120,7 +120,7 @@ public void process(String inDir, String fileName, double topPercent, int maxLen
 							name = mapReader.getNcbiIdToNameMap().get(taxID).replace(' ', '_');
 						else
 							name = "unassingned name";
-						lines.add(al.getReadName()+"\t"+name+"\t"+al.getStart()+"\t"+al.getEnd());
+						lines.add(al.getReadName()+"\t"+name+"\t"+"Start:\t"+al.getStart()+"\t"+"End:\t"+al.getEnd());
 						lines.add(al.getQuery());
 						lines.add(al.getAlignment());
 						lines.add(al.getReference()+"\n");
