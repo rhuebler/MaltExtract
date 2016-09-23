@@ -27,7 +27,7 @@ import megan.rma6.ReadBlockGetterRMA6;
  */
 public class RMA6TaxonDamageFilter extends RMA6TaxonProcessor{
 	protected boolean wantReads = false;
-	protected ArrayList<String> readList;
+	
 	/**
 	 * @param int ID, NCBI_MapReader reader, boolean verbose, Logger, log, Logger warning
 	 * @return int numMatches, String readDistribution, HashMap EditDistance, HashMap Percent Identity
@@ -96,6 +96,7 @@ public void process(String inDir, String fileName, double topPercent, int maxLen
 					Alignment al = new Alignment();
 					al.processText(blocks[i].getText().split("\n"));
 					al.setPIdent(blocks[i].getPercentIdentity());
+					al.setReadName(current.getReadName());
 					if(al.getFivePrimeDamage() && minPIdent <= al.getPIdent()){
 						higher = true;
 						pIdent += blocks[i].getPercentIdentity();
@@ -122,8 +123,7 @@ public void process(String inDir, String fileName, double topPercent, int maxLen
 						lines.add(al.getReadName()+"\t"+name+"\t"+al.getStart()+"\t"+al.getEnd());
 						lines.add(al.getQuery());
 						lines.add(al.getAlignment());
-						lines.add(al.getReference());
-						lines.add("");
+						lines.add(al.getReference()+"\n");
 					}
 				 }
 					

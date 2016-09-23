@@ -188,6 +188,7 @@ public void process(List<Integer>taxIDs, double topPercent) {
 	ArrayList<String> editDistance = new ArrayList<String>();
 	ArrayList<String> percentIdentity = new ArrayList<String>();
 	ArrayList<String> readDistribution = new ArrayList<String>();
+	ArrayList<String> blastHits = new ArrayList<String>();
 	Set<Integer> keys = getAllKeys();
 	Set<Integer> idsToProcess = new HashSet<Integer>();
    // treeReader here to avoid synchronization issues 
@@ -208,11 +209,17 @@ public void process(List<Integer>taxIDs, double topPercent) {
 			if(behave == Filter.NON){// change to all
 				taxProcessor = new RMA6TaxonProcessor(id, minPIdent, mapReader, verbose,log, warning);
 			}else if(behave == Filter.ANCIENT){
-				 taxProcessor = new RMA6TaxonDamageFilter(id, minPIdent, mapReader, verbose,log, warning);
+				 if(reads)
+					 taxProcessor = new RMA6TaxonDamageFilter(id, minPIdent, mapReader, verbose,log, warning, reads);
+				 else	 
+					taxProcessor = new RMA6TaxonDamageFilter(id, minPIdent, mapReader, verbose,log, warning);
 			}else if(behave == Filter.NONDUPLICATES){
 				 taxProcessor = new RMA6TaxonNonDuplicateFilter(id, minPIdent, mapReader, verbose, log, warning);
 			}else if(behave == Filter.ALL){
-				 taxProcessor = new TaxonAncientNonStacked(id, minPIdent, mapReader, verbose, log, warning);	
+				if(reads)
+					taxProcessor = new TaxonAncientNonStacked(id, minPIdent, mapReader, verbose, log, warning, reads);
+				else
+					taxProcessor = new TaxonAncientNonStacked(id, minPIdent, mapReader, verbose, log, warning);
 			}
 			taxProcessor.process(inDir, fileName, topPercent, maxLength);
 			overallSum.put(id,taxProcessor.getNumberOfMatches());
@@ -220,9 +227,12 @@ public void process(List<Integer>taxIDs, double topPercent) {
 			editDistance.add(taxProcessor.getEditDistanceHistogram());
 			percentIdentity.add(taxProcessor.getPercentIdentityHistogram());
 			if((behave == Filter.ALL && reads )|| (behave == Filter.ANCIENT && reads)){
-				writeBlastHits(taxProcessor.getReads(),fileName);
+				blastHits.addAll(taxProcessor.getReads());
 			}
 	  }//TaxIDs
+	if((behave == Filter.ALL && reads )|| (behave == Filter.ANCIENT && reads)){
+			writeBlastHits(blastHits,fileName);
+	}	
 	setSumLine(overallSum); // set number of assigned Reads to overall file summary
 	writeReadDist(readDistribution,fileName); // RMA6Processor now saves its own output 
 	writeEditDistance(editDistance);
