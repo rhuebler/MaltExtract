@@ -11,11 +11,14 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.Future;
+import java.util.concurrent.ThreadPoolExecutor;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import NCBI_MapReader.NCBI_MapReader;
 import NCBI_MapReader.NCBI_TreeReader;
+import RMA6TaxonProcessor.ConcurrentRMA6TaxonProcessor;
 import RMA6TaxonProcessor.RMA6TaxonDamageFilter;
 import RMA6TaxonProcessor.RMA6TaxonNonDuplicateFilter;
 import RMA6TaxonProcessor.RMA6TaxonProcessor;
@@ -57,6 +60,7 @@ public class RMA6Processor {
 	private Logger log;
 	private Logger warning;
 	private boolean reads;
+	private ThreadPoolExecutor executor;
 	// constructor
 	public RMA6Processor(String inDir, String fileName, String outDir, NCBI_MapReader mapReader,
 			NCBI_TreeReader treeReader, int maxLength, double pIdent, Filter b, Taxas t, boolean verbose,
@@ -167,7 +171,9 @@ public class RMA6Processor {
 			warning.log(Level.SEVERE,"Cannot write file", io);
 		}
 	} 
-	
+	private void destroy(){
+		executor.shutdown();
+	}
 	//getter
 	public int getTotalCount(){
 		return this.totalCount;
