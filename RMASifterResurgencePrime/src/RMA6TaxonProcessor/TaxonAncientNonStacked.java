@@ -71,12 +71,16 @@ public class TaxonAncientNonStacked  extends RMA6TaxonDamageFilter{
 				if(!entry.isDuplicate()){
 					pIdents.add(entry.getPIdent());
 					distances.add(entry.getEditInstance());
-					lines.add(entry.getReadName()+ "\t" + maxReference +"\t"+
-					entry.getStart()+"\t" + entry.getEnd());
-					lines.add(entry.getQuery());
-					lines.add(entry.getAlignment());
-					lines.add(entry.getReference());
-					lines.add("");
+					String name;
+					if(mapReader.getNcbiIdToNameMap().get(key) != null)
+						name =  mapReader.getNcbiIdToNameMap().get(key).replace(' ', '_');
+					else
+						name = "unassinged_reference_name";
+					lines.add(entry.getReadName()+"\t"+"Length:\t"+entry.getReadLength()+"\t");
+					lines.add(name+"\t"+entry.getAccessionNumber()+"\t"+"Start:\t"+entry.getStart()+"\t"+"End:\t"+entry.getEnd());
+					lines.add("Q:\t"+entry.getQuery());
+					lines.add("A:\t"+entry.getAlignment());
+					lines.add("R:\t"+entry.getReference()+"\n");
 					numReads++;
 				}
 				

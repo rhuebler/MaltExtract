@@ -1,5 +1,6 @@
 package RMA6Processor;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
@@ -117,10 +118,17 @@ public class RMA6Processor {
 	{	this.overallSum = list;
 	}
 	// private utility functions
-	private void writeBlastHits(ArrayList<String> summary, String fileName){
+	private void writeBlastHits(ArrayList<String> summary, int taxID){
 		try{
-			Path file = Paths.get(outDir+"/reads/"+fileName+"_readDist"+".txt");
+			if(summary.size()>1){
+			String name;
+			if(mapReader.getNcbiIdToNameMap().get(taxID) != null)
+				name = mapReader.getNcbiIdToNameMap().get(taxID).replace(' ', '_');
+			else
+				name = "unassingned name";
+			Path file = Paths.get(outDir+"reads/"+fileName.substring(0,fileName.length()-4)+"/"+name+".txt");
 			Files.write(file, summary, Charset.forName("UTF-8"));
+			}
 		}catch(IOException io){
 			warning.log(Level.SEVERE,"Cannot write file", io);
 		}
@@ -188,7 +196,8 @@ public void process(List<Integer>taxIDs, double topPercent) {
 	ArrayList<String> editDistance = new ArrayList<String>();
 	ArrayList<String> percentIdentity = new ArrayList<String>();
 	ArrayList<String> readDistribution = new ArrayList<String>();
-	ArrayList<String> blastHits = new ArrayList<String>();
+	if(reads)
+		new File(outDir+"reads/"+fileName.substring(0, fileName.length()-4)+"/").mkdirs();
 	Set<Integer> keys = getAllKeys();
 	Set<Integer> idsToProcess = new HashSet<Integer>();
    // treeReader here to avoid synchronization issues 
@@ -227,12 +236,9 @@ public void process(List<Integer>taxIDs, double topPercent) {
 			editDistance.add(taxProcessor.getEditDistanceHistogram());
 			percentIdentity.add(taxProcessor.getPercentIdentityHistogram());
 			if((behave == Filter.ALL && reads )|| (behave == Filter.ANCIENT && reads)){
-				blastHits.addAll(taxProcessor.getReads());
+				writeBlastHits(taxProcessor.getReads(),id);
 			}
-	  }//TaxIDs
-	if((behave == Filter.ALL && reads )|| (behave == Filter.ANCIENT && reads)){
-			writeBlastHits(blastHits,fileName);
-	}	
+	  }//TaxIDs	
 	setSumLine(overallSum); // set number of assigned Reads to overall file summary
 	writeReadDist(readDistribution,fileName); // RMA6Processor now saves its own output 
 	writeEditDistance(editDistance);

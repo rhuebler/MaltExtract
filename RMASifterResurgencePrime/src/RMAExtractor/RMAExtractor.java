@@ -108,7 +108,6 @@ public class RMAExtractor {
     					Future<RMA6Processor> future=executor.submit(task);
     					processedFiles.add(future);
     				}
-    				//System.gc();
     			}catch(IOException io){
     				warning.log(Level.SEVERE,"File not found",io);
        				}

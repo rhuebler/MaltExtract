@@ -13,6 +13,7 @@ public class Alignment {
 	private String reference;
 	private String alignment;
 	private String referenceName;
+	private String accessionNumber;
 	private int start;
 	private int end;
 	private int mLength;
@@ -23,7 +24,18 @@ public class Alignment {
 	private boolean reversed = false;
 	private boolean duplicate = false;
 	private int editDistance;
+	private int readLength;
+	private double score;
 	// getter
+public String getAccessionNumber(){
+	return this.accessionNumber;
+}	
+public double getScore(){
+	return this.score;
+}	
+public int getReadLength(){
+	return this.readLength;
+}	
 public int getEditInstance(){
 	return this.editDistance;
 }
@@ -73,10 +85,16 @@ public String getQuery(){
 	 return this.referenceLength;}
  
  // setters
- public void setReadName(String s){
+ public void setAcessionNumber(String s){
+	 this.accessionNumber =s;
+ }
+public void setReadLength(int d){
+	this.readLength = d;
+}
+public void setReadName(String s){
 		this.readName = s;
 	}	
-	public void setPIdent(double d){
+ public void setPIdent(double d){
 		this.pIdent = d;
 	}
  public void setDuplicate(boolean b){ //works

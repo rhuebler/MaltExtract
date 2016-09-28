@@ -97,6 +97,8 @@ public void process(String inDir, String fileName, double topPercent, int maxLen
 					al.processText(blocks[i].getText().split("\n"));
 					al.setPIdent(blocks[i].getPercentIdentity());
 					al.setReadName(current.getReadName());
+					al.setReadLength(current.getReadLength());
+					al.setAcessionNumber(blocks[i].getRefSeqId());
 					if(al.getFivePrimeDamage() && minPIdent <= al.getPIdent()){
 						higher = true;
 						pIdent += blocks[i].getPercentIdentity();
@@ -116,14 +118,15 @@ public void process(String inDir, String fileName, double topPercent, int maxLen
 					k++;
 					if(wantReads){
 						String name;
-						if(mapReader.getNcbiIdToNameMap().get(taxID) != null)
-							name = mapReader.getNcbiIdToNameMap().get(taxID).replace(' ', '_');
+						if(mapReader.getNcbiIdToNameMap().get(blocks[i].getTaxonId()) != null)
+							name = mapReader.getNcbiIdToNameMap().get(blocks[i].getTaxonId()).replace(' ', '_');
 						else
 							name = "unassingned name";
-						lines.add(al.getReadName()+"\t"+name+"\t"+"Start:\t"+al.getStart()+"\t"+"End:\t"+al.getEnd());
-						lines.add(al.getQuery());
-						lines.add(al.getAlignment());
-						lines.add(al.getReference()+"\n");
+						lines.add(al.getReadName()+"\t"+"Length:\t"+al.getReadLength()+"\t");
+						lines.add(name+"\t"+al.getAccessionNumber()+"\t"+"Start:\t"+al.getStart()+"\t"+"End:\t"+al.getEnd());
+						lines.add("Q:\t"+al.getQuery());
+						lines.add("A:\t"+al.getAlignment());
+						lines.add("R:\t"+al.getReference()+"\n");
 					}
 				 }
 					
