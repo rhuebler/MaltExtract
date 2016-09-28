@@ -11,6 +11,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.logging.Level;
@@ -61,6 +62,7 @@ public class RMA6Processor {
 	private Logger warning;
 	private boolean reads;
 	private ThreadPoolExecutor executor;
+	private int threads = 1;
 	// constructor
 	public RMA6Processor(String inDir, String fileName, String outDir, NCBI_MapReader mapReader,
 			NCBI_TreeReader treeReader, int maxLength, double pIdent, Filter b, Taxas t, boolean verbose,
@@ -219,6 +221,8 @@ public void process(List<Integer>taxIDs, double topPercent) {
 		idsToProcess.addAll(keys);
 	}
 	setContainedIDs(idsToProcess);
+	executor=(ThreadPoolExecutor) Executors.newFixedThreadPool(threads);
+	HashMap<Integer,Future<RMA6TaxonProcessor>> results =  new HashMap<Integer,Future<RMA6TaxonProcessor>>();
 		for(Integer id : idsToProcess){
 			RMA6TaxonProcessor taxProcessor = null;
 			if(behave == Filter.NON){// change to all
@@ -248,6 +252,7 @@ public void process(List<Integer>taxIDs, double topPercent) {
 				writeBlastHits(taxProcessor.getReads(),id);
 			}
 	  }//TaxIDs	
+	destroy();
 	setSumLine(overallSum); // set number of assigned Reads to overall file summary
 	writeReadDist(readDistribution,fileName); // RMA6Processor now saves its own output 
 	writeEditDistance(editDistance);
