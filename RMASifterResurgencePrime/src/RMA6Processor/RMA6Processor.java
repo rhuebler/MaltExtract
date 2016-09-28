@@ -230,6 +230,9 @@ public void process(List<Integer>taxIDs, double topPercent) {
 				else
 					taxProcessor = new TaxonAncientNonStacked(id, minPIdent, mapReader, verbose, log, warning);
 			}
+			ConcurrentRMA6TaxonProcessor task = new ConcurrentRMA6TaxonProcessor(taxProcessor,inDir, fileName, topPercent, maxLength);
+			Future<RMA6TaxonProcessor> future = executor.submit(task);
+			results.put(id, future);
 			taxProcessor.process(inDir, fileName, topPercent, maxLength);
 			overallSum.put(id,taxProcessor.getNumberOfMatches());
 			readDistribution.add(taxProcessor.getReadDistribution());
