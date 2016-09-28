@@ -194,7 +194,7 @@ public class InputParameterProcessor {
     					        
     	        
     	        if (commandLine.hasOption("threads"))
-    	        {
+    	        {	
     	        	log.info("Trying to use "+commandLine.getOptionValue("threads")+" threads");
     	            this.numThreads=Integer.parseInt(commandLine.getOptionValue("threads"));
     	            if(this.numThreads > Runtime.getRuntime().availableProcessors()){

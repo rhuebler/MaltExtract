@@ -62,7 +62,7 @@ public class RMAExtractor {
 		try {
 			error = new FileHandler(inProcessor.getOutDir()+"error.txt");
 		} catch (SecurityException | IOException e) {
-			e.printStackTrace();
+			 warning.log(Level.SEVERE,"Interuption",e);
 		}
 		warning.addHandler(error);
 		log.log(Level.INFO, "Setting up Taxon Name and Taxon ID maps");
