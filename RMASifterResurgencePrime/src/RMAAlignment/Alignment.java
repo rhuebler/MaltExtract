@@ -136,7 +136,7 @@ private void setReferenceLength(int k) {
  private void setNumGaps(int k){
 	 this.numGaps = k;}
  
- private boolean ctMisMatch(int i){
+ private boolean MisMatch(int i){
 	 if((reference.charAt(i) == 'C' && query.charAt(i) == 'T')||
 				 (reference.charAt(i) == 'c' && query.charAt(i) == 't')){
 		 		return true;
@@ -144,9 +144,17 @@ private void setReferenceLength(int k) {
 			 (reference.charAt(i) == '-'&& query.charAt(i) == 'T')||
 			 (reference.charAt(i) == 'n'&& query.charAt(i) == 't')||
 			 (reference.charAt(i) == '-'&& query.charAt(i) == 't')){
-		 return true;
-	 } else {
-		 return false;
+		 		return true;
+	 }else if((reference.charAt(i) == 'G' && query.charAt(i) == 'A')||
+			 (reference.charAt(i) == 'g' && query.charAt(i) == 'a')){
+			 	return true; 		
+	 } else if((reference.charAt(i) == 'N'&& query.charAt(i) == 'A')||
+			 (reference.charAt(i) == '-'&& query.charAt(i) == 'A')||
+			 (reference.charAt(i) == 'n'&& query.charAt(i) == 'a')||
+			 (reference.charAt(i) == '-'&& query.charAt(i) == 'a')){
+		 		return true;
+	 }else {
+		 		return false;
 	 }
  }
  private void calculateEditDistance(String sequence, String reference){
@@ -207,7 +215,7 @@ private void setReferenceLength(int k) {
 					 for(int k = 0; k < 5; k++ ){ //test first and last 5 positvions for g->c mismatch
 						 if(reference.length() > 1+k*2 && query.length() > 1+k*2 
 								 && reference.length() == query.length())		
-							 {if(ctMisMatch(k) || ctMisMatch(this.query.length()-k-1)){ // set damage true if there is a C->T sub at eithter end
+							 {if(MisMatch(k) || MisMatch(this.query.length()-k-1)){ // set damage true if there is a C->T sub at eithter end
 								setFivePrimeDamage(true);
 								break;// break out of loop
 							}
