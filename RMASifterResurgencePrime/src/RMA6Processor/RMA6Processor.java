@@ -11,6 +11,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -176,6 +177,32 @@ public class RMA6Processor {
 	private void destroy(){
 		executor.shutdown();
 	}
+	private void prepareOutput(HashMap<Integer,Future<RMA6TaxonProcessor>> results){
+		HashMap<Integer,Integer> overallSum = new HashMap<Integer,Integer>();
+		ArrayList<String> editDistance = new ArrayList<String>();
+		ArrayList<String> percentIdentity = new ArrayList<String>();
+		ArrayList<String> readDistribution = new ArrayList<String>();
+		for(int id : results.keySet()){
+			RMA6TaxonProcessor taxProcessor;
+			try {
+				taxProcessor = results.get(id).get();
+				overallSum.put(id,taxProcessor.getNumberOfMatches());
+				readDistribution.add(taxProcessor.getReadDistribution());	
+				editDistance.add(taxProcessor.getEditDistanceHistogram());
+				percentIdentity.add(taxProcessor.getPercentIdentityHistogram());
+				if((behave == Filter.ALL && reads )|| (behave == Filter.ANCIENT && reads)){
+					writeBlastHits(taxProcessor.getReads(),id);
+				}
+			} catch (InterruptedException | ExecutionException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}	
+			setSumLine(overallSum); // set number of assigned Reads to overall file summary
+			writeReadDist(readDistribution,fileName); // RMA6Processor now saves its own output 
+			writeEditDistance(editDistance);
+			writePercentIdentity(percentIdentity);
+	}
 	//getter
 	public int getTotalCount(){
 		return this.totalCount;
@@ -200,10 +227,6 @@ public class RMA6Processor {
 // processing 
 public void process(List<Integer>taxIDs, double topPercent) {
 	log.log(Level.INFO,"Reading File: " +inDir+fileName);
-	HashMap<Integer,Integer> overallSum = new HashMap<Integer,Integer>();
-	ArrayList<String> editDistance = new ArrayList<String>();
-	ArrayList<String> percentIdentity = new ArrayList<String>();
-	ArrayList<String> readDistribution = new ArrayList<String>();
 	if(reads)
 		new File(outDir+"reads/"+fileName.substring(0, fileName.length()-4)+"/").mkdirs();
 	Set<Integer> keys = getAllKeys();
@@ -243,19 +266,8 @@ public void process(List<Integer>taxIDs, double topPercent) {
 			ConcurrentRMA6TaxonProcessor task = new ConcurrentRMA6TaxonProcessor(taxProcessor,inDir, fileName, topPercent, maxLength);
 			Future<RMA6TaxonProcessor> future = executor.submit(task);
 			results.put(id, future);
-			taxProcessor.process(inDir, fileName, topPercent, maxLength);
-			overallSum.put(id,taxProcessor.getNumberOfMatches());
-			readDistribution.add(taxProcessor.getReadDistribution());
-			editDistance.add(taxProcessor.getEditDistanceHistogram());
-			percentIdentity.add(taxProcessor.getPercentIdentityHistogram());
-			if((behave == Filter.ALL && reads )|| (behave == Filter.ANCIENT && reads)){
-				writeBlastHits(taxProcessor.getReads(),id);
-			}
 	  }//TaxIDs	
 	destroy();
-	setSumLine(overallSum); // set number of assigned Reads to overall file summary
-	writeReadDist(readDistribution,fileName); // RMA6Processor now saves its own output 
-	writeEditDistance(editDistance);
-	writePercentIdentity(percentIdentity);
+	prepareOutput(results);
     }
  }
