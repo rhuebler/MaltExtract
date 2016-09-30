@@ -2,16 +2,10 @@ package RMA6Processor;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.charset.Charset;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -20,6 +14,7 @@ import java.util.logging.Logger;
 
 import NCBI_MapReader.NCBI_MapReader;
 import NCBI_MapReader.NCBI_TreeReader;
+import RMA6OutputProcessor.RMA6OutputProcessor;
 import RMA6TaxonProcessor.ConcurrentRMA6TaxonProcessor;
 import RMA6TaxonProcessor.RMA6TaxonDamageFilter;
 import RMA6TaxonProcessor.RMA6TaxonNonDuplicateFilter;
@@ -45,8 +40,6 @@ public class RMA6Processor {
 	 * @throws none thrown all caught
 	 */
 	private HashMap<Integer,Integer> overallSum;
-	private ArrayList<String> readDist;
-	private ArrayList<String> supplement;
 	private String outDir;
 	private String fileName;
 	private String inDir;
@@ -125,95 +118,15 @@ public class RMA6Processor {
 	{	this.overallSum = list;
 	}
 	// private utility functions
-	private void writeBlastHits(ArrayList<String> summary, int taxID){
-		try{
-			if(summary.size()>1){
-			String name;
-			if(mapReader.getNcbiIdToNameMap().get(taxID) != null)
-				name = mapReader.getNcbiIdToNameMap().get(taxID).replace(' ', '_');
-			else
-				name = "unassingned name";
-			Path file = Paths.get(outDir+"reads/"+fileName.substring(0,fileName.length()-4)+"/"+name+".txt");
-			Files.write(file, summary, Charset.forName("UTF-8"));
-			}
-		}catch(IOException io){
-			warning.log(Level.SEVERE,"Cannot write file", io);
-		}
-	}
-	private void writeReadDist(List<String> summary, String fileName){
-		try{
-			summary.sort(null);
-			String header = "Taxon\tReference\tMeanReadDistance\tMedianReadDistance\tVarianceReadDistance\tStandardDeviationReadDistance\tuniquePerReference\tnonDuplicatesonReference\tTotalReadsOnReference\tReferenceLength";
-			summary.add(0, header);
-			Path file = Paths.get(outDir+"/readDist/"+fileName+"_readDist"+".txt");
-			Files.write(file, summary, Charset.forName("UTF-8"));
-		}catch(IOException io){
-			warning.log(Level.SEVERE,"Cannot write file", io);
-		}
-		this.readDist = null; //delete data to save space after were done potentially the gc should take of it
-	}
-	private void writeEditDistance(List<String> histo){
-		try{
-			String header = "Node\t0\t1\t2\t3\t4\t5\thigher";
-			histo.sort(null);
-			histo.add(0,header);
-			Path file = Paths.get(outDir+"/editDistance/"+fileName+"_editDistance"+".txt");
-			Files.write(file, histo, Charset.forName("UTF-8"));
-		}catch(IOException io){
-			warning.log(Level.SEVERE,"Cannot write file", io);
-		}
-	}
-	private void writePercentIdentity(List<String> histo){
-		try{
-			String header = "Node\t80\t85\t90\t95\t100";
-			histo.sort(null);
-			histo.add(0,header);
-			Path file = Paths.get(outDir+"/percentIdentity/"+fileName+"_percentIdentity"+".txt");
-			Files.write(file, histo, Charset.forName("UTF-8"));
-		}catch(IOException io){
-			warning.log(Level.SEVERE,"Cannot write file", io);
-		}
-	} 
+	
 	private void destroy(){
 		executor.shutdown();
 	}
-	private void prepareOutput(HashMap<Integer,Future<RMA6TaxonProcessor>> results){
-		HashMap<Integer,Integer> overallSum = new HashMap<Integer,Integer>();
-		ArrayList<String> editDistance = new ArrayList<String>();
-		ArrayList<String> percentIdentity = new ArrayList<String>();
-		ArrayList<String> readDistribution = new ArrayList<String>();
-		for(int id : results.keySet()){
-			RMA6TaxonProcessor taxProcessor;
-			try {
-				taxProcessor = results.get(id).get();
-				overallSum.put(id,taxProcessor.getNumberOfMatches());
-				readDistribution.add(taxProcessor.getReadDistribution());	
-				editDistance.add(taxProcessor.getEditDistanceHistogram());
-				percentIdentity.add(taxProcessor.getPercentIdentityHistogram());
-				if((behave == Filter.ALL && reads )|| (behave == Filter.ANCIENT && reads)){
-					writeBlastHits(taxProcessor.getReads(),id);
-				}
-			} catch (InterruptedException | ExecutionException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		}	
-			setSumLine(overallSum); // set number of assigned Reads to overall file summary
-			writeReadDist(readDistribution,fileName); // RMA6Processor now saves its own output 
-			writeEditDistance(editDistance);
-			writePercentIdentity(percentIdentity);
-	}
+	
 	//getter
 	public int getTotalCount(){
 		return this.totalCount;
 		
-	}
-	public ArrayList<String> getReadDistribution(){
-		return this.readDist;
-	}
-
-	public ArrayList<String> getSupplementary(){
-		return this.supplement;
 	}
 	public HashMap<Integer,Integer> getSumLine(){
 		return this.overallSum;
@@ -268,6 +181,8 @@ public void process(List<Integer>taxIDs, double topPercent) {
 			results.put(id, future);
 	  }//TaxIDs	
 	destroy();
-	prepareOutput(results);
+	RMA6OutputProcessor outProcessor = new RMA6OutputProcessor(fileName, outDir,mapReader,warning, behave, reads);
+	outProcessor.prepareOutput(results);
+	setSumLine(outProcessor.getSumLine());
     }
  }

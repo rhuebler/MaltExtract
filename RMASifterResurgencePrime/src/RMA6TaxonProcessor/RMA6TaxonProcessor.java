@@ -41,7 +41,10 @@ protected boolean verbose;
 protected Logger log;
 protected Logger warning;
 protected ArrayList<String> readList;
+protected HashMap<Integer,Integer> misMap;
+protected int numMatches;
 //constructor
+
 public RMA6TaxonProcessor(Integer id, double pID, NCBI_MapReader reader, boolean v, Logger log, Logger warning){
 	this.mapReader = reader;
 	this.minPIdent = pID;
@@ -49,6 +52,19 @@ public RMA6TaxonProcessor(Integer id, double pID, NCBI_MapReader reader, boolean
 	this.verbose = v;
 	this.log = log;
 	this.warning = warning;
+}
+public HashMap<Integer, Integer>getMisMap(){
+	if( misMap!=null){
+		int numMatches = this.numMatches;
+		
+		misMap.put(20, numMatches);
+		return this.misMap;
+	}else{
+		HashMap<Integer,Integer> map = new HashMap<Integer,Integer>();
+		map.put(0, 0);
+		return map;
+	}
+	
 }
 protected void setEditDistanceHistogram(ArrayList<Integer> list){
 	HashMap<Integer,Integer> histo = new HashMap<Integer,Integer> ();
@@ -167,6 +183,8 @@ public void process(String inDir, String fileName, double topPercent, int maxLen
 			   classificationBlockRMA6.readLocations(location, rma6File.getReader(), taxID, list);
 		   }
 		 }
+		HashMap<Integer,Integer> misMap = new HashMap<Integer,Integer>();
+		int numMatches = 0;
 		IReadBlockIterator classIt  = new ReadBlockIterator(list, new ReadBlockGetterRMA6(rma6File, true, true, (float) 1.0,(float) 100.00,false,true));
 		if(!classIt.hasNext()){ // check if reads are assigned to TaxID if not print to console and skip
 			if(verbose)
@@ -195,6 +213,31 @@ public void process(String inDir, String fileName, double topPercent, int maxLen
 					Alignment al = new Alignment();
 					al.processText(blocks[i].getText().split("\n"));
 					al.setPIdent(blocks[i].getPercentIdentity());
+					//get mismatches
+					HashMap<Integer, String> map=al.getMismatches();
+					if(map != null && al.getMlength() >= 20){//get mismatches per position
+						numMatches++;
+						for(int l = 0; l< 20; l++){
+							if(l < 10){
+								if(map.containsKey(l))
+									if(map.get(l).equals("C>T")){
+										if(misMap.containsKey(l))
+											misMap.replace(l, misMap.get(l)+1);
+										else	
+											misMap.put(l, 1);	
+										}
+							}else{
+								if(map.containsKey(al.getMlength()+l-20)){
+									if(map.get(al.getMlength()+l-20).equals("G>A")){
+										if(misMap.containsKey(l))
+											misMap.replace(l, misMap.get(l)+1);
+										else	
+											misMap.put(l, 1);
+										}
+									}
+								}
+							}//for
+						}// map != null			
 					if(minPIdent <= al.getPIdent()){ // check for minPercentIdentity
 						higher = true;
 						pIdent += al.getPIdent();
@@ -231,6 +274,8 @@ public void process(String inDir, String fileName, double topPercent, int maxLen
 			String s = taxName +"\t" + maxReference;;
 			for(double d : map.getStatistics())
 				s += "\t" + df.format(d);
+			this.misMap = misMap;
+			this.numMatches = numMatches;
 			setReadDistribution(s);
 			setNumberOfMatches(numReads);
 			setEditDistanceHistogram(distances);

@@ -71,6 +71,7 @@ public class RMAExtractor {
 		new File(inProcessor.getOutDir()+"/readDist/").mkdirs(); //TODO could break potentially on Windows systems
 		new File(inProcessor.getOutDir()+"/editDistance/").mkdirs();
 		new File(inProcessor.getOutDir()+"/percentIdentity/").mkdirs();
+		new File(inProcessor.getOutDir()+"/damageMismatch/").mkdirs();
 		if(inProcessor.getBlastHits())
 			new File(inProcessor.getOutDir()+"/reads/").mkdirs();
 		List<Integer> taxIDs= new  ArrayList<Integer>();
