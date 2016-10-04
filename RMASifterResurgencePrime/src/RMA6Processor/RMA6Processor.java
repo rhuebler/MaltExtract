@@ -146,6 +146,9 @@ public void process(List<Integer>taxIDs, double topPercent) {
 	Set<Integer> idsToProcess = new HashSet<Integer>();
    // treeReader here to avoid synchronization issues 
 	if(taxas == Taxas.USER){
+		for(Integer taxID : taxIDs)
+			for(int id : treeReader.getAllStrains(taxID))
+				System.out.println(mapReader.getNcbiIdToNameMap().get(id));
 		for(Integer taxID : taxIDs){
 			idsToProcess.add(taxID);
 			for(Integer id : treeReader.getStrains(taxID, keys))

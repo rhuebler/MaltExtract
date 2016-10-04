@@ -67,5 +67,17 @@ public class NCBI_TreeReader {
 			}
 	    }	
 	    return  getAssigned(children,keys);
+	    
 	}
+		public ArrayList<Integer> getAllStrains(int target){
+			ArrayList<Integer> children = new  ArrayList<Integer>();
+		    for(PhylogenyNode test : ph.getNode(String.valueOf(target)).getDescendants()){ // works in principal but would have to analyze a lot of nodes for it to work.... is there a smaller tre file ?
+		      
+		    	children.add(Integer.parseInt(test.getName()));// so what if I follow Nodes to leaf and see if any thing is assinged there? 
+		    	for (PhylogenyNode t : test.getDescendants()) {// should i solve this here? if in keys do something to get strain IDs and numbers 
+		    		 children.add(Integer.parseInt(t.getName()));
+				}
+		    }	
+			return children;
+		}
 }
