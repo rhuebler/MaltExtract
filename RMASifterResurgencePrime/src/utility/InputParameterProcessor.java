@@ -208,7 +208,7 @@ public class InputParameterProcessor {
     	        {
     	            if(Pattern.compile(Pattern.quote("non"), Pattern.CASE_INSENSITIVE).matcher(commandLine.getOptionValue("filter")).find()){
     	            	this.behave = Filter.NON;
-    	            	log.log(Level.INFO,commandLine.getOptionValue("Custom Behaviour set to: "+"filter"));
+    	            	log.log(Level.INFO,"Custom Behaviour set to: "+commandLine.getOptionValue("filter"));
     	            }else if(Pattern.compile(Pattern.quote("ancient"), Pattern.CASE_INSENSITIVE).matcher(commandLine.getOptionValue("filter")).find()){
     	            	this.behave = Filter.ANCIENT;
     	            	log.log(Level.INFO,"Custom Behaviour set to: "+commandLine.getOptionValue("filter"));
@@ -266,20 +266,16 @@ public class InputParameterProcessor {
     	        	warning.log(Level.SEVERE,"Please, specifiy input files or input directories and output directory");
     	        	System.exit(1);
     	        }
-    	        {
-    	            String[] remainder = commandLine.getArgs();
-    	            if(remainder.length != 0)
-    	            	warning.log(Level.SEVERE,"Remaining arguments: ");
-    	            for (String argument : remainder)
-    	            {
-    	                warning.log(Level.WARNING,argument);
+    	        String[] remainder = commandLine.getArgs();
+    	        if(remainder.length != 0){
+    	           warning.log(Level.SEVERE,"Remaining arguments: ");
+    	            for (String argument : remainder){
+    	              warning.log(Level.WARNING,argument);
     	            }
-    	        }
+    	          }
     	       
     	    }
-    	    
-    	    catch (ParseException exception)
-    	    {
+    	    catch (ParseException exception){
     	    	warning.log(Level.SEVERE, "Parse error: " + exception);
     	    }
     }

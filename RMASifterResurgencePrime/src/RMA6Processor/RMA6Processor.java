@@ -114,11 +114,10 @@ public class RMA6Processor {
 	private void setContainedIDs(Set<Integer> set){
 		this.containedIDs = set;
 	}
-	private void setSumLine(HashMap<Integer,Integer> list)
-	{	this.overallSum = list;
+	private void setSumLine(HashMap<Integer,Integer> list){	
+		this.overallSum = list;
 	}
 	// private utility functions
-	
 	private void destroy(){
 		executor.shutdown();
 	}
@@ -137,8 +136,8 @@ public class RMA6Processor {
 	public String getfileName(){
 		return this.fileName;
 	}
-// processing 
-public void process(List<Integer>taxIDs, double topPercent) {
+
+public void process(List<Integer>taxIDs, double topPercent) {// processing 
 	log.log(Level.INFO,"Reading File: " +inDir+fileName);
 	if(reads)
 		new File(outDir+"reads/"+fileName.substring(0, fileName.length()-4)+"/").mkdirs();
@@ -146,9 +145,6 @@ public void process(List<Integer>taxIDs, double topPercent) {
 	Set<Integer> idsToProcess = new HashSet<Integer>();
    // treeReader here to avoid synchronization issues 
 	if(taxas == Taxas.USER){
-		for(Integer taxID : taxIDs)
-			for(int id : treeReader.getAllStrains(taxID))
-				System.out.println(mapReader.getNcbiIdToNameMap().get(id));
 		for(Integer taxID : taxIDs){
 			idsToProcess.add(taxID);
 			for(Integer id : treeReader.getStrains(taxID, keys))
