@@ -47,13 +47,13 @@ protected void setReads(ArrayList<String> list){
 @Override
 public void process(String inDir, String fileName, double topPercent, int maxLength){ 
 	if(mapReader.getNcbiIdToNameMap().get(taxID) != null)
-		this.taxName = mapReader.getNcbiIdToNameMap().get(taxID).replace(' ', '_');
-	else
-		this.taxName = "unassingned name";
+		this.taxName = getName(taxID);
 	DecimalFormat df = new DecimalFormat("#.###");
 	ArrayList<Integer> distances = new ArrayList<Integer>();
 	ArrayList<Double> pIdents = new ArrayList<Double>();
 	ArrayList<String> lines = new ArrayList<String>();
+	HashMap<Integer,Integer> misMap = new HashMap<Integer,Integer>();
+	int numMatches = 0;
 	// use ReadsIterator to get all Reads assigned to MegantaxID and print top percent to file;
 	try(RMA6File rma6File = new RMA6File(inDir+fileName, "r")){	
 		ListOfLongs list = new ListOfLongs();
@@ -102,7 +102,31 @@ public void process(String inDir, String fileName, double topPercent, int maxLen
 					if(al.getFivePrimeDamage() && minPIdent <= al.getPIdent()){
 						higher = true;
 						pIdent += blocks[i].getPercentIdentity();
-						
+						//get mismatches
+						HashMap<Integer, String> map=al.getMismatches();
+						if(map != null && al.getMlength() >= 20){//get mismatches per position
+							numMatches++;
+							for(int l = 0; l< 20; l++){
+								if(l < 10){
+									if(map.containsKey(l))
+										if(map.get(l).equals("C>T")){
+											if(misMap.containsKey(l))
+												misMap.replace(l, misMap.get(l)+1);
+											else	
+												misMap.put(l, 1);	
+											}
+								}else{
+									if(map.containsKey(al.getMlength()+l-20)){
+										if(map.get(al.getMlength()+l-20).equals("G>A")){
+											if(misMap.containsKey(l))
+												misMap.replace(l, misMap.get(l)+1);
+											else	
+												misMap.put(l, 1);
+											}
+										}
+									}
+								}//for
+							}// map != null		
 						if(!taxonMap.containsKey(blocks[i].getTaxonId())){
 							ArrayList<Alignment> entry =new ArrayList<Alignment>();
 							entry.add(al);
@@ -117,11 +141,8 @@ public void process(String inDir, String fileName, double topPercent, int maxLen
 					damage++;
 					k++;
 					if(wantReads){
-						String name;
-						if(mapReader.getNcbiIdToNameMap().get(blocks[i].getTaxonId()) != null)
-							name = mapReader.getNcbiIdToNameMap().get(blocks[i].getTaxonId()).replace(' ', '_');
-						else
-							name = "unassingned name";
+						String name = getName(blocks[i].getTaxonId());
+						
 						lines.add(al.getReadName()+"\t"+"Length:\t"+al.getReadLength()+"\t");
 						lines.add(name+"\t"+al.getAccessionNumber()+"\t"+"Start:\t"+al.getStart()+"\t"+"End:\t"+al.getEnd());
 						lines.add("Q:\t"+al.getQuery());
@@ -142,15 +163,13 @@ public void process(String inDir, String fileName, double topPercent, int maxLen
 			
 			CompositionMap map = new CompositionMap(taxonMap);
 			map.process();
-			String maxReference;
-			if(mapReader.getNcbiIdToNameMap().get(map.getMaxID()) != null)
-				maxReference =  mapReader.getNcbiIdToNameMap().get(map.getMaxID()).replace(' ', '_');
-			else
-				maxReference = "unassinged_reference_name";
+			String maxReference = getName(map.getMaxID());
 			String s = taxName + "\t" 
 						+ maxReference;
 			for(double d : map.getStatistics())
 				s += "\t" + df.format(d);
+			setMisMap(misMap);
+			setNumMatches(numMatches);
 			setReadDistribution(s);
 			setNumberOfMatches(numReads);
 			setEditDistanceHistogram(distances);

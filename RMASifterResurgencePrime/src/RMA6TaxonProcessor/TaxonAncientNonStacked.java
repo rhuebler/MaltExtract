@@ -43,24 +43,16 @@ public class TaxonAncientNonStacked  extends RMA6TaxonDamageFilter{
 		ArrayList<Integer> distances = new ArrayList<Integer>();
 		ArrayList<Double> pIdents = new ArrayList<Double>();
 		ArrayList<String> lines = new ArrayList<String>();
+		HashMap<Integer,Integer> misMap = new HashMap<Integer,Integer>();
+		int numMatches = 0;
 		DecimalFormat df = new DecimalFormat("#.###");
-		String taxName;
-		if(mapReader.getNcbiIdToNameMap().get(taxID) != null)
-			taxName = mapReader.getNcbiIdToNameMap().get(taxID).replace(' ', '_');
-		else
-			taxName = "unassingned name";
 		lines.add(taxName);
 		CompositionMap map = new CompositionMap(taxonMap);
 		map.process();
 		map.markAllDuplicates();
 		// first set ReadDistribution on Maximum ID
-		String maxReference;
-		if(mapReader.getNcbiIdToNameMap().get(map.getMaxID()) != null)
-			maxReference =  mapReader.getNcbiIdToNameMap().get(map.getMaxID()).replace(' ', '_');
-		else
-			maxReference = "unassinged_reference_name";
-		String s = taxName + "\t" 
-					+ maxReference;
+		String maxReference = getName(map.getMaxID());
+		String s = taxName + "\t" + maxReference;
 		for(double d : map.getStatistics())
 			s+="\t" + df.format(d);
 		setReadDistribution(s);
@@ -82,21 +74,50 @@ public class TaxonAncientNonStacked  extends RMA6TaxonDamageFilter{
 					lines.add("A:\t"+entry.getAlignment());
 					lines.add("R:\t"+entry.getReference()+"\n");
 					numReads++;
+					//get mismatches
+					HashMap<Integer, String> alMap = entry.getMismatches();
+					if(alMap != null && entry.getMlength() >= 20){//get mismatches per position
+						numMatches++;
+						for(int l = 0; l< 20; l++){
+							if(l < 10){
+								if(alMap.containsKey(l))
+									if(alMap.get(l).equals("C>T")){
+										if(misMap.containsKey(l))
+											misMap.replace(l, misMap.get(l)+1);
+										else	
+											misMap.put(l, 1);	
+										}
+							}else{
+								if(alMap.containsKey(entry.getMlength()+l-20)){
+									if(alMap.get(entry.getMlength()+l-20).equals("G>A")){
+										if(misMap.containsKey(l))
+											misMap.replace(l, misMap.get(l)+1);
+										else	
+											misMap.put(l, 1);
+										}
+									}
+								}
+							}//for
+						}// map != null		
+					pIdents.add(entry.getPIdent());
+					distances.add(entry.getEditInstance());
+					numReads++;
 				}
 				
 			}
 			
 		}
+		setMisMap(misMap);
+		setNumMatches(numMatches);
 		setEditDistanceHistogram(distances);
 		setPercentIdentityHistogram(pIdents);
 		setNumberOfMatches(numReads);
 	}	
 	@Override
 	public void process(String inDir, String fileName, double topPercent, int maxLength){ 
-		if(mapReader.getNcbiIdToNameMap().get(taxID) != null)
-			taxName = mapReader.getNcbiIdToNameMap().get(taxID).replace(' ', '_');
-		else
-			taxName = "unassingned name";
+		
+			this.taxName = getName(taxID);
+		
 		HashMap<Integer, ArrayList<Alignment>> taxonMap = new HashMap<Integer,ArrayList<Alignment>>();
 		// use ReadsIterator to get all Reads assigned to MegantaxID and print top percent to file;
 		try(RMA6File rma6File = new RMA6File(inDir+fileName, "r")){

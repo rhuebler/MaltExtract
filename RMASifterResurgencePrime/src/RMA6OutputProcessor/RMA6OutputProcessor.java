@@ -53,7 +53,7 @@ public class RMA6OutputProcessor {
 			summary.sort(null);
 			summary.add(0,header);
 		try{
-			Path file = Paths.get(outDir+"damageMismatch/"+fileName.substring(0,fileName.length()-4)+".txt");
+			Path file = Paths.get(outDir+"damageMismatch/"+fileName+".txt");
 			Files.write(file, summary, Charset.forName("UTF-8"));
 		}catch(IOException io){
 			warning.log(Level.SEVERE, "File writing exception", io);
@@ -67,7 +67,7 @@ public class RMA6OutputProcessor {
 				name = mapReader.getNcbiIdToNameMap().get(taxID).replace(' ', '_');
 			else
 				name = "unassingned_name";
-		Path file = Paths.get(outDir+"reads/"+fileName.substring(0,fileName.length()-4)+"/"+name+".txt");
+		Path file = Paths.get(outDir+"reads/"+fileName+"/"+name+".txt");
 		Files.write(file, summary, Charset.forName("UTF-8"));
 		}catch(IOException io){
 			warning.log(Level.SEVERE,"Cannot write file", io);

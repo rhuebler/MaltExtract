@@ -34,26 +34,17 @@ public class RMA6TaxonNonDuplicateFilter  extends RMA6TaxonProcessor{
 		super(id,pID, reader, v, log, warning);
 	}
 	private void computeOutput(HashMap<Integer, ArrayList<Alignment>> taxonMap, int taxID){
+		HashMap<Integer,Integer> misMap = new HashMap<Integer,Integer>();
+		int numMatches = 0;
 		ArrayList<Integer> distances = new ArrayList<Integer>();
 		ArrayList<Double> pIdents = new ArrayList<Double>();
 		DecimalFormat df = new DecimalFormat("#.###");
-		String taxName;
-		if(mapReader.getNcbiIdToNameMap().get(taxID) != null)
-			taxName = mapReader.getNcbiIdToNameMap().get(taxID).replace(' ', '_');
-		else
-			taxName = "unassingned name";
-		
 		CompositionMap map = new CompositionMap(taxonMap);
 		map.process();
 		map.markAllDuplicates();
 		// first set ReadDistribution on Maximum ID
-		String maxReference;
-		if(mapReader.getNcbiIdToNameMap().get(map.getMaxID()) != null)
-			maxReference =  mapReader.getNcbiIdToNameMap().get(map.getMaxID()).replace(' ', '_');
-		else
-			maxReference = "unassinged_reference_name";
-		String s = taxName + "\t" 
-					+ maxReference;
+		String maxReference = getName(map.getMaxID());
+		String s = taxName + "\t" + maxReference;
 		for(double d : map.getStatistics())
 			s+="\t" + df.format(d);
 		setReadDistribution(s);
@@ -62,6 +53,31 @@ public class RMA6TaxonNonDuplicateFilter  extends RMA6TaxonProcessor{
 		for(int key : taxonMap.keySet()){
 			for(Alignment entry : taxonMap.get(key)){
 				if(!entry.isDuplicate()){
+					//get mismatches
+					HashMap<Integer, String> alMap = entry.getMismatches();
+					if(alMap != null && entry.getMlength() >= 20){//get mismatches per position
+						numMatches++;
+						for(int l = 0; l< 20; l++){
+							if(l < 10){
+								if(alMap.containsKey(l))
+									if(alMap.get(l).equals("C>T")){
+										if(misMap.containsKey(l))
+											misMap.replace(l, misMap.get(l)+1);
+										else	
+											misMap.put(l, 1);	
+										}
+							}else{
+								if(alMap.containsKey(entry.getMlength()+l-20)){
+									if(alMap.get(entry.getMlength()+l-20).equals("G>A")){
+										if(misMap.containsKey(l))
+											misMap.replace(l, misMap.get(l)+1);
+										else	
+											misMap.put(l, 1);
+										}
+									}
+								}
+							}//for
+						}// map != null		
 					pIdents.add(entry.getPIdent());
 					distances.add(entry.getEditInstance());
 					numReads++;
@@ -70,6 +86,8 @@ public class RMA6TaxonNonDuplicateFilter  extends RMA6TaxonProcessor{
 			}
 			
 		}
+		setMisMap(misMap);
+		setNumMatches(numMatches);
 		setEditDistanceHistogram(distances);
 		setPercentIdentityHistogram(pIdents);
 		//setSupplementary(supplementary);
@@ -80,6 +98,7 @@ public class RMA6TaxonNonDuplicateFilter  extends RMA6TaxonProcessor{
 		HashMap<Integer, ArrayList<Alignment>> taxonMap = new HashMap<Integer,ArrayList<Alignment>>();
 		// use ReadsIterator to get all Reads assigned to MegantaxID and print top percent to file;
 		try(RMA6File rma6File = new RMA6File(inDir+fileName, "r")){
+			this.taxName = getName(taxID);
 			ListOfLongs list = new ListOfLongs();
 			Long location = rma6File.getFooterSectionRMA6().getStartClassification("Taxonomy");
 			if (location != null) {
@@ -94,7 +113,7 @@ public class RMA6TaxonNonDuplicateFilter  extends RMA6TaxonProcessor{
 				ArrayList<Integer> distances = new ArrayList<Integer>();
 				ArrayList<Double> pIdents = new ArrayList<Double>();
 				if(verbose)
-					warning.log(Level.WARNING,"TaxID: " + taxID +  " not assigned in File " + fileName+"\n");
+					warning.log(Level.WARNING,"TaxName: " +taxName+  " not assigned in File " + fileName+"\n");
 				setReadDistribution(mapReader.getNcbiIdToNameMap().get(taxID).replace(' ', '_')+"\tNA\t0\t0\t0\t0\t0\t0\t0\t0");
 				setPercentIdentityHistogram(pIdents);
 				setEditDistanceHistogram(distances);
