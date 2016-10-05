@@ -169,7 +169,7 @@ public class InputParameterProcessor {
     	        		File f = new File(commandLine.getOptionValue("output"));
     	        		this.outDir = f.getCanonicalPath()+"/";
     	        		}catch(IOException io){
-    	        			warning.log(Level.SEVERE,"out dir not valid", io);
+    	        			warning.log(Level.SEVERE,"no valid outdir", io);
     	        		}
     	        }
     	        
@@ -179,21 +179,26 @@ public class InputParameterProcessor {
     	            	log.info("Taxons File: ");
     	            	log.info(tax);
     	        	   File f = new File(tax);
-    	        	   if(f.isFile()){
-    	        		   try {
-    	        			   Scanner	in = new Scanner(f);
-    	        			   while(in.hasNext()){
-    	        				   taxNames.add(in.nextLine().trim());
-    	        			   }
-    	        			   in.close();
-    	        		   }catch (FileNotFoundException e) {
-    	        		   e.printStackTrace();
-    	        		   }
-    	        	   }else{
-    	        		   log.info("Added Taxon: ");
-    	        		   log.info(tax +" to analysis");
-    	        		   taxNames.add(tax); 
-    	        	   }
+    	        	   try {
+						if(f.getCanonicalFile().exists()){
+							   try {
+								   Scanner	in = new Scanner(f.getCanonicalFile());
+								   while(in.hasNext()){
+									   taxNames.add(in.nextLine().trim());
+								   }
+								   in.close();
+							   }catch (FileNotFoundException e) {
+							   e.printStackTrace();
+							   }
+						   }else{
+							   log.info("Added Taxon: ");
+							   log.info(tax +" to analysis");
+							   taxNames.add(tax); 
+						   }
+					} catch (IOException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
     	           }	   
     			}
     					        
