@@ -150,11 +150,11 @@ public class InputParameterProcessor {
     	            	try{
     	            		if(inFile.getCanonicalFile().isDirectory()){
     	            			 log.info(arg);
-    	            			for(String name : inFile.list(RMAFilter))
-    	            				this.fileNames.add(arg + name);
-    	            		}else if(inFile.isFile()){
-    	            			log.info(arg);
-    	            			this.fileNames.add(arg);
+    	            			for(String name : inFile.getCanonicalFile().list(RMAFilter))
+    	            				this.fileNames.add(inFile.getCanonicalFile().getPath()+"/" + name);
+    	            		}else if(inFile.getCanonicalFile().isFile()){
+    	            			log.info(inFile.getCanonicalFile().getPath());
+    	            			this.fileNames.add(inFile.getCanonicalFile().getPath());
     	            		}
     	            	}catch(IOException io){
     	            		warning.log(Level.SEVERE,"Can't open File", io);
@@ -165,7 +165,12 @@ public class InputParameterProcessor {
     	        if (commandLine.hasOption("output"))
     	        {
     	        	log.log(Level.INFO,"Output Directory set to: "+commandLine.getOptionValue("output"));
-    	            this.outDir = commandLine.getOptionValue("output");
+    	        	try{
+    	        		File f = new File(commandLine.getOptionValue("output"));
+    	        		this.outDir = f.getCanonicalPath()+"/";
+    	        		}catch(IOException io){
+    	        			warning.log(Level.SEVERE,"out dir not valid", io);
+    	        		}
     	        }
     	        
     	        if (commandLine.hasOption("taxons"))

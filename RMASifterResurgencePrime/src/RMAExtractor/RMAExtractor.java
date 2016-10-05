@@ -68,6 +68,7 @@ public class RMAExtractor {
 		log.log(Level.INFO, "Setting up Taxon Name and Taxon ID maps");
 		
 		NCBI_MapReader mapReader = new NCBI_MapReader(inProcessor.getTreePath());
+		
 		new File(inProcessor.getOutDir()+"/readDist/").mkdirs(); //TODO could break potentially on Windows systems
 		new File(inProcessor.getOutDir()+"/editDistance/").mkdirs();
 		new File(inProcessor.getOutDir()+"/percentIdentity/").mkdirs();
