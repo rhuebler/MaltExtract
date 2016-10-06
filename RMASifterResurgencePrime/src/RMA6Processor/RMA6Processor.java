@@ -18,6 +18,7 @@ import RMA6OutputProcessor.RMA6OutputProcessor;
 import RMA6TaxonProcessor.ConcurrentRMA6TaxonProcessor;
 import RMA6TaxonProcessor.RMA6TaxonDamageFilter;
 import RMA6TaxonProcessor.RMA6TaxonNonDuplicateFilter;
+import RMA6TaxonProcessor.RMA6TaxonNonFilter;
 import RMA6TaxonProcessor.RMA6TaxonProcessor;
 import RMA6TaxonProcessor.TaxonAncientNonStacked;
 import behaviour.Filter;
@@ -161,7 +162,7 @@ public void process(List<Integer>taxIDs, double topPercent) {// processing
 		for(Integer id : idsToProcess){
 			RMA6TaxonProcessor taxProcessor = null;
 			if(behave == Filter.NON){// change to all
-				taxProcessor = new RMA6TaxonProcessor(id, minPIdent, mapReader, verbose,log, warning);
+				taxProcessor = new RMA6TaxonNonFilter(id, minPIdent, mapReader, verbose,log, warning);
 			}else if(behave == Filter.ANCIENT){
 				 if(reads)
 					 taxProcessor = new RMA6TaxonDamageFilter(id, minPIdent, mapReader, verbose,log, warning, reads);

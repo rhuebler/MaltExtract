@@ -1,7 +1,6 @@
 package RMA6TaxonProcessor;
 
 import java.io.IOException;
-import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.logging.Level;
@@ -34,20 +33,16 @@ public class RMA6TaxonNonDuplicateFilter  extends RMA6TaxonProcessor{
 		super(id,pID, reader, v, log, warning);
 	}
 	private void computeOutput(HashMap<Integer, ArrayList<Alignment>> taxonMap, int taxID){
+		HashMap<Integer,Integer> substitutionMap = new HashMap<Integer,Integer>();
 		HashMap<Integer,Integer> misMap = new HashMap<Integer,Integer>();
 		int numMatches = 0;
 		ArrayList<Integer> distances = new ArrayList<Integer>();
 		ArrayList<Double> pIdents = new ArrayList<Double>();
-		DecimalFormat df = new DecimalFormat("#.###");
 		CompositionMap map = new CompositionMap(taxonMap);
 		map.process();
 		map.markAllDuplicates();
-		// first set ReadDistribution on Maximum ID
-		String maxReference = getName(map.getMaxID());
-		String s = taxName + "\t" + maxReference;
-		for(double d : map.getStatistics())
-			s+="\t" + df.format(d);
-		setReadDistribution(s);
+		
+		setReadDistribution(map);// first set ReadDistribution on Maximum ID
 		taxonMap = map.getCompositionMap();
 		int numReads=0;
 		for(int key : taxonMap.keySet()){
@@ -65,7 +60,12 @@ public class RMA6TaxonNonDuplicateFilter  extends RMA6TaxonProcessor{
 											misMap.replace(l, misMap.get(l)+1);
 										else	
 											misMap.put(l, 1);	
-										}
+									}else{//get all others
+										if(substitutionMap.containsKey(l))
+											substitutionMap.replace(l, substitutionMap.get(l)+1);
+										else
+											substitutionMap.put(l, 1);
+									}
 							}else{
 								if(alMap.containsKey(entry.getMlength()+l-20)){
 									if(alMap.get(entry.getMlength()+l-20).equals("G>A")){
@@ -74,6 +74,11 @@ public class RMA6TaxonNonDuplicateFilter  extends RMA6TaxonProcessor{
 										else	
 											misMap.put(l, 1);
 										}
+									}else{//get all others
+										if(substitutionMap.containsKey(l))
+											substitutionMap.replace(l, substitutionMap.get(l)+1);
+										else
+											substitutionMap.put(l, 1);
 									}
 								}
 							}//for
@@ -86,6 +91,7 @@ public class RMA6TaxonNonDuplicateFilter  extends RMA6TaxonProcessor{
 			}
 			
 		}
+		setSubstitutionMap(substitutionMap);
 		setMisMap(misMap);
 		setNumMatches(numMatches);
 		setEditDistanceHistogram(distances);
@@ -114,7 +120,7 @@ public class RMA6TaxonNonDuplicateFilter  extends RMA6TaxonProcessor{
 				ArrayList<Double> pIdents = new ArrayList<Double>();
 				if(verbose)
 					warning.log(Level.WARNING,"TaxName: " +taxName+  " not assigned in File " + fileName+"\n");
-				setReadDistribution(mapReader.getNcbiIdToNameMap().get(taxID).replace(' ', '_')+"\tNA\t0\t0\t0\t0\t0\t0\t0\t0");
+				setReadDistribution(new CompositionMap(new HashMap<Integer,ArrayList<Alignment>>()));
 				setPercentIdentityHistogram(pIdents);
 				setEditDistanceHistogram(distances);
 				setNumberOfMatches(0);

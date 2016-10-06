@@ -1,7 +1,6 @@
 package RMA6TaxonProcessor;
 
 import java.io.IOException;
-import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.logging.Level;
@@ -48,11 +47,11 @@ protected void setReads(ArrayList<String> list){
 public void process(String inDir, String fileName, double topPercent, int maxLength){ 
 	if(mapReader.getNcbiIdToNameMap().get(taxID) != null)
 		this.taxName = getName(taxID);
-	DecimalFormat df = new DecimalFormat("#.###");
 	ArrayList<Integer> distances = new ArrayList<Integer>();
 	ArrayList<Double> pIdents = new ArrayList<Double>();
 	ArrayList<String> lines = new ArrayList<String>();
 	HashMap<Integer,Integer> misMap = new HashMap<Integer,Integer>();
+	HashMap<Integer,Integer> substitutionMap = new HashMap<Integer,Integer>();
 	int numMatches = 0;
 	// use ReadsIterator to get all Reads assigned to MegantaxID and print top percent to file;
 	try(RMA6File rma6File = new RMA6File(inDir+fileName, "r")){	
@@ -70,7 +69,7 @@ public void process(String inDir, String fileName, double topPercent, int maxLen
 		if(!classIt.hasNext()){ // check if reads are assigned to TaxID if not print to console and skip
 			if(verbose)
 				warning.log(Level.WARNING,"TaxID: " + taxID +  " not assigned in File " + fileName+"\n");
-			setReadDistribution(taxName+"\tNA\t0\t0\t0\t0\t0\t0\t0\t0");
+			setReadDistribution(new CompositionMap(new HashMap<Integer,ArrayList<Alignment>>()));
 			setPercentIdentityHistogram(pIdents);
 			setEditDistanceHistogram(distances);
 			setNumberOfMatches(0);	
@@ -114,6 +113,11 @@ public void process(String inDir, String fileName, double topPercent, int maxLen
 												misMap.replace(l, misMap.get(l)+1);
 											else	
 												misMap.put(l, 1);	
+											}else{//get all others
+												if(substitutionMap.containsKey(l))
+													substitutionMap.replace(l, substitutionMap.get(l)+1);
+												else
+													substitutionMap.put(l, 1);
 											}
 								}else{
 									if(map.containsKey(al.getMlength()+l-20)){
@@ -123,6 +127,11 @@ public void process(String inDir, String fileName, double topPercent, int maxLen
 											else	
 												misMap.put(l, 1);
 											}
+										}else{//get all others
+											if(substitutionMap.containsKey(l))
+												substitutionMap.replace(l, substitutionMap.get(l)+1);
+											else
+												substitutionMap.put(l, 1);
 										}
 									}
 								}//for
@@ -163,14 +172,11 @@ public void process(String inDir, String fileName, double topPercent, int maxLen
 			
 			CompositionMap map = new CompositionMap(taxonMap);
 			map.process();
-			String maxReference = getName(map.getMaxID());
-			String s = taxName + "\t" 
-						+ maxReference;
-			for(double d : map.getStatistics())
-				s += "\t" + df.format(d);
+			
+			setSubstitutionMap(substitutionMap);
 			setMisMap(misMap);
 			setNumMatches(numMatches);
-			setReadDistribution(s);
+			setReadDistribution(map);
 			setNumberOfMatches(numReads);
 			setEditDistanceHistogram(distances);
 			setPercentIdentityHistogram(pIdents);
