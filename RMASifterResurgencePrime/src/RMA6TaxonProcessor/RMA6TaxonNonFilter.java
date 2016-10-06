@@ -16,7 +16,11 @@ import megan.data.ReadBlockIterator;
 import megan.rma6.ClassificationBlockRMA6;
 import megan.rma6.RMA6File;
 import megan.rma6.ReadBlockGetterRMA6;
-
+/**
+ * Default filter that just outputs additional proofs without any filtering
+ * @author huebler
+ *
+ */
 public class RMA6TaxonNonFilter  extends RMA6TaxonProcessor{
 	public RMA6TaxonNonFilter(Integer id, double pID, NCBI_MapReader reader, boolean v, Logger log, Logger warning) {
 		super(id, pID, reader, v, log, warning);
