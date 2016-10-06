@@ -188,7 +188,7 @@ public class InputParameterProcessor {
 								   }
 								   in.close();
 							   }catch (FileNotFoundException e) {
-							   e.printStackTrace();
+								   warning.log(Level.WARNING,"File Not Found",e);
 							   }
 						   }else{
 							   log.info("Added Taxon: ");
@@ -197,7 +197,7 @@ public class InputParameterProcessor {
 						   }
 					} catch (IOException e) {
 						// TODO Auto-generated catch block
-						e.printStackTrace();
+						warning.log(Level.WARNING,"IOException",e);
 					}
     	           }	   
     			}

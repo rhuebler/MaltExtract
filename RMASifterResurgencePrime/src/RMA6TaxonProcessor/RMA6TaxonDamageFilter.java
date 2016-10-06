@@ -113,7 +113,7 @@ public void process(String inDir, String fileName, double topPercent, int maxLen
 												misMap.replace(l, misMap.get(l)+1);
 											else	
 												misMap.put(l, 1);	
-											}else{//get all others
+											}else if(!map.get(l).contains("[Nn-]+")){//get all others
 												if(substitutionMap.containsKey(l))
 													substitutionMap.replace(l, substitutionMap.get(l)+1);
 												else
@@ -127,7 +127,7 @@ public void process(String inDir, String fileName, double topPercent, int maxLen
 											else	
 												misMap.put(l, 1);
 											}
-										}else{//get all others
+										}else if(!map.get(al.getMlength()+l-20).contains("[Nn-]+")){//get all others
 											if(substitutionMap.containsKey(l))
 												substitutionMap.replace(l, substitutionMap.get(l)+1);
 											else

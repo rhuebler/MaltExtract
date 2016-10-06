@@ -80,7 +80,7 @@ public class TaxonAncientNonStacked  extends RMA6TaxonDamageFilter{
 											misMap.replace(l, misMap.get(l)+1);
 										else	
 											misMap.put(l, 1);	
-									}else{//get all others
+									}else if(!alMap.get(l).contains("[Nn-]+")){//get all others
 										if(substitutionMap.containsKey(l))
 											substitutionMap.replace(l, substitutionMap.get(l)+1);
 										else
@@ -93,7 +93,7 @@ public class TaxonAncientNonStacked  extends RMA6TaxonDamageFilter{
 											misMap.replace(l, misMap.get(l)+1);
 										else	
 											misMap.put(l, 1);
-										}else{//get all others
+										}else if(!alMap.get(entry.getMlength()+l-20).contains("[Nn-]+")){//get all others
 											if(substitutionMap.containsKey(l))
 												substitutionMap.replace(l, substitutionMap.get(l)+1);
 											else

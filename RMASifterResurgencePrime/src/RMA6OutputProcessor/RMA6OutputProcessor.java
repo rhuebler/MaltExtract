@@ -57,8 +57,8 @@ public class RMA6OutputProcessor {
 					header+="\t"+"C>T_"+(i+1);
 					header_part2+="\t"+"C>T_"+(i+1);
 				}else{
-					header+="\t"+"D>V_"+(i+1);
-					header_part2+="\t"+"H>B_"+(i+1);
+					header+="\t"+"D>V(10Substitution)_"+(i+1);
+					header_part2+="\t"+"H>B(10Substitution)_"+(i+1);
 				}
 			}
 			header+=header_part2+"\tconsidered_Matches";

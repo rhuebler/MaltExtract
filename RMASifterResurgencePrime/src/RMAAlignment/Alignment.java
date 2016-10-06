@@ -32,11 +32,7 @@ public HashMap<Integer,String> getMismatches(){
 	HashMap<Integer,String> map = new HashMap<Integer,String>();
 	for(int i = 0; i < reference.length(); i++){
 		if(query.charAt(i) != reference.charAt(i))
-			if(reversed)
-				map.put(reference.length()-i, reference.charAt(i)+">"+query.charAt(i));
-			else
 				map.put(i, reference.charAt(i)+">"+query.charAt(i));
-			
 		}
 		return map;
 } 	
@@ -149,25 +145,20 @@ private void setReferenceLength(int k) {
  private void setNumGaps(int k){
 	 this.numGaps = k;}
  
- private boolean misMatch(int i){
+ private boolean misMatchFivePrime(int i){
 	 if((reference.charAt(i) == 'C' && query.charAt(i) == 'T')||
-				 (reference.charAt(i) == 'c' && query.charAt(i) == 't')){
-		 		return true;
-	 }else if((reference.charAt(i) == 'N'&& query.charAt(i) == 'T')||
-			 (reference.charAt(i) == '-'&& query.charAt(i) == 'T')||
-			 (reference.charAt(i) == 'n'&& query.charAt(i) == 't')||
-			 (reference.charAt(i) == '-'&& query.charAt(i) == 't')){
-		 		return true;
-	 }else if((reference.charAt(i) == 'G' && query.charAt(i) == 'A')||
-			 (reference.charAt(i) == 'g' && query.charAt(i) == 'a')){
-			 	return true; 		
-	 } else if((reference.charAt(i) == 'N'&& query.charAt(i) == 'A')||
-			 (reference.charAt(i) == '-'&& query.charAt(i) == 'A')||
-			 (reference.charAt(i) == 'n'&& query.charAt(i) == 'a')||
-			 (reference.charAt(i) == '-'&& query.charAt(i) == 'a')){
+		(reference.charAt(i) == 'c' && query.charAt(i) == 't')){
 		 		return true;
 	 }else {
-		 		return false;
+	 		return false;
+	 }
+ }
+ private boolean misMatchThreePrime(int i){
+	 if((reference.charAt(i) == 'G' && query.charAt(i) == 'A')||
+		(reference.charAt(i) == 'g' && query.charAt(i) == 'a')){
+			 return true; 		
+	 }else{
+		 return false;
 	 }
  }
  private void calculateEditDistance(String sequence, String reference){
@@ -224,11 +215,10 @@ private void setReferenceLength(int k) {
 			 for(String frag:line.split("\\s")){
 				 if(frag.trim().matches("[ATGCNatgcn-]+")){
 					 setReference(frag.trim());
-					
-					 for(int k = 0; k < 5; k++ ){ //test first and last 5 positvions for g->c mismatch
+					 for(int k = 0; k < 5; k++ ){ //test first and last 5 positions for g->c mismatch
 						 if(reference.length() > 1+k*2 && query.length() > 1+k*2 
-								 && reference.length() == query.length())		
-							 {if(misMatch(k) || misMatch(this.query.length()-k-1)){ // set damage true if there is a C->T sub at eithter end
+								 && reference.length() == query.length()){
+							 if(misMatchFivePrime(k) || misMatchThreePrime(this.query.length()-k-1)){ // set damage true if there is a C->T sub at eithter end
 								setFivePrimeDamage(true);
 								break;// break out of loop
 							}
