@@ -41,15 +41,27 @@ public class RMA6OutputProcessor {
 	public HashMap<Integer,Integer> getSumLine(){
 		return this.overallSum;
 	}
+	private String getName(int id){
+		String line;
+		if(mapReader.getNcbiIdToNameMap().get(id) != null)
+			line = mapReader.getNcbiIdToNameMap().get(id).replace(' ', '_');
+		else
+			line = "unassingned_name";
+		return line;
+	}
 	private void writeMisMap(ArrayList<String> summary){
 			String header = "Node";
+			String header_part2 ="";
 			for(int i = 0; i < 20; i++){
-				if(i<10)
+				if(i<10){
 					header+="\t"+"C>T_"+(i+1);
-				else
-					header+="\t"+"G>A_"+(i+1);
+					header_part2+="\t"+"C>T_"+(i+1);
+				}else{
+					header+="\t"+"D>V_"+(i+1);
+					header_part2+="\t"+"H>B_"+(i+1);
+				}
 			}
-			header+="\tconsidered_Matches";
+			header+=header_part2+"\tconsidered_Matches";
 			summary.sort(null);
 			summary.add(0,header);
 		try{
@@ -121,20 +133,24 @@ public class RMA6OutputProcessor {
 				readDistribution.add(taxProcessor.getReadDistribution());	
 				editDistance.add(taxProcessor.getEditDistanceHistogram());
 				percentIdentity.add(taxProcessor.getPercentIdentityHistogram());
-				HashMap<Integer, Integer> map = taxProcessor.getMisMap();
-				String line;
-				if(mapReader.getNcbiIdToNameMap().get(id) != null)
-					line = mapReader.getNcbiIdToNameMap().get(id).replace(' ', '_');
-				else
-					line = "unassingned_name";
+				HashMap<Integer, Integer> misMap = taxProcessor.getMisMap();
+				HashMap<Integer, Integer> subsMap = taxProcessor.getSubstitutionMap();
+				String part1 = getName(id);
+				String part2 = "";
 				for(int i = 0;i < 20; i++){
-					if(map.containsKey(i))
-						line+="\t"+map.get(i);
-					else	
-						line+="\t"+0;
+					if(misMap.containsKey(i)){
+						part1 += "\t" + misMap.get(i);
+						part2 += "\t" + subsMap.get(i);
+					}else{	
+						part1 += "\t" + 0;
+						part2 += "\t" + 0;
+					}	
 				}
-				line += "\t"+map.get(20);
-				misMatches.add(line);
+				if(subsMap.get(20)!=null)
+					part1 += part2 + "\t" + subsMap.get(20);
+				else
+					part1 += part2 + "\t" + 0;
+				misMatches.add(part1);
 				if((behave == Filter.ALL && reads )|| (behave == Filter.ANCIENT && reads)){
 					writeBlastHits(id,taxProcessor.getReads());
 				}

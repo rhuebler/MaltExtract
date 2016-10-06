@@ -10,7 +10,7 @@ import RMAAlignment.CompositionMap;
 
 /**
  * Extract all information from one Taxon and save the information in the specified slots to be retrieved
- * in RMA6Processor is parent class for all filtering Taxonprocessors
+ * in RMA6Processor is parent class for all filtering Taxonprocessors now mainly serves as a makeshift interface
  * @author huebler
  *
  */
@@ -119,6 +119,8 @@ protected void setMisMap(HashMap<Integer,Integer>map){
 protected void setNumMatches(int matches){
 	this.numMatches = matches;
 }
+
+
 //getters
 protected String getName(int taxId){
 	String name;
@@ -131,7 +133,6 @@ protected String getName(int taxId){
 public HashMap<Integer, Integer>getSubstitutionMap(){
 	if( substitutionMap != null){
 		int numMatches = this.numMatches;
-		
 		substitutionMap.put(20, numMatches);
 		return this.substitutionMap;
 	}else{
@@ -143,9 +144,6 @@ public HashMap<Integer, Integer>getSubstitutionMap(){
 }
 public HashMap<Integer, Integer>getMisMap(){
 	if( misMap!=null){
-		int numMatches = this.numMatches;
-		
-		misMap.put(20, numMatches);
 		return this.misMap;
 	}else{
 		HashMap<Integer,Integer> map = new HashMap<Integer,Integer>();

@@ -146,15 +146,15 @@ public class InputParameterProcessor {
     	        {
     	        	log.log(Level.INFO,"Input Set to: ");
     	            for(String arg :commandLine.getOptionValues("input")){
-    	            	File inFile = new File(arg);
     	            	try{
-    	            		if(inFile.getCanonicalFile().isDirectory()){
+    	            		File inFile = new File(arg).getCanonicalFile();
+    	            		if(inFile.isDirectory()){
     	            			 log.info(arg);
-    	            			for(String name : inFile.getCanonicalFile().list(RMAFilter))
-    	            				this.fileNames.add(inFile.getCanonicalFile().getPath()+"/" + name);
-    	            		}else if(inFile.getCanonicalFile().isFile()){
-    	            			log.info(inFile.getCanonicalFile().getPath());
-    	            			this.fileNames.add(inFile.getCanonicalFile().getPath());
+    	            			for(String name : inFile.list(RMAFilter))
+    	            				this.fileNames.add(inFile.getPath()+"/" + name);
+    	            		}else if(inFile.isFile()){
+    	            			log.info(inFile.getPath());
+    	            			this.fileNames.add(inFile.getPath());
     	            		}
     	            	}catch(IOException io){
     	            		warning.log(Level.SEVERE,"Can't open File", io);
