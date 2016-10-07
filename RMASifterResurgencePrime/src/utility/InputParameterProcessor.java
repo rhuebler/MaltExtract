@@ -5,7 +5,6 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
@@ -152,7 +151,7 @@ public class InputParameterProcessor {
     	            		if(new File(arg).getParent()!=null){
     	            			inFile = new File(new File(arg).getParentFile().getCanonicalPath()+"/"+ new File(arg).getName());
     	            		}else {
-    	            			inFile = new File(arg).getCanonicalFile();
+    	            			inFile = new File(System.getProperty("user.dir")+"/"+arg);
     	            		}
     	            		if(inFile.isDirectory()){
     	            			 log.info(arg);
