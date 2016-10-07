@@ -93,26 +93,22 @@ public class RMAExtractor {
 		if(inProcessor.getFilter() != Filter.SCAN){
 			List<Future<RMA6Processor>> processedFiles = new ArrayList<>();
     		for(String fileName : inProcessor.getFileNames()){
-    			try{
-    				File f = new File(fileName);
-    				if(inProcessor.getBlastHits()){
-    					ConcurrentRMA6Processor task = new ConcurrentRMA6Processor(f.getParentFile().getCanonicalFile() + "/", 
-        						f.getName(), inProcessor.getOutDir(), mapReader, treeReader,taxIDs, inProcessor.getTopPercent(),
-        						inProcessor.getMaxLength(),inProcessor.getMinPIdent(),inProcessor.getFilter(), inProcessor.getTaxas(),
-        						inProcessor.isVerbose(), log, warning,inProcessor.getBlastHits());
-        					Future<RMA6Processor> future=executor.submit(task);
-        					processedFiles.add(future);
-    				}else{
-    					ConcurrentRMA6Processor task = new ConcurrentRMA6Processor(f.getParentFile().getCanonicalFile() + "/", 
-    						f.getName(), inProcessor.getOutDir(), mapReader, treeReader,taxIDs, inProcessor.getTopPercent(),
-    						inProcessor.getMaxLength(),inProcessor.getMinPIdent(),inProcessor.getFilter(), inProcessor.getTaxas(),
-    						inProcessor.isVerbose(), log, warning);
-    					Future<RMA6Processor> future=executor.submit(task);
-    					processedFiles.add(future);
-    				}
-    			}catch(IOException io){
-    				warning.log(Level.SEVERE,"File not found",io);
-       				}
+    			File f = new File(fileName);
+				if(inProcessor.getBlastHits()){
+					ConcurrentRMA6Processor task = new ConcurrentRMA6Processor(f.getParent() + "/", 
+							f.getName(), inProcessor.getOutDir(), mapReader, treeReader,taxIDs, inProcessor.getTopPercent(),
+							inProcessor.getMaxLength(),inProcessor.getMinPIdent(),inProcessor.getFilter(), inProcessor.getTaxas(),
+							inProcessor.isVerbose(), log, warning,inProcessor.getBlastHits());
+						Future<RMA6Processor> future=executor.submit(task);
+						processedFiles.add(future);
+				}else{
+					ConcurrentRMA6Processor task = new ConcurrentRMA6Processor(f.getParent() + "/", 
+						f.getName(), inProcessor.getOutDir(), mapReader, treeReader,taxIDs, inProcessor.getTopPercent(),
+						inProcessor.getMaxLength(),inProcessor.getMinPIdent(),inProcessor.getFilter(), inProcessor.getTaxas(),
+						inProcessor.isVerbose(), log, warning);
+					Future<RMA6Processor> future=executor.submit(task);
+					processedFiles.add(future);
+				}
     		}//fileNames;
 	    // wait for all threads to finish here currently no concurrency errors or deadlocks but this would be the place where it would fall apart 
 	    destroy();

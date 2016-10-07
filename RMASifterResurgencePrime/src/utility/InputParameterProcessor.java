@@ -3,8 +3,9 @@ package utility;
 
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.FilenameFilter;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
@@ -93,16 +94,16 @@ public class InputParameterProcessor {
 	public boolean isVerbose(){
 		return this.verbose;
 	}
-    private void process(String[] parameters)
-    {	FilenameFilter RMAFilter = new FilenameFilter() {
-	    	public boolean accept(File file, String name) {
-	    		if (name.endsWith(".rma6")) {
-	    			return true;
-	    		} else {
-	    			return false;
-	    		}
-	    	}
-    	};
+	private void process(String[] parameters){	
+//		FilenameFilter RMAFilter = new FilenameFilter() {
+//	    	public boolean accept(File file, String name) {
+//	    		if (name.endsWith(".rma6")||Files.isSymbolicLink(new File(name).toPath())) {
+//	    			return true;
+//	    		} else {
+//	    			return false;
+//	    		}
+//	    	}
+//    	};
     	 CommandLine commandLine;
     	 	// Short Flags
     	 	// edit distance 
@@ -147,21 +148,26 @@ public class InputParameterProcessor {
     	        	log.log(Level.INFO,"Input Set to: ");
     	            for(String arg :commandLine.getOptionValues("input")){
     	            	try{
-    	            		File inFile = new File(arg).getCanonicalFile();
+    	            		File inFile = null;
+    	            		if(new File(arg).getParent()!=null){
+    	            			inFile = new File(new File(arg).getParentFile().getCanonicalPath()+"/"+ new File(arg).getName());
+    	            		}else {
+    	            			inFile = new File(arg).getCanonicalFile();
+    	            		}
     	            		if(inFile.isDirectory()){
     	            			 log.info(arg);
-    	            			for(String name : inFile.list(RMAFilter))
+    	            			for(String name : inFile.list())
+    	            				if(name.endsWith("rma6")|| Files.isSymbolicLink(new File(inFile.getPath()+"/" + name).toPath()))
     	            				this.fileNames.add(inFile.getPath()+"/" + name);
-    	            		}else if(inFile.isFile()){
+    	            		}else if(inFile.isFile()){// is File
     	            			log.info(inFile.getPath());
     	            			this.fileNames.add(inFile.getPath());
     	            		}
     	            	}catch(IOException io){
     	            		warning.log(Level.SEVERE,"Can't open File", io);
     	            	}	
-    	            }
+    	            }  
     	        }
-
     	        if (commandLine.hasOption("output"))
     	        {
     	        	log.log(Level.INFO,"Output Directory set to: "+commandLine.getOptionValue("output"));

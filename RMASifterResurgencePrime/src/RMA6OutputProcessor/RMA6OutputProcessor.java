@@ -65,7 +65,7 @@ public class RMA6OutputProcessor {
 			summary.sort(null);
 			summary.add(0,header);
 		try{
-			Path file = Paths.get(outDir+"damageMismatch/"+fileName+".txt");
+			Path file = Paths.get(outDir+"damageMismatch/"+fileName+"_damageMismatch"+".txt");
 			Files.write(file, summary, Charset.forName("UTF-8"));
 		}catch(IOException io){
 			warning.log(Level.SEVERE, "File writing exception", io);
