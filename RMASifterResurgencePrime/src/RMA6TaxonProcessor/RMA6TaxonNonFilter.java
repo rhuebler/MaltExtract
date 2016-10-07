@@ -94,14 +94,13 @@ public class RMA6TaxonNonFilter  extends RMA6TaxonProcessor{
 														substitutionMap.put(l, 1);
 												}
 									}else{
-										if(map.containsKey(al.getMlength()+l-20)){// get G>A at appropropriate end
+										if(map.containsKey(al.getMlength()+l-20))// get G>A at appropropriate end
 											if(map.get(al.getMlength()+l-20).equals("G>A")){
 												if(misMap.containsKey(l))
 													misMap.replace(l, misMap.get(l)+1);
 												else	
 													misMap.put(l, 1);
-												}
-											}else if(!map.get(al.getMlength()+l-20).contains("[Nn-]+")){//get all others
+												}else if(!map.get(al.getMlength()+l-20).contains("[Nn-]+")){//get all others
 												if(substitutionMap.containsKey(l))
 													substitutionMap.replace(l, substitutionMap.get(l)+1);
 												else

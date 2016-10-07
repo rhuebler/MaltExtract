@@ -120,13 +120,12 @@ public void process(String inDir, String fileName, double topPercent, int maxLen
 													substitutionMap.put(l, 1);
 											}
 								}else{
-									if(map.containsKey(al.getMlength()+l-20)){
+									if(map.containsKey(al.getMlength()+l-20))
 										if(map.get(al.getMlength()+l-20).equals("G>A")){
 											if(misMap.containsKey(l))
 												misMap.replace(l, misMap.get(l)+1);
 											else	
 												misMap.put(l, 1);
-											}
 										}else if(!map.get(al.getMlength()+l-20).contains("[Nn-]+")){//get all others
 											if(substitutionMap.containsKey(l))
 												substitutionMap.replace(l, substitutionMap.get(l)+1);

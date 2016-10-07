@@ -67,13 +67,12 @@ public class RMA6TaxonNonDuplicateFilter  extends RMA6TaxonProcessor{
 											substitutionMap.put(l, 1);
 									}
 							}else{
-								if(alMap.containsKey(entry.getMlength()+l-20)){
+								if(alMap.containsKey(entry.getMlength()+l-20))
 									if(alMap.get(entry.getMlength()+l-20).equals("G>A")){
 										if(misMap.containsKey(l))
 											misMap.replace(l, misMap.get(l)+1);
 										else	
 											misMap.put(l, 1);
-										}
 									}else if(!alMap.get(entry.getMlength()+l-20).contains("[Nn-]+")){//get all others
 										if(substitutionMap.containsKey(l))
 											substitutionMap.replace(l, substitutionMap.get(l)+1);
