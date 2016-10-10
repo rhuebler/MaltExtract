@@ -1,6 +1,6 @@
 package RMAExtractor;
 
-import java.io.File; //TODO rethink how to adress diffferent filters
+import java.io.File; //TODO rethink how to address different filters
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;

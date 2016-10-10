@@ -141,7 +141,7 @@ public class RMA6Processor {
 public void process(List<Integer>taxIDs, double topPercent) {// processing 
 	log.log(Level.INFO,"Reading File: " +inDir+fileName);
 	if(reads)
-		new File(outDir+"reads/"+fileName.substring(0, fileName.length()-4)+"/").mkdirs();
+		new File(outDir+"reads/"+fileName.substring(0, fileName.length())+"/").mkdirs();
 	Set<Integer> keys = getAllKeys();
 	Set<Integer> idsToProcess = new HashSet<Integer>();
    // treeReader here to avoid synchronization issues 

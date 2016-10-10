@@ -55,9 +55,9 @@ public class RMA6OutputProcessor {
 			for(int i = 0; i < 20; i++){
 				if(i<10){
 					header+="\t"+"C>T_"+(i+1);
-					header_part2+="\t"+"C>T_"+(i+1);
+					header_part2+="\t"+"D>V(10Substitution)_"+(i+1);
 				}else{
-					header+="\t"+"D>V(10Substitution)_"+(i+1);
+					header+="\t"+"G>A_"+(i+1);
 					header_part2+="\t"+"H>B(10Substitution)_"+(i+1);
 				}
 			}
@@ -140,9 +140,12 @@ public class RMA6OutputProcessor {
 				for(int i = 0;i < 20; i++){
 					if(misMap.containsKey(i)){
 						part1 += "\t" + misMap.get(i);
-						part2 += "\t" + subsMap.get(i);
 					}else{	
-						part1 += "\t" + 0;
+						part1 += "\t" + 0;	
+					}
+					if(subsMap.containsKey(i)){
+						part2 += "\t" + subsMap.get(i);
+					}else{
 						part2 += "\t" + 0;
 					}	
 				}
