@@ -55,10 +55,10 @@ public class RMA6OutputProcessor {
 			for(int i = 0; i < 20; i++){
 				if(i<10){
 					header+="\t"+"C>T_"+(i+1);
-					header_part2+="\t"+"D>V(10Substitution)_"+(i+1);
+					header_part2+="\t"+"D>V(11Substitution)_"+(i+1);
 				}else{
 					header+="\t"+"G>A_"+(i+1);
-					header_part2+="\t"+"H>B(10Substitution)_"+(i+1);
+					header_part2+="\t"+"H>B(11Substitution)_"+(i+1);
 				}
 			}
 			header+=header_part2+"\tconsidered_Matches";
