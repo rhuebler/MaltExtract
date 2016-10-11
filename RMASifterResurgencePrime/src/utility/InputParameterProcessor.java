@@ -267,7 +267,8 @@ public class InputParameterProcessor {
     	        	this.verbose = true;
     	        }
     	        if((commandLine.hasOption("reads") && behave == Filter.ANCIENT)||
-    	        	(commandLine.hasOption("reads") && behave == Filter.ALL)	){
+    	        	(commandLine.hasOption("reads") && behave == Filter.ALL)||
+    	        	(commandLine.hasOption("reads") && behave == Filter.NON)){
     	        	this.reads = true;
     	        }
     	        if(commandLine.hasOption("h")){

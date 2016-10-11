@@ -79,7 +79,9 @@ public class RMA6TaxonNonFilter  extends RMA6TaxonProcessor{
 						Alignment al = new Alignment();
 						al.processText(blocks[i].getText().split("\n"));
 						al.setPIdent(blocks[i].getPercentIdentity());
-							
+						al.setReadName(current.getReadName());
+						al.setReadLength(current.getReadLength());
+						al.setAcessionNumber(blocks[i].getRefSeqId());	
 						if(minPIdent <= al.getPIdent()){ // check for minPercentIdentity
 							if(wantReads){
 								String name = getName(blocks[i].getTaxonId());
