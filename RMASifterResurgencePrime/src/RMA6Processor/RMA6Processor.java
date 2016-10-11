@@ -162,6 +162,9 @@ public void process(List<Integer>taxIDs, double topPercent) {// processing
 		for(Integer id : idsToProcess){
 			RMA6TaxonProcessor taxProcessor = null;
 			if(behave == Filter.NON){// change to all
+			if(reads)
+				taxProcessor = new RMA6TaxonNonFilter(id, minPIdent, mapReader, verbose,log, warning,reads);
+			else
 				taxProcessor = new RMA6TaxonNonFilter(id, minPIdent, mapReader, verbose,log, warning);
 			}else if(behave == Filter.ANCIENT){
 				 if(reads)

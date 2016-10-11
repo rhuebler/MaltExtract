@@ -154,7 +154,8 @@ public class RMA6OutputProcessor {
 				else
 					part1 += part2 + "\t" + 0;
 				misMatches.add(part1);
-				if((behave == Filter.ALL && reads )|| (behave == Filter.ANCIENT && reads)){
+				if((behave == Filter.ALL && reads )|| (behave == Filter.ANCIENT && reads)
+						|| (behave == Filter.NON && reads)){
 					writeBlastHits(id,taxProcessor.getReads());
 				}
 			} catch (InterruptedException | ExecutionException e) {

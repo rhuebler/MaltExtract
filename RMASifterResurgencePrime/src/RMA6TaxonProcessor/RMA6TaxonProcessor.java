@@ -45,6 +45,9 @@ public RMA6TaxonProcessor(Integer id, double pID, NCBI_MapReader reader, boolean
 	this.warning = warning;
 }
 //setters
+protected void setReads(ArrayList<String> list){
+	this.readList = list;
+}
 protected void setSubstitutionMap(HashMap<Integer,Integer> map){
 	this.substitutionMap = map;
 }

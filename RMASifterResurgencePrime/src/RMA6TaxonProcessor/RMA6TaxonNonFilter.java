@@ -22,14 +22,20 @@ import megan.rma6.ReadBlockGetterRMA6;
  *
  */
 public class RMA6TaxonNonFilter  extends RMA6TaxonProcessor{
+	protected boolean wantReads = false;
 	public RMA6TaxonNonFilter(Integer id, double pID, NCBI_MapReader reader, boolean v, Logger log, Logger warning) {
 		super(id, pID, reader, v, log, warning);
 		// TODO Auto-generated constructor stub
 	}
-
+	public RMA6TaxonNonFilter(int id ,double pID, NCBI_MapReader reader,
+			boolean v,Logger log, Logger warning, boolean reads) {
+		super(id,pID, reader, v, log, warning);
+		this.wantReads =reads;
+	}
 	public void process(String inDir, String fileName, double topPercent, int maxLength){ 
 		ArrayList<Integer> distances = new ArrayList<Integer>();
 		ArrayList<Double> pIdents = new ArrayList<Double>();
+		ArrayList<String> lines = new ArrayList<String>();
 		HashMap<Integer,Integer> misMap = new HashMap<Integer,Integer>();
 		HashMap<Integer,Integer> substitutionMap = new HashMap<Integer,Integer>();
 		this.taxName = getName(taxID);
@@ -75,6 +81,15 @@ public class RMA6TaxonNonFilter  extends RMA6TaxonProcessor{
 						al.setPIdent(blocks[i].getPercentIdentity());
 							
 						if(minPIdent <= al.getPIdent()){ // check for minPercentIdentity
+							if(wantReads){
+								String name = getName(blocks[i].getTaxonId());
+								
+								lines.add(al.getReadName()+"\t"+"Length:\t"+al.getReadLength()+"\t");
+								lines.add(name+"\t"+al.getAccessionNumber()+"\t"+"Start:\t"+al.getStart()+"\t"+"End:\t"+al.getEnd());
+								lines.add("Q:\t"+al.getQuery());
+								lines.add("A:\t"+al.getAlignment());
+								lines.add("R:\t"+al.getReference()+"\n");
+							}
 							//get mismatches
 							HashMap<Integer, String> map=al.getMismatches();
 							if(map != null && al.getMlength() >= 20){//get mismatches per position
@@ -143,6 +158,7 @@ public class RMA6TaxonNonFilter  extends RMA6TaxonProcessor{
 				setNumberOfMatches(numReads);
 				setEditDistanceHistogram(distances);
 				setPercentIdentityHistogram(pIdents);
+				setReads(lines);
 				rma6File.close();
 		     }//else
 			}catch(Exception e){
