@@ -127,8 +127,8 @@ protected void setNumMatches(int matches){
 //getters
 protected String getName(int taxId){
 	String name;
-	if(mapReader.getNcbiIdToNameMap().get(taxID) != null)
-		name = mapReader.getNcbiIdToNameMap().get(taxID).replace(' ', '_');
+	if(mapReader.getNcbiIdToNameMap().get(taxId) != null)
+		name = mapReader.getNcbiIdToNameMap().get(taxId).replace(' ', '_');
 	else
 		name = "unassignedName";
 	return name;

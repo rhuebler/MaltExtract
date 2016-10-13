@@ -16,6 +16,7 @@ import NCBI_MapReader.NCBI_MapReader;
 import NCBI_MapReader.NCBI_TreeReader;
 import RMA6Processor.ConcurrentRMA6Processor;
 import RMA6Processor.ConcurrentRMA6Scanner;
+import RMA6Processor.RMA6BlastCrawler;
 import RMA6Processor.RMA6Processor;
 import RMA6Processor.RMA6Scanner;
 import behaviour.Filter;
@@ -90,7 +91,7 @@ public class RMAExtractor {
 		executor=(ThreadPoolExecutor) Executors.newFixedThreadPool(inProcessor.getNumThreads());//intialize concurrent thread executor 
 		log.log(Level.INFO, "Setting up Phylogenetic Tree");
 		NCBI_TreeReader treeReader = new NCBI_TreeReader(inProcessor.getTreePath());
-		if(inProcessor.getFilter() != Filter.SCAN){
+		if(inProcessor.getFilter() != Filter.SCAN  && !inProcessor.wantToCrawl()){
 			List<Future<RMA6Processor>> processedFiles = new ArrayList<>();
     		for(String fileName : inProcessor.getFileNames()){
     			File f = new File(fileName);
@@ -115,24 +116,30 @@ public class RMAExtractor {
 	    SummaryWriter sumWriter = new SummaryWriter(processedFiles,mapReader,inProcessor.getOutDir(), warning); 
 	    log.log(Level.INFO, "Writing Summary File");
 	    sumWriter.writeSummary();
-	  }else{
+	  }else if(inProcessor.getFilter() == Filter.SCAN && !inProcessor.wantToCrawl()){
 		  List<Future<RMA6Scanner>> scannerList = new ArrayList<Future<RMA6Scanner>>();
 		  // every tree has its own copy of this now to avoid concurrency issues
 		  for(String fileName : inProcessor.getFileNames()){
-			 try{
 			 File f = new File(fileName);
-			 ConcurrentRMA6Scanner task = new ConcurrentRMA6Scanner(f.getParentFile().getCanonicalFile()+"/",
+			 ConcurrentRMA6Scanner task = new ConcurrentRMA6Scanner(f.getParent()+"/",
 					 f.getName(),inProcessor.getTaxas(),taxIDs, treeReader, log, warning);
 			 Future<RMA6Scanner> future = executor.submit(task);
 			 scannerList.add(future);
-			 }catch(IOException io){
-				 warning.log(Level.SEVERE,"File not found",io);
-			 }
 		  }
 		  destroy();
 		  ScanSummaryWriter writer = new ScanSummaryWriter(scannerList, mapReader, warning);
 		  log.log(Level.INFO, "Writing Scan Summary File");
 		  writer.write(inProcessor.getOutDir());
+	  }else if(inProcessor.wantToCrawl()){
+		  for(String fileName : inProcessor.getFileNames()){
+			  File f = new File(fileName);
+			  for(int taxID:taxIDs){
+			  RMA6BlastCrawler crawler = new RMA6BlastCrawler(f.getParent(),f.getName(),mapReader.getNcbiIdToNameMap().get(taxID),
+					  inProcessor.getOutDir(),mapReader);
+			  crawler.process();
+			  }
+		  }	  
+		  log.log(Level.INFO, "Crawling Done");
 	  }
 		long endTime = System.nanoTime();
 		log.log(Level.INFO,"Runtime: "+ (endTime - startTime)/1000000000 +" Seconds");

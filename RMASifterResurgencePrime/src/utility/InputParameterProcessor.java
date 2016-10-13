@@ -49,6 +49,7 @@ public class InputParameterProcessor {
 	private Logger log;
 	private Logger warning;
 	private boolean reads = false;
+	private boolean crawl = false;
 	// constructor
 	public InputParameterProcessor(String[] params ,Logger log, Logger warning){
 		this.log = log;
@@ -93,6 +94,9 @@ public class InputParameterProcessor {
 	public boolean isVerbose(){
 		return this.verbose;
 	}
+	public boolean wantToCrawl(){
+		return this.crawl;
+	}
 	private void process(String[] parameters){	
 //		FilenameFilter RMAFilter = new FilenameFilter() {
 //	    	public boolean accept(File file, String name) {
@@ -120,6 +124,7 @@ public class InputParameterProcessor {
     	    Option option_Path = Option.builder("r").longOpt("resources").hasArg().optionalArg(true).desc("Path to NCBI tre and map File").build();
     	    Option option_Verbose = Option.builder("v").longOpt("verbose").optionalArg(true).desc("How much output should be printed to screen").build();
     	    Option option_Reads = Option.builder().longOpt("reads").optionalArg(true).desc("Output Blas Hits when filtering for ancient Reads").build();
+    	    Option option_Crawl = Option.builder().longOpt("crawl").optionalArg(true).desc("Find all Blast Hits Matching the Strains of Input Species").build();
     	    Options options = new Options();
     	    CommandLineParser parser = new DefaultParser();
 
@@ -137,6 +142,7 @@ public class InputParameterProcessor {
     	    options.addOption(option_Path);
     	    options.addOption(option_Verbose);
     	    options.addOption(option_Reads);
+    	    options.addOption(option_Crawl);
 
     	    try
     	    {
@@ -265,6 +271,9 @@ public class InputParameterProcessor {
     	        }
     	        if(commandLine.hasOption('v')){
     	        	this.verbose = true;
+    	        }
+    	        if(commandLine.hasOption("crawl")){
+    	        	this.crawl = true;
     	        }
     	        if((commandLine.hasOption("reads") && behave == Filter.ANCIENT)||
     	        	(commandLine.hasOption("reads") && behave == Filter.ALL)||
