@@ -8,6 +8,8 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import NCBI_MapReader.NCBI_MapReader;
 import RMAAlignment.Alignment;
@@ -32,13 +34,15 @@ public class RMA6BlastCrawler {
 	private String speciesName;
 	private NCBI_MapReader mapReader;
 	private String outDir;
+	private Logger warning;
 	private static ArrayList<String> summary= new ArrayList<String>();
-	public RMA6BlastCrawler(String dir, String name, String species, String out, NCBI_MapReader reader ){
+	public RMA6BlastCrawler(String dir, String name, String species, String out, NCBI_MapReader reader , Logger warning){
 		this.inDir = dir;
 		this.fileName = name;
 		this.speciesName = species;
 		this.mapReader = reader;
 		this.outDir = out;
+		this.warning = warning;
 	}
 	private void prepareMisMap(HashMap<Integer,Integer> misMap,HashMap<Integer,Integer> substitutionMap, String name, int numberOfMatches){
 		String part1 = name;
@@ -82,10 +86,10 @@ public class RMA6BlastCrawler {
 		summary.sort(null);
 		summary.add(0,header);
 	try{
-		Path file = Paths.get(outDir+fileName+speciesName.replace(' ', '_')+"_misMatch.txt");
+		Path file = Paths.get(outDir+"/crawlResults/"+fileName+speciesName.replace(' ', '_')+"_misMatch.txt");
 		Files.write(file, summary, Charset.forName("UTF-8"));
 	}catch(IOException io){
-		io.printStackTrace();
+		warning.log(Level.SEVERE,"Can't write File" ,io);
 	}
  
 }
@@ -100,7 +104,7 @@ public class RMA6BlastCrawler {
 		    }
 		    rma6File.close();
 		    }catch(IOException io){
-				io.printStackTrace();
+		    	warning.log(Level.SEVERE,"Can't write File" ,io);io.printStackTrace();
 			}
 		
 		return keys;
@@ -216,7 +220,7 @@ public class RMA6BlastCrawler {
 				classIt.close();
 				rma6File.close();
 			}catch(IOException io){
-				io.printStackTrace();
+				warning.log(Level.SEVERE,"Cannot locate or read File" ,io);
 			}
 		}// for all IDs
 		for(int key :collection.keySet())

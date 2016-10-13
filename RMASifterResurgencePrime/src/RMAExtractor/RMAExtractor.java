@@ -4,6 +4,7 @@ import java.io.File; //TODO rethink how to address different filters
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -14,6 +15,7 @@ import java.util.logging.Logger;
 
 import NCBI_MapReader.NCBI_MapReader;
 import NCBI_MapReader.NCBI_TreeReader;
+import RMA6Processor.ConcurrentRMA6Crawler;
 import RMA6Processor.ConcurrentRMA6Processor;
 import RMA6Processor.ConcurrentRMA6Scanner;
 import RMA6Processor.RMA6BlastCrawler;
@@ -76,6 +78,8 @@ public class RMAExtractor {
 		new File(inProcessor.getOutDir()+"/damageMismatch/").mkdirs();
 		if(inProcessor.getBlastHits())
 			new File(inProcessor.getOutDir()+"/reads/").mkdirs();
+		if(inProcessor.wantToCrawl())
+			new File(inProcessor.getOutDir()+"/crawlResults/").mkdirs();
 		List<Integer> taxIDs= new  ArrayList<Integer>();
 		
 		if(inProcessor.getTaxas() == Taxas.USER){
@@ -133,13 +137,25 @@ public class RMAExtractor {
 	  }else if(inProcessor.wantToCrawl()){
 		  for(String fileName : inProcessor.getFileNames()){
 			  File f = new File(fileName);
+			  log.log(Level.INFO, "Crawl for file " + fileName);
 			  for(int taxID:taxIDs){
-			  RMA6BlastCrawler crawler = new RMA6BlastCrawler(f.getParent(),f.getName(),mapReader.getNcbiIdToNameMap().get(taxID),
-					  inProcessor.getOutDir(),mapReader);
-			  crawler.process();
+			  ConcurrentRMA6Crawler crawler = new ConcurrentRMA6Crawler(f.getParent()+"/",f.getName(),
+					  mapReader.getNcbiIdToNameMap().get(taxID),
+					  inProcessor.getOutDir(),mapReader, warning);
+			  Future<RMA6BlastCrawler> future =  executor.submit(crawler);
+			  try {
+				future.get();
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (ExecutionException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 			  }
 		  }	  
 		  log.log(Level.INFO, "Crawling Done");
+		  destroy();
 	  }
 		long endTime = System.nanoTime();
 		log.log(Level.INFO,"Runtime: "+ (endTime - startTime)/1000000000 +" Seconds");
