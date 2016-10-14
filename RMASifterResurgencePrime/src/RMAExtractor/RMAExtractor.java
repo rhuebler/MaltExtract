@@ -82,11 +82,13 @@ public class RMAExtractor {
 			new File(inProcessor.getOutDir()+"/crawlResults/").mkdirs();
 		List<Integer> taxIDs= new  ArrayList<Integer>();
 		
+		NCBI_TreeReader treeReader = new NCBI_TreeReader(inProcessor.getTreePath());
 		if(inProcessor.getTaxas() == Taxas.USER){
 			for(String name : inProcessor.getTaxNames()){
-				if(mapReader.getNcbiNameToIdMap().get(name) != null)// catch if there is a mistake
+				if(mapReader.getNcbiNameToIdMap().get(name) != null){// catch if there is a mistake
 					taxIDs.add(mapReader.getNcbiNameToIdMap().get(name));
-				else{
+					treeReader.getParents(mapReader.getNcbiNameToIdMap().get(name));
+				}else{
 					warning.log(Level.SEVERE, name + " has no assigned taxID and cannot be processed!");
 				}
 			}
@@ -94,7 +96,8 @@ public class RMAExtractor {
 		
 		executor=(ThreadPoolExecutor) Executors.newFixedThreadPool(inProcessor.getNumThreads());//intialize concurrent thread executor 
 		log.log(Level.INFO, "Setting up Phylogenetic Tree");
-		NCBI_TreeReader treeReader = new NCBI_TreeReader(inProcessor.getTreePath());
+		
+		
 		if(inProcessor.getFilter() != Filter.SCAN  && !inProcessor.wantToCrawl()){
 			List<Future<RMA6Processor>> processedFiles = new ArrayList<>();
     		for(String fileName : inProcessor.getFileNames()){
@@ -141,7 +144,7 @@ public class RMAExtractor {
 			  for(int taxID:taxIDs){
 			  ConcurrentRMA6Crawler crawler = new ConcurrentRMA6Crawler(f.getParent()+"/",f.getName(),
 					  mapReader.getNcbiIdToNameMap().get(taxID),
-					  inProcessor.getOutDir(),mapReader, warning);
+					  inProcessor.getOutDir(),mapReader, warning, treeReader);
 			  Future<RMA6BlastCrawler> future =  executor.submit(crawler);
 			  try {
 				future.get();

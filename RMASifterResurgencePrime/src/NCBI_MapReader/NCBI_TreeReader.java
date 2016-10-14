@@ -80,4 +80,15 @@ public class NCBI_TreeReader {
 		    }	
 			return children;
 		}
+		public ArrayList<Integer>  getParents(int target){
+			ArrayList<Integer> ids = new ArrayList<Integer>();
+			ids.add(target);
+			int id = target;
+			for(int i = 0; i<ph.getNode(String.valueOf(target)).calculateDepth();i++){
+				PhylogenyNode t = ph.getNode(String.valueOf(id)).getParent();
+				id = Integer.parseInt(t.getName());
+				ids.add(id);
+			}
+			return ids;
+		}
 }

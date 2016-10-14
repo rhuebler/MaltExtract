@@ -7,11 +7,13 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import NCBI_MapReader.NCBI_MapReader;
+import NCBI_MapReader.NCBI_TreeReader;
 import RMAAlignment.Alignment;
 import jloda.util.ListOfLongs;
 import megan.data.IMatchBlock;
@@ -35,14 +37,16 @@ public class RMA6BlastCrawler {
 	private NCBI_MapReader mapReader;
 	private String outDir;
 	private Logger warning;
-	private static ArrayList<String> summary= new ArrayList<String>();
-	public RMA6BlastCrawler(String dir, String name, String species, String out, NCBI_MapReader reader , Logger warning){
+	private ArrayList<String> summary= new ArrayList<String>();
+	private NCBI_TreeReader treeReader;
+	public RMA6BlastCrawler(String dir, String name, String species, String out, NCBI_MapReader reader ,Logger warning,NCBI_TreeReader treeReader){
 		this.inDir = dir;
 		this.fileName = name;
 		this.speciesName = species;
 		this.mapReader = reader;
 		this.outDir = out;
 		this.warning = warning;
+		this.treeReader = new NCBI_TreeReader(treeReader);
 	}
 	private void prepareMisMap(HashMap<Integer,Integer> misMap,HashMap<Integer,Integer> substitutionMap, String name, int numberOfMatches){
 		String part1 = name;
@@ -86,7 +90,7 @@ public class RMA6BlastCrawler {
 		summary.sort(null);
 		summary.add(0,header);
 	try{
-		Path file = Paths.get(outDir+"/crawlResults/"+fileName+speciesName.replace(' ', '_')+"_misMatch.txt");
+		Path file = Paths.get(outDir+"/crawlResults/"+fileName+"_"+speciesName.replace(' ', '_')+"_misMatch.txt");
 		Files.write(file, summary, Charset.forName("UTF-8"));
 	}catch(IOException io){
 		warning.log(Level.SEVERE,"Can't write File" ,io);
@@ -111,8 +115,13 @@ public class RMA6BlastCrawler {
 	}
 	public void process(){
 		HashMap<Integer, StrainMap> collection = new HashMap<Integer, StrainMap>();
-		mapReader = new NCBI_MapReader("/Users/huebler/git/RMA6Sifter/RMASifterResurgencePrime/resources/");
-		for(Integer id : getAllKeys(inDir+fileName)){
+		HashSet<Integer> idsToProcess = new HashSet<Integer>();
+		int taxID = mapReader.getNcbiNameToIdMap().get(speciesName);
+		idsToProcess.add(taxID);
+		for(Integer id : treeReader.getStrains(taxID, getAllKeys(inDir+fileName)))
+				idsToProcess.add(id);
+		idsToProcess.addAll(treeReader.getParents(taxID));
+		for(Integer id : idsToProcess){
 			try(RMA6File rma6File = new RMA6File(inDir+fileName, "r")){
 				ListOfLongs list = new ListOfLongs();
 				Long location = rma6File.getFooterSectionRMA6().getStartClassification("Taxonomy");
@@ -215,7 +224,7 @@ public class RMA6BlastCrawler {
 											collection.put(blocks[i].getTaxonId(), strain);
 											}//else
 										}//if
-							}// other for 	//matches
+						}// other for 	//matches
 				}	
 				classIt.close();
 				rma6File.close();
@@ -223,7 +232,7 @@ public class RMA6BlastCrawler {
 				warning.log(Level.SEVERE,"Cannot locate or read File" ,io);
 			}
 		}// for all IDs
-		for(int key :collection.keySet())
+		for(int key :collection.keySet())// write output here 
 			prepareMisMap(collection.get(key).getMisMap(),collection.get(key).getSubstitutionMap(),
 					collection.get(key).getName(),collection.get(key).getNumberOfMatches());
 		writeMisMap(summary);
