@@ -166,25 +166,30 @@ public class RMA6BlastCrawler {
 																	substitutionMap.put(l, 1);
 															}
 													}else{
-														if(map.containsKey(al.getMlength()+l-20))// get G>A at appropropriate end
+														if(map.containsKey(al.getMlength()+l-20)){// get G>A at appropropriate end
 															if(map.get(al.getMlength()+l-20).equals("G>A")){
+																
 																if(misMap.containsKey(l))
 																	misMap.replace(l, misMap.get(l)+1);
 																else	
 																	misMap.put(l, 1);
-															}else if(!map.get(al.getMlength()+l-20).contains("[Nn-]+")){//get all others
+															}else if(!map.get(al.getMlength()+l-20).contains("[Nn-]+") ){//get all others
 																if(substitutionMap.containsKey(l))
 																	substitutionMap.replace(l, substitutionMap.get(l)+1);
 																else
 																	substitutionMap.put(l, 1);
 															}
+															
+														}
 														}//else
 													}//for
 												}//if Map != Null
+										
 										strain.setMisMap(misMap);
 										strain.setSubstitutionMap(substitutionMap);
 										strain.setNumberOfMatches(strain.getNumberOfMatches()+1);
 										collection.replace(blocks[i].getTaxonId(), strain);
+							
 									}else{
 										HashMap<Integer,Integer> misMap = new HashMap<Integer,Integer>();
 										HashMap<Integer,Integer> substitutionMap = new HashMap<Integer,Integer>();
@@ -197,7 +202,7 @@ public class RMA6BlastCrawler {
 																misMap.replace(l, misMap.get(l)+1);
 															else	
 																misMap.put(l, 1);	
-															}else if(!map.get(l).contains("[Nn-]+")){//get all others
+															}else if(!map.get(l).contains("[Nn-]+") ){//get all others
 																if(substitutionMap.containsKey(l))
 																	substitutionMap.replace(l, substitutionMap.get(l)+1);
 																else
@@ -219,6 +224,7 @@ public class RMA6BlastCrawler {
 														}
 													}//for
 												}//if Map != Null
+											
 											StrainMap strain = new StrainMap(mapReader.getNcbiIdToNameMap().get(blocks[i].getTaxonId()),
 													misMap, substitutionMap,1);
 											collection.put(blocks[i].getTaxonId(), strain);
@@ -229,7 +235,7 @@ public class RMA6BlastCrawler {
 				classIt.close();
 				rma6File.close();
 			}catch(IOException io){
-				warning.log(Level.SEVERE,"Cannot locate or read File" ,io);
+				warning.log(Level.SEVERE,"Can not locate or read File" ,io);
 			}
 		}// for all IDs
 		for(int key :collection.keySet())// write output here 
