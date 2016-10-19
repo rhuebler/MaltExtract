@@ -2,6 +2,7 @@ package NCBI_MapReader;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Scanner;
 import java.util.Set;
 
@@ -57,28 +58,31 @@ public class NCBI_TreeReader {
 				assigned.add(key);
 		return assigned;
 	} 
-		public ArrayList<Integer> getStrains(int target, Set<Integer> keys){
-	    ArrayList<Integer> children = new  ArrayList<Integer>();
-	    for(PhylogenyNode test : ph.getNode(String.valueOf(target)).getDescendants()){ // works in principal but would have to analyze a lot of nodes for it to work.... is there a smaller tre file ?
-	      
-	    	children.add(Integer.parseInt(test.getName()));// so what if I follow Nodes to leaf and see if any thing is assinged there? 
-	    	for (PhylogenyNode t : test.getDescendants()) {// should i solve this here? if in keys do something to get strain IDs and numbers 
-	    		 children.add(Integer.parseInt(t.getName()));
-			}
+		private ArrayList<Integer> getStrains(ArrayList<Integer>children, int target, Set<Integer> keys){
+			ArrayList<Integer> targets = new  ArrayList<Integer>();
+	    for(int child : children ){ // works in principal but would have to analyze a lot of nodes for it to work.... is there a smaller tre file ?
+	    		if(child != target)
+	    		 targets.add(Integer.parseInt(ph.getNode(String.valueOf(child)).getParent().getName()));
 	    }	
-	    return  getAssigned(children,keys);
+	    return  getAssigned(targets,keys);
 	    
 	}
-		public ArrayList<Integer> getAllStrains(int target){
-			ArrayList<Integer> children = new  ArrayList<Integer>();
-		    for(PhylogenyNode test : ph.getNode(String.valueOf(target)).getDescendants()){ // works in principal but would have to analyze a lot of nodes for it to work.... is there a smaller tre file ?
-		      
-		    	children.add(Integer.parseInt(test.getName()));// so what if I follow Nodes to leaf and see if any thing is assinged there? 
-		    	for (PhylogenyNode t : test.getDescendants()) {// should i solve this here? if in keys do something to get strain IDs and numbers 
-		    		 children.add(Integer.parseInt(t.getName()));
-				}
-		    }	
-			return children;
+		public ArrayList<Integer> getAllStrains(int target, Set<Integer> keys){// maybe it is more efficient to follow the root up
+			ArrayList<Integer> children = new ArrayList<Integer>();
+			int maxDepth = 0;
+		    for(PhylogenyNode test : ph.getNode(String.valueOf(target)).getAllDescendants()){ // works in principal but would have to analyze a lot of nodes for it to work.... is there a smaller tre file ?
+		      if(maxDepth < test.calculateDepth())
+		    	  maxDepth = test.calculateDepth();
+		      	children.add(Integer.parseInt(test.getName()));
+		    }
+		    children = getAssigned(children,keys);
+		    ArrayList<Integer> positions = new  ArrayList<Integer>();
+		    positions.addAll(children);
+		    for(int i = 0;i< maxDepth-ph.getNode(String.valueOf(target)).calculateDepth();i++){
+		    	positions = getStrains(positions, target, keys);
+		    	children.addAll(positions);
+		    }
+			return getAssigned(children,keys);
 		}
 		public ArrayList<Integer>  getParents(int target){
 			ArrayList<Integer> ids = new ArrayList<Integer>();
@@ -89,6 +93,7 @@ public class NCBI_TreeReader {
 				id = Integer.parseInt(t.getName());
 				ids.add(id);
 			}
+			
 			return ids;
 		}
 }

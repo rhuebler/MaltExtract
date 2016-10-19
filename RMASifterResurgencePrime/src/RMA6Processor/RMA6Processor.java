@@ -148,7 +148,7 @@ public void process(List<Integer>taxIDs, double topPercent) {// processing
 	if(taxas == Taxas.USER){
 		for(Integer taxID : taxIDs){
 			idsToProcess.add(taxID);
-			for(Integer id : treeReader.getStrains(taxID, keys))
+			for(Integer id : treeReader.getAllStrains(taxID, keys))
 				if(!taxIDs.contains(id))
 					idsToProcess.add(id);
 		}

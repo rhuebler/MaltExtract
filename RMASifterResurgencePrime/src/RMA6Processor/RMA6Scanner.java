@@ -81,7 +81,7 @@ public class RMA6Scanner {
 		        	Set<Integer> idsToProcess = new HashSet<Integer>();
 		        	for(Integer taxID : taxIDs){
 		        		idsToProcess.add(taxID);
-		        		for(Integer id : treeReader.getStrains(taxID, cl.getKeySet()))
+		        		for(Integer id : treeReader.getAllStrains(taxID, cl.getKeySet()))
 		        			if(!taxIDs.contains(id))
 		        				idsToProcess.add(id);
 		        	}

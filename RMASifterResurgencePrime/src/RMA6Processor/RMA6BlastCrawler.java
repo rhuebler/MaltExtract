@@ -118,7 +118,7 @@ public class RMA6BlastCrawler {
 		HashSet<Integer> idsToProcess = new HashSet<Integer>();
 		int taxID = mapReader.getNcbiNameToIdMap().get(speciesName);
 		idsToProcess.add(taxID);
-		for(Integer id : treeReader.getStrains(taxID, getAllKeys(inDir+fileName)))
+		for(Integer id : treeReader.getAllStrains(taxID, getAllKeys(inDir+fileName)))
 				idsToProcess.add(id);
 		idsToProcess.addAll(treeReader.getParents(taxID));
 		for(Integer id : idsToProcess){
