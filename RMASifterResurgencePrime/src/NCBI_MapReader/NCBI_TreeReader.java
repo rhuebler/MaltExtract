@@ -2,6 +2,7 @@ package NCBI_MapReader;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Scanner;
 import java.util.Set;
@@ -24,6 +25,7 @@ public class NCBI_TreeReader {
 	 */
 	private String treName= "/projects1/clusterhomes/huebler/RMASifter/RMA_Extractor_Resources/ncbi.tre";//TODO how to provide System resources make relativistic
 	int target;
+	private HashSet<Integer> positionsToKeep = new HashSet<Integer>();
 	private Phylogeny ph;
 	public NCBI_TreeReader(){
 		try(Scanner in = new Scanner(new File(treName))){
@@ -51,38 +53,51 @@ public class NCBI_TreeReader {
 	private Phylogeny getPhylogeny(){
 		return ph;
 	}
-	private ArrayList<Integer> getAssigned( ArrayList<Integer> children,Set<Integer> keys){
+	private ArrayList<Integer> getAssigned( Collection<Integer> children,Set<Integer> keys){
 		ArrayList<Integer> assigned = new ArrayList<Integer>();
 		for(int key : keys)
 			if(children.contains(key))
 				assigned.add(key);
 		return assigned;
 	} 
-		private ArrayList<Integer> getStrains(ArrayList<Integer>children, int target, Set<Integer> keys){
-			ArrayList<Integer> targets = new  ArrayList<Integer>();
-	    for(int child : children ){ // works in principal but would have to analyze a lot of nodes for it to work.... is there a smaller tre file ?
-	    		if(child != target)
-	    		 targets.add(Integer.parseInt(ph.getNode(String.valueOf(child)).getParent().getName()));
+		private ArrayList<Integer> getStrains(ArrayList<Integer>children, Set<Integer> keys){
+			ArrayList<Integer> first = new  ArrayList<Integer>();
+			ArrayList<Integer> second = new  ArrayList<Integer>();
+	    for(int child : children ){
+	    		for(PhylogenyNode grandChild : ph.getNode(String.valueOf(child)).getDescendants()){
+	    			first.add(Integer.parseInt(grandChild.getName()));
+	    			for(PhylogenyNode greatGrandChild:grandChild.getDescendants()){
+	    			second.add(Integer.parseInt(greatGrandChild.getName()));
+	    			}
+	    		}	
+	    		
 	    }	
-	    return  getAssigned(targets,keys);
+	    positionsToKeep.addAll(getAssigned(children,keys));
+	    first.addAll(second);
+	    return  getAssigned(first,keys);
 	    
 	}
-		public ArrayList<Integer> getAllStrains(int target, Set<Integer> keys){// maybe it is more efficient to follow the root up
+		public ArrayList<Integer> getAllStrains(int target, Set<Integer> keys){
 			ArrayList<Integer> children = new ArrayList<Integer>();
 			int maxDepth = 0;
-		    for(PhylogenyNode test : ph.getNode(String.valueOf(target)).getAllDescendants()){ // works in principal but would have to analyze a lot of nodes for it to work.... is there a smaller tre file ?
+		    for(PhylogenyNode test : ph.getNode(String.valueOf(target)).getAllExternalDescendants()){
 		      if(maxDepth < test.calculateDepth())
 		    	  maxDepth = test.calculateDepth();
-		      	children.add(Integer.parseInt(test.getName()));
 		    }
-		    children = getAssigned(children,keys);
+		    for(PhylogenyNode test : ph.getNode(String.valueOf(target)).getDescendants()){
+		    	children.add(Integer.parseInt(test.getName()));
+		    }
+		    
 		    ArrayList<Integer> positions = new  ArrayList<Integer>();
 		    positions.addAll(children);
-		    for(int i = 0;i< maxDepth-ph.getNode(String.valueOf(target)).calculateDepth();i++){
-		    	positions = getStrains(positions, target, keys);
-		    	children.addAll(positions);
+		    for(int i = 0;i< (maxDepth-ph.getNode(String.valueOf(target)).calculateDepth())/3;i++){
+		    	positions = getStrains(positions, keys);
 		    }
-			return getAssigned(children,keys);
+		    positionsToKeep.addAll(getAssigned(positions,keys));
+		    System.out.println(positionsToKeep.size());
+		   children.clear();
+		    children.addAll(positionsToKeep);
+			return children;
 		}
 		public ArrayList<Integer>  getParents(int target){
 			ArrayList<Integer> ids = new ArrayList<Integer>();
