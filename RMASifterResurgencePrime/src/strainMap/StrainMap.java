@@ -3,38 +3,30 @@ import java.util.HashMap;
 
 public class StrainMap {
 	/**
-	 * containter of Strain Map and Mismatches
+	 * containter of StrainMisMatchContainer for one strain
 	 */
 	private String name;
-	private HashMap<Integer,Integer> misMap;
-	private HashMap<Integer,Integer> substitutionMap;
+	private StrainMisMatchContainer container;
 	private int numMatches;
 	
 	//constructor
-	public StrainMap(String s,HashMap<Integer,Integer> m,HashMap<Integer,Integer> sub, int n){
+	public StrainMap(String s,StrainMisMatchContainer container, int n){
 		this.name = s;
-		this.misMap = m;
+		this.container = container;
 		this.numMatches = n;
-		this.substitutionMap = sub;
 		
 	}
 	//setters
-	public void setMisMap(HashMap<Integer,Integer> m){
-		this.misMap = m;
-	}
-	public void setSubstitutionMap(HashMap<Integer,Integer> m){
-		this.substitutionMap = m;
+	public void setStrainMisMatchContainer(StrainMisMatchContainer container){
+		this.container = container;
 	}
 	public void setNumberOfMatches(int n){
 		this.numMatches = n;
 	}
 	
 	// getters
-	public HashMap<Integer,Integer> getMisMap(){
-		return this.misMap;
-	}
-	public HashMap<Integer,Integer> getSubstitutionMap(){
-		return this.substitutionMap;
+	public StrainMisMatchContainer getStrainMisMatchContainer(){
+		return this.container;
 	}
 	public String getName(){
 		return this.name;
@@ -43,16 +35,20 @@ public class StrainMap {
 		return this.numMatches;
 	}
 	public String getLine(){ // process Map Into Damage Output Line
+		container.processMisMatches();
+		HashMap<Integer,Double> damage = container.getDamage(); 
+		HashMap<Integer,Double> noise =container.getNoise();
+		
 		String part1 = name;
 		String part2 = "";
 		for(int i = 0;i < 20; i++){
-			if(misMap.containsKey(i)){
-				part1 += "\t" + misMap.get(i);
+			if(damage.containsKey(i)){
+				part1 += "\t" + damage.get(i);
 			}else{	
 				part1 += "\t" + 0;	
 			}
-			if(substitutionMap.containsKey(i)){
-				part2 += "\t" + substitutionMap.get(i);
+			if(noise.containsKey(i)){
+				part2 += "\t" + noise.get(i);
 			}else{
 				part2 += "\t" + 0;
 			}	

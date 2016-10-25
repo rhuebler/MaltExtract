@@ -24,6 +24,7 @@ import megan.rma6.ClassificationBlockRMA6;
 import megan.rma6.RMA6File;
 import megan.rma6.ReadBlockGetterRMA6;
 import strainMap.StrainMap;
+import strainMap.StrainMisMatchContainer;
 
 public class RMA6BlastCrawler {
 	/**
@@ -47,24 +48,6 @@ public class RMA6BlastCrawler {
 		this.outDir = out;
 		this.warning = warning;
 		this.treeReader = new NCBI_TreeReader(treeReader);
-	}
-	private void prepareMisMap(HashMap<Integer,Integer> misMap,HashMap<Integer,Integer> substitutionMap, String name, int numberOfMatches){
-		String part1 = name;
-		String part2 = "";
-		for(int i = 0;i < 20; i++){
-			if(misMap.containsKey(i)){
-				part1 += "\t" + misMap.get(i);
-			}else{	
-				part1 += "\t" + 0;	
-			}
-			if(substitutionMap.containsKey(i)){
-				part2 += "\t" + substitutionMap.get(i);
-			}else{
-				part2 += "\t" + 0;
-			}	
-		}
-		part1 += part2 + "\t" + numberOfMatches;
-		summary.add(part1);
 	}
 	private String getName(int taxId){
 		String name;
@@ -145,89 +128,20 @@ public class RMA6BlastCrawler {
 				
 									Alignment al = new Alignment();
 									al.processText(blocks[i].getText().split("\n"));
-									HashMap<Integer, String> map=al.getMismatches();
 									if(collection.containsKey(blocks[i].getTaxonId())){
 										StrainMap strain = collection.get(blocks[i].getTaxonId());
-										HashMap<Integer,Integer> misMap = strain.getMisMap();
-										HashMap<Integer,Integer> substitutionMap = strain.getSubstitutionMap();
-										if(map != null && al.getMlength() >= 20){//get mismatches per position
-											for(int l = 0; l< 20; l++){
-												if(l < 10){
-													if(map.containsKey(l))
-														if(map.get(l).equals("C>T")){// get C>T at appropropriate end
-															if(misMap.containsKey(l))
-																misMap.replace(l, misMap.get(l)+1);
-															else	
-																misMap.put(l, 1);	
-															}else if(!map.get(l).contains("[Nn-]+")){//get all others
-																if(substitutionMap.containsKey(l))
-																	substitutionMap.replace(l, substitutionMap.get(l)+1);
-																else
-																	substitutionMap.put(l, 1);
-															}
-													}else{
-														if(map.containsKey(al.getMlength()+l-20)){// get G>A at appropropriate end
-															if(map.get(al.getMlength()+l-20).equals("G>A")){
-																
-																if(misMap.containsKey(l))
-																	misMap.replace(l, misMap.get(l)+1);
-																else	
-																	misMap.put(l, 1);
-															}else if(!map.get(al.getMlength()+l-20).contains("[Nn-]+") ){//get all others
-																if(substitutionMap.containsKey(l))
-																	substitutionMap.replace(l, substitutionMap.get(l)+1);
-																else
-																	substitutionMap.put(l, 1);
-															}
-															
-														}
-														}//else
-													}//for
-												}//if Map != Null
-										
-										strain.setMisMap(misMap);
-										strain.setSubstitutionMap(substitutionMap);
+										StrainMisMatchContainer container =	strain.getStrainMisMatchContainer();
+										container.processAlignment(al);
+										strain.setStrainMisMatchContainer(container);
 										strain.setNumberOfMatches(strain.getNumberOfMatches()+1);
 										collection.replace(blocks[i].getTaxonId(), strain);
 							
 									}else{
-										HashMap<Integer,Integer> misMap = new HashMap<Integer,Integer>();
-										HashMap<Integer,Integer> substitutionMap = new HashMap<Integer,Integer>();
-										if(map != null && al.getMlength() >= 20){//get mismatches per position
-											for(int l = 0; l< 20; l++){
-												if(l < 10){
-													if(map.containsKey(l))
-														if(map.get(l).equals("C>T")){// get C>T at appropropriate end
-															if(misMap.containsKey(l))
-																misMap.replace(l, misMap.get(l)+1);
-															else	
-																misMap.put(l, 1);	
-															}else if(!map.get(l).contains("[Nn-]+") ){//get all others
-																if(substitutionMap.containsKey(l))
-																	substitutionMap.replace(l, substitutionMap.get(l)+1);
-																else
-																	substitutionMap.put(l, 1);
-															}
-													}else{
-														if(map.containsKey(al.getMlength()+l-20))// get G>A at appropropriate end
-															if(map.get(al.getMlength()+l-20).equals("G>A")){
-																if(misMap.containsKey(l))
-																	misMap.replace(l, misMap.get(l)+1);
-																else	
-																	misMap.put(l, 1);
-															}else if(!map.get(al.getMlength()+l-20).contains("[Nn-]+")){//get all others
-																if(substitutionMap.containsKey(l))
-																	substitutionMap.replace(l, substitutionMap.get(l)+1);
-																else
-																	substitutionMap.put(l, 1);
-															}
-														}
-													}//for
-												}//if Map != Null
-											
-											StrainMap strain = new StrainMap(mapReader.getNcbiIdToNameMap().get(blocks[i].getTaxonId()),
-													misMap, substitutionMap,1);
-											collection.put(blocks[i].getTaxonId(), strain);
+										StrainMisMatchContainer container = new StrainMisMatchContainer();
+										container.processAlignment(al);
+										StrainMap strain = new StrainMap(mapReader.getNcbiIdToNameMap().get(blocks[i].getTaxonId()),
+										container,1);
+										collection.put(blocks[i].getTaxonId(), strain);
 											}//else
 										}//if
 						}// other for 	//matches
@@ -238,9 +152,10 @@ public class RMA6BlastCrawler {
 				warning.log(Level.SEVERE,"Can not locate or read File" ,io);
 			}
 		}// for all IDs
-		for(int key :collection.keySet())// write output here 
-			prepareMisMap(collection.get(key).getMisMap(),collection.get(key).getSubstitutionMap(),
-					collection.get(key).getName(),collection.get(key).getNumberOfMatches());
+		for(int key :collection.keySet()){// write output here 
+		summary.add(collection.get(key).getLine());
+		}
+		
 		writeMisMap(summary);
 	}
 }

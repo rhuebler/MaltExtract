@@ -17,6 +17,8 @@ import megan.data.ReadBlockIterator;
 import megan.rma6.ClassificationBlockRMA6;
 import megan.rma6.RMA6File;
 import megan.rma6.ReadBlockGetterRMA6;
+import strainMap.StrainMap;
+import strainMap.StrainMisMatchContainer;
 /**
  * Extract all information from one Taxon and save the information in the specified slots to be retrieved
  * in RMA6Processor this taxon processor only processes reads that have at least one match that hints at c-> end substitutions 
@@ -47,9 +49,8 @@ public void process(String inDir, String fileName, double topPercent, int maxLen
 	ArrayList<Integer> distances = new ArrayList<Integer>();
 	ArrayList<Double> pIdents = new ArrayList<Double>();
 	ArrayList<String> lines = new ArrayList<String>();
-	HashMap<Integer,Integer> misMap = new HashMap<Integer,Integer>();
-	HashMap<Integer,Integer> substitutionMap = new HashMap<Integer,Integer>();
-	int numMatches = 0;
+	int numberOfMatches = 0;
+	StrainMisMatchContainer container = new StrainMisMatchContainer();
 	// use ReadsIterator to get all Reads assigned to MegantaxID and print top percent to file;
 	try(RMA6File rma6File = new RMA6File(inDir+fileName, "r")){	
 		ListOfLongs list = new ListOfLongs();
@@ -69,8 +70,14 @@ public void process(String inDir, String fileName, double topPercent, int maxLen
 			setReadDistribution(new CompositionMap(new HashMap<Integer,ArrayList<Alignment>>()));
 			setPercentIdentityHistogram(pIdents);
 			setEditDistanceHistogram(distances);
-			setNumberOfMatches(0);	
+			setNumberOfReads(0);	
 			setReads(lines);
+			
+			String s = taxName;
+			for(int i = 0;i<=40;i++){
+				s+="\t"+0;
+			}
+			setDamageLine(s);
 		}else{
 			if(verbose)
 				log.log(Level.INFO,"Processing Taxon "+ taxName + " in File " + fileName); 
@@ -96,42 +103,11 @@ public void process(String inDir, String fileName, double topPercent, int maxLen
 					al.setReadLength(current.getReadLength());
 					al.setAcessionNumber(blocks[i].getRefSeqId());
 					if(al.getFivePrimeDamage() && minPIdent <= al.getPIdent()){
+						numberOfMatches++;
 						higher = true;
 						pIdent += blocks[i].getPercentIdentity();
 						//get mismatches
-						HashMap<Integer, String> map=al.getMismatches();
-						if(map != null && al.getMlength() >= 20){//get mismatches per position
-							numMatches++;
-							for(int l = 0; l< 20; l++){
-								if(l < 10){
-									if(map.containsKey(l))
-										if(map.get(l).equals("C>T")){
-											if(misMap.containsKey(l))
-												misMap.replace(l, misMap.get(l)+1);
-											else	
-												misMap.put(l, 1);	
-											}else if(!map.get(l).contains("[Nn-]+")){//get all others
-												if(substitutionMap.containsKey(l))
-													substitutionMap.replace(l, substitutionMap.get(l)+1);
-												else
-													substitutionMap.put(l, 1);
-											}
-								}else{
-									if(map.containsKey(al.getMlength()+l-20))
-										if(map.get(al.getMlength()+l-20).equals("G>A")){
-											if(misMap.containsKey(l))
-												misMap.replace(l, misMap.get(l)+1);
-											else	
-												misMap.put(l, 1);
-										}else if(!map.get(al.getMlength()+l-20).contains("[Nn-]+")){//get all others
-											if(substitutionMap.containsKey(l))
-												substitutionMap.replace(l, substitutionMap.get(l)+1);
-											else
-												substitutionMap.put(l, 1);
-										}
-									}
-								}//for
-							}// map != null		
+						container.processAlignment(al);
 						if(!taxonMap.containsKey(blocks[i].getTaxonId())){
 							ArrayList<Alignment> entry =new ArrayList<Alignment>();
 							entry.add(al);
@@ -165,15 +141,14 @@ public void process(String inDir, String fileName, double topPercent, int maxLen
 			}
 		}// while
 			classIt.close();
+			StrainMap strain = new StrainMap(taxName,container,numberOfMatches);
 			
 			CompositionMap map = new CompositionMap(taxonMap);
 			map.process();
 			
-			setSubstitutionMap(substitutionMap);
-			setMisMap(misMap);
-			setNumMatches(numMatches);
+			setDamageLine(strain.getLine());
 			setReadDistribution(map);
-			setNumberOfMatches(numReads);
+			setNumberOfReads(numReads);
 			setEditDistanceHistogram(distances);
 			setPercentIdentityHistogram(pIdents);
 			setReads(lines);

@@ -20,7 +20,7 @@ public class RMA6TaxonProcessor {
 	 * @return int numMatches, String readDistribution, HashMap EditDistance, HashMap Percent Identity
 	 */ 
 protected String taxName;	
-protected int numOfMatches;
+protected int numOfReads;
 protected String readDistribution;
 protected ArrayList<String> supplemantary;
 protected NCBI_MapReader mapReader;
@@ -32,8 +32,7 @@ protected boolean verbose;
 protected Logger log;
 protected Logger warning;
 protected ArrayList<String> readList;
-protected HashMap<Integer,Integer> misMap;
-protected HashMap<Integer,Integer> substitutionMap;
+protected String damageLine;
 protected int numMatches;
 //constructor
 public RMA6TaxonProcessor(Integer id, double pID, NCBI_MapReader reader, boolean v, Logger log, Logger warning){
@@ -48,8 +47,8 @@ public RMA6TaxonProcessor(Integer id, double pID, NCBI_MapReader reader, boolean
 protected void setReads(ArrayList<String> list){
 	this.readList = list;
 }
-protected void setSubstitutionMap(HashMap<Integer,Integer> map){
-	this.substitutionMap = map;
+protected void setDamageLine(String s){
+	this.damageLine = s;
 }
 protected void setReadDistribution(CompositionMap map){
 	DecimalFormat df = new DecimalFormat("#.###");
@@ -64,8 +63,8 @@ protected void setReadDistribution(CompositionMap map){
 	}
 }
 
-protected void setNumberOfMatches(int n){
-	this.numOfMatches=n;
+protected void setNumberOfReads(int n){
+	this.numOfReads=n;
 }
 protected void setEditDistanceHistogram(ArrayList<Integer> list){
 	HashMap<Integer,Integer> histo = new HashMap<Integer,Integer> ();
@@ -116,15 +115,16 @@ protected void setPercentIdentityHistogram(ArrayList<Double> list){
 	}
 	this.pIdentHistogram =  histo;
 }
-protected void setMisMap(HashMap<Integer,Integer>map){
-	this.misMap = map;
-}
+
 protected void setNumMatches(int matches){
 	this.numMatches = matches;
 }
 
 
 //getters
+public String getDamageLine(){
+	return this.damageLine;
+}
 protected String getName(int taxId){
 	String name;
 	if(mapReader.getNcbiIdToNameMap().get(taxId) != null)
@@ -133,28 +133,7 @@ protected String getName(int taxId){
 		name = "unassignedName";
 	return name;
 }
-public HashMap<Integer, Integer>getSubstitutionMap(){
-	if( substitutionMap != null){
-		int numMatches = this.numMatches;
-		substitutionMap.put(20, numMatches);
-		return this.substitutionMap;
-	}else{
-		HashMap<Integer,Integer> map = new HashMap<Integer,Integer>();
-		map.put(0, 0);
-		return map;
-	}
-	
-}
-public HashMap<Integer, Integer>getMisMap(){
-	if( misMap!=null){
-		return this.misMap;
-	}else{
-		HashMap<Integer,Integer> map = new HashMap<Integer,Integer>();
-		map.put(0, 0);
-		return map;
-	}
-	
-}
+
 public ArrayList<String> getReads(){
 	return this.readList;
 }
@@ -180,8 +159,8 @@ protected double getGcContent(String sequence){
 	return gcContent;
 }
 
-public int getNumberOfMatches(){
-	return this.numOfMatches;
+public int getNumberOfReads(){
+	return this.numOfReads;
 }
 
 public String getReadDistribution(){

@@ -3,9 +3,23 @@ package strainMap;
 import java.util.HashMap;
 
 import RMAAlignment.Alignment;
-
+/**
+ * Functions that collects all misMatches and processes them 
+ * also serves as a container 
+ * @author huebler
+ *
+ */
 public class StrainMisMatchContainer {
 	private HashMap<Integer,HashMap<String,Integer>> container = new HashMap<Integer,HashMap<String,Integer>>();
+	private HashMap<Integer,Double> damage; 
+	private HashMap<Integer,Double> noise;
+//getters
+public HashMap<Integer,Double> getDamage(){
+	return this.damage;
+}
+public HashMap<Integer,Double> getNoise(){
+	return this.noise;
+}	
 public void processAlignment(Alignment al){
 	if(al.getMlength() >= 20){
 	String q = al.getQuery();
@@ -20,7 +34,7 @@ public void processAlignment(Alignment al){
 					}else{
 						misMatches.put(s, 1);
 					}
-					System.out.println(s);
+					//System.out.println(s);
 				}else{
 					HashMap<String,Integer> misMatches = new HashMap<String,Integer>();
 					String s =	r.charAt(i)+""+q.charAt(i);
@@ -36,7 +50,7 @@ public void processAlignment(Alignment al){
 					}else{
 						misMatches.put(s, 1);
 					}
-					System.out.println(s);
+					//System.out.println(s);
 				}else{
 					HashMap<String,Integer> misMatches = new HashMap<String,Integer>();
 					String s =	r.charAt(i)+""+q.charAt(i);
@@ -53,23 +67,25 @@ public void processMisMatches(){
 	for(int i = 0; i<20;i++){
 		HashMap<String, Integer>positionContainer = container.get(i);
 		if(i<10){
-			int damDivident = 0;
-			int damDivisor = 0;
+			double damDivident = 0.0;
+			double damDivisor = 0.0;
 			if(positionContainer.containsKey("CT")){
 				damDivisor=positionContainer.get("CT");
 				if(positionContainer.containsKey("CC")){
+				
 					damDivident = (positionContainer.get("CT")+positionContainer.get("CC"));
-					double d = (damDivisor/damDivident);
+					
+					double d = damDivisor/damDivident;
 					damage.put(i, d);
 				}else{
 					double d = 1.0;
 					damage.put(i, d);
 				}
 			}	
-			int divisor = 0;
+			double divisor = 0.0;
 			double divident = 0.0;
 			for(String key : positionContainer.keySet()){
-				if(!key.equals("CT")){
+				if(!key.equals("CT") |! key.contains("-")){
 					divisor+=positionContainer.get(key);
 				}
 			}
@@ -83,16 +99,19 @@ public void processMisMatches(){
 			if(positionContainer.containsKey("TT")){
 				divident-=positionContainer.get("TT");
 			}
-			divident -= damDivident;
+			if(positionContainer.containsKey("CC")){
+				divident-=positionContainer.get("CC");
+			}
+			divident /= 11;
 			noise.put(i, divident/divisor);
 		}else{
-			int damDivident = 0;
-			int damDivisor = 0;
+			double damDivident = 0.0;
+			double damDivisor = 0.0;
 			if(positionContainer.containsKey("GA")){
 				damDivident=positionContainer.get("GA");
 				if(positionContainer.containsKey("GG")){
 					damDivisor = (positionContainer.get("GA")+positionContainer.get("GG"));
-					double d = (damDivident/damDivisor);
+					double d = damDivident/damDivisor;
 					damage.put(i, d);
 				}else{
 					double d = 1.0;
@@ -100,9 +119,9 @@ public void processMisMatches(){
 				}
 			}
 			double divident = 0.0;
-			int divisor = 0;
+			double divisor = 0.0;
 			for(String key : positionContainer.keySet()){
-				if(!key.equals("GA"))
+				if(!key.equals("GA") || !key.contains("-"))
 					divisor+=positionContainer.get(key);
 			}
 			divident= divisor;
@@ -115,10 +134,15 @@ public void processMisMatches(){
 			if(positionContainer.containsKey("TT")){
 				divident-=positionContainer.get("TT");
 			}
-			divident -= damDivident;
+			if(positionContainer.containsKey("GG")){
+				divident-=positionContainer.get("GG");
+			}
+			divident /= 11;
 			noise.put(i, divident/divisor);
 			
 		}
 	}
+	this.damage = damage;
+	this.noise = noise;
 }
 }

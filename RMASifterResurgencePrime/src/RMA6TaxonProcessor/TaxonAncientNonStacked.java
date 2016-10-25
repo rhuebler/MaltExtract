@@ -17,6 +17,8 @@ import megan.data.ReadBlockIterator;
 import megan.rma6.ClassificationBlockRMA6;
 import megan.rma6.RMA6File;
 import megan.rma6.ReadBlockGetterRMA6;
+import strainMap.StrainMap;
+import strainMap.StrainMisMatchContainer;
 /**
  * NonDuplicate Filter for RMA6 Files
  * Due to technical constraints at the moment we only use the highest scoring BLast it when we remove duplicates at the moment
@@ -39,11 +41,10 @@ public class TaxonAncientNonStacked  extends RMA6TaxonDamageFilter{
 	}
 	
 	private void computeOutput(HashMap<Integer, ArrayList<Alignment>> taxonMap, int taxID){
-		HashMap<Integer,Integer> substitutionMap = new HashMap<Integer,Integer>();
 		ArrayList<Integer> distances = new ArrayList<Integer>();
 		ArrayList<Double> pIdents = new ArrayList<Double>();
 		ArrayList<String> lines = new ArrayList<String>();
-		HashMap<Integer,Integer> misMap = new HashMap<Integer,Integer>();
+		StrainMisMatchContainer container = new StrainMisMatchContainer();
 		int numMatches = 0;
 		lines.add(taxName);
 		CompositionMap map = new CompositionMap(taxonMap);
@@ -69,40 +70,8 @@ public class TaxonAncientNonStacked  extends RMA6TaxonDamageFilter{
 					lines.add("R:\t"+entry.getReference()+"\n");
 					numReads++;
 					//get mismatches
-					HashMap<Integer, String> alMap = entry.getMismatches();
-					if(alMap != null && entry.getMlength() >= 20){//get mismatches per position
-						numMatches++;
-						for(int l = 0; l< 20; l++){
-							if(l < 10){
-								if(alMap.containsKey(l))
-									if(alMap.get(l).equals("C>T")){
-										if(misMap.containsKey(l))
-											misMap.replace(l, misMap.get(l)+1);
-										else	
-											misMap.put(l, 1);	
-									}else if(!alMap.get(l).contains("[Nn-]+")){//get all others
-										if(substitutionMap.containsKey(l))
-											substitutionMap.replace(l, substitutionMap.get(l)+1);
-										else
-											substitutionMap.put(l, 1);
-									}
-							}else{
-								if(alMap.containsKey(entry.getMlength()+l-20)){
-									if(alMap.get(entry.getMlength()+l-20).equals("G>A")){
-										if(misMap.containsKey(l))
-											misMap.replace(l, misMap.get(l)+1);
-										else	
-											misMap.put(l, 1);
-										}else if(!alMap.get(entry.getMlength()+l-20).contains("[Nn-]+")){//get all others
-											if(substitutionMap.containsKey(l))
-												substitutionMap.replace(l, substitutionMap.get(l)+1);
-											else
-												substitutionMap.put(l, 1);
-										}
-									}
-								}
-							}//for
-						}// map != null		
+					numMatches++;
+					container.processAlignment(entry);
 					pIdents.add(entry.getPIdent());
 					distances.add(entry.getEditInstance());
 					numReads++;
@@ -111,12 +80,12 @@ public class TaxonAncientNonStacked  extends RMA6TaxonDamageFilter{
 			}
 			
 		}
-		setSubstitutionMap(substitutionMap);
-		setMisMap(misMap);
+		StrainMap strain = new StrainMap(taxName,container,numReads);
+		setDamageLine(strain.getLine());
 		setNumMatches(numMatches);
 		setEditDistanceHistogram(distances);
 		setPercentIdentityHistogram(pIdents);
-		setNumberOfMatches(numReads);
+		
 	}	
 	@Override
 	public void process(String inDir, String fileName, double topPercent, int maxLength){ 
@@ -146,7 +115,11 @@ public class TaxonAncientNonStacked  extends RMA6TaxonDamageFilter{
 				setReadDistribution(new CompositionMap(new HashMap<Integer,ArrayList<Alignment>>()));
 				setPercentIdentityHistogram(pIdents);
 				setEditDistanceHistogram(distances);
-				setNumberOfMatches(0);
+				String s = taxName;
+				for(int i = 0;i<=40;i++){
+					s+="\t"+0;
+				}
+				setDamageLine(s);
 				setReads(lines);
 			}else{
 				if(verbose)

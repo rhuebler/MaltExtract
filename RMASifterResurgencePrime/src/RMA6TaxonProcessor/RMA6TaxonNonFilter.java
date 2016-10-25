@@ -16,6 +16,8 @@ import megan.data.ReadBlockIterator;
 import megan.rma6.ClassificationBlockRMA6;
 import megan.rma6.RMA6File;
 import megan.rma6.ReadBlockGetterRMA6;
+import strainMap.StrainMap;
+import strainMap.StrainMisMatchContainer;
 /**
  * Default filter that just outputs additional proofs without any filtering
  * @author huebler
@@ -36,8 +38,7 @@ public class RMA6TaxonNonFilter  extends RMA6TaxonProcessor{
 		ArrayList<Integer> distances = new ArrayList<Integer>();
 		ArrayList<Double> pIdents = new ArrayList<Double>();
 		ArrayList<String> lines = new ArrayList<String>();
-		HashMap<Integer,Integer> misMap = new HashMap<Integer,Integer>();
-		HashMap<Integer,Integer> substitutionMap = new HashMap<Integer,Integer>();
+		StrainMisMatchContainer container = new StrainMisMatchContainer();
 		this.taxName = getName(taxID);
 		int numMatches = 0;
 		// use ReadsIterator to get all Reads assigned to MegantaxID and print top percent to file
@@ -58,6 +59,11 @@ public class RMA6TaxonNonFilter  extends RMA6TaxonProcessor{
 				setReadDistribution(new CompositionMap(new HashMap<Integer,ArrayList<Alignment>>()));
 				setPercentIdentityHistogram(pIdents);
 				setEditDistanceHistogram(distances);
+				String s = taxName;
+				for(int i = 0;i<=40;i++){
+					s+="\t"+0;
+				}
+				setDamageLine(s);
 		}else{
 			if(verbose)
 				log.log(Level.INFO,"Processing Taxon "+taxName+" in File " +fileName); 
@@ -93,39 +99,7 @@ public class RMA6TaxonNonFilter  extends RMA6TaxonProcessor{
 								lines.add("R:\t"+al.getReference()+"\n");
 							}
 							//get mismatches
-							HashMap<Integer, String> map=al.getMismatches();
-							if(map != null && al.getMlength() >= 20){//get mismatches per position
-								numMatches++;
-								for(int l = 0; l< 20; l++){
-									if(l < 10){
-										if(map.containsKey(l))
-											if(map.get(l).equals("C>T")){// get C>T at appropropriate end
-												if(misMap.containsKey(l))
-													misMap.replace(l, misMap.get(l)+1);
-												else	
-													misMap.put(l, 1);	
-												}else if(!map.get(l).contains("[Nn-]+")){//get all others
-													if(substitutionMap.containsKey(l))
-														substitutionMap.replace(l, substitutionMap.get(l)+1);
-													else
-														substitutionMap.put(l, 1);
-												}
-									}else{
-										if(map.containsKey(al.getMlength()+l-20))// get G>A at appropropriate end
-											if(map.get(al.getMlength()+l-20).equals("G>A")){
-												if(misMap.containsKey(l))
-													misMap.replace(l, misMap.get(l)+1);
-												else	
-													misMap.put(l, 1);
-												}else if(!map.get(al.getMlength()+l-20).contains("[Nn-]+")){//get all others
-												if(substitutionMap.containsKey(l))
-													substitutionMap.replace(l, substitutionMap.get(l)+1);
-												else
-													substitutionMap.put(l, 1);
-											}
-										}
-									}//for
-								}// map != null		
+							container.processAlignment(al);
 							higher = true;
 							pIdent += al.getPIdent();
 							editDistance += al.getEditInstance();
@@ -153,11 +127,11 @@ public class RMA6TaxonNonFilter  extends RMA6TaxonProcessor{
 				CompositionMap map = new CompositionMap(taxonMap);
 				map.process();
 				
-				setSubstitutionMap(substitutionMap);
-				setMisMap(misMap);
+				StrainMap strain = new StrainMap(taxName,container,numReads);
+				setDamageLine(strain.getLine());
 				setNumMatches(numMatches);
 				setReadDistribution(map);
-				setNumberOfMatches(numReads);
+				
 				setEditDistanceHistogram(distances);
 				setPercentIdentityHistogram(pIdents);
 				setReads(lines);

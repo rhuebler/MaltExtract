@@ -90,11 +90,11 @@ public class NCBI_TreeReader {
 		    
 		    ArrayList<Integer> positions = new  ArrayList<Integer>();
 		    positions.addAll(children);
-		    for(int i = 0;i< (maxDepth-ph.getNode(String.valueOf(target)).calculateDepth())/3;i++){
+		    for(int i = 0;i< (maxDepth-ph.getNode(String.valueOf(target)).calculateDepth());i++){
 		    	positions = getStrains(positions, keys);
 		    }
 		    positionsToKeep.addAll(getAssigned(positions,keys));
-		    System.out.println(positionsToKeep.size());
+		    //System.out.println(positionsToKeep.size());
 		   children.clear();
 		    children.addAll(positionsToKeep);
 			return children;
