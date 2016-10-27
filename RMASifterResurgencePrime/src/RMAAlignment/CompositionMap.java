@@ -89,9 +89,9 @@ public void markAllDuplicates(){
 }
 public void calculateStatistics(){
 	AlignmentStatistics stats = new AlignmentStatistics(this.compositionMap.get(getMaxID()));
-	stats.getGenaralStatistics();
-	this.coverageHistogram=stats.getConverageHistogram();
-	this.generalStatistics=stats.getGenaralStatistics();
+	stats.calculateStatistics();
+	this.coverageHistogram = stats.getConverageHistogram();
+	this.generalStatistics = stats.getGenaralStatistics();
 }
 
 // process composition and find taxon with maximum number of start positions

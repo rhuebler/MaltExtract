@@ -54,6 +54,7 @@ protected void setDamageLine(String s){
 protected void setReadDistribution(CompositionMap map){
 	DecimalFormat df = new DecimalFormat("#.###");
 	if(map != null){
+		map.calculateStatistics();
 		String maxReference = getName(map.getMaxID());
 		String s = taxName +"\t" + maxReference;;
 		for(double d : map.getGenaralStatistics())
