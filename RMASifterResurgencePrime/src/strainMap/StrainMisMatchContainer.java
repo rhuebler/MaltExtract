@@ -13,7 +13,11 @@ public class StrainMisMatchContainer {
 	private HashMap<Integer,HashMap<String,Integer>> container = new HashMap<Integer,HashMap<String,Integer>>();
 	private HashMap<Integer,Double> damage; 
 	private HashMap<Integer,Double> noise;
+	private int processed;
 //getters
+	public int getProcessed(){
+		return this.processed;
+	}
 public HashMap<Integer,Double> getDamage(){
 	return this.damage;
 }
@@ -22,6 +26,7 @@ public HashMap<Integer,Double> getNoise(){
 }	
 public void processAlignment(Alignment al){
 	if(al.getMlength() >= 20){
+		processed+=1;
 	String q = al.getQuery();
 	String r = al.getReference();
 		for(int i = 0; i< 20; i++){

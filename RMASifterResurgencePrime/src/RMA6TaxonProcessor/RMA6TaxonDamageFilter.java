@@ -142,7 +142,6 @@ public void process(String inDir, String fileName, double topPercent, int maxLen
 		}// while
 			classIt.close();
 			StrainMap strain = new StrainMap(taxName,container,numberOfMatches);
-			
 			CompositionMap map = new CompositionMap(taxonMap);
 			map.process();
 			

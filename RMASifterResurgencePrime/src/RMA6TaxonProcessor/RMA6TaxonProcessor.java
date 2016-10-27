@@ -80,17 +80,18 @@ protected void setEditDistanceHistogram(ArrayList<Integer> list){
 	for(int i = 0;i < 7;i++){
 		histo.put(i, 0);
 	}
-	for(int d : list){
-		if(d<=5){
+	if(list != null){
+		for(int d : list){
+			if(d<=5){
 				int value = histo.get(d);
 				value++;
 				histo.put(d, value);
-		}else{
+			}else{
 				int value = histo.get(6);
 				value++;
 				histo.put(6, value);
+			}	
 		}
-		
 	}
 	this.editHistogram = histo;
 }

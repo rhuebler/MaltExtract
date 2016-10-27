@@ -41,7 +41,7 @@ public class AlignmentStatistics {
 		for(int l = 1; l<=11; l++)
 			coverageHistogram.put(l, 0);
 		ArrayList<Alignment> input = removeDuplicates(currentList);
-		if(input.size()>2){
+		if(input != null&&input.size()>2){
 			ArrayList<Double> results = new ArrayList<Double>();
 			int i = 0;//TODO maybe there is a better solution also is there an logical error in here 
 			double unique = 0;

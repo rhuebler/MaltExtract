@@ -35,28 +35,36 @@ public class StrainMap {
 		return this.numMatches;
 	}
 	public String getLine(){ // process Map Into Damage Output Line
-		container.processMisMatches();
-		HashMap<Integer,Double> damage = container.getDamage(); 
-		HashMap<Integer,Double> noise =container.getNoise();
+			if(container.getProcessed()!=0){
+				container.processMisMatches();
+				HashMap<Integer,Double> damage = container.getDamage(); 
+				HashMap<Integer,Double> noise =container.getNoise();
 		
-		String part1 = name;
-		String part2 = "";
-		for(int i = 0;i < 20; i++){
-			if(damage.containsKey(i)){
-				part1 += "\t" + damage.get(i);
-			}else{	
-				part1 += "\t" + 0;	
+				String part1 = name;
+				String part2 = "";
+				for(int i = 0;i < 20; i++){
+					if(damage.containsKey(i)){
+						part1 += "\t" + damage.get(i);
+					}else{	
+						part1 += "\t" + 0;	
+					}
+					if(noise.containsKey(i)){
+						part2 += "\t" + noise.get(i);
+					}else{
+						part2 += "\t" + 0;
+					}	
+				}
+				if(numMatches!=0)
+					part1 += part2 + "\t" + numMatches;
+				else
+					part1 += part2 + "\t" + 0;
+				return part1;
+		}else{
+			String part1 = name;
+			for(int i = 0;i<=40;i++){
+				part1+="\t"+0;
 			}
-			if(noise.containsKey(i)){
-				part2 += "\t" + noise.get(i);
-			}else{
-				part2 += "\t" + 0;
-			}	
+			return part1;
 		}
-		if(numMatches!=0)
-			part1 += part2 + "\t" + numMatches;
-		else
-			part1 += part2 + "\t" + 0;
-		return part1;
 	}
 }
