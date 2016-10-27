@@ -1,7 +1,6 @@
 package RMAAlignment;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 /**
  * Save for a Megan Node all Blast hits stored as Alignment Objects these are kept as hashmap
  *  of the ID of the matching species and a List of the Hits 
@@ -14,22 +13,31 @@ public class CompositionMap {
 private HashMap<Integer,ArrayList<Alignment>> compositionMap;// hashMap of ReferenceID to List of start positions
 //HashMap<Integer,Integer> taxonComposition; currently unused 
 private int maxID;
+private ArrayList<Double> generalStatistics;
+private HashMap<Integer,Integer> coverageHistogram;
 //from stack overflow
 
 
-//owncode
+//getter
 public int getMaxID(){
 	return this.maxID;}
 
 public HashMap<Integer,ArrayList<Alignment>> getCompositionMap(){
 	return this.compositionMap;}
-
+public ArrayList<Double> getGenaralStatistics(){
+	return this.generalStatistics;
+}
+public HashMap<Integer,Integer> getConverageHistogram(){
+	return this.coverageHistogram;
+}
+//setters
 private void setCompositionMap(HashMap<Integer,ArrayList<Alignment>> map){// technically not required
 	this.compositionMap = map;}
 
 private void setMaxID(int i){
 	this.maxID = i;
 }
+//utility
 private ArrayList<Alignment> markDuplicates(ArrayList<Alignment> inList){ // that seems to be correct may be the ordering works better and therefore more stacking reads can be found
 	AlignmentComparator comp = new AlignmentComparator(); // should theoretically sort my alignments according to start positions
 	inList.sort(comp);
@@ -79,10 +87,13 @@ public void markAllDuplicates(){
 	this.compositionMap.put(key, markDuplicates(this.compositionMap.get(key)));
 	}
 }
-public List<Double> getStatistics(){
+public void calculateStatistics(){
 	AlignmentStatistics stats = new AlignmentStatistics(this.compositionMap.get(getMaxID()));
-	return(stats.getStatistics());
+	stats.getGenaralStatistics();
+	this.coverageHistogram=stats.getConverageHistogram();
+	this.generalStatistics=stats.getGenaralStatistics();
 }
+
 // process composition and find taxon with maximum number of start positions
 public void process(){
 	HashMap<Integer,ArrayList<Alignment>> map = getCompositionMap();

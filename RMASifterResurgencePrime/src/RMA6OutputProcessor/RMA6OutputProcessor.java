@@ -78,17 +78,27 @@ public class RMA6OutputProcessor {
 			warning.log(Level.SEVERE,"Cannot write file", io);
 		}
 	}
+	private void writeCoverageHistogram(List<String> summary){
+		try{
+			summary.sort(null);
+			String header = "Taxon\tReference\t0\t1\t2\t3\t4t5\t6\t7\t8\t9\t10\thigher";
+			summary.add(0, header);
+			Path file = Paths.get(outDir+"/readDist/"+fileName+"_coverageHist"+".txt");
+			Files.write(file, summary, Charset.forName("UTF-8"));
+		}catch(IOException io){
+			warning.log(Level.SEVERE,"Cannot write file", io);
+		}
+	}
 	private void writeReadDist(List<String> summary){
 		try{
 			summary.sort(null);
-			String header = "Taxon\tReference\tMeanReadDistance\tMedianReadDistance\tVarianceReadDistance\tStandardDeviationReadDistance\tuniquePerReference\tnonDuplicatesonReference\tTotalReadsOnReference\tReferenceLength";
+			String header = "Taxon\tReference\tuniquePerReference\tnonStacked\tnonDuplicatesonReference\tTotalReadsOnReference\tReferenceLength";
 			summary.add(0, header);
 			Path file = Paths.get(outDir+"/readDist/"+fileName+"_readDist"+".txt");
 			Files.write(file, summary, Charset.forName("UTF-8"));
 		}catch(IOException io){
 			warning.log(Level.SEVERE,"Cannot write file", io);
 		}
-		//this.readDist = null; //delete data to save space after were done potentially the gc should take of it
 	}
 	private void writeEditDistance(List<String> histo){
 		try{
@@ -118,6 +128,7 @@ public class RMA6OutputProcessor {
 		ArrayList<String> percentIdentity = new ArrayList<String>();
 		ArrayList<String> readDistribution = new ArrayList<String>();
 		ArrayList<String> misMatches = new ArrayList<String>();
+		ArrayList<String> coverageHistogram = new ArrayList<String>();
 		for(int id : results.keySet()){
 			RMA6TaxonProcessor taxProcessor;
 			try {
@@ -126,7 +137,7 @@ public class RMA6OutputProcessor {
 				readDistribution.add(taxProcessor.getReadDistribution());	
 				editDistance.add(taxProcessor.getEditDistanceHistogram());
 				percentIdentity.add(taxProcessor.getPercentIdentityHistogram());
-				
+				coverageHistogram.add(taxProcessor.getCoverageLine());
 		
 				misMatches.add(taxProcessor.getDamageLine());
 				if((behave == Filter.ALL && reads )|| (behave == Filter.ANCIENT && reads)
@@ -143,5 +154,6 @@ public class RMA6OutputProcessor {
 			writeReadDist(readDistribution); // RMA6Processor now saves its own output 
 			writeEditDistance(editDistance);
 			writePercentIdentity(percentIdentity);
+			writeCoverageHistogram(coverageHistogram);
 	}
 }

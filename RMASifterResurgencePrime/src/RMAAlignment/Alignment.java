@@ -1,7 +1,6 @@
 package RMAAlignment;
 
 import java.util.Comparator;
-import java.util.HashMap;
 /**
  * This class Represents an MatchBlock from Megan but has more Slots available
  * @author huebler
@@ -28,14 +27,7 @@ public class Alignment {
 	private int readLength;
 	private double score;
 	// getter
-public HashMap<Integer,String> getMismatches(){	
-	HashMap<Integer,String> map = new HashMap<Integer,String>();
-	for(int i = 0; i < reference.length(); i++){
-		if(query.charAt(i) != reference.charAt(i))
-				map.put(i, reference.charAt(i)+">"+query.charAt(i));
-		}
-		return map;
-} 	
+
 public String getAccessionNumber(){
 	return this.accessionNumber;
 }	

@@ -33,6 +33,7 @@ protected Logger log;
 protected Logger warning;
 protected ArrayList<String> readList;
 protected String damageLine;
+protected String coverageLine;
 protected int numMatches;
 //constructor
 public RMA6TaxonProcessor(Integer id, double pID, NCBI_MapReader reader, boolean v, Logger log, Logger warning){
@@ -53,13 +54,20 @@ protected void setDamageLine(String s){
 protected void setReadDistribution(CompositionMap map){
 	DecimalFormat df = new DecimalFormat("#.###");
 	if(map != null){
-	String maxReference = getName(map.getMaxID());
-	String s = taxName +"\t" + maxReference;;
-	for(double d : map.getStatistics())
-		s += "\t" + df.format(d);
+		String maxReference = getName(map.getMaxID());
+		String s = taxName +"\t" + maxReference;;
+		for(double d : map.getGenaralStatistics())
+			s += "\t" + df.format(d);
 		this.readDistribution=s;
+	
+		HashMap<Integer,Integer> histogram = map.getConverageHistogram();
+		String line = taxName+"\t" + maxReference;
+		for(int k : histogram.keySet())
+			line += "\t" + histogram.get(k);
+		this.coverageLine = line;
 	}else{
-		this.readDistribution = mapReader.getNcbiIdToNameMap().get(taxID).replace(' ', '_')+"\tNA\t0\t0\t0\t0\t0\t0\t0\t0";
+		this.readDistribution = taxName+"\tNA\t0\t0\t0\t0\t0";
+		this.coverageLine = taxName+"\tNA\t0\t0\t0\t0\t0\t0\t0\t0\t0\t0\t0";
 	}
 }
 
@@ -122,6 +130,9 @@ protected void setNumMatches(int matches){
 
 
 //getters
+public String getCoverageLine(){
+	return this.coverageLine;
+}
 public String getDamageLine(){
 	return this.damageLine;
 }
