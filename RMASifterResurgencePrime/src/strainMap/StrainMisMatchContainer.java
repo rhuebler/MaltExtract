@@ -73,7 +73,7 @@ public void processMisMatches(){
 				damDivisor=positionContainer.get("CT");
 				if(positionContainer.containsKey("CC")){
 				
-					damDivident = (positionContainer.get("CT")+positionContainer.get("CC"));
+					damDivident = (damDivisor+positionContainer.get("CC"));
 					
 					double d = damDivisor/damDivident;
 					damage.put(i, d);
@@ -110,7 +110,7 @@ public void processMisMatches(){
 			if(positionContainer.containsKey("GA")){
 				damDivident=positionContainer.get("GA");
 				if(positionContainer.containsKey("GG")){
-					damDivisor = (positionContainer.get("GA")+positionContainer.get("GG"));
+					damDivisor = (damDivident+positionContainer.get("GG"));
 					double d = damDivident/damDivisor;
 					damage.put(i, d);
 				}else{
