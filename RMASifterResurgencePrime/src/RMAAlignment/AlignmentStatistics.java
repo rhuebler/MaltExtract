@@ -43,7 +43,7 @@ public class AlignmentStatistics {
 		ArrayList<Alignment> input = removeDuplicates(currentList);
 		if(input != null&&input.size()>2){
 			ArrayList<Double> results = new ArrayList<Double>();
-			int i = 0;//TODO maybe there is a better solution also is there an logical error in here 
+			int i = 0; // better solution implemented
 			double unique = 0;
 			double possible = 0;
 			HashMap<Integer,Integer> coverageContainer = new HashMap<Integer,Integer>();
