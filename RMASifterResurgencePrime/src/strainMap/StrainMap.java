@@ -3,7 +3,7 @@ import java.util.HashMap;
 
 public class StrainMap {
 	/**
-	 * containter of StrainMisMatchContainer for one strain
+	 * Containter of StrainMisMatchContainer for one strain
 	 */
 	private String name;
 	private StrainMisMatchContainer container;

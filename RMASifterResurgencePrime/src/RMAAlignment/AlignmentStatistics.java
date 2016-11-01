@@ -38,7 +38,7 @@ public class AlignmentStatistics {
 	// process best list of start positions
 	public void calculateStatistics(){
 		HashMap<Integer,Integer> coverageHistogram = new HashMap<Integer,Integer>();
-		for(int l = 1; l<=11; l++)
+		for(int l = 0; l<=11; l++)
 			coverageHistogram.put(l, 0);
 		ArrayList<Alignment> input = removeDuplicates(currentList);
 		if(input != null&&input.size()>2){
@@ -123,7 +123,10 @@ public class AlignmentStatistics {
 				}
 				i++;
 			}
-			
+		int zeros = currentList.get(0).getReferenceLength()-coverageContainer.size();	
+		if(zeros<0)
+			zeros = 0;
+		coverageHistogram.put(0, zeros);	
 		this.coverageHistogram = coverageHistogram;
 		results.add(unique/(possible));
 		int nonDuplicates = input.size();

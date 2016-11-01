@@ -16,7 +16,13 @@ import java.util.logging.Logger;
 import NCBI_MapReader.NCBI_MapReader;
 import RMA6TaxonProcessor.RMA6TaxonProcessor;
 import behaviour.Filter;
-
+/**
+ * This class is used to retrieve all outputs from RMA6TaxonProcessors
+ * Writes RMA6Distributions. Coverage Histograms, damage mismatch Histograms 
+ * Edit Histograms and Percent Identity Histograms and potentially Reads
+ * @author huebler
+ *
+ */
 public class RMA6OutputProcessor {
 	private String fileName;
 	private String outDir;
@@ -81,7 +87,7 @@ public class RMA6OutputProcessor {
 	private void writeCoverageHistogram(List<String> summary){
 		try{
 			summary.sort(null);
-			String header = "Taxon\tReference\t0\t1\t2\t3\t4t5\t6\t7\t8\t9\t10\thigher";
+			String header = "Taxon\tReference\t0\t1\t2\t3\t4\t5\t6\t7\t8\t9\t10\thigher";
 			summary.add(0, header);
 			Path file = Paths.get(outDir+"/readDist/"+fileName+"_coverageHist"+".txt");
 			Files.write(file, summary, Charset.forName("UTF-8"));

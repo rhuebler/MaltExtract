@@ -68,7 +68,7 @@ protected void setReadDistribution(CompositionMap map){
 		this.coverageLine = line;
 	}else{
 		this.readDistribution = taxName+"\tNA\t0\t0\t0\t0\t0";
-		this.coverageLine = taxName+"\tNA\t0\t0\t0\t0\t0\t0\t0\t0\t0\t0\t0";
+		this.coverageLine = taxName+"\tNA\t0\t0\t0\t0\t0\t0\t0\t0\t0\t0\t0\t0";
 	}
 }
 
