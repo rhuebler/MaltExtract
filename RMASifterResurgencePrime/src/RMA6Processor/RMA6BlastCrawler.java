@@ -29,9 +29,10 @@ import strainMap.StrainMisMatchContainer;
 public class RMA6BlastCrawler {
 	/**
 	 * Go through whole file and find blast hits that that match the strains of the target species
+	 * one line per strain currently only works with Strains that contain species name and won't
+	 * work for anything for that is higher than species level
 	 */
 	
-	//TODO what am I missing here 
 	private String inDir;
 	private String fileName;
 	private String speciesName;

@@ -1,5 +1,7 @@
 package RScriptReader;
-
+/**
+ * function serves to call RScripts from Java currently not used
+ */
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;

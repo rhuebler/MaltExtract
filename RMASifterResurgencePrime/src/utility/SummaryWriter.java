@@ -17,7 +17,7 @@ import java.util.logging.Logger;
 import NCBI_MapReader.NCBI_MapReader;
 import RMA6Processor.RMA6Processor;
 /**
- * Write overall Summy file from proceesed RMA6Files
+ * Write overall Summy file from processed RMA6Files
  * @author huebler
  *
  */
