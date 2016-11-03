@@ -105,7 +105,6 @@ public void process(String inDir, String fileName, double topPercent, int maxLen
 					if(al.getFivePrimeDamage() && minPIdent <= al.getPIdent()){
 						numberOfMatches++;
 						higher = true;
-						pIdent += blocks[i].getPercentIdentity();
 						//get mismatches
 						container.processAlignment(al);
 						if(!taxonMap.containsKey(blocks[i].getTaxonId())){

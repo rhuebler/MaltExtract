@@ -56,8 +56,6 @@ public class TaxonAncientNonStacked  extends RMA6TaxonDamageFilter{
 		for(int key : taxonMap.keySet()){
 			for(Alignment entry : taxonMap.get(key)){
 				if(!entry.isDuplicate()){
-					pIdents.add(entry.getPIdent());
-					distances.add(entry.getEditInstance());
 					String name;
 					if(mapReader.getNcbiIdToNameMap().get(key) != null)
 						name =  mapReader.getNcbiIdToNameMap().get(key).replace(' ', '_');
@@ -68,7 +66,6 @@ public class TaxonAncientNonStacked  extends RMA6TaxonDamageFilter{
 					lines.add("Q:\t"+entry.getQuery());
 					lines.add("A:\t"+entry.getAlignment());
 					lines.add("R:\t"+entry.getReference()+"\n");
-					numReads++;
 					//get mismatches
 					numMatches++;
 					container.processAlignment(entry);
