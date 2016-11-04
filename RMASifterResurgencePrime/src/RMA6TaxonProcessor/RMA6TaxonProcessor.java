@@ -35,6 +35,15 @@ protected ArrayList<String> readList;
 protected String damageLine;
 protected String coverageLine;
 protected int numMatches;
+
+protected ArrayList<String> readAncientList;
+protected String damageAncientLine;
+protected String coverageAncientLine;
+protected int numAncientMatches;
+protected int numAncientOfReads;
+protected String readDistributionAncient;
+protected HashMap<Integer,Integer> editHistogramAncient;
+protected HashMap<Integer,Integer> pIdentHistogramAncient;
 //constructor
 public RMA6TaxonProcessor(Integer id, double pID, NCBI_MapReader reader, boolean v, Logger log, Logger warning){
 	this.mapReader = reader;
@@ -130,7 +139,90 @@ protected void setNumMatches(int matches){
 	this.numMatches = matches;
 }
 
+protected void setAncientReads(ArrayList<String> list){
+	this.readAncientList = list;
+}
+protected void setAncientDamageLine(String s){
+	this.damageAncientLine = s;
+}
+protected void setAncientReadDistribution(CompositionMap map){
+	DecimalFormat df = new DecimalFormat("#.###");
+	if(map != null){
+		map.calculateStatistics();
+		String maxReference = getName(map.getMaxID());
+		String s = taxName +"\t" + maxReference;;
+		for(double d : map.getGenaralStatistics())
+			s += "\t" + df.format(d);
+		this.readDistribution=s;
+	
+		HashMap<Integer,Integer> histogram = map.getConverageHistogram();
+		String line = taxName+"\t" + maxReference;
+		for(int k : histogram.keySet())
+			line += "\t" + histogram.get(k);
+		this.coverageAncientLine = line;
+	}else{
+		this.readDistributionAncient = taxName+"\tNA\t0\t0\t0\t0\t0";
+		this.coverageAncientLine = taxName+"\tNA\t0\t0\t0\t0\t0\t0\t0\t0\t0\t0\t0\t0";
+	}
+}
 
+protected void setAncientNumberOfReads(int n){
+	this.numAncientOfReads=n;
+}
+protected void setAncientEditDistanceHistogram(ArrayList<Integer> list){
+	HashMap<Integer,Integer> histo = new HashMap<Integer,Integer> ();
+	for(int i = 0;i < 7;i++){
+		histo.put(i, 0);
+	}
+	if(list != null){
+		for(int d : list){
+			if(d<=5){
+				int value = histo.get(d);
+				value++;
+				histo.put(d, value);
+			}else{
+				int value = histo.get(6);
+				value++;
+				histo.put(6, value);
+			}	
+		}
+	}
+	this.editHistogramAncient = histo;
+}
+protected void setAncientPercentIdentityHistogram(ArrayList<Double> list){
+	HashMap<Integer,Integer> histo = new HashMap<Integer,Integer> ();
+	for(int i = 0;i < 5; i++){
+		histo.put(i, 0);
+	}
+	for(double d: list){
+		if(77.5 <= d && d< 82.5){
+				int value = histo.get(0);
+				value++;
+				histo.put(0, value);
+		}else if(82.5 <= d && d< 87.5){
+				int value = histo.get(1);
+				value++;
+				histo.put(1, value);
+		}else if(87.5 <= d && d< 92.5){
+				int value = histo.get(2);
+				value++;
+				histo.put(2, value);
+		}else if(92.5 <= d && d< 97.5){
+				int value = histo.get(3);
+				value++;
+				histo.put(3, value);
+		}else if(97.5 <= d){
+				int value = histo.get(4);
+				value++;
+				histo.put(4, value);
+		}
+	}
+	this.pIdentHistogramAncient =  histo;
+}
+
+protected void setAncientNumMatches(int matches){
+	this.numAncientMatches = matches;
+}
 //getters
 public String getCoverageLine(){
 	return this.coverageLine;
@@ -179,7 +271,32 @@ public int getNumberOfReads(){
 public String getReadDistribution(){
 	return this.readDistribution;
 }
+public String getAncientCoverageLine(){
+	return this.coverageAncientLine;
+}
+public String getAncientDamageLine(){
+	return this.damageAncientLine;
+}
 
+public ArrayList<String> getAncientReads(){
+	return this.readAncientList;
+}
+public String getAncientEditDistanceHistogram(){
+	HashMap<Integer,Integer> histo = this.editHistogramAncient;
+	return taxName+"\t"+ histo.get(0)+"\t"+histo.get(1)+"\t"+histo.get(2)+"\t"+histo.get(3)+"\t"+histo.get(4)+"\t"+histo.get(5)+"\t"+histo.get(6);
+}
+public String getAncientPercentIdentityHistogram(){
+	HashMap<Integer,Integer> histo = this.pIdentHistogramAncient;
+	return taxName+"\t"+histo.get(0)+"\t"+histo.get(1)+"\t"+histo.get(2)+"\t"+histo.get(3)+"\t"+histo.get(4);
+}
+
+public int getAncientNumberOfReads(){
+	return this.numAncientOfReads;
+}
+
+public String getAncientReadDistribution(){
+	return this.readDistributionAncient;
+}
 public ArrayList<String> getSupplementary(){
 	return this.supplemantary;
 }

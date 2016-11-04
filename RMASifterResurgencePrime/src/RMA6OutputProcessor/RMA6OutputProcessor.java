@@ -1,5 +1,6 @@
 package RMA6OutputProcessor;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
@@ -48,7 +49,7 @@ public class RMA6OutputProcessor {
 		return this.overallSum;
 	}
 	
-	private void writeMisMap(ArrayList<String> summary){
+	private void writeMisMap(ArrayList<String> summary, String outDir){
 			String header = "Node";
 			String header_part2 ="";
 			for(int i = 0; i < 20; i++){
@@ -64,71 +65,79 @@ public class RMA6OutputProcessor {
 			summary.sort(null);
 			summary.add(0,header);
 		try{
-			Path file = Paths.get(outDir+"damageMismatch/"+fileName+"_damageMismatch"+".txt");
+			Path file = Paths.get(outDir);
 			Files.write(file, summary, Charset.forName("UTF-8"));
 		}catch(IOException io){
 			warning.log(Level.SEVERE, "File writing exception", io);
 		}
 	 
 	}
-	private void writeBlastHits(int taxID, ArrayList<String> summary){
+	private void writeBlastHits(int taxID, ArrayList<String> summary, String outDir){
 		try{
 			String name;
 			if(mapReader.getNcbiIdToNameMap().get(taxID) != null)
 				name = mapReader.getNcbiIdToNameMap().get(taxID).replace(' ', '_');
 			else
 				name = "unassingned_name";
-		Path file = Paths.get(outDir+"reads/"+fileName+"/"+name+".txt");
+		Path file = Paths.get(outDir+name+".txt");
 		Files.write(file, summary, Charset.forName("UTF-8"));
 		}catch(IOException io){
 			warning.log(Level.SEVERE,"Cannot write file", io);
 		}
 	}
-	private void writeCoverageHistogram(List<String> summary){
+	private void writeCoverageHistogram(List<String> summary, String outDir){
 		try{
 			summary.sort(null);
 			String header = "Taxon\tReference\t0\t1\t2\t3\t4\t5\t6\t7\t8\t9\t10\thigher";
 			summary.add(0, header);
-			Path file = Paths.get(outDir+"/readDist/"+fileName+"_coverageHist"+".txt");
+			Path file = Paths.get(outDir);
 			Files.write(file, summary, Charset.forName("UTF-8"));
 		}catch(IOException io){
 			warning.log(Level.SEVERE,"Cannot write file", io);
 		}
 	}
-	private void writeReadDist(List<String> summary){
+	private void writeReadDist(List<String> summary, String outDir){
 		try{
 			summary.sort(null);
 			String header = "Taxon\tReference\tuniquePerReference\tnonStacked\tnonDuplicatesonReference\tTotalReadsOnReference\tReferenceLength";
 			summary.add(0, header);
-			Path file = Paths.get(outDir+"/readDist/"+fileName+"_readDist"+".txt");
+			Path file = Paths.get(outDir);
 			Files.write(file, summary, Charset.forName("UTF-8"));
 		}catch(IOException io){
 			warning.log(Level.SEVERE,"Cannot write file", io);
 		}
 	}
-	private void writeEditDistance(List<String> histo){
+	private void writeEditDistance(List<String> histo, String outDir){
 		try{
 			String header = "Node\t0\t1\t2\t3\t4\t5\thigher";
 			histo.sort(null);
 			histo.add(0,header);
-			Path file = Paths.get(outDir+"/editDistance/"+fileName+"_editDistance"+".txt");
+			Path file = Paths.get(outDir);
 			Files.write(file, histo, Charset.forName("UTF-8"));
 		}catch(IOException io){
 			warning.log(Level.SEVERE,"Cannot write file", io);
 		}
 	}
-	private void writePercentIdentity(List<String> histo){
+	private void writePercentIdentity(List<String> histo, String outDir){
 		try{
 			String header = "Node\t80\t85\t90\t95\t100";
 			histo.sort(null);
 			histo.add(0,header);
-			Path file = Paths.get(outDir+"/percentIdentity/"+fileName+"_percentIdentity"+".txt");
+			Path file = Paths.get(outDir);
 			Files.write(file, histo, Charset.forName("UTF-8"));
 		}catch(IOException io){
 			warning.log(Level.SEVERE,"Cannot write file", io);
 		}
 	} 
 	public void prepareOutput(HashMap<Integer,Future<RMA6TaxonProcessor>> results){
+		
+		HashMap<Integer,Integer> ancientSum = new HashMap<Integer,Integer>();
+		ArrayList<String> ancientEditDistance = new ArrayList<String>();
+		ArrayList<String> ancientPercentIdentity = new ArrayList<String>();
+		ArrayList<String> ancientReadDistribution = new ArrayList<String>();
+		ArrayList<String> ancientMisMatches = new ArrayList<String>();
+		ArrayList<String> ancientCoverageHistogram = new ArrayList<String>();
+	
 		HashMap<Integer,Integer> overallSum = new HashMap<Integer,Integer>();
 		ArrayList<String> editDistance = new ArrayList<String>();
 		ArrayList<String> percentIdentity = new ArrayList<String>();
@@ -148,18 +157,44 @@ public class RMA6OutputProcessor {
 				misMatches.add(taxProcessor.getDamageLine());
 				if((behave == Filter.ALL && reads )|| (behave == Filter.ANCIENT && reads)
 						|| (behave == Filter.NON && reads)){
-					writeBlastHits(id,taxProcessor.getReads());
+					writeBlastHits(id,taxProcessor.getReads(),outDir+"reads/"+fileName+"/");
+				}
+				if(behave == Filter.NON_ANCIENT){
+					ancientSum.put(id, taxProcessor.getAncientNumberOfReads());
+					ancientEditDistance.add(taxProcessor.getAncientEditDistanceHistogram());
+					ancientPercentIdentity.add(taxProcessor.getAncientPercentIdentityHistogram());
+					ancientReadDistribution.add(taxProcessor.getAncientReadDistribution());
+					ancientMisMatches.add(taxProcessor.getAncientDamageLine());
+					ancientCoverageHistogram.add(taxProcessor.getAncientCoverageLine());
 				}
 			} catch (InterruptedException | ExecutionException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}	
+			if(behave!=Filter.ANCIENT){
 			setSumLine(overallSum); // set number of assigned Reads to overall file summary
-			writeMisMap(misMatches);
-			writeReadDist(readDistribution); // RMA6Processor now saves its own output 
-			writeEditDistance(editDistance);
-			writePercentIdentity(percentIdentity);
-			writeCoverageHistogram(coverageHistogram);
+			writeMisMap(misMatches, outDir+"damageMismatch/"+fileName+"_damageMismatch"+".txt");
+			writeReadDist(readDistribution, outDir+"/readDist/"+fileName+"_readDist"+".txt"); 
+			writeEditDistance(editDistance, outDir+"/editDistance/"+fileName+"_editDistance"+".txt");
+			writePercentIdentity(percentIdentity, outDir+"/percentIdentity/"+fileName+"_percentIdentity"+".txt");
+			writeCoverageHistogram(coverageHistogram, outDir+"/readDist/"+fileName+"_coverageHist"+".txt");
+			}else if(behave == Filter.ANCIENT){
+				//normal stuff
+				new File(outDir+"/default/").mkdirs();
+				writeMisMap(misMatches, outDir+"/default/damageMismatch/"+fileName+"_damageMismatch"+".txt");
+				writeReadDist(readDistribution, outDir+"/default/readDist/"+fileName+"_readDist"+".txt");
+				writeEditDistance(editDistance, outDir+"/default/editDistance/"+fileName+"_editDistance"+".txt");
+				writePercentIdentity(percentIdentity, outDir+"/default/percentIdentity/"+fileName+"_percentIdentity"+".txt");
+				writeCoverageHistogram(coverageHistogram, outDir+"/default/readDist/"+fileName+"_coverageHist"+".txt");
+				
+				//ancient stuff
+				new File(outDir+"/ancient/").mkdirs();
+				writeMisMap(misMatches, outDir+"/ancient/damageMismatch/"+fileName+"_damageMismatch"+".txt");
+				writeReadDist(readDistribution, outDir+"/ancient/readDist/"+fileName+"_readDist"+".txt"); 
+				writeEditDistance(editDistance, outDir+"/ancient/editDistance/"+fileName+"_editDistance"+".txt");
+				writePercentIdentity(percentIdentity, outDir+"/ancient/percentIdentity/"+fileName+"_percentIdentity"+".txt");
+				writeCoverageHistogram(coverageHistogram, outDir+"/ancient/readDist/"+fileName+"_coverageHist"+".txt");
+			}
 	}
 }
