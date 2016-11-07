@@ -67,6 +67,10 @@ public class SimultaniouslyAncientNon extends RMA6TaxonDamageFilter{
 					s+="\t"+0;
 				}
 				setDamageLine(s);
+				setAncientDamageLine(s);
+				setAncientReadDistribution(new CompositionMap(new HashMap<Integer,ArrayList<Alignment>>()));
+				setAncientEditDistanceHistogram(ancientDistances);
+				setAncientPercentIdentityHistogram(ancientPIdents);
 		}else{
 			if(verbose)
 				log.log(Level.INFO,"Processing Taxon "+taxName+" in File " +fileName); 
@@ -160,7 +164,7 @@ public class SimultaniouslyAncientNon extends RMA6TaxonDamageFilter{
 				//set all non-filter information 
 				CompositionMap map = new CompositionMap(taxonMap);
 				map.process();
-				
+				//set defaults
 				StrainMap strain = new StrainMap(taxName,allContainer,numMatches);
 				setDamageLine(strain.getLine());
 				setNumberOfReads(numReads);

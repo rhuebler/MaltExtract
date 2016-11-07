@@ -59,9 +59,9 @@ public class RMA6TaxonNonDuplicateFilter  extends RMA6TaxonProcessor{
 			}
 			
 		}
-		StrainMap strain = new StrainMap(taxName,container,numReads);
+		StrainMap strain = new StrainMap(taxName,container,numMatches);
 		setDamageLine(strain.getLine());
-		setNumMatches(numMatches);
+		setNumberOfReads(numReads);
 		setEditDistanceHistogram(distances);
 		setPercentIdentityHistogram(pIdents);
 		//setSupplementary(supplementary);

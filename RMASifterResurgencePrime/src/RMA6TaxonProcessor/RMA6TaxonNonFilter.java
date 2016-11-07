@@ -127,9 +127,9 @@ public class RMA6TaxonNonFilter  extends RMA6TaxonProcessor{
 				CompositionMap map = new CompositionMap(taxonMap);
 				map.process();
 				
-				StrainMap strain = new StrainMap(taxName,container,numReads);
+				StrainMap strain = new StrainMap(taxName,container,numMatches);
 				setDamageLine(strain.getLine());
-				setNumMatches(numMatches);
+				setNumberOfReads(numReads);
 				setReadDistribution(map);
 				
 				setEditDistanceHistogram(distances);

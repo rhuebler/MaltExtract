@@ -23,6 +23,7 @@ import RMA6Processor.RMA6Processor;
 import RMA6Processor.RMA6Scanner;
 import behaviour.Filter;
 import behaviour.Taxas;
+import utility.DirectoryCreator;
 import utility.InputParameterProcessor;
 import utility.ScanSummaryWriter;
 import utility.SummaryWriter;
@@ -71,29 +72,8 @@ public class RMAExtractor {
 		log.log(Level.INFO, "Setting up Taxon Name and Taxon ID maps");
 		
 		NCBI_MapReader mapReader = new NCBI_MapReader(inProcessor.getTreePath());
-		if(inProcessor.getFilter()!=Filter.NON_ANCIENT){
-		new File(inProcessor.getOutDir()+"/readDist/").mkdirs(); //TODO could break potentially on Windows systems
-		new File(inProcessor.getOutDir()+"/editDistance/").mkdirs();
-		new File(inProcessor.getOutDir()+"/percentIdentity/").mkdirs();
-		new File(inProcessor.getOutDir()+"/damageMismatch/").mkdirs();
-		if(inProcessor.getBlastHits())
-			new File(inProcessor.getOutDir()+"/reads/").mkdirs();
-		if(inProcessor.wantToCrawl())
-			new File(inProcessor.getOutDir()+"/crawlResults/").mkdirs();
-		}else if(inProcessor.getFilter()==Filter.NON_ANCIENT){
-		new File(inProcessor.getOutDir()+"/default/").mkdirs();
-		new File(inProcessor.getOutDir()+"/ancient/").mkdirs();
-		new File(inProcessor.getOutDir()+"/ancient/"+"/readDist/").mkdirs(); //TODO could break potentially on Windows systems
-		new File(inProcessor.getOutDir()+"/ancient/"+"/editDistance/").mkdirs();
-		new File(inProcessor.getOutDir()+"/ancient/"+"/percentIdentity/").mkdirs();
-		new File(inProcessor.getOutDir()+"/ancient/"+"/damageMismatch/").mkdirs();
-		new File(inProcessor.getOutDir()+"/default/"+"/readDist/").mkdirs(); //TODO could break potentially on Windows systems
-		new File(inProcessor.getOutDir()+"/default/"+"/editDistance/").mkdirs();
-		new File(inProcessor.getOutDir()+"/default/"+"/percentIdentity/").mkdirs();
-		new File(inProcessor.getOutDir()+"/default/"+"/damageMismatch/").mkdirs();
-		if(inProcessor.getBlastHits())
-			new File(inProcessor.getOutDir()+"/ancient/"+"/reads/").mkdirs();
-		}
+		DirectoryCreator dCreator = new DirectoryCreator();
+		dCreator.process(inProcessor.getFilter(),inProcessor.getOutDir(),inProcessor.getBlastHits(),inProcessor.wantToCrawl());
 		List<Integer> taxIDs= new  ArrayList<Integer>();
 		
 		NCBI_TreeReader treeReader = new NCBI_TreeReader(inProcessor.getTreePath());

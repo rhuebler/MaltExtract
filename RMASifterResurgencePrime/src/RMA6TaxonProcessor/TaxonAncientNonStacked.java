@@ -77,9 +77,9 @@ public class TaxonAncientNonStacked  extends RMA6TaxonDamageFilter{
 			}
 			
 		}
-		StrainMap strain = new StrainMap(taxName,container,numReads);
+		StrainMap strain = new StrainMap(taxName,container,numMatches);
 		setDamageLine(strain.getLine());
-		setNumMatches(numMatches);
+		setNumberOfReads(numReads);
 		setEditDistanceHistogram(distances);
 		setPercentIdentityHistogram(pIdents);
 		
