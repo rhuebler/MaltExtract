@@ -165,6 +165,7 @@ public class RMA6OutputProcessor {
 					writeBlastHits(id,taxProcessor.getReads(),outDir+"reads/"+fileName+"/");
 				}
 				if(behave == Filter.NON_ANCIENT){
+					ancientSum.put(id, taxProcessor.getAncientNumberOfReads());
 					ancientEditDistance.add(taxProcessor.getAncientEditDistanceHistogram());
 					ancientPercentIdentity.add(taxProcessor.getAncientPercentIdentityHistogram());
 					ancientReadDistribution.add(taxProcessor.getAncientReadDistribution());

@@ -152,7 +152,7 @@ public class SimultaniouslyAncientNon extends RMA6TaxonDamageFilter{
 						allDistances.add(editDistance/k);
 						allPIdents.add(pIdent/k);
 					}
-					if(higher&&damage !=0){
+					if(higher&&damage != 0){
 						ancientNumReads++;
 						ancientDistances.add(ancientEditDistance/damage);
 						ancientPIdents.add(ancientPIdent/damage);
