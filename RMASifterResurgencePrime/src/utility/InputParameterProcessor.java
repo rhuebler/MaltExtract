@@ -117,7 +117,7 @@ public class InputParameterProcessor {
     	    // long flags
     	    Option option_Threads = Option.builder("p").longOpt("threads").argName("1..maxNumberOfCores").hasArg().optionalArg(true).desc("Number of Cores to run on").build();		
     	    Option option_TopPercent = Option.builder("a").longOpt("top").argName("0.0-0.99").hasArg().optionalArg(true).desc("Top Percent of Matches to Consider").build();
-    	    Option option_Filter = Option.builder("f").longOpt("filter").argName("non,ancient,nonduplicate, scan").optionalArg(true).hasArg().desc("Specify the behaviour for run eg ancient").build();
+    	    Option option_Filter = Option.builder("f").longOpt("filter").argName("non, ancient, nonduplicate, def_anc, nd_anc, scan").optionalArg(true).hasArg().desc("Specify the behaviour for run eg ancient").build();
     	    Option option_MaxLength = Option.builder().longOpt("maxLength").argName("maxLength").hasArg().optionalArg(true).desc("Set Maximum Read Length").build();
     	    Option option_minPercentIdent = Option.builder().longOpt("minPI").argName("minPI").hasArg().optionalArg(true).desc("Set Minumum Percent Identity").build(); 
     	    Option option_Help = Option.builder("h").longOpt("help").optionalArg(true).desc("Print Usage and shutdown").build();
@@ -240,7 +240,7 @@ public class InputParameterProcessor {
     	            	this.behave = Filter.SCAN;
     	            	log.log(Level.INFO,"Custom Behaviour set to: "+commandLine.getOptionValue("filter"));
     	            }
-    	            else if(Pattern.compile(Pattern.quote("all"), Pattern.CASE_INSENSITIVE).matcher(commandLine.getOptionValue("filter")).find()){
+    	            else if(Pattern.compile(Pattern.quote("nd_anc"), Pattern.CASE_INSENSITIVE).matcher(commandLine.getOptionValue("filter")).find()){
     	            	this.behave = Filter.ALL;
     	            	log.log(Level.INFO,"Custom Behaviour set to: "+commandLine.getOptionValue("filter"));
     	            }
