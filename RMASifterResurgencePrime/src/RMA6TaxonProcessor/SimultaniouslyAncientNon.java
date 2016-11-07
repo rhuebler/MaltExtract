@@ -43,6 +43,7 @@ public class SimultaniouslyAncientNon extends RMA6TaxonDamageFilter{
 		
 		this.taxName = getName(taxID);
 		int numMatches = 0;
+		int ancientNumMatches = 0;
 		// use ReadsIterator to get all Reads assigned to MegantaxID and print top percent to file
 		try(RMA6File rma6File = new RMA6File(inDir+fileName, "r")){
 			ListOfLongs list = new ListOfLongs();
@@ -89,6 +90,7 @@ public class SimultaniouslyAncientNon extends RMA6TaxonDamageFilter{
 						if(blocks[i].getBitScore()/topScore < 1-topPercent){
 							break;}
 						
+						numMatches++;
 						Alignment al = new Alignment();
 						al.processText(blocks[i].getText().split("\n"));
 						al.setPIdent(blocks[i].getPercentIdentity());
@@ -97,7 +99,7 @@ public class SimultaniouslyAncientNon extends RMA6TaxonDamageFilter{
 						al.setAcessionNumber(blocks[i].getRefSeqId());	
 						if(minPIdent <= al.getPIdent()){ // check for minPercentIdentity
 							if(al.getFivePrimeDamage()){
-								ancientNumReads++;
+								ancientNumMatches++;
 								higher = true;
 								//get mismatches
 								ancientContainer.processAlignment(al);
@@ -159,9 +161,9 @@ public class SimultaniouslyAncientNon extends RMA6TaxonDamageFilter{
 				CompositionMap map = new CompositionMap(taxonMap);
 				map.process();
 				
-				StrainMap strain = new StrainMap(taxName,allContainer,numReads);
+				StrainMap strain = new StrainMap(taxName,allContainer,numMatches);
 				setDamageLine(strain.getLine());
-				setNumMatches(numMatches);
+				setNumberOfReads(numReads);
 				setReadDistribution(map);
 				
 				setEditDistanceHistogram(allDistances);
@@ -171,9 +173,9 @@ public class SimultaniouslyAncientNon extends RMA6TaxonDamageFilter{
 				CompositionMap aMap = new CompositionMap(ancientMap);
 				aMap.process();
 				
-				StrainMap aStrain = new StrainMap(taxName,ancientContainer,ancientNumReads);
+				StrainMap aStrain = new StrainMap(taxName,ancientContainer,ancientNumMatches);
 				setAncientDamageLine(aStrain.getLine());
-				setAncientNumMatches(numMatches);
+				setAncientNumberOfReads(ancientNumReads);
 				setAncientReadDistribution(aMap);
 				
 				setAncientEditDistanceHistogram(ancientDistances);

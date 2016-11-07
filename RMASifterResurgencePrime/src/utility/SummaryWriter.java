@@ -16,6 +16,7 @@ import java.util.logging.Logger;
 
 import NCBI_MapReader.NCBI_MapReader;
 import RMA6Processor.RMA6Processor;
+import behaviour.Filter;
 /**
  * Write overall Summy file from processed RMA6Files
  * @author huebler
@@ -30,16 +31,24 @@ public class SummaryWriter {
 	private NCBI_MapReader mapReader;
 	private List<Future<RMA6Processor>> processedFiles;
 	private Set<Integer> processedIDs;
-	private List<String> summary;
 	private String outDir;
 	private Logger warning;
-	public SummaryWriter(List<Future<RMA6Processor>> pFiles, NCBI_MapReader mReader, String oDir, Logger warning){
+	private Filter behave;
+	public SummaryWriter(List<Future<RMA6Processor>> pFiles, NCBI_MapReader mReader, String oDir, Logger warning, Filter behave){
 		this.processedFiles = pFiles;
 		this.mapReader = mReader;
 		this.outDir = oDir;
 		this.warning = warning;
+		this.behave = behave;
+		
+	}
+	public void process(){
 		setProcessedIds();
-		prepareOutput();
+		if(behave != Filter.NON_ANCIENT){
+			prepareOutput();
+		}else{
+			prepareSimultaneOutput();
+		}
 	}
 	private void setProcessedIds(){
 		Set<Integer> pIDs = new HashSet<>();
@@ -108,11 +117,95 @@ public class SummaryWriter {
 		   summary.sort(null);
 		   summary.add(0,reads);
 		   summary.add(0,header);
-		   this.summary =  summary;
+		   writeSummary(summary,outDir+"RunSummary"+".txt");
 	}
-	public void writeSummary() {
+	private void prepareSimultaneOutput() {
+		   List<String> summary = new ArrayList<String>();
+		   List<String> ancient = new ArrayList<String>();
+		   String header ="Node"; // could and should be its own function 
+		   String reads = "Total_Count";
+		   boolean first = true;	   
+		   for(Future<RMA6Processor> future : processedFiles){
+			   RMA6Processor current;
+			   try {
+				   current = future.get();
+				   header+="\t" + current.getfileName();
+				   reads += "\t" + current.getTotalCount();
+				   HashMap<Integer,Integer> fileResults = current.getSumLine();
+				   HashMap<Integer,Integer> ancientResults  = current.getAncientLine();
+				   if(first ==true){
+					   for(int id : processedIDs){
+						   String line;
+						   String ancientLine;
+							if( mapReader.getNcbiIdToNameMap().get(id) != null){
+								line = mapReader.getNcbiIdToNameMap().get(id).replace(' ', '_');
+								ancientLine = mapReader.getNcbiIdToNameMap().get(id).replace(' ', '_');
+							}else{
+								line = "unasigned";
+								ancientLine = "unasigned";
+							}
+						   if(fileResults.containsKey(id)){
+							   line+= "\t"+fileResults.get(id);
+							   summary.add(line);
+						   }else{
+							   line+= "\t"+0;
+							   summary.add(line);
+						   }
+						   if(ancientResults.containsKey(id)){
+							   ancientLine += "\t"+ancientResults.get(id);
+							   ancient.add(ancientLine);
+						   }else{
+							   ancientLine += "\t"+0;
+							   ancient.add(ancientLine);
+						   }
+							   
+					   first = false;
+					   }//for
+				   	}else{
+					   int i = 0;
+					   for(int id : processedIDs){ 
+						   String line = summary.get(i);
+						   String ancientLine = ancient.get(i);
+						   if(fileResults.containsKey(id)){
+							   line+= "\t"+fileResults.get(id);
+							   summary.set(i,line);
+						   }else{
+							   line+= "\t"+0;
+							   summary.set(i,line);
+						   }
+						   if(ancientResults.containsKey(id)){
+							   ancientLine += "\t"+ancientResults.get(id);
+							   ancient.set(i,ancientLine);
+						   }else{
+							   ancientLine += "\t"+0;
+							   ancient.set(i,ancientLine);
+						   }
+					  
+						   i++;
+					   }
+				   	}
+				  
+			}catch (InterruptedException e) {
+				warning.log(Level.SEVERE, "Error", e);
+			} catch (ExecutionException e) {
+				warning.log(Level.SEVERE, "Error", e);
+			}
+			   
+		   }//for
+		   summary.sort(null);
+		   summary.add(0,reads);
+		   summary.add(0,header);
+		   
+		   ancient.sort(null);
+		   ancient.add(0,reads);
+		   ancient.add(0,header);
+		   
+		   writeSummary(ancient,outDir+"/ancient/"+"RunSummary"+".txt");
+		   writeSummary(summary,outDir+"/default/"+"RunSummary"+".txt");
+	}
+	private void writeSummary(List<String> summary,String outDir) {
 		try{
-		Path file = Paths.get(outDir+"RunSummary"+".txt");
+		Path file = Paths.get(outDir);
 		Files.write(file, summary, Charset.forName("UTF-8"));
 		}catch(IOException io){
 			warning.log(Level.SEVERE, "Error", io);

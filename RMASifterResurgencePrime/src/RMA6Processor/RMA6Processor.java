@@ -20,6 +20,7 @@ import RMA6TaxonProcessor.RMA6TaxonDamageFilter;
 import RMA6TaxonProcessor.RMA6TaxonNonDuplicateFilter;
 import RMA6TaxonProcessor.RMA6TaxonNonFilter;
 import RMA6TaxonProcessor.RMA6TaxonProcessor;
+import RMA6TaxonProcessor.SimultaniouslyAncientNon;
 import RMA6TaxonProcessor.TaxonAncientNonStacked;
 import behaviour.Filter;
 import behaviour.Taxas;
@@ -41,6 +42,7 @@ public class RMA6Processor {
 	 * @throws none thrown all caught
 	 */
 	private HashMap<Integer,Integer> overallSum;
+	private HashMap<Integer,Integer> ancientSum;
 	private String outDir;
 	private String fileName;
 	private String inDir;
@@ -124,6 +126,9 @@ public class RMA6Processor {
 	}
 	
 	//getter
+	public HashMap<Integer,Integer> getAncientLine(){
+		return this.ancientSum;
+	}
 	public int getTotalCount(){
 		return this.totalCount;
 		
@@ -178,7 +183,12 @@ public void process(List<Integer>taxIDs, double topPercent) {// processing
 					taxProcessor = new TaxonAncientNonStacked(id, minPIdent, mapReader, verbose, log, warning, reads);
 				else
 					taxProcessor = new TaxonAncientNonStacked(id, minPIdent, mapReader, verbose, log, warning);
-			}
+			}else if(behave == Filter.NON_ANCIENT){
+			if(reads)
+				taxProcessor = new SimultaniouslyAncientNon(id, minPIdent, mapReader, verbose, log, warning, reads);
+			else
+				taxProcessor = new SimultaniouslyAncientNon(id, minPIdent, mapReader, verbose, log, warning);
+		}
 			ConcurrentRMA6TaxonProcessor task = new ConcurrentRMA6TaxonProcessor(taxProcessor,inDir, fileName, topPercent, maxLength);
 			Future<RMA6TaxonProcessor> future = executor.submit(task);
 			results.put(id, future);
@@ -187,5 +197,8 @@ public void process(List<Integer>taxIDs, double topPercent) {// processing
 	RMA6OutputProcessor outProcessor = new RMA6OutputProcessor(fileName, outDir,mapReader,warning, behave, reads);
 	outProcessor.prepareOutput(results);
 	setSumLine(outProcessor.getSumLine());
+	if(behave==Filter.NON_ANCIENT){
+		ancientSum = outProcessor.getAncientLine();
+	}
     }
  }

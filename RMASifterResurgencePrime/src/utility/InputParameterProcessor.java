@@ -244,7 +244,10 @@ public class InputParameterProcessor {
     	            	this.behave = Filter.ALL;
     	            	log.log(Level.INFO,"Custom Behaviour set to: "+commandLine.getOptionValue("filter"));
     	            }
-    	            
+    	            else if(Pattern.compile(Pattern.quote("def_anc"), Pattern.CASE_INSENSITIVE).matcher(commandLine.getOptionValue("filter")).find()){
+    	            	this.behave = Filter.NON_ANCIENT;
+    	            	log.log(Level.INFO,"Custom Behaviour set to: "+commandLine.getOptionValue("filter"));
+    	            }
     	        }
 
     	        if (commandLine.hasOption("top"))

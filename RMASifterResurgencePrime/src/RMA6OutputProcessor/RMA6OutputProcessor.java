@@ -1,6 +1,5 @@
 package RMA6OutputProcessor;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
@@ -31,6 +30,7 @@ public class RMA6OutputProcessor {
 	private Logger warning;
 	private Filter behave;
 	HashMap<Integer,Integer> overallSum;
+	HashMap<Integer,Integer> ancientSum;
 	private boolean reads = false;
 	// constructor
 	public RMA6OutputProcessor(String fileName, String outDir, NCBI_MapReader mapReader,
@@ -48,7 +48,12 @@ public class RMA6OutputProcessor {
 	public HashMap<Integer,Integer> getSumLine(){
 		return this.overallSum;
 	}
-	
+	private void setAncientLine(HashMap<Integer,Integer> list)
+	{	this.ancientSum = list;
+	}
+	public HashMap<Integer,Integer> getAncientLine(){
+		return this.ancientSum;
+	}
 	private void writeMisMap(ArrayList<String> summary, String outDir){
 			String header = "Node";
 			String header_part2 ="";
@@ -160,7 +165,6 @@ public class RMA6OutputProcessor {
 					writeBlastHits(id,taxProcessor.getReads(),outDir+"reads/"+fileName+"/");
 				}
 				if(behave == Filter.NON_ANCIENT){
-					ancientSum.put(id, taxProcessor.getAncientNumberOfReads());
 					ancientEditDistance.add(taxProcessor.getAncientEditDistanceHistogram());
 					ancientPercentIdentity.add(taxProcessor.getAncientPercentIdentityHistogram());
 					ancientReadDistribution.add(taxProcessor.getAncientReadDistribution());
@@ -172,16 +176,19 @@ public class RMA6OutputProcessor {
 				e.printStackTrace();
 			}
 		}	
-			if(behave!=Filter.ANCIENT){
+			if(behave!=Filter.NON_ANCIENT){
+			//normal behaviour	
 			setSumLine(overallSum); // set number of assigned Reads to overall file summary
 			writeMisMap(misMatches, outDir+"damageMismatch/"+fileName+"_damageMismatch"+".txt");
 			writeReadDist(readDistribution, outDir+"/readDist/"+fileName+"_readDist"+".txt"); 
 			writeEditDistance(editDistance, outDir+"/editDistance/"+fileName+"_editDistance"+".txt");
 			writePercentIdentity(percentIdentity, outDir+"/percentIdentity/"+fileName+"_percentIdentity"+".txt");
 			writeCoverageHistogram(coverageHistogram, outDir+"/readDist/"+fileName+"_coverageHist"+".txt");
-			}else if(behave == Filter.ANCIENT){
+			
+			}else if(behave == Filter.NON_ANCIENT){
+				//Non ancient
 				//normal stuff
-				new File(outDir+"/default/").mkdirs();
+				setSumLine(overallSum);
 				writeMisMap(misMatches, outDir+"/default/damageMismatch/"+fileName+"_damageMismatch"+".txt");
 				writeReadDist(readDistribution, outDir+"/default/readDist/"+fileName+"_readDist"+".txt");
 				writeEditDistance(editDistance, outDir+"/default/editDistance/"+fileName+"_editDistance"+".txt");
@@ -189,12 +196,13 @@ public class RMA6OutputProcessor {
 				writeCoverageHistogram(coverageHistogram, outDir+"/default/readDist/"+fileName+"_coverageHist"+".txt");
 				
 				//ancient stuff
-				new File(outDir+"/ancient/").mkdirs();
+				setAncientLine(ancientSum);
 				writeMisMap(misMatches, outDir+"/ancient/damageMismatch/"+fileName+"_damageMismatch"+".txt");
 				writeReadDist(readDistribution, outDir+"/ancient/readDist/"+fileName+"_readDist"+".txt"); 
 				writeEditDistance(editDistance, outDir+"/ancient/editDistance/"+fileName+"_editDistance"+".txt");
 				writePercentIdentity(percentIdentity, outDir+"/ancient/percentIdentity/"+fileName+"_percentIdentity"+".txt");
 				writeCoverageHistogram(coverageHistogram, outDir+"/ancient/readDist/"+fileName+"_coverageHist"+".txt");
+				
 			}
 	}
 }

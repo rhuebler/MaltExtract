@@ -71,7 +71,7 @@ public class RMAExtractor {
 		log.log(Level.INFO, "Setting up Taxon Name and Taxon ID maps");
 		
 		NCBI_MapReader mapReader = new NCBI_MapReader(inProcessor.getTreePath());
-		
+		if(inProcessor.getFilter()!=Filter.NON_ANCIENT){
 		new File(inProcessor.getOutDir()+"/readDist/").mkdirs(); //TODO could break potentially on Windows systems
 		new File(inProcessor.getOutDir()+"/editDistance/").mkdirs();
 		new File(inProcessor.getOutDir()+"/percentIdentity/").mkdirs();
@@ -80,6 +80,20 @@ public class RMAExtractor {
 			new File(inProcessor.getOutDir()+"/reads/").mkdirs();
 		if(inProcessor.wantToCrawl())
 			new File(inProcessor.getOutDir()+"/crawlResults/").mkdirs();
+		}else if(inProcessor.getFilter()==Filter.NON_ANCIENT){
+		new File(inProcessor.getOutDir()+"/default/").mkdirs();
+		new File(inProcessor.getOutDir()+"/ancient/").mkdirs();
+		new File(inProcessor.getOutDir()+"/ancient/"+"/readDist/").mkdirs(); //TODO could break potentially on Windows systems
+		new File(inProcessor.getOutDir()+"/ancient/"+"/editDistance/").mkdirs();
+		new File(inProcessor.getOutDir()+"/ancient/"+"/percentIdentity/").mkdirs();
+		new File(inProcessor.getOutDir()+"/ancient/"+"/damageMismatch/").mkdirs();
+		new File(inProcessor.getOutDir()+"/default/"+"/readDist/").mkdirs(); //TODO could break potentially on Windows systems
+		new File(inProcessor.getOutDir()+"/default/"+"/editDistance/").mkdirs();
+		new File(inProcessor.getOutDir()+"/default/"+"/percentIdentity/").mkdirs();
+		new File(inProcessor.getOutDir()+"/default/"+"/damageMismatch/").mkdirs();
+		if(inProcessor.getBlastHits())
+			new File(inProcessor.getOutDir()+"/ancient/"+"/reads/").mkdirs();
+		}
 		List<Integer> taxIDs= new  ArrayList<Integer>();
 		
 		NCBI_TreeReader treeReader = new NCBI_TreeReader(inProcessor.getTreePath());
@@ -120,9 +134,9 @@ public class RMAExtractor {
     		}//fileNames;
 	    // wait for all threads to finish here currently no concurrency errors or deadlocks but this would be the place where it would fall apart 
 	    destroy();
-	    SummaryWriter sumWriter = new SummaryWriter(processedFiles,mapReader,inProcessor.getOutDir(), warning); 
+	    SummaryWriter sumWriter = new SummaryWriter(processedFiles,mapReader,inProcessor.getOutDir(), warning,inProcessor.getFilter()); 
+	    sumWriter.process();
 	    log.log(Level.INFO, "Writing Summary File");
-	    sumWriter.writeSummary();
 	  }else if(inProcessor.getFilter() == Filter.SCAN && !inProcessor.wantToCrawl()){
 		  List<Future<RMA6Scanner>> scannerList = new ArrayList<Future<RMA6Scanner>>();
 		  // every tree has its own copy of this now to avoid concurrency issues
