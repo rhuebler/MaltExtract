@@ -42,7 +42,6 @@ public RMA6TaxonDamageFilter(int id ,double pID, NCBI_MapReader reader,
 	super(id,pID, reader, v, log, warning);
 	this.wantReads =reads;
 }
-@Override
 public void process(String inDir, String fileName, double topPercent, int maxLength){ 
 	if(mapReader.getNcbiIdToNameMap().get(taxID) != null)
 		this.taxName = getName(taxID);
