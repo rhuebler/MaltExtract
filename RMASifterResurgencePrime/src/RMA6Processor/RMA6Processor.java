@@ -21,7 +21,7 @@ import RMA6TaxonProcessor.RMA6TaxonNonDuplicateFilter;
 import RMA6TaxonProcessor.RMA6TaxonNonFilter;
 import RMA6TaxonProcessor.RMA6TaxonProcessor;
 import RMA6TaxonProcessor.SimultaniouslyAncientNon;
-import RMA6TaxonProcessor.TaxonAncientNonStacked;
+import RMA6TaxonProcessor.RMA6TaxonAncientNonDuplicate;
 import behaviour.Filter;
 import behaviour.Taxas;
 import megan.rma6.ClassificationBlockRMA6;
@@ -180,9 +180,9 @@ public void process(List<Integer>taxIDs, double topPercent) {// processing
 				 taxProcessor = new RMA6TaxonNonDuplicateFilter(id, minPIdent, mapReader, verbose, log, warning);
 			}else if(behave == Filter.ALL){
 				if(reads)
-					taxProcessor = new TaxonAncientNonStacked(id, minPIdent, mapReader, verbose, log, warning, reads);
+					taxProcessor = new RMA6TaxonAncientNonDuplicate(id, minPIdent, mapReader, verbose, log, warning, reads);
 				else
-					taxProcessor = new TaxonAncientNonStacked(id, minPIdent, mapReader, verbose, log, warning);
+					taxProcessor = new RMA6TaxonAncientNonDuplicate(id, minPIdent, mapReader, verbose, log, warning);
 			}else if(behave == Filter.NON_ANCIENT){
 			if(reads)
 				taxProcessor = new SimultaniouslyAncientNon(id, minPIdent, mapReader, verbose, log, warning, reads);

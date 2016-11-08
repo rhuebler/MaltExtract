@@ -20,10 +20,10 @@ import megan.rma6.ReadBlockGetterRMA6;
 import strainMap.StrainMap;
 import strainMap.StrainMisMatchContainer;
 public class NodeProcessor{
-		private RMA6TaxonProcessor ancientProcessor;
-		private RMA6TaxonProcessor defaultProcessor;
-		private RMA6TaxonProcessor nonDuplicateProcessor;
-		private RMA6TaxonProcessor ancientNonDuplicateProcessor;
+		private RMA6TaxonDamageFilter ancientProcessor;
+		private RMA6TaxonNonFilter defaultProcessor;
+		private RMA6TaxonNonDuplicateFilter nonDuplicateProcessor;
+		private RMA6TaxonAncientNonDuplicate ancientNonDuplicateProcessor;
 		private String taxName;	
 		private boolean wantReads = false;
 		private NCBI_MapReader mapReader;
@@ -78,15 +78,25 @@ public class NodeProcessor{
 			
 		}
 		public void process(String inDir, String fileName, double topPercent, int maxLength){ 
-			ArrayList<Integer> allDistances = new ArrayList<Integer>();
-			ArrayList<Double> allPIdents = new ArrayList<Double>();
-			StrainMisMatchContainer allContainer = new StrainMisMatchContainer();
-			
-			ArrayList<Integer> ancientDistances = new ArrayList<Integer>();
-			ArrayList<Double> ancientPIdents = new ArrayList<Double>();
-			ArrayList<String> ancientLines = new ArrayList<String>();
-			StrainMisMatchContainer ancientContainer = new StrainMisMatchContainer();
-			
+			if(wantReads){
+				if(behave == Filter.NON_ANCIENT ||behave == Filter.ANCIENT ){
+					
+				}else if(behave == Filter.NON_ANCIENT ||behave == Filter.NON ){
+					
+				}else if(behave == Filter.ALL){
+					
+				}		
+			}else{
+if(behave == Filter.NON_ANCIENT ||behave == Filter.ANCIENT ){
+					
+				}else if(behave == Filter.NON_ANCIENT ||behave == Filter.NON ){
+					
+				}else if(behave == Filter.ALL){
+					
+				}else if(behave == Filter.NONDUPLICATES){
+					
+				}	
+			}
 			this.taxName = getName(taxID);
 			int numMatches = 0;
 			int ancientNumMatches = 0;
@@ -114,20 +124,20 @@ public class NodeProcessor{
 					defaultProcessor.setEditDistanceHistogram(allDistances);
 					defaultProcessor.setDamageLine(s);
 					
-					ancientProcessor.setAncientDamageLine(s);
-					ancientProcessor.setAncientReadDistribution(new CompositionMap(new HashMap<Integer,ArrayList<Alignment>>()));
-					ancientProcessor.setAncientEditDistanceHistogram(ancientDistances);
-					ancientProcessor.setAncientPercentIdentityHistogram(ancientPIdents);
+					ancientProcessor.setDamageLine(s);
+					ancientProcessor.setReadDistribution(new CompositionMap(new HashMap<Integer,ArrayList<Alignment>>()));
+					ancientProcessor.setEditDistanceHistogram(ancientDistances);
+					ancientProcessor.setPercentIdentityHistogram(ancientPIdents);
 					
-					nonDuplicateProcessor.setAncientDamageLine(s);
-					nonDuplicateProcessor.setAncientReadDistribution(new CompositionMap(new HashMap<Integer,ArrayList<Alignment>>()));
-					nonDuplicateProcessor.setAncientEditDistanceHistogram(ancientDistances);
-					nonDuplicateProcessor.setAncientPercentIdentityHistogram(ancientPIdents);
+					nonDuplicateProcessor.setDamageLine(s);
+					nonDuplicateProcessor.setReadDistribution(new CompositionMap(new HashMap<Integer,ArrayList<Alignment>>()));
+					nonDuplicateProcessor.setEditDistanceHistogram(ancientDistances);
+					nonDuplicateProcessor.setPercentIdentityHistogram(ancientPIdents);
 					
-					ancientNonDuplicateProcessor.setAncientDamageLine(s);
-					ancientNonDuplicateProcessor.setAncientReadDistribution(new CompositionMap(new HashMap<Integer,ArrayList<Alignment>>()));
-					ancientNonDuplicateProcessor.setAncientEditDistanceHistogram(ancientDistances);
-					ancientNonDuplicateProcessor.setAncientPercentIdentityHistogram(ancientPIdents);
+					ancientNonDuplicateProcessor.setDamageLine(s);
+					ancientNonDuplicateProcessor.setReadDistribution(new CompositionMap(new HashMap<Integer,ArrayList<Alignment>>()));
+					ancientNonDuplicateProcessor.setEditDistanceHistogram(ancientDistances);
+					ancientNonDuplicateProcessor.setPercentIdentityHistogram(ancientPIdents);
 			}else{
 				if(verbose)
 					log.log(Level.INFO,"Processing Taxon "+taxName+" in File " +fileName); 
