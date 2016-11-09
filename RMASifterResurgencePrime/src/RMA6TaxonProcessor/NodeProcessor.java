@@ -17,8 +17,6 @@ import megan.data.ReadBlockIterator;
 import megan.rma6.ClassificationBlockRMA6;
 import megan.rma6.RMA6File;
 import megan.rma6.ReadBlockGetterRMA6;
-import strainMap.StrainMap;
-import strainMap.StrainMisMatchContainer;
 public class NodeProcessor{
 		private RMA6TaxonDamageFilter ancientProcessor;
 		private RMA6TaxonNonFilter defaultProcessor;
@@ -28,25 +26,24 @@ public class NodeProcessor{
 		private boolean wantReads = false;
 		private NCBI_MapReader mapReader;
 		private Integer taxID;
-		private double minPIdent;
 		private boolean verbose;
 		private Logger log;
 		private Logger warning;
 		private Filter behave;
-		
-		public NodeProcessor(int id, double pID, NCBI_MapReader reader, boolean v, Logger log, Logger warning, Filter behave) {
+		private double minPIdent;
+		public NodeProcessor(int id,double minPIdent, NCBI_MapReader reader, boolean v, Logger log, Logger warning, Filter behave) {
 			this.taxID = id;
-			this.minPIdent = pID;
+			this.minPIdent = minPIdent;
 			this.mapReader = reader;
 			this.verbose = v;
 			this.log = log;
 			this.warning = warning;
 		}
 		
-		public NodeProcessor(int id, double pID, NCBI_MapReader reader, boolean v, Logger log, Logger warning,
+		public NodeProcessor(int id, double minPIdent, NCBI_MapReader reader, boolean v, Logger log, Logger warning,
 				boolean reads, Filter behave) {
 			this.taxID = id;
-			this.minPIdent = pID;
+			this.minPIdent = minPIdent;
 			this.mapReader = reader;
 			this.verbose = v;
 			this.log = log;
@@ -80,26 +77,24 @@ public class NodeProcessor{
 		public void process(String inDir, String fileName, double topPercent, int maxLength){ 
 			if(wantReads){
 				if(behave == Filter.NON_ANCIENT ||behave == Filter.ANCIENT ){
-					
+					ancientProcessor = new RMA6TaxonDamageFilter(maxLength, minPIdent, mapReader, verbose, log, log, wantReads, topPercent, maxLength);
 				}else if(behave == Filter.NON_ANCIENT ||behave == Filter.NON ){
-					
+					defaultProcessor = new RMA6TaxonNonFilter(maxLength, minPIdent, mapReader, verbose, log, log, wantReads, topPercent, maxLength);
 				}else if(behave == Filter.ALL){
-					
+					ancientNonDuplicateProcessor = new RMA6TaxonAncientNonDuplicate(maxLength, minPIdent, mapReader, verbose, log, log, wantReads, topPercent, maxLength);
 				}		
 			}else{
-if(behave == Filter.NON_ANCIENT ||behave == Filter.ANCIENT ){
-					
+				if(behave == Filter.NON_ANCIENT ||behave == Filter.ANCIENT ){
+					ancientProcessor = new RMA6TaxonDamageFilter(maxLength, minPIdent, mapReader, verbose, log, log, topPercent, maxLength);
 				}else if(behave == Filter.NON_ANCIENT ||behave == Filter.NON ){
-					
+					defaultProcessor = new RMA6TaxonNonFilter(maxLength, minPIdent, mapReader, verbose, log, log, topPercent, maxLength);
 				}else if(behave == Filter.ALL){
-					
+					ancientNonDuplicateProcessor = new RMA6TaxonAncientNonDuplicate(maxLength, minPIdent, mapReader, verbose, log, log, topPercent, maxLength);
 				}else if(behave == Filter.NONDUPLICATES){
-					
+					nonDuplicateProcessor = new RMA6TaxonNonDuplicateFilter(maxLength, minPIdent, mapReader, verbose, log, log, topPercent, maxLength);
 				}	
 			}
 			this.taxName = getName(taxID);
-			int numMatches = 0;
-			int ancientNumMatches = 0;
 			// use ReadsIterator to get all Reads assigned to MegantaxID and print top percent to file
 			try(RMA6File rma6File = new RMA6File(inDir+fileName, "r")){
 				ListOfLongs list = new ListOfLongs();
@@ -112,247 +107,70 @@ if(behave == Filter.NON_ANCIENT ||behave == Filter.ANCIENT ){
 				   }
 				 }
 				IReadBlockIterator classIt  = new ReadBlockIterator(list, new ReadBlockGetterRMA6(rma6File, true, true, (float) 1.0,(float) 100.00,false,true));
-				if(!classIt.hasNext()){ // check if reads are assigned to TaxID if not print to console and skip
+				if(!classIt.hasNext()){ // check if reads are assigned to TaxID if not print to console and skip and set all values to default
 					if(verbose)
 						warning.log(Level.WARNING,"TaxID: " + taxID +  " not assigned in File " + fileName+"\n");
 					String s = taxName;
 					for(int i = 0;i<=40;i++){
 						s+="\t"+0;
 					}
+					ArrayList<Double> pIdents = new ArrayList<Double>();
+					ArrayList<Integer> distances = new ArrayList<Integer>();
 					defaultProcessor.setReadDistribution(new CompositionMap(new HashMap<Integer,ArrayList<Alignment>>()));
-					defaultProcessor.setPercentIdentityHistogram(allPIdents);
-					defaultProcessor.setEditDistanceHistogram(allDistances);
+					defaultProcessor.setPercentIdentityHistogram(pIdents);
+					defaultProcessor.setEditDistanceHistogram(distances);
 					defaultProcessor.setDamageLine(s);
 					
 					ancientProcessor.setDamageLine(s);
 					ancientProcessor.setReadDistribution(new CompositionMap(new HashMap<Integer,ArrayList<Alignment>>()));
-					ancientProcessor.setEditDistanceHistogram(ancientDistances);
-					ancientProcessor.setPercentIdentityHistogram(ancientPIdents);
+					ancientProcessor.setEditDistanceHistogram(distances);
+					ancientProcessor.setPercentIdentityHistogram(pIdents);
 					
 					nonDuplicateProcessor.setDamageLine(s);
 					nonDuplicateProcessor.setReadDistribution(new CompositionMap(new HashMap<Integer,ArrayList<Alignment>>()));
-					nonDuplicateProcessor.setEditDistanceHistogram(ancientDistances);
-					nonDuplicateProcessor.setPercentIdentityHistogram(ancientPIdents);
+					nonDuplicateProcessor.setEditDistanceHistogram(distances);
+					nonDuplicateProcessor.setPercentIdentityHistogram(pIdents);
 					
 					ancientNonDuplicateProcessor.setDamageLine(s);
 					ancientNonDuplicateProcessor.setReadDistribution(new CompositionMap(new HashMap<Integer,ArrayList<Alignment>>()));
-					ancientNonDuplicateProcessor.setEditDistanceHistogram(ancientDistances);
-					ancientNonDuplicateProcessor.setPercentIdentityHistogram(ancientPIdents);
+					ancientNonDuplicateProcessor.setEditDistanceHistogram(distances);
+					ancientNonDuplicateProcessor.setPercentIdentityHistogram(pIdents);
 			}else{
 				if(verbose)
 					log.log(Level.INFO,"Processing Taxon "+taxName+" in File " +fileName); 
-				HashMap<Integer, ArrayList<Alignment>> taxonMap = new HashMap<Integer,ArrayList<Alignment>>();
-				HashMap<Integer, ArrayList<Alignment>> ancientMap = new HashMap<Integer,ArrayList<Alignment>>();
-				int numReads = 0;
-				int ancientNumReads = 0;
 				while(classIt.hasNext()){
 					IReadBlock current = classIt.next();
-					boolean higher = false;
-					int damage = 0;
 					if(current.getReadLength() <= maxLength || maxLength == 0){
 						IMatchBlock[] blocks=current.getMatchBlocks();
-						int k=0;
-						float topScore = current.getMatchBlock(0).getBitScore();
-						double pIdent = 0;
-						int editDistance=0;
-						double ancientPIdent = 0;
-						int ancientEditDistance=0;
-						for(int i = 0; i< blocks.length;i++){
-							if(blocks[i].getBitScore()/topScore < 1-topPercent){
-								break;}
-							
-							numMatches++;
-							Alignment al = new Alignment();
-							al.processText(blocks[i].getText().split("\n"));
-							al.setPIdent(blocks[i].getPercentIdentity());
-							al.setReadName(current.getReadName());
-							al.setReadLength(current.getReadLength());
-							al.setAcessionNumber(blocks[i].getRefSeqId());	
-							if(minPIdent <= al.getPIdent()){ // check for minPercentIdentity
-								if(al.getFivePrimeDamage()){
-									ancientNumMatches++;
-									higher = true;
-									//get mismatches
-									ancientContainer.processAlignment(al);
-									if(!ancientMap.containsKey(blocks[i].getTaxonId())){
-										ArrayList<Alignment> entry =new ArrayList<Alignment>();
-										entry.add(al);
-										ancientMap.put(blocks[i].getTaxonId(), entry);
-									}else{
-										ArrayList<Alignment> entry = ancientMap.get(blocks[i].getTaxonId());
-										entry.add(al);
-										ancientMap.put(blocks[i].getTaxonId(),entry);
-									}
-									ancientEditDistance += al.getEditInstance();
-									ancientPIdent += al.getPIdent();
-									damage++;
-									if(wantReads){
-										String name = getName(blocks[i].getTaxonId());
-										ancientLines.add(al.getReadName()+"\t"+"Length:\t"+al.getReadLength()+"\t");
-										ancientLines.add(name+"\t"+al.getAccessionNumber()+"\t"+"Start:\t"+al.getStart()+"\t"+"End:\t"+al.getEnd());
-										ancientLines.add("Q:\t"+al.getQuery());
-										ancientLines.add("A:\t"+al.getAlignment());
-										ancientLines.add("R:\t"+al.getReference()+"\n");
-									}
-								}
-								//get mismatches
-								allContainer.processAlignment(al);
-								higher = true;
-								pIdent += al.getPIdent();
-								editDistance += al.getEditInstance();
-								if(!taxonMap.containsKey(blocks[i].getTaxonId())){
-									ArrayList<Alignment> entry =new ArrayList<Alignment>();
-									entry.add(al);
-									taxonMap.put(blocks[i].getTaxonId(), entry);
-								}else{
-									ArrayList<Alignment> entry = taxonMap.get(blocks[i].getTaxonId());
-									entry.add(al);
-									taxonMap.put(blocks[i].getTaxonId(),entry);
-								}
-								k++;
-							}
-							if(behave == Filter.NONDUPLICATES ||behave == Filter.ALL)
-								break;
-						}
-						if(behave==Filter.NON || behave==Filter.NON_ANCIENT){
-							if(higher){
-								numReads++;
-								allDistances.add(editDistance/k);
-								allPIdents.add(pIdent/k);
-							}
-						}
-						if(behave==Filter.ANCIENT || behave==Filter.NON_ANCIENT){
-							if(higher&&damage != 0){
-								ancientNumReads++;
-								ancientDistances.add(ancientEditDistance/damage);
-								ancientPIdents.add(ancientPIdent/damage);
-							}
-						}			
+						if(behave == Filter.NON_ANCIENT ||behave == Filter.ANCIENT ){
+							ancientProcessor.processMatchBlocks(blocks, current.getReadName(), current.getReadLength());
+						}else if(behave == Filter.NON_ANCIENT ||behave == Filter.NON ){
+							defaultProcessor.processMatchBlocks(blocks, current.getReadName(), current.getReadLength());
+						}else if(behave == Filter.ALL){
+							ancientNonDuplicateProcessor.processMatchBlocks(blocks, current.getReadName(), current.getReadLength());
+						}else if(behave == Filter.NONDUPLICATES){
+							nonDuplicateProcessor.processMatchBlocks(blocks, current.getReadName(), current.getReadLength());
+						}	
 					}// if  
 				}// while
-					classIt.close();
-					//set all non-filter information 
-					if(behave==Filter.NON || behave==Filter.NON_ANCIENT){
-						//set defaults
-					CompositionMap map = new CompositionMap(taxonMap);
-					map.process();
-					StrainMap strain = new StrainMap(taxName,allContainer,numMatches);
-					RMA6TaxonProcessor defaultProcessor = new RMA6TaxonProcessor();
-					defaultProcessor.setDamageLine(strain.getLine());
-					defaultProcessor.setNumberOfReads(numReads);
-					defaultProcessor.setReadDistribution(map);
-					defaultProcessor.setEditDistanceHistogram(allDistances);
-					defaultProcessor.setPercentIdentityHistogram(allPIdents);
-					this.defaultProcessor = defaultProcessor;
-					}
-					if(behave==Filter.ANCIENT || behave==Filter.NON_ANCIENT){
-						//set ancient information
-						CompositionMap aMap = new CompositionMap(ancientMap);
-						aMap.process();
-						StrainMap aStrain = new StrainMap(taxName,ancientContainer,ancientNumMatches);
-						RMA6TaxonProcessor ancientProcessor = new RMA6TaxonProcessor();
-						ancientProcessor.setDamageLine(aStrain.getLine());
-						ancientProcessor.setNumberOfReads(ancientNumReads);
-						ancientProcessor.setReadDistribution(aMap);
-						ancientProcessor.setEditDistanceHistogram(ancientDistances);
-						ancientProcessor.setPercentIdentityHistogram(ancientPIdents);
-						ancientProcessor.setReads(ancientLines);
-						this.ancientProcessor = ancientProcessor;
-					}
-					if(behave == Filter.NONDUPLICATES){
-						computeOutputNonDefault(taxonMap,taxID);
-					}
-					if(behave == Filter.ALL){
-						computeAncientNonDuplicates(ancientMap,taxID);
-					}
-					rma6File.close();
-			     }//else
-				}catch(Exception e){
+				classIt.close();
+				rma6File.close();
+				if(behave == Filter.NON_ANCIENT ||behave == Filter.ANCIENT ){
+					ancientProcessor.process();
+				}else if(behave == Filter.NON_ANCIENT ||behave == Filter.NON ){
+					defaultProcessor.process();
+				}else if(behave == Filter.ALL){
+					ancientNonDuplicateProcessor.process();
+				}else if(behave == Filter.NONDUPLICATES){
+					nonDuplicateProcessor.process();
+				}	
+				
+				}
+			}catch(Exception e){
 					warning.log(Level.SEVERE,mapReader.getNcbiIdToNameMap().get(taxID), e);	
 				
-				}
-			}// void
-		private void computeAncientNonDuplicates(HashMap<Integer, ArrayList<Alignment>> taxonMap, int taxID){
-			ArrayList<Integer> distances = new ArrayList<Integer>();
-			ArrayList<Double> pIdents = new ArrayList<Double>();
-			ArrayList<String> lines = new ArrayList<String>();
-			StrainMisMatchContainer container = new StrainMisMatchContainer();
-			int numMatches = 0;
-			lines.add(taxName);
-			CompositionMap map = new CompositionMap(taxonMap);
-			map.process();
-			map.markAllDuplicates();
-			ancientNonDuplicateProcessor.setReadDistribution(map);
-			taxonMap = map.getCompositionMap();
-			int numReads=0;
-			for(int key : taxonMap.keySet()){
-				for(Alignment entry : taxonMap.get(key)){
-					if(!entry.isDuplicate()){
-						String name = getName(key);
-						lines.add(entry.getReadName()+"\t"+"Length:\t"+entry.getReadLength()+"\t");
-						lines.add(name+"\t"+entry.getAccessionNumber()+"\t"+"Start:\t"+entry.getStart()+"\t"+"End:\t"+entry.getEnd());
-						lines.add("Q:\t"+entry.getQuery());
-						lines.add("A:\t"+entry.getAlignment());
-						lines.add("R:\t"+entry.getReference()+"\n");
-						//get mismatches
-						numMatches++;
-						container.processAlignment(entry);
-						pIdents.add(entry.getPIdent());
-						distances.add(entry.getEditInstance());
-						numReads++;
-					}
-					
-				}
-				
 			}
-			StrainMap strain = new StrainMap(taxName,container,numMatches);
-			ancientNonDuplicateProcessor.setReads(lines);
-			ancientNonDuplicateProcessor.setDamageLine(strain.getLine());
-			ancientNonDuplicateProcessor.setNumberOfReads(numReads);
-			ancientNonDuplicateProcessor.setEditDistanceHistogram(distances);
-			ancientNonDuplicateProcessor.setPercentIdentityHistogram(pIdents);
-			
-		}	
-		private void computeOutputNonDefault(HashMap<Integer, ArrayList<Alignment>> taxonMap, int taxID){
-			ArrayList<Integer> distances = new ArrayList<Integer>();
-			ArrayList<Double> pIdents = new ArrayList<Double>();
-			ArrayList<String> lines = new ArrayList<String>();
-			StrainMisMatchContainer container = new StrainMisMatchContainer();
-			int numMatches = 0;
-			lines.add(taxName);
-			CompositionMap map = new CompositionMap(taxonMap);
-			map.process();
-			map.markAllDuplicates();
-			nonDuplicateProcessor.setReadDistribution(map);
-			taxonMap = map.getCompositionMap();
-			int numReads=0;
-			for(int key : taxonMap.keySet()){
-				for(Alignment entry : taxonMap.get(key)){
-					if(!entry.isDuplicate()){
-						String name = getName(key);
-						lines.add(entry.getReadName()+"\t"+"Length:\t"+entry.getReadLength()+"\t");
-						lines.add(name+"\t"+entry.getAccessionNumber()+"\t"+"Start:\t"+entry.getStart()+"\t"+"End:\t"+entry.getEnd());
-						lines.add("Q:\t"+entry.getQuery());
-						lines.add("A:\t"+entry.getAlignment());
-						lines.add("R:\t"+entry.getReference()+"\n");
-						//get mismatches
-						numMatches++;
-						container.processAlignment(entry);
-						pIdents.add(entry.getPIdent());
-						distances.add(entry.getEditInstance());
-						numReads++;
-					}
-					
-				}
-				
-			}
-			StrainMap strain = new StrainMap(taxName,container,numMatches);
-			nonDuplicateProcessor.setReads(lines);
-			nonDuplicateProcessor.setDamageLine(strain.getLine());
-			nonDuplicateProcessor.setNumberOfReads(numReads);
-			nonDuplicateProcessor.setEditDistanceHistogram(distances);
-			nonDuplicateProcessor.setPercentIdentityHistogram(pIdents);
-			
-		}	
+		}// void
+		
 	}
 

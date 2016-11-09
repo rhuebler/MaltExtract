@@ -15,13 +15,8 @@ import java.util.logging.Logger;
 import NCBI_MapReader.NCBI_MapReader;
 import NCBI_MapReader.NCBI_TreeReader;
 import RMA6OutputProcessor.RMA6OutputProcessor;
-import RMA6TaxonProcessor.ConcurrentRMA6TaxonProcessor;
-import RMA6TaxonProcessor.RMA6TaxonDamageFilter;
-import RMA6TaxonProcessor.RMA6TaxonNonDuplicateFilter;
-import RMA6TaxonProcessor.RMA6TaxonNonFilter;
-import RMA6TaxonProcessor.RMA6TaxonProcessor;
-import RMA6TaxonProcessor.SimultaniouslyAncientNon;
-import RMA6TaxonProcessor.RMA6TaxonAncientNonDuplicate;
+import RMA6TaxonProcessor.ConcurrentNodeProcessor;
+import RMA6TaxonProcessor.NodeProcessor;
 import behaviour.Filter;
 import behaviour.Taxas;
 import megan.rma6.ClassificationBlockRMA6;
@@ -163,39 +158,21 @@ public void process(List<Integer>taxIDs, double topPercent) {// processing
 	}
 	setContainedIDs(idsToProcess);
 	executor=(ThreadPoolExecutor) Executors.newFixedThreadPool(threads);
-	HashMap<Integer,Future<RMA6TaxonProcessor>> results =  new HashMap<Integer,Future<RMA6TaxonProcessor>>();
+	HashMap<Integer,Future<NodeProcessor>> results =  new HashMap<Integer,Future<NodeProcessor>>();
 		for(Integer id : idsToProcess){
-			RMA6TaxonProcessor taxProcessor = null;
-			if(behave == Filter.NON){// change to all
+			NodeProcessor nodeProcessor = null;
+			
 			if(reads)
-				taxProcessor = new RMA6TaxonNonFilter(id, minPIdent, mapReader, verbose,log, warning,reads);
+				nodeProcessor = new NodeProcessor(id, minPIdent, mapReader, verbose,log, warning,reads,behave);
 			else
-				taxProcessor = new RMA6TaxonNonFilter(id, minPIdent, mapReader, verbose,log, warning);
-			}else if(behave == Filter.ANCIENT){
-				 if(reads)
-					 taxProcessor = new RMA6TaxonDamageFilter(id, minPIdent, mapReader, verbose,log, warning, reads);
-				 else	 
-					taxProcessor = new RMA6TaxonDamageFilter(id, minPIdent, mapReader, verbose,log, warning);
-			}else if(behave == Filter.NONDUPLICATES){
-				 taxProcessor = new RMA6TaxonNonDuplicateFilter(id, minPIdent, mapReader, verbose, log, warning);
-			}else if(behave == Filter.ALL){
-				if(reads)
-					taxProcessor = new RMA6TaxonAncientNonDuplicate(id, minPIdent, mapReader, verbose, log, warning, reads);
-				else
-					taxProcessor = new RMA6TaxonAncientNonDuplicate(id, minPIdent, mapReader, verbose, log, warning);
-			}else if(behave == Filter.NON_ANCIENT){
-			if(reads)
-				taxProcessor = new SimultaniouslyAncientNon(id, minPIdent, mapReader, verbose, log, warning, reads);
-			else
-				taxProcessor = new SimultaniouslyAncientNon(id, minPIdent, mapReader, verbose, log, warning);
-		}
-			ConcurrentRMA6TaxonProcessor task = new ConcurrentRMA6TaxonProcessor(taxProcessor,inDir, fileName, topPercent, maxLength);
-			Future<RMA6TaxonProcessor> future = executor.submit(task);
+				nodeProcessor = new NodeProcessor(id, minPIdent, mapReader, verbose,log, warning,behave);
+			ConcurrentNodeProcessor task = new ConcurrentNodeProcessor(nodeProcessor,inDir, fileName, topPercent, maxLength);
+			Future<NodeProcessor> future = executor.submit(task);
 			results.put(id, future);
 	  }//TaxIDs	
 	destroy();
 	RMA6OutputProcessor outProcessor = new RMA6OutputProcessor(fileName, outDir,mapReader,warning, behave, reads);
-	outProcessor.prepareOutput(results);
+	outProcessor.process(results);
 	setSumLine(outProcessor.getSumLine());
 	if(behave==Filter.NON_ANCIENT){
 		ancientSum = outProcessor.getAncientLine();
