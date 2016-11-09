@@ -83,11 +83,10 @@ public class AlignmentStatistics {
 					cStart = current.getStart();
 					cEnd = current.getEnd();		
 				}
-				possible += (cEnd -cStart);
+				possible += (cEnd - cStart);
 				for(int k = cStart; k<= cEnd; k++){
 					int coverage = coverageContainer.get(k);
 					if(coverage == 1){
-						unique += 1;
 						coverageHistogram.replace(1, coverageHistogram.get(1)+1);
 					}else if(coverage == 2){
 						coverageHistogram.replace(2, coverageHistogram.get(2)+1);
@@ -127,6 +126,7 @@ public class AlignmentStatistics {
 		if(zeros<0)
 			zeros = 0;
 		coverageHistogram.put(0, zeros);	
+		unique=coverageHistogram.get(1);
 		this.coverageHistogram = coverageHistogram;
 		results.add(unique/(possible));
 		int nonDuplicates = input.size();

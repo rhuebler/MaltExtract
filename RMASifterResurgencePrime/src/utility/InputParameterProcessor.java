@@ -227,7 +227,7 @@ public class InputParameterProcessor {
 
     	        if (commandLine.hasOption("filter"))
     	        {
-    	            if(Pattern.compile(Pattern.quote("non"), Pattern.CASE_INSENSITIVE).matcher(commandLine.getOptionValue("filter")).find()){
+    	            if(Pattern.compile(Pattern.quote("default"), Pattern.CASE_INSENSITIVE).matcher(commandLine.getOptionValue("filter")).find()){
     	            	this.behave = Filter.NON;
     	            	log.log(Level.INFO,"Custom Behaviour set to: "+commandLine.getOptionValue("filter"));
     	            }else if(Pattern.compile(Pattern.quote("ancient"), Pattern.CASE_INSENSITIVE).matcher(commandLine.getOptionValue("filter")).find()){
@@ -280,7 +280,8 @@ public class InputParameterProcessor {
     	        }
     	        if((commandLine.hasOption("reads") && behave == Filter.ANCIENT)||
     	        	(commandLine.hasOption("reads") && behave == Filter.ALL)||
-    	        	(commandLine.hasOption("reads") && behave == Filter.NON)){
+    	        	(commandLine.hasOption("reads") && behave == Filter.NON)||
+    	        	(commandLine.hasOption("reads") && behave == Filter.NON_ANCIENT)){
     	        	this.reads = true;
     	        }
     	        if(commandLine.hasOption("h")){

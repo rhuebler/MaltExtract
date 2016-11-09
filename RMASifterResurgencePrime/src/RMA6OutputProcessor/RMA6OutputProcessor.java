@@ -1,5 +1,6 @@
 package RMA6OutputProcessor;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
@@ -158,7 +159,7 @@ public class RMA6OutputProcessor {
 		ArrayList<String> misMatches = new ArrayList<String>();
 		ArrayList<String> coverageHistogram = new ArrayList<String>();
 		for(int id : results.keySet()){
-			RMA6TaxonProcessor taxProcessor = new RMA6TaxonProcessor();
+			RMA6TaxonProcessor taxProcessor;
 			try {
 				if(switcher == Filter.NON){
 					taxProcessor = results.get(id).get().getDefault();
@@ -166,7 +167,7 @@ public class RMA6OutputProcessor {
 					taxProcessor = results.get(id).get().getAncient();
 				}else if(switcher == Filter.NONDUPLICATES){
 					taxProcessor = results.get(id).get().getNonDuplicate();
-				}else if(switcher == Filter.ALL){
+				}else {
 					taxProcessor = results.get(id).get().getAncientNonDuplicate();
 				}
 				results.get(id).get();
@@ -177,26 +178,30 @@ public class RMA6OutputProcessor {
 				coverageHistogram.add(taxProcessor.getCoverageLine());
 		
 				misMatches.add(taxProcessor.getDamageLine());
-				if((behave == Filter.ALL && reads )|| (behave == Filter.ANCIENT && reads)
-						|| (behave == Filter.NON && reads)){
-					writeBlastHits(id,taxProcessor.getReads(),outDir+"reads/"+fileName+"/");
-				}
+				if(switcher == Filter.ALL && reads )
+					writeBlastHits(id,taxProcessor.getReads(),outDir+"/ancientNonDuplicate/reads/"+fileName+"/");
+				if(switcher == Filter.ANCIENT && reads)
+					writeBlastHits(id,taxProcessor.getReads(),outDir+"/ancient/reads/"+fileName+"/");
+				if(switcher == Filter.NON && reads)
+					writeBlastHits(id,taxProcessor.getReads(),outDir+"/default/reads/"+fileName+"/");
+				
+				
 			} catch (InterruptedException | ExecutionException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}	
 			String dir = "";
-			if(behave == Filter.NON){
+			if(switcher == Filter.NON){
 				dir = outDir+"/default/";
 				setSumLine(overallSum);
-			}else if(behave == Filter.ANCIENT){
+			}else if(switcher == Filter.ANCIENT){
 				setAncientLine(overallSum);
 				dir = outDir+"/ancient/";
-			}else if(behave == Filter.NONDUPLICATES){
+			}else if(switcher == Filter.NONDUPLICATES){
 				dir = outDir+"/nonDuplicates/";
 				setNonDuplicateLine(overallSum);
-			}else if(behave == Filter.ALL){
+			}else if(switcher == Filter.ALL){
 				dir = outDir+"/ancientNonDuplicates/";
 				setAncientNonDuplicateLine(overallSum);
 			}
@@ -206,17 +211,33 @@ public class RMA6OutputProcessor {
 			writeEditDistance(editDistance, dir+"editDistance/"+fileName+"_editDistance"+".txt");
 			writePercentIdentity(percentIdentity, dir+"percentIdentity/"+fileName+"_percentIdentity"+".txt");
 			writeCoverageHistogram(coverageHistogram, dir+"readDist/"+fileName+"_coverageHist"+".txt");	
+			if(reads){
+				
+			}
 	}
 	public void process(HashMap<Integer,Future<NodeProcessor>> results){
 		if(behave == Filter.NON){
+			if(reads){
+				new File(outDir+"/default/"+"/reads/"+fileName).mkdirs();
+			}
 			prepareOutput(results,behave);
 		}else if(behave == Filter.ANCIENT){
+			if(reads){
+				new File(outDir+"/ancient/"+"/reads/"+fileName).mkdirs();
+			}
 			prepareOutput(results,behave);
 		}else if(behave == Filter.NONDUPLICATES){
 			prepareOutput(results,behave);
 		}else if(behave == Filter.ALL){
+			if(reads){
+				new File(outDir+"/ancientNonDuplicates/"+"/reads/"+fileName).mkdirs();
+			}
 			prepareOutput(results,behave);
 		}else if(behave == Filter.NON_ANCIENT){
+			if(reads){
+				new File(outDir+"/ancient/"+"/reads/"+fileName).mkdirs();
+				new File(outDir+"/default/"+"/reads/"+fileName).mkdirs();
+			}
 			prepareOutput(results,Filter.NON);
 			prepareOutput(results,Filter.ANCIENT);
 		}

@@ -44,10 +44,17 @@ public class SummaryWriter {
 	}
 	public void process(){
 		setProcessedIds();
-		if(behave != Filter.NON_ANCIENT){
-			prepareOutput();
-		}else{
-			prepareSimultaneOutput();
+		if(behave == Filter.NON){
+			prepareOutput(behave);
+		}else if(behave == Filter.ANCIENT){
+			prepareOutput(behave);
+		}else if(behave == Filter.ALL){
+			prepareOutput(behave);
+		}else if(behave == Filter.NONDUPLICATES){
+			prepareOutput(behave);
+		}else if(behave == Filter.NON_ANCIENT){
+			prepareOutput(Filter.NON);
+			prepareOutput(Filter.ANCIENT);
 		}
 	}
 	private void setProcessedIds(){
@@ -62,7 +69,7 @@ public class SummaryWriter {
 			warning.log(Level.SEVERE, "Error", ee);
 		}
 	}
-	private void prepareOutput() {
+	private void prepareOutput(Filter switcher) {
 		   List<String> summary = new ArrayList<String>();
 		   String header ="Node"; // could and should be its own function 
 		   String reads = "Total_Count";
@@ -73,7 +80,16 @@ public class SummaryWriter {
 				   current = future.get();
 				   header+="\t" + current.getfileName();
 				   reads += "\t" + current.getTotalCount();
-				   HashMap<Integer,Integer> fileResults = current.getSumLine();
+				   HashMap<Integer,Integer> fileResults = new  HashMap<Integer,Integer>();
+				   if(switcher==Filter.NON)
+					   fileResults = current.getSumLine();
+				   else if(switcher==Filter.ANCIENT)
+					   fileResults = current.getAncientLine();
+				   else if(switcher==Filter.NONDUPLICATES)
+					   fileResults = current.getNonDuplicateLine();
+				   else if(switcher==Filter.ALL)
+					   fileResults = current.getAncientNonDuplicateLine();
+				  
 				   if(first ==true){
 					   for(int id : processedIDs){
 						   String line;
@@ -117,92 +133,17 @@ public class SummaryWriter {
 		   summary.sort(null);
 		   summary.add(0,reads);
 		   summary.add(0,header);
-		   writeSummary(summary,outDir+"RunSummary"+".txt");
-	}
-	private void prepareSimultaneOutput() {
-		   List<String> summary = new ArrayList<String>();
-		   List<String> ancient = new ArrayList<String>();
-		   String header ="Node"; // could and should be its own function 
-		   String reads = "Total_Count";
-		   boolean first = true;	   
-		   for(Future<RMA6Processor> future : processedFiles){
-			   RMA6Processor current;
-			   try {
-				   current = future.get();
-				   header+="\t" + current.getfileName();
-				   reads += "\t" + current.getTotalCount();
-				   HashMap<Integer,Integer> fileResults = current.getSumLine();
-				   HashMap<Integer,Integer> ancientResults  = current.getAncientLine();
-				   if(first ==true){
-					   for(int id : processedIDs){
-						   String line;
-						   String ancientLine;
-							if( mapReader.getNcbiIdToNameMap().get(id) != null){
-								line = mapReader.getNcbiIdToNameMap().get(id).replace(' ', '_');
-								ancientLine = mapReader.getNcbiIdToNameMap().get(id).replace(' ', '_');
-							}else{
-								line = "unasigned";
-								ancientLine = "unasigned";
-							}
-						   if(fileResults.containsKey(id)){
-							   line+= "\t"+fileResults.get(id);
-							   summary.add(line);
-						   }else{
-							   line+= "\t"+0;
-							   summary.add(line);
-						   }
-						   if(ancientResults.containsKey(id)){
-							   ancientLine += "\t"+ancientResults.get(id);
-							   ancient.add(ancientLine);
-						   }else{
-							   ancientLine += "\t"+0;
-							   ancient.add(ancientLine);
-						   }
-							   
-					   first = false;
-					   }//for
-				   	}else{
-					   int i = 0;
-					   for(int id : processedIDs){ 
-						   String line = summary.get(i);
-						   String ancientLine = ancient.get(i);
-						   if(fileResults.containsKey(id)){
-							   line+= "\t"+fileResults.get(id);
-							   summary.set(i,line);
-						   }else{
-							   line+= "\t"+0;
-							   summary.set(i,line);
-						   }
-						   if(ancientResults.containsKey(id)){
-							   ancientLine += "\t"+ancientResults.get(id);
-							   ancient.set(i,ancientLine);
-						   }else{
-							   ancientLine += "\t"+0;
-							   ancient.set(i,ancientLine);
-						   }
-					  
-						   i++;
-					   }
-				   	}
-				  
-			}catch (InterruptedException e) {
-				warning.log(Level.SEVERE, "Error", e);
-			} catch (ExecutionException e) {
-				warning.log(Level.SEVERE, "Error", e);
-			}
-			   
-		   }//for
-		   summary.sort(null);
-		   summary.add(0,reads);
-		   summary.add(0,header);
+		   if(switcher==Filter.NON)
+			   writeSummary(summary,outDir+"/default/"+"RunSummary"+".txt");
+		   else if(switcher==Filter.ANCIENT)
+			   writeSummary(summary,outDir+"/ancient/"+"RunSummary"+".txt");
+		   else if(switcher==Filter.NONDUPLICATES)
+			   writeSummary(summary,outDir+"/nonDuplicates/"+"RunSummary"+".txt");
+		   else if(switcher==Filter.ALL)
+			   writeSummary(summary,outDir+"/ancientNonDuplicates/"+"RunSummary"+".txt");
 		   
-		   ancient.sort(null);
-		   ancient.add(0,reads);
-		   ancient.add(0,header);
-		   
-		   writeSummary(ancient,outDir+"/ancient/"+"RunSummary"+".txt");
-		   writeSummary(summary,outDir+"/default/"+"RunSummary"+".txt");
 	}
+
 	private void writeSummary(List<String> summary,String outDir) {
 		try{
 		Path file = Paths.get(outDir);

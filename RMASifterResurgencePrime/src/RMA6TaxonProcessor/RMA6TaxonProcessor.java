@@ -54,6 +54,7 @@ public RMA6TaxonProcessor(Integer id, double pID, NCBI_MapReader reader, boolean
 	this.warning = warning;
 	this.topPercent = topPercent;
 	this.maxLength = maxLength;
+	this.taxName = getName(id);
 }
 public RMA6TaxonProcessor() {
 	// TODO Auto-generated constructor stub

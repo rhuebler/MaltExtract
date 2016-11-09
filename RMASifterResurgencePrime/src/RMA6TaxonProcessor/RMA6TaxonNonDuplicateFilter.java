@@ -23,7 +23,7 @@ public class RMA6TaxonNonDuplicateFilter  extends RMA6TaxonProcessor{
 	public RMA6TaxonNonDuplicateFilter(int id ,double pID, NCBI_MapReader reader, boolean v,Logger log, Logger warning,double tp,int mL) {
 		super(id,pID, reader, v, log, warning, tp, mL);
 	}
-	public void computeOutput(){
+	public void process(){
 		CompositionMap map = new CompositionMap(taxonMap);
 		map.process();
 		map.markAllDuplicates();
@@ -33,7 +33,8 @@ public class RMA6TaxonNonDuplicateFilter  extends RMA6TaxonProcessor{
 			for(Alignment entry : taxonMap.get(key)){
 				if(!entry.isDuplicate()){
 					//get mismatches
-					container.processAlignment(entry);		
+					numMatches++;
+					container.processAlignment(entry);
 					pIdents.add(entry.getPIdent());
 					distances.add(entry.getEditInstance());
 					numOfReads++;

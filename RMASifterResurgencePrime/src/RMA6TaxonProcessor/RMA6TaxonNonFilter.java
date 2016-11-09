@@ -17,7 +17,6 @@ public class RMA6TaxonNonFilter  extends RMA6TaxonProcessor{
 	protected boolean wantReads = false;
 	public RMA6TaxonNonFilter(Integer id, double pID, NCBI_MapReader reader, boolean v, Logger log, Logger warning,double tp,int mL) {
 		super(id, pID, reader, v, log, warning,tp,mL);
-		// TODO Auto-generated constructor stub
 	}
 	public RMA6TaxonNonFilter(int id ,double pID, NCBI_MapReader reader,
 			boolean v,Logger log, Logger warning, boolean reads,double tp,int mL) {
@@ -74,6 +73,7 @@ public class RMA6TaxonNonFilter  extends RMA6TaxonProcessor{
 			}
 }		
 	public void process(){ 
+		
 		CompositionMap map = new CompositionMap(taxonMap);
 		map.process();
 		StrainMap strain = new StrainMap(taxName,container,numMatches);

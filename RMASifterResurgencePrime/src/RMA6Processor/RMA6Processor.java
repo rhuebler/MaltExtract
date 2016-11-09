@@ -38,6 +38,8 @@ public class RMA6Processor {
 	 */
 	private HashMap<Integer,Integer> overallSum;
 	private HashMap<Integer,Integer> ancientSum;
+	private HashMap<Integer,Integer> nonDuplicateSum;
+	private HashMap<Integer,Integer> ancientNonDuplicateSum;
 	private String outDir;
 	private String fileName;
 	private String inDir;
@@ -124,6 +126,12 @@ public class RMA6Processor {
 	public HashMap<Integer,Integer> getAncientLine(){
 		return this.ancientSum;
 	}
+	public HashMap<Integer,Integer> getAncientNonDuplicateLine(){
+		return this.ancientNonDuplicateSum;
+	}
+	public HashMap<Integer,Integer> getNonDuplicateLine(){
+		return this.nonDuplicateSum;
+	}
 	public int getTotalCount(){
 		return this.totalCount;
 		
@@ -160,8 +168,7 @@ public void process(List<Integer>taxIDs, double topPercent) {// processing
 	executor=(ThreadPoolExecutor) Executors.newFixedThreadPool(threads);
 	HashMap<Integer,Future<NodeProcessor>> results =  new HashMap<Integer,Future<NodeProcessor>>();
 		for(Integer id : idsToProcess){
-			NodeProcessor nodeProcessor = null;
-			
+			NodeProcessor nodeProcessor;
 			if(reads)
 				nodeProcessor = new NodeProcessor(id, minPIdent, mapReader, verbose,log, warning,reads,behave);
 			else
@@ -173,9 +180,17 @@ public void process(List<Integer>taxIDs, double topPercent) {// processing
 	destroy();
 	RMA6OutputProcessor outProcessor = new RMA6OutputProcessor(fileName, outDir,mapReader,warning, behave, reads);
 	outProcessor.process(results);
-	setSumLine(outProcessor.getSumLine());
-	if(behave==Filter.NON_ANCIENT){
+	if(behave==Filter.NON_ANCIENT || behave==Filter.NON){
+		setSumLine(outProcessor.getSumLine());
+	}
+	if(behave==Filter.NON_ANCIENT || behave==Filter.ANCIENT){
 		ancientSum = outProcessor.getAncientLine();
+	}
+	if(behave==Filter.NONDUPLICATES){
+		nonDuplicateSum = outProcessor.getNonDuplicateLine();
+	}
+	if(behave==Filter.ALL){
+		ancientNonDuplicateSum = outProcessor.getAncientNonDuplicateLine();
 	}
     }
  }

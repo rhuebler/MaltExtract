@@ -38,6 +38,7 @@ public class NodeProcessor{
 			this.verbose = v;
 			this.log = log;
 			this.warning = warning;
+			this.behave = behave;
 		}
 		
 		public NodeProcessor(int id, double minPIdent, NCBI_MapReader reader, boolean v, Logger log, Logger warning,
@@ -49,6 +50,7 @@ public class NodeProcessor{
 			this.log = log;
 			this.warning = warning;
 			this.wantReads = reads;
+			this.behave = behave;
 		}
 		private String getName(int taxId){
 			String name;
@@ -76,22 +78,29 @@ public class NodeProcessor{
 		}
 		public void process(String inDir, String fileName, double topPercent, int maxLength){ 
 			if(wantReads){
-				if(behave == Filter.NON_ANCIENT ||behave == Filter.ANCIENT ){
-					ancientProcessor = new RMA6TaxonDamageFilter(maxLength, minPIdent, mapReader, verbose, log, log, wantReads, topPercent, maxLength);
-				}else if(behave == Filter.NON_ANCIENT ||behave == Filter.NON ){
-					defaultProcessor = new RMA6TaxonNonFilter(maxLength, minPIdent, mapReader, verbose, log, log, wantReads, topPercent, maxLength);
+				if(behave == Filter.ANCIENT){
+					ancientProcessor = new RMA6TaxonDamageFilter(taxID, minPIdent, mapReader, verbose, log, log, wantReads, topPercent, maxLength);
+				}else if(behave == Filter.NON){
+					defaultProcessor = new RMA6TaxonNonFilter(taxID, minPIdent, mapReader, verbose, log, log, wantReads, topPercent, maxLength);
 				}else if(behave == Filter.ALL){
-					ancientNonDuplicateProcessor = new RMA6TaxonAncientNonDuplicate(maxLength, minPIdent, mapReader, verbose, log, log, wantReads, topPercent, maxLength);
+					ancientNonDuplicateProcessor = new RMA6TaxonAncientNonDuplicate(taxID, minPIdent, mapReader, verbose, log, log, wantReads, topPercent, maxLength);
+				}else if(behave == Filter.NON_ANCIENT){
+					ancientProcessor = new RMA6TaxonDamageFilter(taxID, minPIdent, mapReader, verbose, log, log, wantReads, topPercent, maxLength);
+					defaultProcessor = new RMA6TaxonNonFilter(taxID, minPIdent, mapReader, verbose, log, log, wantReads, topPercent, maxLength);
 				}		
 			}else{
-				if(behave == Filter.NON_ANCIENT ||behave == Filter.ANCIENT ){
-					ancientProcessor = new RMA6TaxonDamageFilter(maxLength, minPIdent, mapReader, verbose, log, log, topPercent, maxLength);
-				}else if(behave == Filter.NON_ANCIENT ||behave == Filter.NON ){
-					defaultProcessor = new RMA6TaxonNonFilter(maxLength, minPIdent, mapReader, verbose, log, log, topPercent, maxLength);
+				if(behave == Filter.ANCIENT ){
+					ancientProcessor = new RMA6TaxonDamageFilter(taxID, minPIdent, mapReader, verbose, log, log, topPercent, maxLength);
+				} 
+				if(behave == Filter.NON ){
+					defaultProcessor = new RMA6TaxonNonFilter(taxID, minPIdent, mapReader, verbose, log, log, topPercent, maxLength);
 				}else if(behave == Filter.ALL){
-					ancientNonDuplicateProcessor = new RMA6TaxonAncientNonDuplicate(maxLength, minPIdent, mapReader, verbose, log, log, topPercent, maxLength);
+					ancientNonDuplicateProcessor = new RMA6TaxonAncientNonDuplicate(taxID, minPIdent, mapReader, verbose, log, log, topPercent, maxLength);
 				}else if(behave == Filter.NONDUPLICATES){
-					nonDuplicateProcessor = new RMA6TaxonNonDuplicateFilter(maxLength, minPIdent, mapReader, verbose, log, log, topPercent, maxLength);
+					nonDuplicateProcessor = new RMA6TaxonNonDuplicateFilter(taxID, minPIdent, mapReader, verbose, log, log, topPercent, maxLength);
+				}else if(behave == Filter.NON_ANCIENT){
+					ancientProcessor = new RMA6TaxonDamageFilter(taxID, minPIdent, mapReader, verbose, log, log, topPercent, maxLength);
+					defaultProcessor = new RMA6TaxonNonFilter(taxID, minPIdent, mapReader, verbose, log, log, topPercent, maxLength);
 				}	
 			}
 			this.taxName = getName(taxID);
@@ -144,7 +153,9 @@ public class NodeProcessor{
 						IMatchBlock[] blocks=current.getMatchBlocks();
 						if(behave == Filter.NON_ANCIENT ||behave == Filter.ANCIENT ){
 							ancientProcessor.processMatchBlocks(blocks, current.getReadName(), current.getReadLength());
-						}else if(behave == Filter.NON_ANCIENT ||behave == Filter.NON ){
+						} 
+						if(behave == Filter.NON_ANCIENT ||behave == Filter.NON ){
+							
 							defaultProcessor.processMatchBlocks(blocks, current.getReadName(), current.getReadLength());
 						}else if(behave == Filter.ALL){
 							ancientNonDuplicateProcessor.processMatchBlocks(blocks, current.getReadName(), current.getReadLength());
@@ -155,22 +166,25 @@ public class NodeProcessor{
 				}// while
 				classIt.close();
 				rma6File.close();
-				if(behave == Filter.NON_ANCIENT ||behave == Filter.ANCIENT ){
+				if(behave == Filter.ANCIENT ){
 					ancientProcessor.process();
-				}else if(behave == Filter.NON_ANCIENT ||behave == Filter.NON ){
+				}else if(behave == Filter.NON ){
 					defaultProcessor.process();
 				}else if(behave == Filter.ALL){
 					ancientNonDuplicateProcessor.process();
 				}else if(behave == Filter.NONDUPLICATES){
 					nonDuplicateProcessor.process();
+				}else if(behave == Filter.NON_ANCIENT) {
+					ancientProcessor.process();
+					defaultProcessor.process();
 				}	
 				
-				}
-			}catch(Exception e){
-					warning.log(Level.SEVERE,mapReader.getNcbiIdToNameMap().get(taxID), e);	
-				
 			}
-		}// void
+		}catch(Exception e){
+			warning.log(Level.SEVERE,mapReader.getNcbiIdToNameMap().get(taxID), e);	
+				
+		}
+	}// void
 		
-	}
+}
 
