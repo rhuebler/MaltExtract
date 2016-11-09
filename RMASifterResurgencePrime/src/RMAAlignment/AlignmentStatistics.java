@@ -83,7 +83,7 @@ public class AlignmentStatistics {
 					cStart = current.getStart();
 					cEnd = current.getEnd();		
 				}
-				possible += (cEnd - cStart);
+				possible += (cEnd - cStart)+1;
 				for(int k = cStart; k<= cEnd; k++){
 					int coverage = coverageContainer.get(k);
 					if(coverage == 1){

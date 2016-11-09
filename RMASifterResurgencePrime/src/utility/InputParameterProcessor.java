@@ -112,7 +112,7 @@ public class InputParameterProcessor {
     	 	// edit distance 
     	    Option option_Input = Option.builder("i").longOpt("input").argName("Path/to/inDir or RMA6Files").hasArgs().desc("Input Directory or files").build();
     	    Option option_Output = Option.builder("o").longOpt("output").argName("Path/to/outDir").hasArg().desc("Output Directory").build();
-    	    Option option_Taxons = Option.builder("t").longOpt("taxons").argName("Path/to/taxFile or Taxon in \"\"").hasArg().desc("Taxons to look up").build();
+    	    Option option_Taxons = Option.builder("t").longOpt("taxons").argName("Path/to/taxFile or Taxon in \"\"").hasArgs().desc("Taxons to look up").build();
     	    
     	    // long flags
     	    Option option_Threads = Option.builder("p").longOpt("threads").argName("1..maxNumberOfCores").hasArg().optionalArg(true).desc("Number of Cores to run on").build();		
