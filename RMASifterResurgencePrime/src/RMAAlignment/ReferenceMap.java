@@ -2,6 +2,7 @@ package RMAAlignment;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 
 public class ReferenceMap {
 	private ArrayList<Alignment> input;
@@ -78,7 +79,7 @@ public class ReferenceMap {
 			i++;
 		}	
 		i = 0;
-		ArrayList<Alignment> stacked = new ArrayList<Alignment>();
+		HashSet<Alignment> stacked = new HashSet<Alignment>();
 		
 		while(i<alignments.size()){
 		//calculate unique positions per read plus average distance between current and next read
