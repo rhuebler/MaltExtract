@@ -5,6 +5,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import java.util.logging.Logger;
+
+import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
+
 import NCBI_MapReader.NCBI_MapReader;
 import RMAAlignment.Alignment;
 import RMAAlignment.CompositionMap;
@@ -44,6 +47,9 @@ protected ArrayList<Double> pIdents = new ArrayList<Double>();
 protected HashMap<Integer, ArrayList<Alignment>> taxonMap = new HashMap<Integer, ArrayList<Alignment>>();
 protected ArrayList<String> lines = new ArrayList<String>();
 protected StrainMisMatchContainer container = new StrainMisMatchContainer();
+protected String readLengthStatistics = taxName+"\t0\t0\t0\t0";
+protected int refLength = 0;
+protected ArrayList<Integer> lengths = new ArrayList<Integer>();
 //constructor
 public RMA6TaxonProcessor(Integer id, double pID, NCBI_MapReader reader, boolean v, Logger log, Logger warning, double topPercent, int maxLength){
 	this.mapReader = reader;
@@ -186,7 +192,19 @@ protected double getGcContent(String sequence){
 	}
 	return gcContent;
 }
-
+protected void calculateReadLengthDistribution(){
+	if(lengths.size() != 0){
+		DescriptiveStatistics stats = new DescriptiveStatistics();
+		for(int i : lengths)
+			stats.addValue(i);
+		String line = taxName;
+		line += "\t"+stats.getMean();
+		line += "\t"+stats.getGeometricMean();
+		line += "\t"+stats.getPercentile(50);
+		line += "\t"+stats.getStandardDeviation();
+		this.readLengthStatistics = line;
+	}
+}
 public int getNumberOfReads(){
 	return this.numOfReads;
 }

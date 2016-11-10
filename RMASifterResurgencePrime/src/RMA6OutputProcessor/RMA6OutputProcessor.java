@@ -179,7 +179,7 @@ public class RMA6OutputProcessor {
 		
 				misMatches.add(taxProcessor.getDamageLine());
 				if(switcher == Filter.ALL && reads )
-					writeBlastHits(id,taxProcessor.getReads(),outDir+"/ancientNonDuplicate/reads/"+fileName+"/");
+					writeBlastHits(id,taxProcessor.getReads(),outDir+"/ancientNonDuplicates/reads/"+fileName+"/");
 				if(switcher == Filter.ANCIENT && reads)
 					writeBlastHits(id,taxProcessor.getReads(),outDir+"/ancient/reads/"+fileName+"/");
 				if(switcher == Filter.NON && reads)

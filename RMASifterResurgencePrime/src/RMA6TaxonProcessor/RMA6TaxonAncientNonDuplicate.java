@@ -36,16 +36,18 @@ public class RMA6TaxonAncientNonDuplicate  extends RMA6TaxonDamageFilter{
 		map.markAllDuplicates();
 		setReadDistribution(map);
 		taxonMap = map.getCompositionMap();
-		int numReads=0;
 		for(int key : taxonMap.keySet()){
 			for(Alignment entry : taxonMap.get(key)){
 				if(!entry.isDuplicate()){
-					String name = getName(key);
-					lines.add(entry.getReadName()+"\t"+"Length:\t"+entry.getReadLength()+"\t");
-					lines.add(name+"\t"+entry.getAccessionNumber()+"\t"+"Start:\t"+entry.getStart()+"\t"+"End:\t"+entry.getEnd());
-					lines.add("Q:\t"+entry.getQuery());
-					lines.add("A:\t"+entry.getAlignment());
-					lines.add("R:\t"+entry.getReference()+"\n");
+					lengths.add(entry.getReadLength());
+					if(wantReads){
+						String name = getName(key);
+						lines.add(entry.getReadName()+"\t"+"Length:\t"+entry.getReadLength()+"\t");
+						lines.add(name+"\t"+entry.getAccessionNumber()+"\t"+"Start:\t"+entry.getStart()+"\t"+"End:\t"+entry.getEnd());
+						lines.add("Q:\t"+entry.getQuery());
+						lines.add("A:\t"+entry.getAlignment());
+						lines.add("R:\t"+entry.getReference()+"\n");
+					}
 					//get mismatches
 					numMatches++;
 					container.processAlignment(entry);
@@ -59,17 +61,22 @@ public class RMA6TaxonAncientNonDuplicate  extends RMA6TaxonDamageFilter{
 		}
 		StrainMap strain = new StrainMap(taxName,container,numMatches);
 		setDamageLine(strain.getLine());
-		setNumberOfReads(numReads);
+		setNumberOfReads(numOfReads);
+		setReadDistribution(map);
 		setEditDistanceHistogram(distances);
 		setPercentIdentityHistogram(pIdents);
+		setReads(lines);
+		calculateReadLengthDistribution();
 		
 	}	
 	public void processMatchBlocks(IMatchBlock[] blocks, String readName, int readLength){ 
 		IMatchBlock block = blocks[0];
 		Alignment al = new Alignment();
 		al.processText(block.getText().split("\n"));
-		al.setReadName(readName);
 		al.setPIdent(block.getPercentIdentity());
+		al.setReadName(readName);
+		al.setReadLength(readLength);
+		al.setAcessionNumber(block.getRefSeqId());
 		if(al.getFivePrimeDamage() && minPIdent <= al.getPIdent()){
 			if(!taxonMap.containsKey(block.getTaxonId())){
 				ArrayList<Alignment> entry =new ArrayList<Alignment>();

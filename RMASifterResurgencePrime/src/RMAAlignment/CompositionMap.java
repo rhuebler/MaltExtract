@@ -15,10 +15,14 @@ private HashMap<Integer,ArrayList<Alignment>> compositionMap;// hashMap of Refer
 private int maxID;
 private ArrayList<Double> generalStatistics;
 private HashMap<Integer,Integer> coverageHistogram;
+private int refLength = 0;
 //from stack overflow
 
 
 //getter
+public int getReferenceLength(){
+	return this.refLength;
+}
 public int getMaxID(){
 	return this.maxID;}
 
@@ -70,12 +74,12 @@ private ArrayList<Alignment> markDuplicates(ArrayList<Alignment> inList){ // tha
 			nStart = next.getEnd();
 			nEnd = next.getStart();
 		}
-		if( cStart == nStart && cEnd == nEnd){
+		if( cStart == nStart && cEnd == nEnd &&
+		 current.getReferenceLength() == next.getReferenceLength()){
 			inList.get(i).setDuplicate(true);
 			inList.get(i+1).setDuplicate(true);
 		}
 			i++;
-	
 	}
 	return inList;
 }
@@ -92,6 +96,7 @@ public void calculateStatistics(){
 	stats.calculateStatistics();
 	this.coverageHistogram = stats.getConverageHistogram();
 	this.generalStatistics = stats.getGenaralStatistics();
+	this.refLength = stats.getLength();
 }
 
 // process composition and find taxon with maximum number of start positions

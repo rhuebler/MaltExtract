@@ -25,6 +25,7 @@ public class RMA6TaxonNonFilter  extends RMA6TaxonProcessor{
 	}
 	
 	public void processMatchBlocks(IMatchBlock[] blocks, String readName, int readLength){
+		lengths.add(readLength);
 		int k=0;
 		float topScore = blocks[0].getBitScore();
 		double pIdent = 0;
@@ -83,6 +84,7 @@ public class RMA6TaxonNonFilter  extends RMA6TaxonProcessor{
 		setEditDistanceHistogram(distances);
 		setPercentIdentityHistogram(pIdents);
 		setReads(lines);
+		calculateReadLengthDistribution();
 	}//process
 		
 }

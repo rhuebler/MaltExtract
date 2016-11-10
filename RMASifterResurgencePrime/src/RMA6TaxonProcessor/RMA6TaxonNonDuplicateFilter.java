@@ -32,6 +32,7 @@ public class RMA6TaxonNonDuplicateFilter  extends RMA6TaxonProcessor{
 		for(int key : taxonMap.keySet()){
 			for(Alignment entry : taxonMap.get(key)){
 				if(!entry.isDuplicate()){
+					lengths.add(entry.getReadLength());
 					//get mismatches
 					numMatches++;
 					container.processAlignment(entry);
@@ -45,8 +46,11 @@ public class RMA6TaxonNonDuplicateFilter  extends RMA6TaxonProcessor{
 		}
 		StrainMap strain = new StrainMap(taxName,container,numMatches);
 		setDamageLine(strain.getLine());
+		setNumberOfReads(numOfReads);
+		setReadDistribution(map);
 		setEditDistanceHistogram(distances);
 		setPercentIdentityHistogram(pIdents);
+		calculateReadLengthDistribution();
 	}	
 	public void processMatchBlocks(IMatchBlock[] blocks, String readName, int readLength){ 
 		IMatchBlock block = blocks[0];
@@ -54,6 +58,7 @@ public class RMA6TaxonNonDuplicateFilter  extends RMA6TaxonProcessor{
 		al.processText(block.getText().split("\n"));
 		al.setReadName(readName);
 		al.setPIdent(block.getPercentIdentity());
+		al.setReadLength(readLength);
 		if(minPIdent <= al.getPIdent()){
 			if(!taxonMap.containsKey(block.getTaxonId())){
 				ArrayList<Alignment> entry =new ArrayList<Alignment>();

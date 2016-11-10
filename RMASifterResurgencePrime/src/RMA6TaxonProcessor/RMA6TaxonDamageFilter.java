@@ -77,6 +77,7 @@ public void processMatchBlocks(IMatchBlock[] blocks, String readName, int readLe
 					
 				}
 				if(damage !=0 && higher){
+					lengths.add(readLength);
 					numOfReads++;
 					distances.add(editDistance/k);
 					pIdents.add(pIdent/k);
@@ -93,5 +94,6 @@ public void processMatchBlocks(IMatchBlock[] blocks, String readName, int readLe
 		setEditDistanceHistogram(distances);
 		setPercentIdentityHistogram(pIdents);
 		setReads(lines);
+		calculateReadLengthDistribution();
 	 }
 }// class 

@@ -3,6 +3,7 @@ package RMAAlignment;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 /**
  * This class is used to compute some Statistics from a List of Alignments. Alignments should come from CompositionMap and must have their duplicates marked
  * @author huebler
@@ -12,6 +13,7 @@ public class AlignmentStatistics {
 	private ArrayList<Alignment> currentList;
 	private ArrayList<Double> generalStatistics;
 	private HashMap<Integer,Integer> coverageHistogram;
+	private int length;
 	public AlignmentStatistics(ArrayList<Alignment> list){
 		this.currentList = list;
 	}
@@ -22,17 +24,25 @@ public class AlignmentStatistics {
 	public HashMap<Integer,Integer> getConverageHistogram(){
 		return this.coverageHistogram;
 	}
+	public int getLength(){
+		return this.length;
+	}
 	private ArrayList<Alignment> removeDuplicates(ArrayList<Alignment> input){
+		HashSet<Integer> length = new HashSet<Integer>();
 		if(input != null && input.size() > 2){
 			ArrayList<Alignment> positionsToKeep = new ArrayList<Alignment>();
 			for(Alignment al : input){
+				length.add(al.getReferenceLength());
 				if(!al.isDuplicate())
 					positionsToKeep.add(al);
 			}
+			int temp = 0;
+			for(int l:length)
+				temp+=l;
+			this.length = temp;
 			return positionsToKeep;
 			}
 		else return input;
-		
 	}
 	
 	// process best list of start positions
@@ -41,7 +51,7 @@ public class AlignmentStatistics {
 		for(int l = 0; l<=11; l++)
 			coverageHistogram.put(l, 0);
 		ArrayList<Alignment> input = removeDuplicates(currentList);
-		if(input != null&&input.size()>2){
+		if(input != null && input.size()>2){
 			ArrayList<Double> results = new ArrayList<Double>();
 			int i = 0; // better solution implemented
 			double unique = 0;
@@ -134,7 +144,7 @@ public class AlignmentStatistics {
 		results.add((double) input.size());
 		results.add((double) nonDuplicates);
 		results.add((double) currentList.size());
-		results.add((double) currentList.get(0).getReferenceLength());
+		results.add((double) length);
 		this.generalStatistics = results;
 		}else{
 		this.coverageHistogram = coverageHistogram;
