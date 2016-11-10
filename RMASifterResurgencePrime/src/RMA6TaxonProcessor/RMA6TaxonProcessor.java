@@ -205,6 +205,10 @@ protected void calculateReadLengthDistribution(){
 		this.readLengthStatistics = line;
 	}
 }
+//getters
+public String getReadLengthStatistics(){
+	return this.readLengthStatistics;
+}
 public int getNumberOfReads(){
 	return this.numOfReads;
 }

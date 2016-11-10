@@ -150,6 +150,17 @@ public class RMA6OutputProcessor {
 			warning.log(Level.SEVERE,"Cannot write file", io);
 		}
 	} 
+	private void writeReadLengthDistribution(List<String> histo, String outDir){
+		try{
+			String header = "Node\tMean\tGeometricMean\tMedian\tStandardDev";
+			histo.sort(null);
+			histo.add(0,header);
+			Path file = Paths.get(outDir);
+			Files.write(file, histo, Charset.forName("UTF-8"));
+		}catch(IOException io){
+			warning.log(Level.SEVERE,"Cannot write file", io);
+		}
+	}
 	private void prepareOutput(HashMap<Integer,Future<NodeProcessor>> results, Filter switcher){
 		
 		HashMap<Integer,Integer> overallSum = new HashMap<Integer,Integer>();
@@ -158,6 +169,7 @@ public class RMA6OutputProcessor {
 		ArrayList<String> readDistribution = new ArrayList<String>();
 		ArrayList<String> misMatches = new ArrayList<String>();
 		ArrayList<String> coverageHistogram = new ArrayList<String>();
+		ArrayList<String> readLengthHistogram = new ArrayList<String>();
 		for(int id : results.keySet()){
 			RMA6TaxonProcessor taxProcessor;
 			try {
@@ -176,8 +188,9 @@ public class RMA6OutputProcessor {
 				editDistance.add(taxProcessor.getEditDistanceHistogram());
 				percentIdentity.add(taxProcessor.getPercentIdentityHistogram());
 				coverageHistogram.add(taxProcessor.getCoverageLine());
-		
 				misMatches.add(taxProcessor.getDamageLine());
+				readLengthHistogram.add(taxProcessor.getReadLengthStatistics());
+				
 				if(switcher == Filter.ALL && reads )
 					writeBlastHits(id,taxProcessor.getReads(),outDir+"/ancientNonDuplicates/reads/"+fileName+"/");
 				if(switcher == Filter.ANCIENT && reads)
@@ -211,9 +224,7 @@ public class RMA6OutputProcessor {
 			writeEditDistance(editDistance, dir+"editDistance/"+fileName+"_editDistance"+".txt");
 			writePercentIdentity(percentIdentity, dir+"percentIdentity/"+fileName+"_percentIdentity"+".txt");
 			writeCoverageHistogram(coverageHistogram, dir+"readDist/"+fileName+"_coverageHist"+".txt");	
-			if(reads){
-				
-			}
+			writeReadLengthDistribution(readLengthHistogram, dir+"readDist/"+fileName+"_readLengthHist"+".txt");
 	}
 	public void process(HashMap<Integer,Future<NodeProcessor>> results){
 		if(behave == Filter.NON){
