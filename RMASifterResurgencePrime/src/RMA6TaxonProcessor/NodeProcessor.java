@@ -58,6 +58,7 @@ public class NodeProcessor{
 			this.minComplexity = minCompl;
 		}
 		//getters
+		// calculate complexity of read from Megan code
 		public double getComplexity(String sequence){
 			return DNAComplexityMeasure.getMinimumDNAComplexityWoottenFederhen(sequence);
 		}
