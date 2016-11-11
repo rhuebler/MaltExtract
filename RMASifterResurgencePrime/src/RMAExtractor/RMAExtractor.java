@@ -100,14 +100,14 @@ public class RMAExtractor {
 					ConcurrentRMA6Processor task = new ConcurrentRMA6Processor(f.getParent() + "/", 
 							f.getName(), inProcessor.getOutDir(), mapReader, treeReader,taxIDs, inProcessor.getTopPercent(),
 							inProcessor.getMaxLength(),inProcessor.getMinPIdent(),inProcessor.getFilter(), inProcessor.getTaxas(),
-							inProcessor.isVerbose(), log, warning,inProcessor.getBlastHits());
+							inProcessor.isVerbose(), log, warning,inProcessor.getBlastHits(), inProcessor.getMinComplexity());
 						Future<RMA6Processor> future=executor.submit(task);
 						processedFiles.add(future);
 				}else{
 					ConcurrentRMA6Processor task = new ConcurrentRMA6Processor(f.getParent() + "/", 
 						f.getName(), inProcessor.getOutDir(), mapReader, treeReader,taxIDs, inProcessor.getTopPercent(),
 						inProcessor.getMaxLength(),inProcessor.getMinPIdent(),inProcessor.getFilter(), inProcessor.getTaxas(),
-						inProcessor.isVerbose(), log, warning);
+						inProcessor.isVerbose(), log, warning, inProcessor.getMinComplexity());
 					Future<RMA6Processor> future=executor.submit(task);
 					processedFiles.add(future);
 				}

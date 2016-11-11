@@ -50,7 +50,11 @@ public class InputParameterProcessor {
 	private Logger warning;
 	private boolean reads = false;
 	private boolean crawl = false;
+	private double minComplexity = 0;
 	// constructor
+	public double getMinComplexity(){
+		return this.minComplexity;
+	}
 	public InputParameterProcessor(String[] params ,Logger log, Logger warning){
 		this.log = log;
 		this.warning =  warning;
@@ -98,15 +102,6 @@ public class InputParameterProcessor {
 		return this.crawl;
 	}
 	private void process(String[] parameters){	
-//		FilenameFilter RMAFilter = new FilenameFilter() {
-//	    	public boolean accept(File file, String name) {
-//	    		if (name.endsWith(".rma6")||Files.isSymbolicLink(new File(name).toPath())) {
-//	    			return true;
-//	    		} else {
-//	    			return false;
-//	    		}
-//	    	}
-//    	};
     	 CommandLine commandLine;
     	 	// Short Flags
     	 	// edit distance 
@@ -125,7 +120,9 @@ public class InputParameterProcessor {
     	    Option option_Verbose = Option.builder("v").longOpt("verbose").optionalArg(true).desc("How much output should be printed to screen").build();
     	    Option option_Reads = Option.builder().longOpt("reads").optionalArg(true).desc("Output Blas Hits when filtering for ancient Reads").build();
     	    Option option_Crawl = Option.builder().longOpt("crawl").optionalArg(true).desc("Find all Blast Hits Matching the Strains of Input Species").build();
+    	    Option option_minComplexity = Option.builder().longOpt("minComp").optionalArg(true).desc("Only Use Reads with minimum complexity greater than input").build();
     	    Options options = new Options();
+    	    
     	    CommandLineParser parser = new DefaultParser();
 
     	    options.addOption(option_Input);
@@ -137,6 +134,7 @@ public class InputParameterProcessor {
     	    options.addOption(option_Filter);
     	    options.addOption(option_MaxLength);
     	    options.addOption(option_minPercentIdent);
+    	    options.addOption(option_minComplexity);
     	    
     	    options.addOption(option_Help);
     	    options.addOption(option_Path);
@@ -271,6 +269,9 @@ public class InputParameterProcessor {
     	        	if(f.isDirectory()){
     	        		this.tree_Path = commandLine.getOptionValue("resources");
     	        	}
+    	        }
+    	        if(commandLine.hasOption("minComp")){
+    	        	this.minComplexity = Double.parseDouble(commandLine.getOptionValue("minComp"));
     	        }
     	        if(commandLine.hasOption('v')){
     	        	this.verbose = true;

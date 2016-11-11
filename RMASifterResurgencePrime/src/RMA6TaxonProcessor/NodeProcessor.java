@@ -9,6 +9,7 @@ import NCBI_MapReader.NCBI_MapReader;
 import RMAAlignment.Alignment;
 import RMAAlignment.CompositionMap;
 import behaviour.Filter;
+import jloda.util.DNAComplexityMeasure;
 import jloda.util.ListOfLongs;
 import megan.data.IMatchBlock;
 import megan.data.IReadBlock;
@@ -31,7 +32,9 @@ public class NodeProcessor{
 		private Logger warning;
 		private Filter behave;
 		private double minPIdent;
-		public NodeProcessor(int id,double minPIdent, NCBI_MapReader reader, boolean v, Logger log, Logger warning, Filter behave) {
+		private double minComplexity;
+		//constructors
+		public NodeProcessor(int id,double minPIdent, NCBI_MapReader reader, boolean v, Logger log, Logger warning, Filter behave, double minCompl) {
 			this.taxID = id;
 			this.minPIdent = minPIdent;
 			this.mapReader = reader;
@@ -39,10 +42,11 @@ public class NodeProcessor{
 			this.log = log;
 			this.warning = warning;
 			this.behave = behave;
+			this.minComplexity = minCompl;
 		}
 		
 		public NodeProcessor(int id, double minPIdent, NCBI_MapReader reader, boolean v, Logger log, Logger warning,
-				boolean reads, Filter behave) {
+				boolean reads, Filter behave, double minCompl) {
 			this.taxID = id;
 			this.minPIdent = minPIdent;
 			this.mapReader = reader;
@@ -51,6 +55,11 @@ public class NodeProcessor{
 			this.warning = warning;
 			this.wantReads = reads;
 			this.behave = behave;
+			this.minComplexity = minCompl;
+		}
+		//getters
+		public double getComplexity(String sequence){
+			return DNAComplexityMeasure.getMinimumDNAComplexityWoottenFederhen(sequence);
 		}
 		private String getName(int taxId){
 			String name;
@@ -76,6 +85,7 @@ public class NodeProcessor{
 			return  this.ancientNonDuplicateProcessor;
 			
 		}
+		//processing
 		public void process(String inDir, String fileName, double topPercent, int maxLength){ 
 			if(wantReads){
 				if(behave == Filter.ANCIENT){
@@ -150,18 +160,19 @@ public class NodeProcessor{
 				while(classIt.hasNext()){
 					IReadBlock current = classIt.next();
 					if(current.getReadLength() <= maxLength || maxLength == 0){
-						IMatchBlock[] blocks=current.getMatchBlocks();
-						if(behave == Filter.NON_ANCIENT ||behave == Filter.ANCIENT ){
-							ancientProcessor.processMatchBlocks(blocks, current.getReadName(), current.getReadLength());
-						} 
-						if(behave == Filter.NON_ANCIENT ||behave == Filter.NON ){
-							
-							defaultProcessor.processMatchBlocks(blocks, current.getReadName(), current.getReadLength());
-						}else if(behave == Filter.ALL){
-							ancientNonDuplicateProcessor.processMatchBlocks(blocks, current.getReadName(), current.getReadLength());
-						}else if(behave == Filter.NONDUPLICATES){
-							nonDuplicateProcessor.processMatchBlocks(blocks, current.getReadName(), current.getReadLength());
-						}	
+						if(minComplexity<=getComplexity(current.getReadSequence())){
+							IMatchBlock[] blocks=current.getMatchBlocks();
+							if(behave == Filter.NON_ANCIENT ||behave == Filter.ANCIENT ){
+								ancientProcessor.processMatchBlocks(blocks, current.getReadName(), current.getReadLength());
+							} 
+							if(behave == Filter.NON_ANCIENT ||behave == Filter.NON ){
+								defaultProcessor.processMatchBlocks(blocks, current.getReadName(), current.getReadLength());
+							}else if(behave == Filter.ALL){
+								ancientNonDuplicateProcessor.processMatchBlocks(blocks, current.getReadName(), current.getReadLength());
+							}else if(behave == Filter.NONDUPLICATES){
+								nonDuplicateProcessor.processMatchBlocks(blocks, current.getReadName(), current.getReadLength());
+							}
+						}
 					}// if  
 				}// while
 				classIt.close();

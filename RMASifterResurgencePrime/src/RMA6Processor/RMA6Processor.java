@@ -57,10 +57,11 @@ public class RMA6Processor {
 	private boolean reads;
 	private ThreadPoolExecutor executor;
 	private int threads = 1;
+	private double minComplexity;
 	// constructor
 	public RMA6Processor(String inDir, String fileName, String outDir, NCBI_MapReader mapReader,
 			NCBI_TreeReader treeReader, int maxLength, double pIdent, Filter b, Taxas t, boolean verbose,
-			Logger log, Logger warning) {
+			Logger log, Logger warning, double minCompl) {
 		this.inDir = inDir;
 		this.outDir = outDir;
 		this.fileName = fileName;
@@ -73,10 +74,11 @@ public class RMA6Processor {
 		this.verbose = verbose;
 		this.log = log;
 		this.warning = warning;
+		this.minComplexity = minCompl;
 	}
 	public RMA6Processor(String inDir, String fileName, String outDir, NCBI_MapReader mapReader,
 			NCBI_TreeReader treeReader, int maxLength, double pIdent, Filter b, Taxas t, boolean verbose,
-			Logger log, Logger warning, boolean readInf) {
+			Logger log, Logger warning, boolean readInf, double minCompl) {
 		this.inDir = inDir;
 		this.outDir = outDir;
 		this.fileName = fileName;
@@ -90,6 +92,7 @@ public class RMA6Processor {
 		this.log = log;
 		this.warning = warning;
 		this.reads = readInf;
+		this.minComplexity = minCompl;
 	}
 	
 	//setters
@@ -170,9 +173,9 @@ public void process(List<Integer>taxIDs, double topPercent) {// processing
 		for(Integer id : idsToProcess){
 			NodeProcessor nodeProcessor;
 			if(reads)
-				nodeProcessor = new NodeProcessor(id, minPIdent, mapReader, verbose,log, warning,reads,behave);
+				nodeProcessor = new NodeProcessor(id, minPIdent, mapReader, verbose,log, warning,reads,behave, minComplexity);
 			else
-				nodeProcessor = new NodeProcessor(id, minPIdent, mapReader, verbose,log, warning,behave);
+				nodeProcessor = new NodeProcessor(id, minPIdent, mapReader, verbose,log, warning,behave, minComplexity);
 			ConcurrentNodeProcessor task = new ConcurrentNodeProcessor(nodeProcessor,inDir, fileName, topPercent, maxLength);
 			Future<NodeProcessor> future = executor.submit(task);
 			results.put(id, future);
