@@ -224,7 +224,7 @@ public class RMA6OutputProcessor {
 			writeEditDistance(editDistance, dir+"editDistance/"+fileName+"_editDistance"+".txt");
 			writePercentIdentity(percentIdentity, dir+"percentIdentity/"+fileName+"_percentIdentity"+".txt");
 			writeCoverageHistogram(coverageHistogram, dir+"readDist/"+fileName+"_coverageHist"+".txt");	
-			writeReadLengthDistribution(readLengthHistogram, dir+"readDist/"+fileName+"_readLengthHist"+".txt");
+			writeReadLengthDistribution(readLengthHistogram, dir+"readDist/"+fileName+"_readLengthDist"+".txt");
 	}
 	public void process(HashMap<Integer,Future<NodeProcessor>> results){
 		if(behave == Filter.NON){

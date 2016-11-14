@@ -120,7 +120,7 @@ public class InputParameterProcessor {
     	    Option option_Verbose = Option.builder("v").longOpt("verbose").optionalArg(true).desc("How much output should be printed to screen").build();
     	    Option option_Reads = Option.builder().longOpt("reads").optionalArg(true).desc("Output Blas Hits when filtering for ancient Reads").build();
     	    Option option_Crawl = Option.builder().longOpt("crawl").optionalArg(true).desc("Find all Blast Hits Matching the Strains of Input Species").build();
-    	    Option option_minComplexity = Option.builder().longOpt("minComp").optionalArg(true).desc("Only Use Reads with minimum complexity greater than input").build();
+    	    Option option_minComplexity = Option.builder().longOpt("minComp").hasArg().optionalArg(true).desc("Only Use Reads with minimum complexity greater than input").build();
     	    Options options = new Options();
     	    
     	    CommandLineParser parser = new DefaultParser();
@@ -272,6 +272,7 @@ public class InputParameterProcessor {
     	        }
     	        if(commandLine.hasOption("minComp")){
     	        	this.minComplexity = Double.parseDouble(commandLine.getOptionValue("minComp"));
+    	        	log.log(Level.INFO, "Minimum Complexity set to " + minComplexity);
     	        }
     	        if(commandLine.hasOption('v')){
     	        	this.verbose = true;
