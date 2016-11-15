@@ -25,8 +25,8 @@ public class RMA6TaxonProcessor {
 	 * @param int ID, NCBI_MapReader reader, boolean verbose, Logger, log, Logger warning, minPIdent
 	 * @return int numMatches, String readDistribution, HashMap EditDistance, HashMap Percent Identity
 	 */ 
-protected String taxName;	
-protected String readDistribution;
+protected String taxName="unasigned_Name";	
+protected String readDistribution=taxName+"\tNA\t0\t0\t0\t0\t0";
 protected NCBI_MapReader mapReader;
 protected Integer taxID;
 protected double minPIdent;
@@ -39,7 +39,7 @@ protected Logger log;
 protected Logger warning;
 protected ArrayList<String> readList;
 protected String damageLine;
-protected String coverageLine;
+protected String coverageLine=taxName+"\tNA\t0\t0\t0\t0\t0\t0\t0\t0\t0\t0\t0\t0";
 protected int numOfReads = 0;
 protected int numMatches = 0;
 protected ArrayList<Integer> distances = new ArrayList<Integer>();
@@ -121,27 +121,29 @@ protected void setPercentIdentityHistogram(ArrayList<Double> list){
 	for(int i = 0;i < 5; i++){
 		histo.put(i, 0);
 	}
-	for(double d: list){
-		if(77.5 <= d && d< 82.5){
+	if(list != null){
+		for(double d: list){
+			if(77.5 <= d && d< 82.5){
 				int value = histo.get(0);
 				value++;
 				histo.put(0, value);
-		}else if(82.5 <= d && d< 87.5){
+			}else if(82.5 <= d && d< 87.5){
 				int value = histo.get(1);
 				value++;
 				histo.put(1, value);
-		}else if(87.5 <= d && d< 92.5){
+			}else if(87.5 <= d && d< 92.5){
 				int value = histo.get(2);
 				value++;
 				histo.put(2, value);
-		}else if(92.5 <= d && d< 97.5){
+			}else if(92.5 <= d && d< 97.5){
 				int value = histo.get(3);
 				value++;
 				histo.put(3, value);
-		}else if(97.5 <= d){
+			}else if(97.5 <= d){
 				int value = histo.get(4);
 				value++;
 				histo.put(4, value);
+			}
 		}
 	}
 	this.pIdentHistogram =  histo;

@@ -1,13 +1,10 @@
 package RMA6TaxonProcessor;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import NCBI_MapReader.NCBI_MapReader;
-import RMAAlignment.Alignment;
-import RMAAlignment.CompositionMap;
 import behaviour.Filter;
 import jloda.util.DNAComplexityMeasure;
 import jloda.util.ListOfLongs;
@@ -136,25 +133,34 @@ public class NodeProcessor{
 					}
 					ArrayList<Double> pIdents = new ArrayList<Double>();
 					ArrayList<Integer> distances = new ArrayList<Integer>();
-					defaultProcessor.setReadDistribution(new CompositionMap(new HashMap<Integer,ArrayList<Alignment>>()));
-					defaultProcessor.setPercentIdentityHistogram(pIdents);
-					defaultProcessor.setEditDistanceHistogram(distances);
-					defaultProcessor.setDamageLine(s);
-					
-					ancientProcessor.setDamageLine(s);
-					ancientProcessor.setReadDistribution(new CompositionMap(new HashMap<Integer,ArrayList<Alignment>>()));
-					ancientProcessor.setEditDistanceHistogram(distances);
-					ancientProcessor.setPercentIdentityHistogram(pIdents);
-					
-					nonDuplicateProcessor.setDamageLine(s);
-					nonDuplicateProcessor.setReadDistribution(new CompositionMap(new HashMap<Integer,ArrayList<Alignment>>()));
-					nonDuplicateProcessor.setEditDistanceHistogram(distances);
-					nonDuplicateProcessor.setPercentIdentityHistogram(pIdents);
-					
-					ancientNonDuplicateProcessor.setDamageLine(s);
-					ancientNonDuplicateProcessor.setReadDistribution(new CompositionMap(new HashMap<Integer,ArrayList<Alignment>>()));
-					ancientNonDuplicateProcessor.setEditDistanceHistogram(distances);
-					ancientNonDuplicateProcessor.setPercentIdentityHistogram(pIdents);
+					ArrayList<String> reads = new ArrayList<String>();
+					reads.add("None");
+					pIdents.add(0.0);
+					distances.add(0);
+					if(behave==Filter.NON_ANCIENT || behave == Filter.NON || behave == Filter.ANCIENT){
+						if(behave==Filter.NON_ANCIENT || behave == Filter.NON){ 
+							defaultProcessor.setPercentIdentityHistogram(pIdents);
+							defaultProcessor.setEditDistanceHistogram(distances);
+							defaultProcessor.setDamageLine(s);
+							defaultProcessor.setReads(reads);
+						}	
+						if(behave==Filter.NON_ANCIENT || behave == Filter.ANCIENT){
+							ancientProcessor.setDamageLine(s);
+							ancientProcessor.setEditDistanceHistogram(distances);
+							ancientProcessor.setPercentIdentityHistogram(pIdents);
+							ancientProcessor.setReads(reads);
+						}
+					}
+					else if(behave==Filter.NONDUPLICATES){
+						nonDuplicateProcessor.setDamageLine(s);
+						nonDuplicateProcessor.setEditDistanceHistogram(distances);
+						nonDuplicateProcessor.setPercentIdentityHistogram(pIdents);
+					}else if(behave==Filter.NON_ANCIENT){
+						ancientNonDuplicateProcessor.setDamageLine(s);
+						ancientNonDuplicateProcessor.setEditDistanceHistogram(distances);
+						ancientNonDuplicateProcessor.setPercentIdentityHistogram(pIdents);
+						ancientNonDuplicateProcessor.setReads(reads);
+					}
 			}else{
 				if(verbose)
 					log.log(Level.INFO,"Processing Taxon "+taxName+" in File " +fileName); 
