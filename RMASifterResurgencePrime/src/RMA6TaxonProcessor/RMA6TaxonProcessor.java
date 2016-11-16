@@ -38,7 +38,7 @@ protected boolean verbose;
 protected Logger log;
 protected Logger warning;
 protected ArrayList<String> readList;
-protected ArrayList<String> lines;
+protected ArrayList<String> lines = new ArrayList<String>();
 protected String damageLine;
 protected String coverageLine;
 protected int numOfReads = 0;
