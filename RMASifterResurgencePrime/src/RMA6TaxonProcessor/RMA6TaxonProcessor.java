@@ -26,7 +26,7 @@ public class RMA6TaxonProcessor {
 	 * @return int numMatches, String readDistribution, HashMap EditDistance, HashMap Percent Identity
 	 */ 
 protected String taxName="unasigned_Name";	
-protected String readDistribution=taxName+"\tNA\t0\t0\t0\t0\t0";
+protected String readDistribution;
 protected NCBI_MapReader mapReader;
 protected Integer taxID;
 protected double minPIdent;
@@ -38,16 +38,17 @@ protected boolean verbose;
 protected Logger log;
 protected Logger warning;
 protected ArrayList<String> readList;
+protected ArrayList<String> lines;
 protected String damageLine;
-protected String coverageLine=taxName+"\tNA\t0\t0\t0\t0\t0\t0\t0\t0\t0\t0\t0\t0";
+protected String coverageLine;
 protected int numOfReads = 0;
 protected int numMatches = 0;
 protected ArrayList<Integer> distances = new ArrayList<Integer>();
 protected ArrayList<Double> pIdents = new ArrayList<Double>();
 protected HashMap<Integer, ArrayList<Alignment>> taxonMap = new HashMap<Integer, ArrayList<Alignment>>();
-protected ArrayList<String> lines = new ArrayList<String>();
+
 protected StrainMisMatchContainer container = new StrainMisMatchContainer();
-protected String readLengthStatistics = taxName+"\t0\t0\t0\t0";
+protected String readLengthStatistics;
 protected int refLength = 0;
 protected ArrayList<Integer> lengths = new ArrayList<Integer>();
 //constructor
@@ -61,6 +62,24 @@ public RMA6TaxonProcessor(Integer id, double pID, NCBI_MapReader reader, boolean
 	this.topPercent = topPercent;
 	this.maxLength = maxLength;
 	this.taxName = getName(id);
+	//initlaize with default values for output
+	this.readLengthStatistics = taxName+"\t0\t0\t0\t0";
+	this.coverageLine = taxName+"\tNA\t0\t0\t0\t0\t0\t0\t0\t0\t0\t0\t0\t0";
+	ArrayList<Double> pIdents = new ArrayList<Double>();
+	ArrayList<Integer> distances = new ArrayList<Integer>();
+	ArrayList<String> reads = new ArrayList<String>();
+	reads.add("None");
+	pIdents.add(0.0);
+	distances.add(0);
+	this.readList = reads;
+	setEditDistanceHistogram(distances);
+	setPercentIdentityHistogram(pIdents);
+	String s = taxName;
+	for(int i = 0;i<=40;i++){
+		s+="\t"+0;
+	}
+	setDamageLine(s);
+	
 }
 public RMA6TaxonProcessor() {
 	// TODO Auto-generated constructor stub

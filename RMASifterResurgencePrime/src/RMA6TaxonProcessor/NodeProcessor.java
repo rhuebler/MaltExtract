@@ -1,6 +1,5 @@
 package RMA6TaxonProcessor;
 
-import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -127,61 +126,27 @@ public class NodeProcessor{
 				if(!classIt.hasNext()){ // check if reads are assigned to TaxID if not print to console and skip and set all values to default
 					if(verbose)
 						warning.log(Level.WARNING,"TaxID: " + taxID +  " not assigned in File " + fileName+"\n");
-					String s = taxName;
-					for(int i = 0;i<=40;i++){
-						s+="\t"+0;
-					}
-					ArrayList<Double> pIdents = new ArrayList<Double>();
-					ArrayList<Integer> distances = new ArrayList<Integer>();
-					ArrayList<String> reads = new ArrayList<String>();
-					reads.add("None");
-					pIdents.add(0.0);
-					distances.add(0);
-					if(behave==Filter.NON_ANCIENT || behave == Filter.NON || behave == Filter.ANCIENT){
-						if(behave==Filter.NON_ANCIENT || behave == Filter.NON){ 
-							defaultProcessor.setPercentIdentityHistogram(pIdents);
-							defaultProcessor.setEditDistanceHistogram(distances);
-							defaultProcessor.setDamageLine(s);
-							defaultProcessor.setReads(reads);
-						}	
-						if(behave==Filter.NON_ANCIENT || behave == Filter.ANCIENT){
-							ancientProcessor.setDamageLine(s);
-							ancientProcessor.setEditDistanceHistogram(distances);
-							ancientProcessor.setPercentIdentityHistogram(pIdents);
-							ancientProcessor.setReads(reads);
-						}
-					}
-					else if(behave==Filter.NONDUPLICATES){
-						nonDuplicateProcessor.setDamageLine(s);
-						nonDuplicateProcessor.setEditDistanceHistogram(distances);
-						nonDuplicateProcessor.setPercentIdentityHistogram(pIdents);
-					}else if(behave==Filter.NON_ANCIENT){
-						ancientNonDuplicateProcessor.setDamageLine(s);
-						ancientNonDuplicateProcessor.setEditDistanceHistogram(distances);
-						ancientNonDuplicateProcessor.setPercentIdentityHistogram(pIdents);
-						ancientNonDuplicateProcessor.setReads(reads);
-					}
-			}else{
-				if(verbose)
-					log.log(Level.INFO,"Processing Taxon "+taxName+" in File " +fileName); 
-				while(classIt.hasNext()){
-					IReadBlock current = classIt.next();
-					if(current.getReadLength() <= maxLength || maxLength == 0){
-						if(minComplexity<=getComplexity(current.getReadSequence())){
-							IMatchBlock[] blocks=current.getMatchBlocks();
-							if(behave == Filter.NON_ANCIENT ||behave == Filter.ANCIENT ){
-								ancientProcessor.processMatchBlocks(blocks, current.getReadName(), current.getReadLength());
-							} 
-							if(behave == Filter.NON_ANCIENT ||behave == Filter.NON ){
-								defaultProcessor.processMatchBlocks(blocks, current.getReadName(), current.getReadLength());
-							}else if(behave == Filter.ALL){
-								ancientNonDuplicateProcessor.processMatchBlocks(blocks, current.getReadName(), current.getReadLength());
-							}else if(behave == Filter.NONDUPLICATES){
-								nonDuplicateProcessor.processMatchBlocks(blocks, current.getReadName(), current.getReadLength());
+				}else{
+					if(verbose)
+						log.log(Level.INFO,"Processing Taxon "+taxName+" in File " +fileName); 
+					while(classIt.hasNext()){
+						IReadBlock current = classIt.next();
+						if(current.getReadLength() <= maxLength || maxLength == 0){
+							if(minComplexity<=getComplexity(current.getReadSequence())){
+								IMatchBlock[] blocks=current.getMatchBlocks();
+								if(behave == Filter.NON_ANCIENT ||behave == Filter.ANCIENT ){
+									ancientProcessor.processMatchBlocks(blocks, current.getReadName(), current.getReadLength());
+								} 
+								if(behave == Filter.NON_ANCIENT ||behave == Filter.NON ){
+									defaultProcessor.processMatchBlocks(blocks, current.getReadName(), current.getReadLength());
+								}else if(behave == Filter.ALL){
+									ancientNonDuplicateProcessor.processMatchBlocks(blocks, current.getReadName(), current.getReadLength());
+								}else if(behave == Filter.NONDUPLICATES){
+									nonDuplicateProcessor.processMatchBlocks(blocks, current.getReadName(), current.getReadLength());
+								}
 							}
-						}
-					}// if  
-				}// while
+						}// if  
+					}// while
 				classIt.close();
 				rma6File.close();
 				if(behave == Filter.ANCIENT ){
