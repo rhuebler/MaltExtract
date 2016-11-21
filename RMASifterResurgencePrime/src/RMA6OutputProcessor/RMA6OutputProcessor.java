@@ -197,7 +197,8 @@ public class RMA6OutputProcessor {
 					writeBlastHits(id,taxProcessor.getReads(),outDir+"/ancient/reads/"+fileName+"/");
 				if(switcher == Filter.NON && reads)
 					writeBlastHits(id,taxProcessor.getReads(),outDir+"/default/reads/"+fileName+"/");
-				
+				if(switcher == Filter.NONDUPLICATES && reads)
+					writeBlastHits(id,taxProcessor.getReads(),outDir+"/nonDuplicates/reads/"+fileName+"/");
 				
 			} catch (InterruptedException | ExecutionException e) {
 				// TODO Auto-generated catch block
@@ -238,6 +239,9 @@ public class RMA6OutputProcessor {
 			}
 			prepareOutput(results,behave);
 		}else if(behave == Filter.NONDUPLICATES){
+			if(reads){
+				new File(outDir+"/nonDuplicates/"+"/reads/"+fileName).mkdirs();
+			}
 			prepareOutput(results,behave);
 		}else if(behave == Filter.ALL){
 			if(reads){

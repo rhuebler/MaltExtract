@@ -20,8 +20,13 @@ public class RMA6TaxonNonDuplicateFilter  extends RMA6TaxonProcessor{
 	 * @param int ID, NCBI_MapReader reader, boolean verbose, Logger, log, Logger warning
 	 * @return int numMatches, String readDistribution, HashMap EditDistance, HashMap Percent Identity
 	 */ 
+	protected boolean wantReads = false;
 	public RMA6TaxonNonDuplicateFilter(int id ,double pID, NCBI_MapReader reader, boolean v,Logger log, Logger warning,double tp,int mL) {
 		super(id,pID, reader, v, log, warning, tp, mL);
+	}
+	public RMA6TaxonNonDuplicateFilter(int id ,double pID, NCBI_MapReader reader, boolean v,Logger log, Logger warning,double tp,int mL, boolean reads) {
+		super(id,pID, reader, v, log, warning, tp, mL);
+		this.wantReads = reads;
 	}
 	public void process(){
 		CompositionMap map = new CompositionMap(taxonMap);
@@ -34,6 +39,14 @@ public class RMA6TaxonNonDuplicateFilter  extends RMA6TaxonProcessor{
 				if(!entry.isDuplicate()){
 					lengths.add(entry.getReadLength());
 					//get mismatches
+					if(wantReads){
+						String name = getName(key);
+						lines.add(entry.getReadName()+"\t"+"Length:\t"+entry.getReadLength()+"\t");
+						lines.add(name+"\t"+entry.getAccessionNumber()+"\t"+"Start:\t"+entry.getStart()+"\t"+"End:\t"+entry.getEnd());
+						lines.add("Q:\t"+entry.getQuery());
+						lines.add("A:\t"+entry.getAlignment());
+						lines.add("R:\t"+entry.getReference()+"\n");
+					}
 					numMatches++;
 					container.processAlignment(entry);
 					pIdents.add(entry.getPIdent());
@@ -51,6 +64,7 @@ public class RMA6TaxonNonDuplicateFilter  extends RMA6TaxonProcessor{
 		setEditDistanceHistogram(distances);
 		setPercentIdentityHistogram(pIdents);
 		calculateReadLengthDistribution();
+		setReads(lines);
 	}	
 	public void processMatchBlocks(IMatchBlock[] blocks, String readName, int readLength){ 
 		IMatchBlock block = blocks[0];

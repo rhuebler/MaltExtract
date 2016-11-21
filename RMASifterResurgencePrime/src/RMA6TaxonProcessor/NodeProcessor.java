@@ -94,6 +94,8 @@ public class NodeProcessor{
 				}else if(behave == Filter.NON_ANCIENT){
 					ancientProcessor = new RMA6TaxonDamageFilter(taxID, minPIdent, mapReader, verbose, log, log, wantReads, topPercent, maxLength);
 					defaultProcessor = new RMA6TaxonNonFilter(taxID, minPIdent, mapReader, verbose, log, log, wantReads, topPercent, maxLength);
+				}else if(behave == Filter.NONDUPLICATES ){
+					nonDuplicateProcessor = new RMA6TaxonNonDuplicateFilter(taxID, minPIdent, mapReader, verbose, log, log, topPercent, maxLength,wantReads);
 				}		
 			}else{
 				if(behave == Filter.ANCIENT ){

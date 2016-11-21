@@ -32,6 +32,8 @@ public class DirectoryCreator {
 			new File(outDir+"/nonDuplicates/"+"/editDistance/").mkdirs();
 			new File(outDir+"/nonDuplicates/"+"/percentIdentity/").mkdirs();
 			new File(outDir+"/nonDuplicates/"+"/damageMismatch/").mkdirs();
+			if(hits)
+				new File(outDir+"/nonDuplicates/"+"/reads/").mkdirs();
 		}else if(behave == Filter.ALL){
 			new File(outDir+"/ancientNonDuplicates/").mkdirs();
 			new File(outDir+"/ancientNonDuplicates/"+"/readDist/").mkdirs(); 

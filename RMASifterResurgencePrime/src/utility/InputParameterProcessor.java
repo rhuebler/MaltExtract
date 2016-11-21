@@ -280,10 +280,7 @@ public class InputParameterProcessor {
     	        if(commandLine.hasOption("crawl")){
     	        	this.crawl = true;
     	        }
-    	        if((commandLine.hasOption("reads") && behave == Filter.ANCIENT)||
-    	        	(commandLine.hasOption("reads") && behave == Filter.ALL)||
-    	        	(commandLine.hasOption("reads") && behave == Filter.NON)||
-    	        	(commandLine.hasOption("reads") && behave == Filter.NON_ANCIENT)){
+    	        if((commandLine.hasOption("reads") && behave != Filter.SCAN)){
     	        	this.reads = true;
     	        }
     	        if(commandLine.hasOption("h")){
