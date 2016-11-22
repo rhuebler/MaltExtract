@@ -35,7 +35,7 @@ public class InputParameterProcessor {
 	 * @throws none thrown all caught
 	 * @return return values and parameters to run and control the program
 	 */
-	private double topPercent = 0.01; // initialize with standard value;	
+	private double topPercent = 0.01; // initialize with standard values;	
 	private List<String> fileNames = new ArrayList<String>();
 	private List<String> taxNames = new ArrayList<String>();
 	private String outDir;
