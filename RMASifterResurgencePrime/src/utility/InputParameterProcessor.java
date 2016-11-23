@@ -105,26 +105,25 @@ public class InputParameterProcessor {
     	 CommandLine commandLine;
     	 	// Short Flags
     	 	// edit distance 
-    	    Option option_Input = Option.builder("i").longOpt("input").argName("Path/to/inDir or RMA6Files").hasArgs().desc("Input Directory or files").build();
-    	    Option option_Output = Option.builder("o").longOpt("output").argName("Path/to/outDir").hasArg().desc("Output Directory").build();
-    	    Option option_Taxons = Option.builder("t").longOpt("taxons").argName("Path/to/taxFile or Taxon in \"\"").hasArgs().desc("Taxons to look up").build();
+    	    Option option_Input = Option.builder("i").longOpt("input").argName("Path/to/inDir or RMA6Files").hasArgs().desc("specify input directory or files").build();
+    	    Option option_Output = Option.builder("o").longOpt("output").argName("Path/to/outDir").hasArg().desc("specify out directory").build();
+    	    Option option_Taxons = Option.builder("t").longOpt("taxons").argName("Path/to/taxFile or Taxon in \"\"").hasArgs().desc("target species or list of targets").build();
     	    
     	    // long flags
-    	    Option option_Threads = Option.builder("p").longOpt("threads").argName("1..maxNumberOfCores").hasArg().optionalArg(true).desc("Number of Cores to run on").build();		
-    	    Option option_TopPercent = Option.builder("a").longOpt("top").argName("0.0-0.99").hasArg().optionalArg(true).desc("Top Percent of Matches to Consider").build();
-    	    Option option_Filter = Option.builder("f").longOpt("filter").argName("default, ancient, nonduplicate, def_anc, nd_anc, scan").optionalArg(true).hasArg().desc("Specify the behaviour for run eg ancient").build();
-    	    Option option_MaxLength = Option.builder().longOpt("maxLength").argName("maxLength").hasArg().optionalArg(true).desc("Set Maximum Read Length").build();
-    	    Option option_minPercentIdent = Option.builder().longOpt("minPI").argName("minPI").hasArg().optionalArg(true).desc("Set Minumum Percent Identity").build(); 
-    	    Option option_Help = Option.builder("h").longOpt("help").optionalArg(true).desc("Print Usage and shutdown").build();
-    	    Option option_Path = Option.builder("r").longOpt("resources").hasArg().optionalArg(true).desc("Path to NCBI tre and map File").build();
-    	    Option option_Verbose = Option.builder("v").longOpt("verbose").optionalArg(true).desc("How much output should be printed to screen").build();
-    	    Option option_Reads = Option.builder().longOpt("reads").optionalArg(true).desc("Output Blas Hits when filtering for ancient Reads").build();
-    	    Option option_Crawl = Option.builder().longOpt("crawl").optionalArg(true).desc("Find all Blast Hits Matching the Strains of Input Species").build();
-    	    Option option_minComplexity = Option.builder().longOpt("minComp").hasArg().optionalArg(true).desc("Only Use Reads with minimum complexity greater than input").build();
+    	    Option option_Threads = Option.builder("p").longOpt("threads").argName("1..maxNumberOfCores").hasArg().optionalArg(true).desc("how many cores to use").build();		
+    	    Option option_TopPercent = Option.builder("a").longOpt("top").argName("0.0-0.99").hasArg().optionalArg(true).desc("use top 0.XX percent").build();
+    	    Option option_Filter = Option.builder("f").longOpt("filter").argName("default, ancient, nonduplicate, def_anc, nd_anc, scan").optionalArg(true).hasArg().desc("use filter").build();
+    	    Option option_MaxLength = Option.builder().longOpt("maxReadLength").argName("maxReadLength").hasArg().optionalArg(true).desc("set maximum read length").build();
+    	    Option option_minPercentIdent = Option.builder().longOpt("minPI").argName("minPI").hasArg().optionalArg(true).desc("set minimum percent identity to XX.X").build(); 
+    	    Option option_Help = Option.builder("h").longOpt("help").optionalArg(true).desc("print help").build();
+    	    Option option_Path = Option.builder("r").longOpt("resources").hasArg().argName("path").optionalArg(true).desc("set path to required ncbi files").build();
+    	    Option option_Verbose = Option.builder("v").longOpt("verbose").optionalArg(true).desc("how much output to print to screen").build();
+    	    Option option_Reads = Option.builder().longOpt("reads").optionalArg(true).desc("retrieve alignments").build();
+    	    Option option_Crawl = Option.builder().longOpt("crawl").optionalArg(true).desc("use all alignments for damage and edit distance").build();
+    	    Option option_minComplexity = Option.builder().longOpt("minComp").hasArg().argName("minComplexity").optionalArg(true).desc("use minimum complexity").build();
     	    Options options = new Options();
     	    
     	    CommandLineParser parser = new DefaultParser();
-
     	    options.addOption(option_Input);
     	    options.addOption(option_Output);
     	    options.addOption(option_Taxons);
@@ -293,9 +292,10 @@ public class InputParameterProcessor {
     	        	this.reads = true;
     	        }
     	        if(commandLine.hasOption("h")){
-    	        	String header = "RMAExtractor concurrent alpha";
+    	        	String header = "RMAExtractor beta 0.1";
     	    	    String footer = "In case you encounter an error drop an email to huebler@shh.mpg.de with useful description";
     	    	    HelpFormatter formatter = new HelpFormatter();
+    	    	    formatter.setWidth(500);
     	    	    formatter.printHelp("RMAExtractor", header, options, footer, true);   
     	    	    System.exit(0);
     	        }
@@ -310,11 +310,15 @@ public class InputParameterProcessor {
     	              warning.log(Level.WARNING,argument);
     	            }
     	          }
-    	       
+    	        if(!commandLine.hasOption("taxon") && behave != Filter.SCAN){
+    	        	warning.log(Level.SEVERE,"No target species provided for filtering");
+    	        	System.exit(1);
+    	        }
     	    }
     	    catch (ParseException exception){
     	    	warning.log(Level.SEVERE, "Parse error: " + exception);
     	    }
+    	    
     }
   
 }

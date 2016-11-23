@@ -157,3 +157,9 @@ public class RMAExtractor {
 	}//main
 	
 }//class
+//TODO HAve either default list or shut down if no list is provided 
+//TODO also get edit distance and read dist while crawling 
+//TODO default plot all function 
+//TODO get Plotting functions in R package 
+//TODO get RMAExtracterBeta into tools 
+
