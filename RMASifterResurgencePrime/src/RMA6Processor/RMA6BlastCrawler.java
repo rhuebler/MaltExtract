@@ -8,6 +8,7 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -41,6 +42,9 @@ public class RMA6BlastCrawler {
 	private Logger warning;
 	private ArrayList<String> summary= new ArrayList<String>();
 	private NCBI_TreeReader treeReader;
+	private ArrayList<String> editDistances = new ArrayList<String>();
+	private ArrayList<String> percentIdentities = new ArrayList<String>();
+	private ArrayList<String> readDistributions = new ArrayList<String>();
 	public RMA6BlastCrawler(String dir, String name, String species, String out, NCBI_MapReader reader ,Logger warning,NCBI_TreeReader treeReader){
 		this.inDir = dir;
 		this.fileName = name;
@@ -50,6 +54,40 @@ public class RMA6BlastCrawler {
 		this.warning = warning;
 		this.treeReader = new NCBI_TreeReader(treeReader);
 	}
+
+	private void writeReadLengthDistribution(List<String> histo){
+		try{
+			String header = "Node\tMean\tGeometricMean\tMedian\tStandardDev";
+			histo.sort(null);
+			histo.add(0,header);
+			Path file = Paths.get(outDir+"/crawlResults/readDist/"+fileName+"_"+speciesName.replace(' ', '_')+"_readDist.txt");
+			Files.write(file, histo, Charset.forName("UTF-8"));
+		}catch(IOException io){
+			warning.log(Level.SEVERE,"Cannot write file", io);
+		}
+	}
+	private void writeEditDistance(List<String> histo){
+		try{
+			String header = "Node\t0\t1\t2\t3\t4\t5\thigher";
+			histo.sort(null);
+			histo.add(0,header);
+			Path file = Paths.get(outDir+"/crawlResults/editDistance/"+fileName+"_"+speciesName.replace(' ', '_')+"_editDistance.txt");
+			Files.write(file, histo, Charset.forName("UTF-8"));
+		}catch(IOException io){
+			warning.log(Level.SEVERE,"Cannot write file", io);
+		}
+	}
+	private void writePercentIdentity(List<String> histo){
+		try{
+			String header = "Node\t80\t85\t90\t95\t100";
+			histo.sort(null);
+			histo.add(0,header);
+			Path file = Paths.get(outDir+"/crawlResults/percentIdentitiy/"+fileName+"_"+speciesName.replace(' ', '_')+"_percentIdentitiy.txt");
+			Files.write(file, histo, Charset.forName("UTF-8"));
+		}catch(IOException io){
+			warning.log(Level.SEVERE,"Cannot write file", io);
+		}
+	} 
 	private String getName(int taxId){
 		String name;
 		if(mapReader.getNcbiIdToNameMap().get(taxId) != null)
@@ -74,7 +112,7 @@ public class RMA6BlastCrawler {
 		summary.sort(null);
 		summary.add(0,header);
 	try{
-		Path file = Paths.get(outDir+"/crawlResults/"+fileName+"_"+speciesName.replace(' ', '_')+"_misMatch.txt");
+		Path file = Paths.get(outDir+"/crawlResults/damageMismatch/"+fileName+"_"+speciesName.replace(' ', '_')+"_misMatch.txt");
 		Files.write(file, summary, Charset.forName("UTF-8"));
 	}catch(IOException io){
 		warning.log(Level.SEVERE,"Can't write File" ,io);
@@ -98,6 +136,7 @@ public class RMA6BlastCrawler {
 		return keys;
 	}
 	public void process(){
+		
 		HashMap<Integer, StrainMap> collection = new HashMap<Integer, StrainMap>();
 		HashSet<Integer> idsToProcess = new HashSet<Integer>();
 		int taxID = mapReader.getNcbiNameToIdMap().get(speciesName);
@@ -129,6 +168,7 @@ public class RMA6BlastCrawler {
 				
 									Alignment al = new Alignment();
 									al.processText(blocks[i].getText().split("\n"));
+									al.setPIdent(blocks[i].getPercentIdentity());
 									if(collection.containsKey(blocks[i].getTaxonId())){
 										StrainMap strain = collection.get(blocks[i].getTaxonId());
 										StrainMisMatchContainer container =	strain.getStrainMisMatchContainer();
@@ -140,7 +180,7 @@ public class RMA6BlastCrawler {
 									}else{
 										StrainMisMatchContainer container = new StrainMisMatchContainer();
 										container.processAlignment(al);
-										StrainMap strain = new StrainMap(mapReader.getNcbiIdToNameMap().get(blocks[i].getTaxonId()),
+										StrainMap strain = new StrainMap(getName(blocks[i].getTaxonId()),
 										container,1);
 										collection.put(blocks[i].getTaxonId(), strain);
 											}//else
@@ -155,8 +195,14 @@ public class RMA6BlastCrawler {
 		}// for all IDs
 		for(int key :collection.keySet()){// write output here 
 		summary.add(collection.get(key).getLine());
+		editDistances.add(collection.get(key).getEditDistanceHistogram());
+		percentIdentities.add(collection.get(key).getPercentIdentityHistogram());
+		readDistributions.add(collection.get(key).getReadLengthDistribution());
 		}
 		
 		writeMisMap(summary);
+		writeEditDistance(editDistances);
+		writePercentIdentity(percentIdentities);
+		writeReadLengthDistribution(readDistributions);
 	}
 }

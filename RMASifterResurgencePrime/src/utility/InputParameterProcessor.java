@@ -310,7 +310,7 @@ public class InputParameterProcessor {
     	              warning.log(Level.WARNING,argument);
     	            }
     	          }
-    	        if(!commandLine.hasOption("taxon") && behave != Filter.SCAN){
+    	        if(!commandLine.hasOption("taxons") && behave != Filter.SCAN){
     	        	warning.log(Level.SEVERE,"No target species provided for filtering");
     	        	System.exit(1);
     	        }

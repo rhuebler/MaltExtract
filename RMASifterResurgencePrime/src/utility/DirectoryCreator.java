@@ -9,6 +9,11 @@ public class DirectoryCreator {
 	public void process(Filter behave, String outDir, boolean hits, boolean crawl) {
 		if(crawl){
 			new File(outDir+"/crawlResults/").mkdirs();
+			new File(outDir+"/crawlResults/damageMismatch/").mkdirs();
+			new File(outDir+"/crawlResults/readDist/").mkdirs();
+			new File(outDir+"/crawlResults/editDistance/").mkdirs();
+			new File(outDir+"/crawlResults/percentIdentitiy/").mkdirs();
+			
 		}
 		if(behave == Filter.NON){
 			new File(outDir+"/default/").mkdirs();

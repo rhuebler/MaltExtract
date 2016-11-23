@@ -1,4 +1,5 @@
 package strainMap;
+import java.util.ArrayList;
 // Store all Combinations for the first 10 and last 10 Positions of each Blast hit
 import java.util.HashMap;
 
@@ -13,10 +14,22 @@ public class StrainMisMatchContainer {
 	private HashMap<Integer,HashMap<String,Integer>> container = new HashMap<Integer,HashMap<String,Integer>>();
 	private HashMap<Integer,Double> damage; 
 	private HashMap<Integer,Double> noise;
+	private ArrayList<Integer> distances = new ArrayList<Integer>();
+	private ArrayList<Double> pIdents = new ArrayList<Double>();
+	private ArrayList<Integer> lengths = new ArrayList<Integer>();
 	private int processed;
 //getters
 	public int getProcessed(){
 		return this.processed;
+	}
+	public ArrayList<Integer> getEditDistances(){
+		return this.distances;
+	}
+	public ArrayList<Integer> getLengths(){
+		return this.lengths;
+	}
+	public ArrayList<Double> getPercentIdentity(){
+		return this.pIdents;
 	}
 public HashMap<Integer,Double> getDamage(){
 	return this.damage;
@@ -26,9 +39,12 @@ public HashMap<Integer,Double> getNoise(){
 }	
 public void processAlignment(Alignment al){
 	if(al.getMlength() >= 20){
+		distances.add(al.getEditInstance());
+		pIdents.add(al.getPIdent());
+		lengths.add(al.getMlength());
 		processed+=1;
-	String q = al.getQuery();
-	String r = al.getReference();
+		String q = al.getQuery();
+		String r = al.getReference();
 		for(int i = 0; i< 20; i++){
 			if(i<10){
 			if(container.containsKey(i)){
