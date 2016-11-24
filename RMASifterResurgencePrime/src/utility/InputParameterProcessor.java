@@ -107,7 +107,7 @@ public class InputParameterProcessor {
     	 	// edit distance 
     	    Option option_Input = Option.builder("i").longOpt("input").argName("Path/to/inDir or RMA6Files").hasArgs().desc("specify input directory or files").build();
     	    Option option_Output = Option.builder("o").longOpt("output").argName("Path/to/outDir").hasArg().desc("specify out directory").build();
-    	    Option option_Taxons = Option.builder("t").longOpt("taxons").argName("Path/to/taxFile or Taxon in \"\"").hasArgs().desc("target species or list of targets").build();
+    	    Option option_Taxons = Option.builder("t").longOpt("taxa").argName("Path/to/taxFile or Taxon in \"\"").hasArgs().desc("target species or list of targets").build();
     	    
     	    // long flags
     	    Option option_Threads = Option.builder("p").longOpt("threads").argName("1..maxNumberOfCores").hasArg().optionalArg(true).desc("how many cores to use").build();		
@@ -181,10 +181,10 @@ public class InputParameterProcessor {
     	        		}
     	        }
     	        
-    	        if (commandLine.hasOption("taxons"))
+    	        if (commandLine.hasOption("taxa"))
     	        {	this.taxas = Taxas.USER;
-    	            for(String tax : commandLine.getOptionValues("taxons")){
-    	            	log.info("Taxons File: ");
+    	            for(String tax : commandLine.getOptionValues("taxa")){
+    	            	log.info("Taxon File: ");
     	            	log.info(tax);
     	        	   File f = new File(tax);
     	        	   try {
@@ -310,7 +310,7 @@ public class InputParameterProcessor {
     	              warning.log(Level.WARNING,argument);
     	            }
     	          }
-    	        if(!commandLine.hasOption("taxons") && behave != Filter.SCAN){
+    	        if(!commandLine.hasOption("taxa") && behave != Filter.SCAN){
     	        	warning.log(Level.SEVERE,"No target species provided for filtering");
     	        	System.exit(1);
     	        }
