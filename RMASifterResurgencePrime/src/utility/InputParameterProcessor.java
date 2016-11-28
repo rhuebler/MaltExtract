@@ -101,6 +101,17 @@ public class InputParameterProcessor {
 	public boolean wantToCrawl(){
 		return this.crawl;
 	}
+	private void readTaxList(File f) throws IOException{
+				   try {
+					   Scanner	in = new Scanner(f.getCanonicalFile());
+					   while(in.hasNext()){
+						   taxNames.add(in.nextLine().trim());
+					   }
+					   in.close();
+				   }catch (FileNotFoundException e) {
+					   warning.log(Level.WARNING,"File Not Found",e);
+				   }		
+	}	
 	private void process(String[] parameters){	
     	 CommandLine commandLine;
     	 	// Short Flags
@@ -121,6 +132,7 @@ public class InputParameterProcessor {
     	    Option option_Reads = Option.builder().longOpt("reads").optionalArg(true).desc("retrieve alignments").build();
     	    Option option_Crawl = Option.builder().longOpt("crawl").optionalArg(true).desc("use all alignments for damage and edit distance").build();
     	    Option option_minComplexity = Option.builder().longOpt("minComp").hasArg().argName("minComplexity").optionalArg(true).desc("use minimum complexity").build();
+    	    Option option_List = Option.builder().longOpt("list").hasArg().argName("list").optionalArg(true).desc("decide on which build in list to use (not enabled yet)").build();
     	    Options options = new Options();
     	    
     	    CommandLineParser parser = new DefaultParser();
@@ -140,6 +152,7 @@ public class InputParameterProcessor {
     	    options.addOption(option_Verbose);
     	    options.addOption(option_Reads);
     	    options.addOption(option_Crawl);
+    	    options.addOption(option_List);
 
     	    try
     	    {
@@ -186,25 +199,16 @@ public class InputParameterProcessor {
     	            for(String tax : commandLine.getOptionValues("taxa")){
     	            	log.info("Taxon File: ");
     	            	log.info(tax);
-    	        	   File f = new File(tax);
-    	        	   try {
-						if(f.getCanonicalFile().exists()){
-							   try {
-								   Scanner	in = new Scanner(f.getCanonicalFile());
-								   while(in.hasNext()){
-									   taxNames.add(in.nextLine().trim());
-								   }
-								   in.close();
-							   }catch (FileNotFoundException e) {
-								   warning.log(Level.WARNING,"File Not Found",e);
-							   }
-						   }else{
+    	            	try{
+    	            		File f = new File(tax);
+    	     				if(f.getCanonicalFile().exists()){
+    	     					readTaxList(f);
+    	     				}else{
 							   log.info("Added Taxon: ");
 							   log.info(tax +" to analysis");
 							   taxNames.add(tax); 
-						   }
-					} catch (IOException e) {
-						// TODO Auto-generated catch block
+    	     				}
+    	            	} catch (IOException e) {
 						warning.log(Level.WARNING,"IOException",e);
 					}
     	           }	   
@@ -291,6 +295,22 @@ public class InputParameterProcessor {
     	        if((commandLine.hasOption("reads") && behave != Filter.SCAN)){
     	        	this.reads = true;
     	        }
+    	        if(commandLine.hasOption("list")){
+    	        	String list = commandLine.getOptionValue("list");
+    	        	String line = "";
+    	        	if(Pattern.compile(Pattern.quote("default"), Pattern.CASE_INSENSITIVE).matcher(list).find()){
+    	        		log.log(Level.INFO, "use default list" + minComplexity);
+    	        		line = "myPointer";
+    	        	}// use other lists here
+    	        	try{
+	            		File f = new File(line);
+	     				if(f.getCanonicalFile().exists()){
+	     					readTaxList(f);
+	     				}
+    	        	} catch(IOException io)	{
+    	        		warning.log(Level.WARNING, line+" not exist", io);
+    	        	}
+    	        }
     	        if(commandLine.hasOption("h")){
     	        	String header = "RMAExtractor beta 0.1";
     	    	    String footer = "In case you encounter an error drop an email to huebler@shh.mpg.de with useful description";
@@ -312,6 +332,10 @@ public class InputParameterProcessor {
     	          }
     	        if(!commandLine.hasOption("taxa") && behave != Filter.SCAN){
     	        	warning.log(Level.SEVERE,"No target species provided for filtering");
+    	        	System.exit(1);
+    	        }
+    	        if(commandLine.hasOption("taxa") && commandLine.hasOption("list")){
+    	        	warning.log(Level.SEVERE,"Use either list for build in lists or use taxa not both");
     	        	System.exit(1);
     	        }
     	    }
