@@ -92,6 +92,8 @@ public class NCBI_TreeReader {
 		    positions.addAll(children);
 		    for(int i = 0;i< (maxDepth-ph.getNode(String.valueOf(target)).calculateDepth());i++){
 		    	positions = getStrains(positions, keys);
+		    	if(positions.size() == 0)
+		    		break;
 		    }
 		    positionsToKeep.addAll(getAssigned(positions,keys));
 		    //System.out.println(positionsToKeep.size());
