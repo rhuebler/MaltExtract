@@ -82,7 +82,7 @@ public class RMA6BlastCrawler {
 			String header = "Node\t80\t85\t90\t95\t100";
 			histo.sort(null);
 			histo.add(0,header);
-			Path file = Paths.get(outDir+"/crawlResults/percentIdentitiy/"+fileName+"_"+speciesName.replace(' ', '_')+"_percentIdentitiy.txt");
+			Path file = Paths.get(outDir+"/crawlResults/percentIdentity/"+fileName+"_"+speciesName.replace(' ', '_')+"_percentIdentity.txt");
 			Files.write(file, histo, Charset.forName("UTF-8"));
 		}catch(IOException io){
 			warning.log(Level.SEVERE,"Cannot write file", io);

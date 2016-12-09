@@ -157,9 +157,7 @@ public class RMAExtractor {
 	}//main
 	
 }//class
-//TODO HAve either default list or shut down if no list is provided 
 
 //TODO default plot all function 
-//TODO get Plotting functions in R package 
 //TODO get RMAExtracterBeta into tools 
-
+//TODO What is aquiring the extra memory
