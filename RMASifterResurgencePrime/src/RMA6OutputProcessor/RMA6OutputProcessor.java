@@ -90,6 +90,8 @@ public class RMA6OutputProcessor {
 			Files.write(file, summary, Charset.forName("UTF-8"));
 		}catch(IOException io){
 			warning.log(Level.SEVERE, "File writing exception", io);
+		}catch(NullPointerException np){
+			warning.log(Level.SEVERE,"Cannot write file"+fileName, np);
 		}
 	 
 	}
@@ -103,7 +105,9 @@ public class RMA6OutputProcessor {
 		Path file = Paths.get(outDir+name+".txt");
 		Files.write(file, summary, Charset.forName("UTF-8"));
 		}catch(IOException io){
-			warning.log(Level.SEVERE,"Cannot write file", io);
+			warning.log(Level.SEVERE,"Cannot write file"+ fileName, io);
+		}catch(NullPointerException np){
+			warning.log(Level.SEVERE,"Cannot write file"+fileName, np);
 		}
 	}
 	private void writeCoverageHistogram(List<String> summary, String outDir){
@@ -114,7 +118,9 @@ public class RMA6OutputProcessor {
 			Path file = Paths.get(outDir);
 			Files.write(file, summary, Charset.forName("UTF-8"));
 		}catch(IOException io){
-			warning.log(Level.SEVERE,"Cannot write file", io);
+			warning.log(Level.SEVERE,"Cannot write file "+ fileName, io);
+		}catch(NullPointerException np){
+			warning.log(Level.SEVERE,"Cannot write file"+fileName, np);
 		}
 	}
 	private void writeReadDist(List<String> summary, String outDir){
@@ -125,7 +131,9 @@ public class RMA6OutputProcessor {
 			Path file = Paths.get(outDir);
 			Files.write(file, summary, Charset.forName("UTF-8"));
 		}catch(IOException io){
-			warning.log(Level.SEVERE,"Cannot write file", io);
+			warning.log(Level.SEVERE,"Cannot write file " + fileName, io);
+		}catch(NullPointerException np){
+			warning.log(Level.SEVERE,"Cannot write file"+fileName, np);
 		}
 	}
 	private void writeEditDistance(List<String> histo, String outDir){
@@ -136,7 +144,9 @@ public class RMA6OutputProcessor {
 			Path file = Paths.get(outDir);
 			Files.write(file, histo, Charset.forName("UTF-8"));
 		}catch(IOException io){
-			warning.log(Level.SEVERE,"Cannot write file", io);
+			warning.log(Level.SEVERE,"Cannot write file"+fileName, io);
+		}catch(NullPointerException np){
+			warning.log(Level.SEVERE,"Cannot write file"+fileName, np);
 		}
 	}
 	private void writePercentIdentity(List<String> histo, String outDir){
@@ -146,8 +156,10 @@ public class RMA6OutputProcessor {
 			histo.add(0,header);
 			Path file = Paths.get(outDir);
 			Files.write(file, histo, Charset.forName("UTF-8"));
-		}catch(IOException io){
+		}catch(IOException io ){
 			warning.log(Level.SEVERE,"Cannot write file", io);
+		}catch(NullPointerException np){
+			warning.log(Level.SEVERE,"Cannot write file"+fileName, np);
 		}
 	} 
 	private void writeReadLengthDistribution(List<String> histo, String outDir){

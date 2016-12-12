@@ -124,9 +124,9 @@ public class SummaryWriter {
 				   	}
 				  
 			}catch (InterruptedException e) {
-				warning.log(Level.SEVERE, "Error", e);
+				warning.log(Level.SEVERE, "Interuption Error" , e);
 			} catch (ExecutionException e) {
-				warning.log(Level.SEVERE, "Error", e);
+				warning.log(Level.SEVERE, "Execution Error", e);
 			}
 			   
 		   }//for

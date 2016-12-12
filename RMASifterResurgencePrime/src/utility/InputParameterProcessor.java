@@ -287,6 +287,7 @@ public class InputParameterProcessor {
     	        	log.log(Level.INFO, "Minimum Complexity set to " + minComplexity);
     	        }
     	        if(commandLine.hasOption('v')){
+    	        	log.log(Level.INFO, "Verbose");
     	        	this.verbose = true;
     	        }
     	        if(commandLine.hasOption("crawl")){
