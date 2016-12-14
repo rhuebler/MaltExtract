@@ -79,7 +79,7 @@ public RMA6TaxonProcessor(Integer id, double pID, NCBI_MapReader reader, boolean
 		s+="\t"+0;
 	}
 	setDamageLine(s);
-	
+	this.readDistribution = taxName+"\tNA\t0\t0\t0\t0\t0";
 }
 public RMA6TaxonProcessor() {
 	// TODO Auto-generated constructor stub
@@ -184,6 +184,8 @@ protected String getName(int taxId){
 	String name;
 	if(mapReader.getNcbiIdToNameMap().get(taxId) != null)
 		name = mapReader.getNcbiIdToNameMap().get(taxId).replace(' ', '_');
+	else if(taxId == 0)
+		name="NA";
 	else
 		name = "unassignedName";
 	return name;

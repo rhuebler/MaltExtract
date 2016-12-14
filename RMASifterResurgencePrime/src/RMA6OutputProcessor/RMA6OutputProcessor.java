@@ -124,17 +124,18 @@ public class RMA6OutputProcessor {
 		}
 	}
 	private void writeReadDist(List<String> summary, String outDir){
-		try{
-			summary.sort(null);
-			String header = "Taxon\tReference\tuniquePerReference\tnonStacked\tnonDuplicatesonReference\tTotalReadsOnReference\tReferenceLength";
-			summary.add(0, header);
-			Path file = Paths.get(outDir);
-			Files.write(file, summary, Charset.forName("UTF-8"));
-		}catch(IOException io){
-			warning.log(Level.SEVERE,"Cannot write file " + fileName, io);
-		}catch(NullPointerException np){
-			warning.log(Level.SEVERE,"Cannot write file"+fileName, np);
-		}
+			//problem is null lines in file
+			try{
+				summary.sort(null);
+				String header = "Taxon\tReference\tuniquePerReference\tnonStacked\tnonDuplicatesonReference\tTotalReadsOnReference\tReferenceLength";
+				summary.add(0, header);
+				Path file = Paths.get(outDir);
+				Files.write(file, summary, Charset.forName("UTF-8"));
+			}catch(IOException io){
+				warning.log(Level.SEVERE,"Cannot write file " + outDir, io);
+			}catch(NullPointerException np){
+				warning.log(Level.SEVERE,"Cannot write file "+ outDir, np);
+			}
 	}
 	private void writeEditDistance(List<String> histo, String outDir){
 		try{
@@ -194,7 +195,6 @@ public class RMA6OutputProcessor {
 				}else {
 					taxProcessor = results.get(id).get().getAncientNonDuplicate();
 				}
-				results.get(id).get();
 				overallSum.put(id,taxProcessor.getNumberOfReads());
 				readDistribution.add(taxProcessor.getReadDistribution());	
 				editDistance.add(taxProcessor.getEditDistanceHistogram());

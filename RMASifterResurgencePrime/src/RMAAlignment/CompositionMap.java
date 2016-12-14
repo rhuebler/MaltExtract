@@ -16,8 +16,6 @@ private int maxID;
 private ArrayList<Double> generalStatistics;
 private HashMap<Integer,Integer> coverageHistogram;
 private int refLength = 0;
-//from stack overflow
-
 
 //getter
 public int getReferenceLength(){

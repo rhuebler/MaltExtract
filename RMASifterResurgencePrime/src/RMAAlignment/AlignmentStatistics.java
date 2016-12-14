@@ -49,7 +49,7 @@ public class AlignmentStatistics {
 	public void calculateStatistics(){
 		
 		ArrayList<Alignment> input = removeDuplicates(currentList);
-		if(input != null){
+		if(input != null && input.size()>0){
 			ArrayList<Double> results = new ArrayList<Double>();
 			ReferenceMap refMap = new ReferenceMap(input);
 			refMap.process();
