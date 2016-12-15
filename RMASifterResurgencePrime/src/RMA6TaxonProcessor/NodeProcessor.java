@@ -1,5 +1,11 @@
 package RMA6TaxonProcessor;
-//TODO comment
+/**
+ * The purpose of this class is to serve as mediator between the rma6File and the filters
+ * it has different slots for each filters and passes the match blocks into the filters to be processed 
+ * and keep some statistics 
+ * @author huebler
+ */
+
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
