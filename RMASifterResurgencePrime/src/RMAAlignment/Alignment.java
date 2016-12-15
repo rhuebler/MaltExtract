@@ -186,7 +186,7 @@ private void setReferenceLength(int k) {
 			 if(line.startsWith(">"))
 				 setReferenceName(line.trim());
 			 if(line.contains("Query")){
-				 for(String frag:line.split("\\s")){
+				 for(String frag:line.split(":|\\s")){
 					 if(frag.trim().matches("[ATGCNatgcn-]+")){
 						 query+=(frag.trim());
 						 setMLength(frag.trim().length());
@@ -205,7 +205,7 @@ private void setReferenceLength(int k) {
 			 }	 
 			 if(line.contains("Sbjct")){
 				
-				 for(String frag:line.split("\\s")){
+				 for(String frag:line.split(":|\\s")){
 					 if(frag.trim().matches("[ATGCNatgcn-]+")){
 						 reference += (frag.trim());	 
 					 }

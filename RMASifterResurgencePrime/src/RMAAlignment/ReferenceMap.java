@@ -69,8 +69,9 @@ public class ReferenceMap {
 				cStart = current.getStart();
 				cEnd = current.getEnd();		
 			}
-			for(int k = cStart; k<= cEnd; k++){
-				if(coverageContainer.containsKey(k)){
+			
+			for(int k = cStart; k<= cEnd; k++){ 
+				if(coverageContainer.containsKey(k)){ 
 					coverageContainer.replace(k, coverageContainer.get(k)+1);
 				}else{
 					coverageContainer.put(k, 1);
