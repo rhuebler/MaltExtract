@@ -35,20 +35,10 @@ public class NodeProcessor{
 		private Filter behave;
 		private double minPIdent;
 		private double minComplexity;
+		private boolean alignment = false;
 		//constructors
-		public NodeProcessor(int id,double minPIdent, NCBI_MapReader reader, boolean v, Logger log, Logger warning, Filter behave, double minCompl) {
-			this.taxID = id;
-			this.minPIdent = minPIdent;
-			this.mapReader = reader;
-			this.verbose = v;
-			this.log = log;
-			this.warning = warning;
-			this.behave = behave;
-			this.minComplexity = minCompl;
-		}
-		
 		public NodeProcessor(int id, double minPIdent, NCBI_MapReader reader, boolean v, Logger log, Logger warning,
-				boolean reads, Filter behave, double minCompl) {
+				boolean reads, Filter behave, double minCompl,boolean alignment) {
 			this.taxID = id;
 			this.minPIdent = minPIdent;
 			this.mapReader = reader;
@@ -58,6 +48,7 @@ public class NodeProcessor{
 			this.wantReads = reads;
 			this.behave = behave;
 			this.minComplexity = minCompl;
+			this.alignment = alignment;
 		}
 		//getters
 		// calculate complexity of read from Megan code

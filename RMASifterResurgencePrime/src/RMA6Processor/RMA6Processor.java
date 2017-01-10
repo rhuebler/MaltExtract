@@ -154,11 +154,7 @@ public void process(List<Integer>taxIDs, double topPercent) {// processing
 	executor=(ThreadPoolExecutor) Executors.newFixedThreadPool(threads);
 	HashMap<Integer,Future<NodeProcessor>> results =  new HashMap<Integer,Future<NodeProcessor>>();
 		for(Integer id : idsToProcess){
-			NodeProcessor nodeProcessor;
-			if(reads)
-				nodeProcessor = new NodeProcessor(id, minPIdent, mapReader, verbose,log, warning,reads,behave, minComplexity);
-			else
-				nodeProcessor = new NodeProcessor(id, minPIdent, mapReader, verbose,log, warning,behave, minComplexity);
+			NodeProcessor nodeProcessor = new NodeProcessor(id, minPIdent, mapReader, verbose,log, warning,reads,behave, minComplexity,alignments);
 			ConcurrentNodeProcessor task = new ConcurrentNodeProcessor(nodeProcessor,inDir, fileName, topPercent, maxLength);
 			Future<NodeProcessor> future = executor.submit(task);
 			results.put(id, future);
