@@ -37,29 +37,10 @@ public class ConcurrentRMA6Processor implements Callable<RMA6Processor>{
 	private Logger log;
 	private Logger warning;
 	private double minComplexity;
+	private boolean alignments;
 	public ConcurrentRMA6Processor(String inDir, String fileName, String outDir, NCBI_MapReader mapReader, 
 			NCBI_TreeReader treeReader,List<Integer>taxIDs,double topPercent, int i,double minPI, Filter b,
-			Taxas t, boolean verbose, Logger log, Logger warning, double minCompl) {
-		
-		this.inDir = inDir;
-		this.outDir = outDir;
-		this.fileName = fileName;
-		this.mapReader = mapReader;
-		this.treeReader = treeReader;
-		this.taxIDs = taxIDs;
-		this.topPercent=topPercent;
-		this.behave = b;
-		this.maxLength = i;
-		this.minPIdent = minPI;
-		this.t = t;
-		this.verbose = verbose;
-		this.log = log;
-		this.warning = warning;
-		this.minComplexity = minCompl;
-	}
-	public ConcurrentRMA6Processor(String inDir, String fileName, String outDir, NCBI_MapReader mapReader, 
-			NCBI_TreeReader treeReader,List<Integer>taxIDs,double topPercent, int i,double minPI, Filter b,
-			Taxas t, boolean verbose, Logger log, Logger warning, boolean reads,  double minCompl) {
+			Taxas t, boolean verbose, Logger log, Logger warning, boolean reads,  double minCompl, boolean alignments) {
 		
 		this.inDir = inDir;
 		this.outDir = outDir;
@@ -76,21 +57,15 @@ public class ConcurrentRMA6Processor implements Callable<RMA6Processor>{
 		this.log = log;
 		this.warning = warning;
 		this.readInf = reads;
+		this.alignments = alignments;
 		this.minComplexity = minCompl;
 	}
 	@Override
 	public RMA6Processor call(){
-		if(readInf){
 		RMA6Processor processor = new RMA6Processor(inDir, fileName, outDir, mapReader,
-				treeReader,maxLength,minPIdent ,behave, t, verbose, log, warning, readInf, minComplexity); // should be implemented as callable 
+				treeReader,maxLength,minPIdent ,behave, t, verbose, log, warning, readInf, minComplexity,alignments); // should be implemented as callable 
     	processor.process(taxIDs, topPercent);// loop through file
 		return processor;
-		}else{
-			RMA6Processor processor = new RMA6Processor(inDir, fileName, outDir, mapReader,
-					treeReader,maxLength,minPIdent ,behave, t, verbose, log, warning, minComplexity); // should be implemented as callable 
-	    	processor.process(taxIDs, topPercent);// loop through file
-	    	return processor;
-		}
 	}
 
 }

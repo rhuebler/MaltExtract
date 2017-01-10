@@ -96,21 +96,12 @@ public class RMAExtractor {
 			List<Future<RMA6Processor>> processedFiles = new ArrayList<>();
     		for(String fileName : inProcessor.getFileNames()){
     			File f = new File(fileName);
-				if(inProcessor.getBlastHits()){
 					ConcurrentRMA6Processor task = new ConcurrentRMA6Processor(f.getParent() + "/", 
 							f.getName(), inProcessor.getOutDir(), mapReader, treeReader,taxIDs, inProcessor.getTopPercent(),
 							inProcessor.getMaxLength(),inProcessor.getMinPIdent(),inProcessor.getFilter(), inProcessor.getTaxas(),
-							inProcessor.isVerbose(), log, warning,inProcessor.getBlastHits(), inProcessor.getMinComplexity());
+							inProcessor.isVerbose(), log, warning,inProcessor.getBlastHits(), inProcessor.getMinComplexity(), inProcessor.wantReads());
 						Future<RMA6Processor> future=executor.submit(task);
 						processedFiles.add(future);
-				}else{
-					ConcurrentRMA6Processor task = new ConcurrentRMA6Processor(f.getParent() + "/", 
-						f.getName(), inProcessor.getOutDir(), mapReader, treeReader,taxIDs, inProcessor.getTopPercent(),
-						inProcessor.getMaxLength(),inProcessor.getMinPIdent(),inProcessor.getFilter(), inProcessor.getTaxas(),
-						inProcessor.isVerbose(), log, warning, inProcessor.getMinComplexity());
-					Future<RMA6Processor> future=executor.submit(task);
-					processedFiles.add(future);
-				}
     		}//fileNames;
 	    // wait for all threads to finish here currently no concurrency errors or deadlocks but this would be the place where it would fall apart 
 	    destroy();

@@ -55,13 +55,14 @@ public class RMA6Processor {
 	private Logger log;
 	private Logger warning;
 	private boolean reads;
+	private boolean alignments;
 	private ThreadPoolExecutor executor;
 	private int threads = 1;
 	private double minComplexity;
 	// constructor
 	public RMA6Processor(String inDir, String fileName, String outDir, NCBI_MapReader mapReader,
 			NCBI_TreeReader treeReader, int maxLength, double pIdent, Filter b, Taxas t, boolean verbose,
-			Logger log, Logger warning, double minCompl) {
+			Logger log, Logger warning, boolean readInf, double minCompl, boolean alignment) {
 		this.inDir = inDir;
 		this.outDir = outDir;
 		this.fileName = fileName;
@@ -74,23 +75,7 @@ public class RMA6Processor {
 		this.verbose = verbose;
 		this.log = log;
 		this.warning = warning;
-		this.minComplexity = minCompl;
-	}
-	public RMA6Processor(String inDir, String fileName, String outDir, NCBI_MapReader mapReader,
-			NCBI_TreeReader treeReader, int maxLength, double pIdent, Filter b, Taxas t, boolean verbose,
-			Logger log, Logger warning, boolean readInf, double minCompl) {
-		this.inDir = inDir;
-		this.outDir = outDir;
-		this.fileName = fileName;
-		this.mapReader = mapReader;
-		this.treeReader = new NCBI_TreeReader(treeReader);
-		this.behave = b;
-		this.maxLength = maxLength;
-		this.minPIdent = pIdent;
-		this.taxas = t;
-		this.verbose = verbose;
-		this.log = log;
-		this.warning = warning;
+		this.alignments = alignment;
 		this.reads = readInf;
 		this.minComplexity = minCompl;
 	}
@@ -179,7 +164,7 @@ public void process(List<Integer>taxIDs, double topPercent) {// processing
 			results.put(id, future);
 	  }//TaxIDs	
 	destroy();
-	RMA6OutputProcessor outProcessor = new RMA6OutputProcessor(fileName, outDir,mapReader,warning, behave, reads);
+	RMA6OutputProcessor outProcessor = new RMA6OutputProcessor(fileName, outDir,mapReader,warning, behave,alignments, reads);
 	outProcessor.process(results);
 	if(behave==Filter.NON_ANCIENT || behave==Filter.NON){
 		setSumLine(outProcessor.getSumLine());

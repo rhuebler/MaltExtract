@@ -35,16 +35,18 @@ public class RMA6OutputProcessor {
 	HashMap<Integer,Integer> ancientSum;
 	HashMap<Integer,Integer> nonDuplicateSum;
 	HashMap<Integer,Integer> ancientNonDuplicateSum;
+	private boolean alignment = false;
 	private boolean reads = false;
 	// constructor
 	public RMA6OutputProcessor(String fileName, String outDir, NCBI_MapReader mapReader,
-			Logger warning, Filter behave, boolean reads) {
+			Logger warning, Filter behave, boolean alignment, boolean reads) {
 		this.fileName = fileName;
 		this.outDir = outDir;
 		this.mapReader = mapReader;
 		this.warning = warning;
 		this.behave = behave;
-		this.reads = reads;
+		this.alignment = alignment;
+		this.reads =  reads;
 	}
 	private void setSumLine(HashMap<Integer,Integer> list)
 	{	this.defaultSum = list;
@@ -203,14 +205,14 @@ public class RMA6OutputProcessor {
 				misMatches.add(taxProcessor.getDamageLine());
 				readLengthHistogram.add(taxProcessor.getReadLengthStatistics());
 				
-				if(switcher == Filter.ALL && reads )
-					writeBlastHits(id,taxProcessor.getReads(),outDir+"/ancientNonDuplicates/reads/"+fileName+"/");
-				if(switcher == Filter.ANCIENT && reads)
-					writeBlastHits(id,taxProcessor.getReads(),outDir+"/ancient/reads/"+fileName+"/");
-				if(switcher == Filter.NON && reads)
-					writeBlastHits(id,taxProcessor.getReads(),outDir+"/default/reads/"+fileName+"/");
-				if(switcher == Filter.NONDUPLICATES && reads)
-					writeBlastHits(id,taxProcessor.getReads(),outDir+"/nonDuplicates/reads/"+fileName+"/");
+				if(switcher == Filter.ALL && alignment )
+					writeBlastHits(id,taxProcessor.getReads(),outDir+"/ancientNonDuplicates/alignment/"+fileName+"/");
+				if(switcher == Filter.ANCIENT && alignment)
+					writeBlastHits(id,taxProcessor.getReads(),outDir+"/ancient/alignment/"+fileName+"/");
+				if(switcher == Filter.NON && alignment)
+					writeBlastHits(id,taxProcessor.getReads(),outDir+"/default/alignment/"+fileName+"/");
+				if(switcher == Filter.NONDUPLICATES && alignment)
+					writeBlastHits(id,taxProcessor.getReads(),outDir+"/nonDuplicates/alignment/"+fileName+"/");
 				
 			} catch (InterruptedException | ExecutionException e) {
 				// TODO Auto-generated catch block
@@ -241,29 +243,45 @@ public class RMA6OutputProcessor {
 	}
 	public void process(HashMap<Integer,Future<NodeProcessor>> results){
 		if(behave == Filter.NON){
+			if(alignment){
+				new File(outDir+"/default/"+"/alignment/"+fileName).mkdirs();
+			}
 			if(reads){
 				new File(outDir+"/default/"+"/reads/"+fileName).mkdirs();
 			}
 			prepareOutput(results,behave);
 		}else if(behave == Filter.ANCIENT){
+			if(alignment){
+				new File(outDir+"/ancient/"+"/alignment/"+fileName).mkdirs();
+			}
 			if(reads){
 				new File(outDir+"/ancient/"+"/reads/"+fileName).mkdirs();
 			}
 			prepareOutput(results,behave);
 		}else if(behave == Filter.NONDUPLICATES){
+			if(alignment){
+				new File(outDir+"/nonDuplicates/"+"/alignment/"+fileName).mkdirs();
+			}
 			if(reads){
 				new File(outDir+"/nonDuplicates/"+"/reads/"+fileName).mkdirs();
 			}
 			prepareOutput(results,behave);
 		}else if(behave == Filter.ALL){
+			if(alignment){
+				new File(outDir+"/ancientNonDuplicates/"+"/alignment/"+fileName).mkdirs();
+			}
 			if(reads){
-				new File(outDir+"/ancientNonDuplicates/"+"/reads/"+fileName).mkdirs();
+				new File(outDir+"/ancientNonDuplicates/"+"/reads/"+fileName).mkdirs();	
 			}
 			prepareOutput(results,behave);
 		}else if(behave == Filter.NON_ANCIENT){
+			if(alignment){
+				new File(outDir+"/ancient/"+"/alignment/"+fileName).mkdirs();
+				new File(outDir+"/default/"+"/alignment/"+fileName).mkdirs();
 			if(reads){
-				new File(outDir+"/ancient/"+"/reads/"+fileName).mkdirs();
-				new File(outDir+"/default/"+"/reads/"+fileName).mkdirs();
+					new File(outDir+"/default/"+"/reads/"+fileName).mkdirs();
+					new File(outDir+"/ancient/"+"/reads/"+fileName).mkdirs();
+				}
 			}
 			prepareOutput(results,Filter.NON);
 			prepareOutput(results,Filter.ANCIENT);
