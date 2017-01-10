@@ -63,47 +63,45 @@ public class NCBI_TreeReader {
 				assigned.add(key);
 		return assigned;
 	} 
-		private ArrayList<Integer> getStrains(ArrayList<Integer>children, Set<Integer> keys){
-			ArrayList<Integer> first = new  ArrayList<Integer>();
-			ArrayList<Integer> second = new  ArrayList<Integer>();
-	    for(int child : children ){
-	    		for(PhylogenyNode grandChild : ph.getNode(String.valueOf(child)).getDescendants()){
-	    			first.add(Integer.parseInt(grandChild.getName()));
-	    			for(PhylogenyNode greatGrandChild:grandChild.getDescendants()){
-	    			second.add(Integer.parseInt(greatGrandChild.getName()));
-	    			}
-	    		}	
-	    		
+	private HashSet<Integer> getPath(HashSet<Integer>children, Set<Integer> keys, int target){
+		HashSet<Integer> parents = new  HashSet<Integer>();
+		
+		for(int child : children ){
+    		if(keys.contains(child)){
+    			positionsToKeep.add(child);
+    		}
+    	int id = Integer.parseInt(ph.getNode(String.valueOf(child)).getParent().getName());
+    	if(id != target){
+    		parents.add(id);
+    		}
+		}
+		return  parents;
+}
+	public ArrayList<Integer> getAllStrains(int target, Set<Integer> keys){
+		HashSet<Integer> children = new HashSet<Integer>();
+		HashSet<Integer> parents = new HashSet<Integer>();
+		int maxDepth = 0;
+	    for(PhylogenyNode test : ph.getNode(String.valueOf(target)).getAllExternalDescendants()){
+	      if(maxDepth < test.calculateDepth()){
+	    	  maxDepth = test.calculateDepth();
+	    	  }
+	      	 children.add(Integer.parseInt(test.getName()));
+	      	 int id = Integer.parseInt(test.getParent().getName());
+	      	 if(id!=target)
+	      		 parents.add(id);
+	      	 
 	    }	
 	    positionsToKeep.addAll(getAssigned(children,keys));
-	    first.addAll(second);
-	    return  getAssigned(first,keys);
-	    
+	    for(int i = 0;i< (maxDepth-ph.getNode(String.valueOf(target)).calculateDepth());i++){
+	    	parents = getPath(parents, keys,target);
+	    	if(parents.size() == 0)
+	    		break;
+	    }
+	   ArrayList<Integer> results = new ArrayList<Integer>();
+			   results.addAll(positionsToKeep);
+	   
+		return results;
 	}
-		public ArrayList<Integer> getAllStrains(int target, Set<Integer> keys){
-			ArrayList<Integer> children = new ArrayList<Integer>();
-			int maxDepth = 0;
-		    for(PhylogenyNode test : ph.getNode(String.valueOf(target)).getAllExternalDescendants()){
-		      if(maxDepth < test.calculateDepth())
-		    	  maxDepth = test.calculateDepth();
-		    }
-		    for(PhylogenyNode test : ph.getNode(String.valueOf(target)).getDescendants()){
-		    	children.add(Integer.parseInt(test.getName()));
-		    }
-		    
-		    ArrayList<Integer> positions = new  ArrayList<Integer>();
-		    positions.addAll(children);
-		    for(int i = 0;i< (maxDepth-ph.getNode(String.valueOf(target)).calculateDepth());i++){
-		    	positions = getStrains(positions, keys);
-		    	if(positions.size() == 0)
-		    		break;
-		    }
-		    positionsToKeep.addAll(getAssigned(positions,keys));
-		    //System.out.println(positionsToKeep.size());
-		   children.clear();
-		    children.addAll(positionsToKeep);
-			return children;
-		}
 		public ArrayList<Integer>  getParents(int target){
 			ArrayList<Integer> ids = new ArrayList<Integer>();
 			ids.add(target);

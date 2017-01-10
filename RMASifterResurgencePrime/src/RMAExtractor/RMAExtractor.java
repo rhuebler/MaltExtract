@@ -160,4 +160,6 @@ public class RMAExtractor {
 
 //TODO default plot all function 
 //TODO get RMAExtracterBeta into tools 
-//TODO What is aquiring the extra memory
+//TODO What is aquiring the extra memory an error
+//TODO okay how to get the complete taxonomy path?\
+//TODO plot Node distribution function
