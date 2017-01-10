@@ -6,7 +6,7 @@ import behaviour.Filter;
 
 public class DirectoryCreator {
 
-	public void process(Filter behave, String outDir, boolean hits, boolean crawl) {
+	public void process(Filter behave, String outDir, boolean hits, boolean crawl,boolean reads) {
 		if(crawl){
 			new File(outDir+"/crawlResults/").mkdirs();
 			new File(outDir+"/crawlResults/damageMismatch/").mkdirs();
@@ -22,6 +22,8 @@ public class DirectoryCreator {
 			new File(outDir+"/default/"+"/percentIdentity/").mkdirs();
 			new File(outDir+"/default/"+"/damageMismatch/").mkdirs();
 			if(hits)
+				new File(outDir+"/default/"+"/alignments/").mkdirs();
+			if(reads)
 				new File(outDir+"/default/"+"/reads/").mkdirs();
 		}else if(behave == Filter.ANCIENT){
 			new File(outDir+"/ancient/").mkdirs();
@@ -30,6 +32,8 @@ public class DirectoryCreator {
 			new File(outDir+"/ancient/"+"/percentIdentity/").mkdirs();
 			new File(outDir+"/ancient/"+"/damageMismatch/").mkdirs();
 			if(hits)
+				new File(outDir+"/ancient/"+"/alignments/").mkdirs();
+			if(reads)
 				new File(outDir+"/ancient/"+"/reads/").mkdirs();
 		}else if(behave == Filter.NONDUPLICATES){
 			new File(outDir+"/nonDuplicates/").mkdirs();
@@ -38,6 +42,8 @@ public class DirectoryCreator {
 			new File(outDir+"/nonDuplicates/"+"/percentIdentity/").mkdirs();
 			new File(outDir+"/nonDuplicates/"+"/damageMismatch/").mkdirs();
 			if(hits)
+				new File(outDir+"/nonDuplicates/"+"/alignments/").mkdirs();
+			if(reads)
 				new File(outDir+"/nonDuplicates/"+"/reads/").mkdirs();
 		}else if(behave == Filter.ALL){
 			new File(outDir+"/ancientNonDuplicates/").mkdirs();
@@ -46,6 +52,8 @@ public class DirectoryCreator {
 			new File(outDir+"/ancientNonDuplicates/"+"/percentIdentity/").mkdirs();
 			new File(outDir+"/ancientNonDuplicates/"+"/damageMismatch/").mkdirs();
 			if(hits)
+				new File(outDir+"/ancientNonDuplicates/"+"/alignments/").mkdirs();
+			if(reads)
 				new File(outDir+"/ancientNonDuplicates/"+"/reads/").mkdirs();
 		}else if(behave == Filter.NON_ANCIENT){
 			new File(outDir+"/default/").mkdirs();
@@ -59,6 +67,10 @@ public class DirectoryCreator {
 			new File(outDir+"/default/"+"/percentIdentity/").mkdirs();
 			new File(outDir+"/default/"+"/damageMismatch/").mkdirs();
 			if(hits){
+				new File(outDir+"/default/"+"/alignments/").mkdirs();
+				new File(outDir+"/ancient/"+"/alignments/").mkdirs();
+			}
+			if(reads){
 				new File(outDir+"/default/"+"/reads/").mkdirs();
 				new File(outDir+"/ancient/"+"/reads/").mkdirs();
 			}

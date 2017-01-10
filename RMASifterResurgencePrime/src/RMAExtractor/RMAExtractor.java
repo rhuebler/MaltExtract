@@ -73,7 +73,7 @@ public class RMAExtractor {
 		
 		NCBI_MapReader mapReader = new NCBI_MapReader(inProcessor.getTreePath());
 		DirectoryCreator dCreator = new DirectoryCreator();
-		dCreator.process(inProcessor.getFilter(),inProcessor.getOutDir(),inProcessor.getBlastHits(),inProcessor.wantToCrawl());
+		dCreator.process(inProcessor.getFilter(),inProcessor.getOutDir(),inProcessor.getBlastHits(),inProcessor.wantToCrawl(),inProcessor.wantReads());
 		List<Integer> taxIDs= new  ArrayList<Integer>();
 		
 		NCBI_TreeReader treeReader = new NCBI_TreeReader(inProcessor.getTreePath());
@@ -160,6 +160,6 @@ public class RMAExtractor {
 
 //TODO default plot all function 
 //TODO get RMAExtracterBeta into tools 
-//TODO What is aquiring the extra memory an error
+//TODO What is acquiring the extra memory an error
 //TODO okay how to get the complete taxonomy path?\
 //TODO plot Node distribution function

@@ -48,6 +48,7 @@ public class InputParameterProcessor {
 	private boolean verbose = false;
 	private Logger log;
 	private Logger warning;
+	private boolean alignment = false;
 	private boolean reads = false;
 	private boolean crawl = false;
 	private double minComplexity = 0;
@@ -62,7 +63,7 @@ public class InputParameterProcessor {
 	}
 	// getters
 	public boolean getBlastHits(){
-		return reads;
+		return this.alignment;
 	}
 	public double getMinPIdent(){
 		return this.minPIdent;
@@ -101,41 +102,46 @@ public class InputParameterProcessor {
 	public boolean wantToCrawl(){
 		return this.crawl;
 	}
+	public boolean wantReads(){
+		return this.reads;
+	}
 	private void readTaxList(File f) throws IOException{
-				   try {
-					   Scanner	in = new Scanner(f.getCanonicalFile());
-					   while(in.hasNext()){
-						   taxNames.add(in.nextLine().trim());
-					   }
-					   in.close();
-				   }catch (FileNotFoundException e) {
-					   warning.log(Level.WARNING,"File Not Found",e);
-				   }		
+		try {
+			 Scanner	in = new Scanner(f.getCanonicalFile());
+			 while(in.hasNext()){
+				 taxNames.add(in.nextLine().trim());
+			 }
+			 in.close();
+		 	}catch (FileNotFoundException e) {
+		 warning.log(Level.WARNING,"File Not Found",e);
+		}		
 	}	
 	private void process(String[] parameters){	
     	 CommandLine commandLine;
     	 	// Short Flags
     	 	// edit distance 
-    	    Option option_Input = Option.builder("i").longOpt("input").argName("Path/to/inDir or RMA6Files").hasArgs().desc("specify input directory or files").build();
-    	    Option option_Output = Option.builder("o").longOpt("output").argName("Path/to/outDir").hasArg().desc("specify out directory").build();
-    	    Option option_Taxons = Option.builder("t").longOpt("taxa").argName("Path/to/taxFile or Taxon in \"\"").hasArgs().desc("target species or list of targets").build();
+    	    Option option_Input = Option.builder("i").longOpt("input").argName("Path/to/inDir or RMA6Files").hasArgs().desc("Specify input directory or files").build();
+    	    Option option_Output = Option.builder("o").longOpt("output").argName("Path/to/outDir").hasArg().desc("Specify out directory").build();
+    	    Option option_Taxons = Option.builder("t").longOpt("taxa").argName("Path/to/taxFile or Taxon in \"\"").hasArgs().desc("Target species or list of targets").build();
     	    
     	    // long flags
-    	    Option option_Threads = Option.builder("p").longOpt("threads").argName("1..maxNumberOfCores").hasArg().optionalArg(true).desc("how many cores to use").build();		
-    	    Option option_TopPercent = Option.builder("a").longOpt("top").argName("0.0-0.99").hasArg().optionalArg(true).desc("use top 0.XX percent").build();
-    	    Option option_Filter = Option.builder("f").longOpt("filter").argName("default, ancient, nonduplicate, def_anc, nd_anc, scan").optionalArg(true).hasArg().desc("use filter").build();
-    	    Option option_MaxLength = Option.builder().longOpt("maxReadLength").argName("maxReadLength").hasArg().optionalArg(true).desc("set maximum read length").build();
-    	    Option option_minPercentIdent = Option.builder().longOpt("minPI").argName("minPI").hasArg().optionalArg(true).desc("set minimum percent identity to XX.X").build(); 
-    	    Option option_Help = Option.builder("h").longOpt("help").optionalArg(true).desc("print help").build();
-    	    Option option_Path = Option.builder("r").longOpt("resources").hasArg().argName("path").optionalArg(true).desc("set path to required ncbi files").build();
-    	    Option option_Verbose = Option.builder("v").longOpt("verbose").optionalArg(true).desc("how much output to print to screen").build();
-    	    Option option_Reads = Option.builder().longOpt("reads").optionalArg(true).desc("retrieve alignments").build();
-    	    Option option_Crawl = Option.builder().longOpt("crawl").optionalArg(true).desc("use all alignments for damage and edit distance").build();
-    	    Option option_minComplexity = Option.builder().longOpt("minComp").hasArg().argName("minComplexity").optionalArg(true).desc("use minimum complexity").build();
-    	    Option option_List = Option.builder().longOpt("list").hasArg().argName("list").optionalArg(true).desc("decide on which build in list to use (not enabled yet)").build();
+    	    Option option_Threads = Option.builder("p").longOpt("threads").argName("1..maxNumberOfCores").hasArg().optionalArg(true).desc("How many cores to use?").build();		
+    	    Option option_TopPercent = Option.builder("a").longOpt("top").argName("0.0-0.99").hasArg().optionalArg(true).desc("Use top 0.XX percent").build();
+    	    Option option_Filter = Option.builder("f").longOpt("filter").argName("default, ancient, nonduplicate, def_anc, nd_anc, scan").optionalArg(true).hasArg().desc("Use chosen filter").build();
+    	    Option option_MaxLength = Option.builder().longOpt("maxReadLength").argName("maxReadLength").hasArg().optionalArg(true).desc("Set maximum read length").build();
+    	    Option option_minPercentIdent = Option.builder().longOpt("minPI").argName("minPI").hasArg().optionalArg(true).desc("Set minimum percent identity to XX.X").build(); 
+    	    Option option_Help = Option.builder("h").longOpt("help").optionalArg(true).desc("Print Help").build();
+    	    Option option_Path = Option.builder("r").longOpt("resources").hasArg().argName("path").optionalArg(true).desc("Set path to required ncbi files").build();
+    	    Option option_Verbose = Option.builder("v").longOpt("verbose").optionalArg(true).desc("How much output to print to screen").build();
+    	    Option option_Alignment = Option.builder().longOpt("alignment").optionalArg(true).desc("Retrieve Alignments").build();
+    	    Option option_Reads = Option.builder().longOpt("Reads").optionalArg(true).desc("Retrieve Reads").build();
+    	    Option option_Crawl = Option.builder().longOpt("crawl").optionalArg(true).desc("Use all alignments for damage and edit distance").build();
+    	    Option option_minComplexity = Option.builder().longOpt("minComp").hasArg().argName("minComplexity").optionalArg(true).desc("Use minimum complexity").build();
+    	    Option option_List = Option.builder().longOpt("list").hasArg().argName("list").optionalArg(true).desc("Decide on which build in list to use (not enabled yet)").build();
     	    Options options = new Options();
     	    
     	    CommandLineParser parser = new DefaultParser();
+
     	    options.addOption(option_Input);
     	    options.addOption(option_Output);
     	    options.addOption(option_Taxons);
@@ -146,6 +152,7 @@ public class InputParameterProcessor {
     	    options.addOption(option_MaxLength);
     	    options.addOption(option_minPercentIdent);
     	    options.addOption(option_minComplexity);
+    	    options.addOption(option_Alignment);
     	    
     	    options.addOption(option_Help);
     	    options.addOption(option_Path);
@@ -311,6 +318,10 @@ public class InputParameterProcessor {
     	        	} catch(IOException io)	{
     	        		warning.log(Level.WARNING, line+" not exist", io);
     	        	}
+    	        }
+    	        if(commandLine.hasOption("Alignment")){
+    	        	log.log(Level.INFO, "retrieve filtered Reads");
+    	        	alignment = true;
     	        }
     	        if(commandLine.hasOption("h")){
     	        	String header = "RMAExtractor beta 0.1";
