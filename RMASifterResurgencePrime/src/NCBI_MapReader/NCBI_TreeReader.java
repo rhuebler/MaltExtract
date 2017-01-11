@@ -78,29 +78,25 @@ public class NCBI_TreeReader {
 		return  parents;
 }
 	public ArrayList<Integer> getAllStrains(int target, Set<Integer> keys){
-		HashSet<Integer> children = new HashSet<Integer>();
-		HashSet<Integer> parents = new HashSet<Integer>();
-		int maxDepth = 0;
-	    for(PhylogenyNode test : ph.getNode(String.valueOf(target)).getAllExternalDescendants()){
-	      if(maxDepth < test.calculateDepth()){
-	    	  maxDepth = test.calculateDepth();
-	    	  }
-	      	 children.add(Integer.parseInt(test.getName()));
-	      	 int id = Integer.parseInt(test.getParent().getName());
-	      	 if(id!=target)
-	      		 parents.add(id);
-	      	 
+		PhylogenyNode query = ph.getNode(String.valueOf(target));
+	    for(PhylogenyNode leaf : query.getAllExternalDescendants()){
+	    	HashSet<Integer> children = new HashSet<Integer>();
+	    	children.add(Integer.parseInt(leaf.getName()));
+	      for(int i = 0;i< (leaf.calculateDepth()-query.calculateDepth());i++){
+	    	leaf = leaf.getParent();
+	    	int id = Integer.parseInt(leaf.getName());
+	    	if(id != target){
+	    		children.add(id);
+	    	}
+	      }
+	      positionsToKeep.addAll(getAssigned(children,keys));
 	    }	
-	    positionsToKeep.addAll(getAssigned(children,keys));
-	    for(int i = 0;i< (maxDepth-ph.getNode(String.valueOf(target)).calculateDepth());i++){
-	    	parents = getPath(parents, keys,target);
-	    	if(parents.size() == 0)
-	    		break;
-	    }
+	   
 	   ArrayList<Integer> results = new ArrayList<Integer>();
 			   results.addAll(positionsToKeep);
 	   
 		return results;
+	   
 	}
 		public ArrayList<Integer>  getParents(int target){
 			ArrayList<Integer> ids = new ArrayList<Integer>();

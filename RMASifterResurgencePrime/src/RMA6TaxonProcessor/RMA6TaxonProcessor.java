@@ -74,7 +74,6 @@ public RMA6TaxonProcessor(Integer id, double pID, NCBI_MapReader reader, boolean
 	reads.add("None");
 	alignments.add("None");
 	pIdents.add(0.0);
-	distances.add(0);
 	this.readList = reads;
 	this.alignmentList = alignments;
 	setEditDistanceHistogram(distances);

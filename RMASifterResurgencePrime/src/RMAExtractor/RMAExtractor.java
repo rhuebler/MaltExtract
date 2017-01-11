@@ -154,3 +154,4 @@ public class RMAExtractor {
 //TODO okay how to get the complete taxonomy path? works for now but slooowly
 //TODO plot Node distribution function
 //TODO resurrect GC content
+//TODO should I use the Blast format for alignment that Daniel uses?
