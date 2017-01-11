@@ -112,6 +112,21 @@ public class RMA6OutputProcessor {
 			warning.log(Level.SEVERE,"Cannot write file"+fileName, np);
 		}
 	}
+	private void writeReads(int taxID, ArrayList<String> summary, String outDir){
+		try{
+			String name;
+			if(mapReader.getNcbiIdToNameMap().get(taxID) != null)
+				name = mapReader.getNcbiIdToNameMap().get(taxID).replace(' ', '_');
+			else
+				name = "unassingned_name";
+		Path file = Paths.get(outDir+name+".txt");
+		Files.write(file, summary, Charset.forName("UTF-8"));
+		}catch(IOException io){
+			warning.log(Level.SEVERE,"Cannot write file"+ fileName, io);
+		}catch(NullPointerException np){
+			warning.log(Level.SEVERE,"Cannot write file"+fileName, np);
+		}
+	}
 	private void writeCoverageHistogram(List<String> summary, String outDir){
 		try{
 			summary.sort(null);
@@ -206,13 +221,22 @@ public class RMA6OutputProcessor {
 				readLengthHistogram.add(taxProcessor.getReadLengthStatistics());
 				
 				if(switcher == Filter.ALL && alignment )
-					writeBlastHits(id,taxProcessor.getReads(),outDir+"/ancientNonDuplicates/alignment/"+fileName+"/");
+					writeBlastHits(id,taxProcessor.getAlignments(),outDir+"/ancientNonDuplicates/alignment/"+fileName+"/");
 				if(switcher == Filter.ANCIENT && alignment)
-					writeBlastHits(id,taxProcessor.getReads(),outDir+"/ancient/alignment/"+fileName+"/");
+					writeBlastHits(id,taxProcessor.getAlignments(),outDir+"/ancient/alignment/"+fileName+"/");
 				if(switcher == Filter.NON && alignment)
-					writeBlastHits(id,taxProcessor.getReads(),outDir+"/default/alignment/"+fileName+"/");
+					writeBlastHits(id,taxProcessor.getAlignments(),outDir+"/default/alignment/"+fileName+"/");
 				if(switcher == Filter.NONDUPLICATES && alignment)
-					writeBlastHits(id,taxProcessor.getReads(),outDir+"/nonDuplicates/alignment/"+fileName+"/");
+					writeBlastHits(id,taxProcessor.getAlignments(),outDir+"/nonDuplicates/alignment/"+fileName+"/");
+				
+				if(switcher == Filter.ALL && reads)
+					writeReads(id,taxProcessor.getReads(),outDir+"/ancientNonDuplicates/reads/"+fileName+"/");
+				if(switcher == Filter.ANCIENT && reads)
+					writeReads(id,taxProcessor.getReads(),outDir+"/ancient/reads/"+fileName+"/");
+				if(switcher == Filter.NON && reads)
+					writeReads(id,taxProcessor.getReads(),outDir+"/default/reads/"+fileName+"/");
+				if(switcher == Filter.NONDUPLICATES && reads)
+					writeReads(id,taxProcessor.getReads(),outDir+"/nonDuplicates/reads/"+fileName+"/");
 				
 			} catch (InterruptedException | ExecutionException e) {
 				// TODO Auto-generated catch block

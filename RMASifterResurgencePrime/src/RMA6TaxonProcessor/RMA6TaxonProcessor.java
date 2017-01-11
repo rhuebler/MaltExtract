@@ -196,7 +196,7 @@ protected String getName(int taxId){
 		name = "unassignedName";
 	return name;
 }
-public ArrayList<String> getAlignmetns(){
+public ArrayList<String> getAlignments(){
 	return this.alignments;
 }
 public ArrayList<String> getReads(){
