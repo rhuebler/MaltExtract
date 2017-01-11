@@ -37,6 +37,7 @@ protected HashMap<Integer,Integer> pIdentHistogram;
 protected boolean verbose;
 protected Logger log;
 protected Logger warning;
+protected ArrayList<String> alignments;
 protected ArrayList<String> readList;
 protected ArrayList<String> lines = new ArrayList<String>();
 protected String damageLine;
@@ -68,7 +69,9 @@ public RMA6TaxonProcessor(Integer id, double pID, NCBI_MapReader reader, boolean
 	ArrayList<Double> pIdents = new ArrayList<Double>();
 	ArrayList<Integer> distances = new ArrayList<Integer>();
 	ArrayList<String> reads = new ArrayList<String>();
+	ArrayList<String> alignments = new ArrayList<String>();
 	reads.add("None");
+	alignments.add("None");
 	pIdents.add(0.0);
 	distances.add(0);
 	this.readList = reads;
@@ -87,6 +90,9 @@ public RMA6TaxonProcessor() {
 //setters
 protected void setReads(ArrayList<String> list){
 	this.readList = list;
+}
+protected void setAlignments(ArrayList<String> list){
+	this.alignments = list;
 }
 protected void setDamageLine(String s){
 	this.damageLine = s;
@@ -190,7 +196,9 @@ protected String getName(int taxId){
 		name = "unassignedName";
 	return name;
 }
-
+public ArrayList<String> getAlignmetns(){
+	return this.alignments;
+}
 public ArrayList<String> getReads(){
 	return this.readList;
 }

@@ -20,13 +20,10 @@ public class RMA6TaxonAncientNonDuplicate  extends RMA6TaxonDamageFilter{
 	 * @param int ID, NCBI_MapReader reader, boolean verbose, Logger, log, Logger warning
 	 * @return int numMatches, String readDistribution, HashMap EditDistance, HashMap Percent Identity
 	 */ 
+	
 	public RMA6TaxonAncientNonDuplicate(int id ,double pID, NCBI_MapReader reader,
-			boolean v,Logger log, Logger warning,double tp,int mL) {
-		super(id,pID, reader, v, log, warning,tp,mL);
-	}
-	public RMA6TaxonAncientNonDuplicate(int id ,double pID, NCBI_MapReader reader,
-			boolean v,Logger log, Logger warning, boolean reads,double tp,int mL) {
-		super(id,pID, reader, v, log, warning,reads,tp,mL);
+			boolean v,Logger log, Logger warning, boolean reads,double tp,int mL,boolean wantAlignments) {
+		super(id,pID, reader, v, log, warning,reads,tp,mL,wantAlignments);
 	}
 	
 	public void process(){
@@ -40,13 +37,29 @@ public class RMA6TaxonAncientNonDuplicate  extends RMA6TaxonDamageFilter{
 			for(Alignment entry : taxonMap.get(key)){
 				if(!entry.isDuplicate()){
 					lengths.add(entry.getReadLength());
-					if(wantReads){
+					if(wantAlignments){
 						String name = getName(key);
-						lines.add(entry.getReadName()+"\t"+"Length:\t"+entry.getReadLength()+"\t");
-						lines.add(name+"\t"+entry.getAccessionNumber()+"\t"+"Start:\t"+entry.getStart()+"\t"+"End:\t"+entry.getEnd());
-						lines.add("Q:\t"+entry.getQuery());
-						lines.add("A:\t"+entry.getAlignment());
-						lines.add("R:\t"+entry.getReference()+"\n");
+						alignments.add(entry.getReadName()+"\t"+"Length:\t"+entry.getReadLength()+"\t");
+						alignments.add(name+"\t"+entry.getAccessionNumber()+"\t"+"Start:\t"+entry.getStart()+"\t"+"End:\t"+entry.getEnd());
+						alignments.add("Q:\t"+entry.getQuery());
+						alignments.add("A:\t"+entry.getAlignment());
+						alignments.add("R:\t"+entry.getReference()+"\n");
+					}
+					if(wantReads){
+						String name = "";
+						if (!entry.getReadName().startsWith(">"))
+	                        name = ">"+entry.getReadName();
+						else
+							name = entry.getReadName();
+						lines.add(name);
+	                    if (!name.endsWith("\n"))
+	                        name += "\n";
+	                    String readData = entry.getSequence();
+	                    if (readData != null) {
+	                        if (!readData.endsWith("\n"))
+	                        	readData+=("\n");
+	                    lines.add(readData);    
+	                    }
 					}
 					//get mismatches
 					numMatches++;
@@ -66,12 +79,14 @@ public class RMA6TaxonAncientNonDuplicate  extends RMA6TaxonDamageFilter{
 		setEditDistanceHistogram(distances);
 		setPercentIdentityHistogram(pIdents);
 		setReads(lines);
+		setAlignments(alignments);
 		calculateReadLengthDistribution();
 		
 	}	
-	public void processMatchBlocks(IMatchBlock[] blocks, String readName, int readLength){ 
+	public void processMatchBlocks(IMatchBlock[] blocks, String readName, int readLength,String sequence){ 
 		IMatchBlock block = blocks[0];
 		Alignment al = new Alignment();
+		al.setSequence(sequence);
 		al.processText(block.getText().split("\n"));
 		al.setPIdent(block.getPercentIdentity());
 		al.setReadName(readName);

@@ -26,8 +26,11 @@ public class Alignment {
 	private int editDistance;
 	private int readLength;
 	private double score;
+	private String sequence;
 	// getter
-
+public String getSequence(){
+	return this.sequence;
+}
 public String getAccessionNumber(){
 	return this.accessionNumber;
 }	
@@ -86,6 +89,9 @@ public String getQuery(){
 	 return this.referenceLength;}
  
  // setters
+ public void setSequence(String s){
+	 this.sequence = s;
+ }
  public void setAcessionNumber(String s){
 	 this.accessionNumber =s;
  }

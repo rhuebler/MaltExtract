@@ -81,34 +81,18 @@ public class NodeProcessor{
 		}
 		//processing
 		public void process(String inDir, String fileName, double topPercent, int maxLength){ 
-			if(wantReads){
 				if(behave == Filter.ANCIENT){
-					ancientProcessor = new RMA6TaxonDamageFilter(taxID, minPIdent, mapReader, verbose, log, log, wantReads, topPercent, maxLength);
+					ancientProcessor = new RMA6TaxonDamageFilter(taxID, minPIdent, mapReader, verbose, log, log, wantReads, topPercent, maxLength,alignment);
 				}else if(behave == Filter.NON){
-					defaultProcessor = new RMA6TaxonNonFilter(taxID, minPIdent, mapReader, verbose, log, log, wantReads, topPercent, maxLength);
+					defaultProcessor = new RMA6TaxonNonFilter(taxID, minPIdent, mapReader, verbose, log, log, wantReads, topPercent, maxLength,alignment);
 				}else if(behave == Filter.ALL){
-					ancientNonDuplicateProcessor = new RMA6TaxonAncientNonDuplicate(taxID, minPIdent, mapReader, verbose, log, log, wantReads, topPercent, maxLength);
+					ancientNonDuplicateProcessor = new RMA6TaxonAncientNonDuplicate(taxID, minPIdent, mapReader, verbose, log, log, wantReads, topPercent, maxLength,alignment);
 				}else if(behave == Filter.NON_ANCIENT){
-					ancientProcessor = new RMA6TaxonDamageFilter(taxID, minPIdent, mapReader, verbose, log, log, wantReads, topPercent, maxLength);
-					defaultProcessor = new RMA6TaxonNonFilter(taxID, minPIdent, mapReader, verbose, log, log, wantReads, topPercent, maxLength);
+					ancientProcessor = new RMA6TaxonDamageFilter(taxID, minPIdent, mapReader, verbose, log, log, wantReads, topPercent, maxLength,alignment);
+					defaultProcessor = new RMA6TaxonNonFilter(taxID, minPIdent, mapReader, verbose, log, log, wantReads, topPercent, maxLength,alignment);
 				}else if(behave == Filter.NONDUPLICATES ){
-					nonDuplicateProcessor = new RMA6TaxonNonDuplicateFilter(taxID, minPIdent, mapReader, verbose, log, log, topPercent, maxLength,wantReads);
+					nonDuplicateProcessor = new RMA6TaxonNonDuplicateFilter(taxID, minPIdent, mapReader, verbose, log, log, wantReads, topPercent, maxLength,alignment);
 				}		
-			}else{
-				if(behave == Filter.ANCIENT ){
-					ancientProcessor = new RMA6TaxonDamageFilter(taxID, minPIdent, mapReader, verbose, log, log, topPercent, maxLength);
-				} 
-				if(behave == Filter.NON ){
-					defaultProcessor = new RMA6TaxonNonFilter(taxID, minPIdent, mapReader, verbose, log, log, topPercent, maxLength);
-				}else if(behave == Filter.ALL){
-					ancientNonDuplicateProcessor = new RMA6TaxonAncientNonDuplicate(taxID, minPIdent, mapReader, verbose, log, log, topPercent, maxLength);
-				}else if(behave == Filter.NONDUPLICATES){
-					nonDuplicateProcessor = new RMA6TaxonNonDuplicateFilter(taxID, minPIdent, mapReader, verbose, log, log, topPercent, maxLength);
-				}else if(behave == Filter.NON_ANCIENT){
-					ancientProcessor = new RMA6TaxonDamageFilter(taxID, minPIdent, mapReader, verbose, log, log, topPercent, maxLength);
-					defaultProcessor = new RMA6TaxonNonFilter(taxID, minPIdent, mapReader, verbose, log, log, topPercent, maxLength);
-				}	
-			}
 			this.taxName = getName(taxID);
 			// use ReadsIterator to get all Reads assigned to MegantaxID and print top percent to file
 			try(RMA6File rma6File = new RMA6File(inDir+fileName, "r")){
@@ -134,14 +118,14 @@ public class NodeProcessor{
 							if(minComplexity<=getComplexity(current.getReadSequence())){
 								IMatchBlock[] blocks=current.getMatchBlocks();
 								if(behave == Filter.NON_ANCIENT ||behave == Filter.ANCIENT ){
-									ancientProcessor.processMatchBlocks(blocks, current.getReadName(), current.getReadLength());
+									ancientProcessor.processMatchBlocks(blocks, current.getReadName(), current.getReadLength(),current.getReadSequence());
 								} 
 								if(behave == Filter.NON_ANCIENT ||behave == Filter.NON ){
-									defaultProcessor.processMatchBlocks(blocks, current.getReadName(), current.getReadLength());
+									defaultProcessor.processMatchBlocks(blocks, current.getReadName(), current.getReadLength(), current.getReadSequence());
 								}else if(behave == Filter.ALL){
-									ancientNonDuplicateProcessor.processMatchBlocks(blocks, current.getReadName(), current.getReadLength());
+									ancientNonDuplicateProcessor.processMatchBlocks(blocks, current.getReadName(), current.getReadLength(), current.getReadSequence());
 								}else if(behave == Filter.NONDUPLICATES){
-									nonDuplicateProcessor.processMatchBlocks(blocks, current.getReadName(), current.getReadLength());
+									nonDuplicateProcessor.processMatchBlocks(blocks, current.getReadName(), current.getReadLength(), current.getReadSequence());
 								}
 							}
 						}// if  

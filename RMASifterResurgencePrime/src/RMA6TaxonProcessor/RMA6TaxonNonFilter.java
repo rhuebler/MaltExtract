@@ -15,16 +15,18 @@ import strainMap.StrainMap;
  */
 public class RMA6TaxonNonFilter  extends RMA6TaxonProcessor{
 	protected boolean wantReads = false;
+	protected boolean wantAlignments = false;
 	public RMA6TaxonNonFilter(Integer id, double pID, NCBI_MapReader reader, boolean v, Logger log, Logger warning,double tp,int mL) {
 		super(id, pID, reader, v, log, warning,tp,mL);
 	}
 	public RMA6TaxonNonFilter(int id ,double pID, NCBI_MapReader reader,
-			boolean v,Logger log, Logger warning, boolean reads,double tp,int mL) {
+			boolean v,Logger log, Logger warning, boolean reads,double tp,int mL,boolean wantAls) {
 		super(id,pID, reader, v, log, warning,tp,mL);
 		this.wantReads =reads;
+		this.wantAlignments = wantAls;
 	}
 	
-	public void processMatchBlocks(IMatchBlock[] blocks, String readName, int readLength){
+	public void processMatchBlocks(IMatchBlock[] blocks, String readName, int readLength, String sequence){
 		lengths.add(readLength);
 		int k=0;
 		float topScore = blocks[0].getBitScore();
@@ -42,14 +44,14 @@ public class RMA6TaxonNonFilter  extends RMA6TaxonProcessor{
 				al.setReadLength(readLength);
 				al.setAcessionNumber(blocks[i].getRefSeqId());	
 				if(minPIdent <= al.getPIdent()){ // check for minPercentIdentity
-					if(wantReads){
+					if(wantAlignments){
 						String name = getName(blocks[i].getTaxonId());
-						lines.add(al.getReadName()+"\t"+"Length:\t"+al.getReadLength()+"\t");
-						lines.add(name+"\t"+al.getAccessionNumber()+"\t"+"Start:\t"+al.getStart()+"\t"+"End:\t"+al.getEnd());
-						lines.add("Q:\t"+al.getQuery());
-						lines.add("A:\t"+al.getAlignment());
-						lines.add("R:\t"+al.getReference()+"\n");
-								}
+						alignments.add(al.getReadName()+"\t"+"Length:\t"+al.getReadLength()+"\t");
+						alignments.add(name+"\t"+al.getAccessionNumber()+"\t"+"Start:\t"+al.getStart()+"\t"+"End:\t"+al.getEnd());
+						alignments.add("Q:\t"+al.getQuery());
+						alignments.add("A:\t"+al.getAlignment());
+						alignments.add("R:\t"+al.getReference()+"\n");
+					}
 								//get mismatches
 				container.processAlignment(al);
 				higher = true;
@@ -71,6 +73,22 @@ public class RMA6TaxonNonFilter  extends RMA6TaxonProcessor{
 				numOfReads++;
 				distances.add(editDistance/k);
 				pIdents.add(pIdent/k);
+				if(wantReads){
+					String name = "";
+					if (!readName.startsWith(">"))
+                        name = ">"+readName;
+					else
+						name = readName;
+					lines.add(name);
+                    if (!name.endsWith("\n"))
+                        name += "\n";
+                    String readData = sequence;
+                    if (readData != null) {
+                        if (!readData.endsWith("\n"))
+                        	readData+=("\n");
+                    lines.add(readData);    
+                    }
+				}
 			}
 }		
 	public void process(){ 
@@ -84,6 +102,7 @@ public class RMA6TaxonNonFilter  extends RMA6TaxonProcessor{
 		setEditDistanceHistogram(distances);
 		setPercentIdentityHistogram(pIdents);
 		setReads(lines);
+		setAlignments(alignments);
 		calculateReadLengthDistribution();
 	}//process
 		
