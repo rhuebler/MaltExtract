@@ -133,8 +133,8 @@ public class InputParameterProcessor {
     	    Option option_Help = Option.builder("h").longOpt("help").optionalArg(true).desc("Print Help").build();
     	    Option option_Path = Option.builder("r").longOpt("resources").hasArg().argName("path").optionalArg(true).desc("Set path to required ncbi files").build();
     	    Option option_Verbose = Option.builder("v").longOpt("verbose").optionalArg(true).desc("How much output to print to screen").build();
-    	    Option option_Alignment = Option.builder().longOpt("alignment").optionalArg(true).desc("Retrieve Alignments").build();
-    	    Option option_Reads = Option.builder().longOpt("Reads").optionalArg(true).desc("Retrieve Reads").build();
+    	    Option option_Alignment = Option.builder().longOpt("matches").optionalArg(true).desc("Retrieve Alignments").build();
+    	    Option option_Reads = Option.builder().longOpt("reads").optionalArg(true).desc("Retrieve Reads").build();
     	    Option option_Crawl = Option.builder().longOpt("crawl").optionalArg(true).desc("Use all alignments for damage and edit distance").build();
     	    Option option_minComplexity = Option.builder().longOpt("minComp").hasArg().argName("minComplexity").optionalArg(true).desc("Use minimum complexity").build();
     	    Option option_List = Option.builder().longOpt("list").hasArg().argName("list").optionalArg(true).desc("Decide on which build in list to use (not enabled yet)").build();
@@ -301,6 +301,7 @@ public class InputParameterProcessor {
     	        	this.crawl = true;
     	        }
     	        if((commandLine.hasOption("reads") && behave != Filter.SCAN)){
+    	        	log.log(Level.INFO, "Rerieve filtered Reads");
     	        	this.reads = true;
     	        }
     	        if(commandLine.hasOption("list")){
@@ -319,8 +320,8 @@ public class InputParameterProcessor {
     	        		warning.log(Level.WARNING, line+" not exist", io);
     	        	}
     	        }
-    	        if(commandLine.hasOption("Alignment")){
-    	        	log.log(Level.INFO, "retrieve filtered Reads");
+    	        if(commandLine.hasOption("matches")&& behave != Filter.SCAN){
+    	        	log.log(Level.INFO, "retrieve Alignments");
     	        	alignment = true;
     	        }
     	        if(commandLine.hasOption("h")){

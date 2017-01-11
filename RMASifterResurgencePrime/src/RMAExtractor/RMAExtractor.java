@@ -40,7 +40,7 @@ import utility.SummaryWriter;
  */
 public class RMAExtractor {
 	/**
-	 * @param String[] args all comandline parameters
+	 * @param String[] args all command line parameters
 	 * @throws none thrown all caught
 	 */
 	private static final Logger log = Logger.getLogger(RMAExtractor.class.getName());
@@ -70,7 +70,6 @@ public class RMAExtractor {
 		}
 		warning.addHandler(error);
 		log.log(Level.INFO, "Setting up Taxon Name and Taxon ID maps");
-		
 		NCBI_MapReader mapReader = new NCBI_MapReader(inProcessor.getTreePath());
 		DirectoryCreator dCreator = new DirectoryCreator();
 		dCreator.process(inProcessor.getFilter(),inProcessor.getOutDir(),inProcessor.getBlastHits(),inProcessor.wantToCrawl(),inProcessor.wantReads());
@@ -99,7 +98,7 @@ public class RMAExtractor {
 					ConcurrentRMA6Processor task = new ConcurrentRMA6Processor(f.getParent() + "/", 
 							f.getName(), inProcessor.getOutDir(), mapReader, treeReader,taxIDs, inProcessor.getTopPercent(),
 							inProcessor.getMaxLength(),inProcessor.getMinPIdent(),inProcessor.getFilter(), inProcessor.getTaxas(),
-							inProcessor.isVerbose(), log, warning,inProcessor.getBlastHits(), inProcessor.getMinComplexity(), inProcessor.wantReads());
+							inProcessor.isVerbose(), log, warning,inProcessor.wantReads(), inProcessor.getMinComplexity(), inProcessor.getBlastHits());
 						Future<RMA6Processor> future=executor.submit(task);
 						processedFiles.add(future);
     		}//fileNames;
@@ -152,5 +151,6 @@ public class RMAExtractor {
 //TODO default plot all function 
 //TODO get RMAExtracterBeta into tools 
 //TODO What is acquiring the extra memory an error
-//TODO okay how to get the complete taxonomy path?\
+//TODO okay how to get the complete taxonomy path? works for now but slooowly
 //TODO plot Node distribution function
+//TODO resurrect GC content

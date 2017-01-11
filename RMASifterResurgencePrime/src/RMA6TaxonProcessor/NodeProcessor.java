@@ -49,6 +49,7 @@ public class NodeProcessor{
 			this.behave = behave;
 			this.minComplexity = minCompl;
 			this.alignment = alignment;
+			
 		}
 		//getters
 		// calculate complexity of read from Megan code

@@ -119,7 +119,7 @@ public class RMA6OutputProcessor {
 				name = mapReader.getNcbiIdToNameMap().get(taxID).replace(' ', '_');
 			else
 				name = "unassingned_name";
-		Path file = Paths.get(outDir+name+".txt");
+		Path file = Paths.get(outDir+name+".fasta");
 		Files.write(file, summary, Charset.forName("UTF-8"));
 		}catch(IOException io){
 			warning.log(Level.SEVERE,"Cannot write file"+ fileName, io);
@@ -221,13 +221,13 @@ public class RMA6OutputProcessor {
 				readLengthHistogram.add(taxProcessor.getReadLengthStatistics());
 				
 				if(switcher == Filter.ALL && alignment )
-					writeBlastHits(id,taxProcessor.getAlignments(),outDir+"/ancientNonDuplicates/alignment/"+fileName+"/");
+					writeBlastHits(id,taxProcessor.getAlignments(),outDir+"/ancientNonDuplicates/alignments/"+fileName+"/");
 				if(switcher == Filter.ANCIENT && alignment)
-					writeBlastHits(id,taxProcessor.getAlignments(),outDir+"/ancient/alignment/"+fileName+"/");
+					writeBlastHits(id,taxProcessor.getAlignments(),outDir+"/ancient/alignments/"+fileName+"/");
 				if(switcher == Filter.NON && alignment)
-					writeBlastHits(id,taxProcessor.getAlignments(),outDir+"/default/alignment/"+fileName+"/");
+					writeBlastHits(id,taxProcessor.getAlignments(),outDir+"/default/alignments/"+fileName+"/");
 				if(switcher == Filter.NONDUPLICATES && alignment)
-					writeBlastHits(id,taxProcessor.getAlignments(),outDir+"/nonDuplicates/alignment/"+fileName+"/");
+					writeBlastHits(id,taxProcessor.getAlignments(),outDir+"/nonDuplicates/alignments/"+fileName+"/");
 				
 				if(switcher == Filter.ALL && reads)
 					writeReads(id,taxProcessor.getReads(),outDir+"/ancientNonDuplicates/reads/"+fileName+"/");
@@ -266,9 +266,10 @@ public class RMA6OutputProcessor {
 			writeReadLengthDistribution(readLengthHistogram, dir+"readDist/"+fileName+"_readLengthDist"+".txt");
 	}
 	public void process(HashMap<Integer,Future<NodeProcessor>> results){
+		
 		if(behave == Filter.NON){
 			if(alignment){
-				new File(outDir+"/default/"+"/alignment/"+fileName).mkdirs();
+				new File(outDir+"/default/"+"/alignments/"+fileName).mkdirs();
 			}
 			if(reads){
 				new File(outDir+"/default/"+"/reads/"+fileName).mkdirs();
@@ -276,7 +277,7 @@ public class RMA6OutputProcessor {
 			prepareOutput(results,behave);
 		}else if(behave == Filter.ANCIENT){
 			if(alignment){
-				new File(outDir+"/ancient/"+"/alignment/"+fileName).mkdirs();
+				new File(outDir+"/ancient/"+"/alignments/"+fileName).mkdirs();
 			}
 			if(reads){
 				new File(outDir+"/ancient/"+"/reads/"+fileName).mkdirs();
@@ -284,7 +285,7 @@ public class RMA6OutputProcessor {
 			prepareOutput(results,behave);
 		}else if(behave == Filter.NONDUPLICATES){
 			if(alignment){
-				new File(outDir+"/nonDuplicates/"+"/alignment/"+fileName).mkdirs();
+				new File(outDir+"/nonDuplicates/"+"/alignments/"+fileName).mkdirs();
 			}
 			if(reads){
 				new File(outDir+"/nonDuplicates/"+"/reads/"+fileName).mkdirs();
@@ -292,7 +293,7 @@ public class RMA6OutputProcessor {
 			prepareOutput(results,behave);
 		}else if(behave == Filter.ALL){
 			if(alignment){
-				new File(outDir+"/ancientNonDuplicates/"+"/alignment/"+fileName).mkdirs();
+				new File(outDir+"/ancientNonDuplicates/"+"/alignments/"+fileName).mkdirs();
 			}
 			if(reads){
 				new File(outDir+"/ancientNonDuplicates/"+"/reads/"+fileName).mkdirs();	
@@ -300,8 +301,8 @@ public class RMA6OutputProcessor {
 			prepareOutput(results,behave);
 		}else if(behave == Filter.NON_ANCIENT){
 			if(alignment){
-				new File(outDir+"/ancient/"+"/alignment/"+fileName).mkdirs();
-				new File(outDir+"/default/"+"/alignment/"+fileName).mkdirs();
+				new File(outDir+"/ancient/"+"/alignments/"+fileName).mkdirs();
+				new File(outDir+"/default/"+"/alignments/"+fileName).mkdirs();
 			if(reads){
 					new File(outDir+"/default/"+"/reads/"+fileName).mkdirs();
 					new File(outDir+"/ancient/"+"/reads/"+fileName).mkdirs();

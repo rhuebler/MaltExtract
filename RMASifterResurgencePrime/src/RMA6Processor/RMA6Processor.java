@@ -1,6 +1,5 @@
 package RMA6Processor;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -136,8 +135,6 @@ public class RMA6Processor {
 
 public void process(List<Integer>taxIDs, double topPercent) {// processing 
 	log.log(Level.INFO,"Reading File: " +inDir+fileName);
-	if(reads)
-		new File(outDir+"reads/"+fileName.substring(0, fileName.length())+"/").mkdirs();
 	Set<Integer> keys = getAllKeys();
 	Set<Integer> idsToProcess = new HashSet<Integer>();
    // treeReader here to avoid synchronization issues 

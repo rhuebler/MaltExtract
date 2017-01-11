@@ -5,7 +5,15 @@ import java.io.File;
 import behaviour.Filter;
 
 public class DirectoryCreator {
-
+/**
+ * @author huebler
+ * Create all directories associated with RMAextractor depending on input behavaviour
+ * @param behave
+ * @param outDir
+ * @param hits
+ * @param crawl
+ * @param reads
+ */
 	public void process(Filter behave, String outDir, boolean hits, boolean crawl,boolean reads) {
 		if(crawl){
 			new File(outDir+"/crawlResults/").mkdirs();

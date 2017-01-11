@@ -65,6 +65,7 @@ public void processMatchBlocks(IMatchBlock[] blocks, String readName, int readLe
 			damage++;
 			k++;
 			if(wantAlignments){
+				alignments.add("blub");
 				String name = getName(blocks[i].getTaxonId());
 				alignments.add(al.getReadName()+"\t"+"Length:\t"+al.getReadLength()+"\t");
 				alignments.add(name+"\t"+al.getAccessionNumber()+"\t"+"Start:\t"+al.getStart()+"\t"+"End:\t"+al.getEnd());
