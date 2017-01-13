@@ -38,19 +38,15 @@ public class RMA6TaxonNonFilter  extends RMA6TaxonProcessor{
 					break;}
 				numMatches++;			
 				Alignment al = new Alignment();
-				al.processText(blocks[i].getText().split("\n"));
+				al.setText(blocks[i].getText());
+				al.processText();
 				al.setPIdent(blocks[i].getPercentIdentity());
 				al.setReadName(readName);
 				al.setReadLength(readLength);
 				al.setAcessionNumber(blocks[i].getRefSeqId());	
 				if(minPIdent <= al.getPIdent()){ // check for minPercentIdentity
 					if(wantAlignments){
-						String name = getName(blocks[i].getTaxonId());
-						alignments.add(al.getReadName()+"\t"+"Length:\t"+al.getReadLength()+"\t");
-						alignments.add(name+"\t"+al.getAccessionNumber()+"\t"+"Start:\t"+al.getStart()+"\t"+"End:\t"+al.getEnd());
-						alignments.add("Q:\t"+al.getQuery());
-						alignments.add("A:\t"+al.getAlignment());
-						alignments.add("R:\t"+al.getReference()+"\n");
+						alignments.add(al.getText());
 					}
 								//get mismatches
 				container.processAlignment(al);

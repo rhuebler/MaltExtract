@@ -41,7 +41,8 @@ public void processMatchBlocks(IMatchBlock[] blocks, String readName, int readLe
 			break;}
 		Alignment al = new Alignment();
 		al.setSequence(sequence);
-		al.processText(blocks[i].getText().split("\n"));
+		al.setText(blocks[i].getText());
+		al.processText();
 		al.setPIdent(blocks[i].getPercentIdentity());
 		al.setReadName(readName);
 		al.setReadLength(readLength);
@@ -65,13 +66,7 @@ public void processMatchBlocks(IMatchBlock[] blocks, String readName, int readLe
 			damage++;
 			k++;
 			if(wantAlignments){
-				alignments.add("blub");
-				String name = getName(blocks[i].getTaxonId());
-				alignments.add(al.getReadName()+"\t"+"Length:\t"+al.getReadLength()+"\t");
-				alignments.add(name+"\t"+al.getAccessionNumber()+"\t"+"Start:\t"+al.getStart()+"\t"+"End:\t"+al.getEnd());
-				alignments.add("Q:\t"+al.getQuery());
-				alignments.add("A:\t"+al.getAlignment());
-				alignments.add("R:\t"+al.getReference()+"\n");
+				alignments.add(al.getText());
 			}
 		}
 					

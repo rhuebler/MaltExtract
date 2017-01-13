@@ -6,6 +6,7 @@ import java.util.Comparator;
  * @author huebler
  *
  */
+// readnamen, Node, wieviele Reads fallen da hon wo sie hinfallen und wieviele von denen target reads sind echt  
 public class Alignment {
 	private String readName;
 	private double pIdent;
@@ -27,7 +28,11 @@ public class Alignment {
 	private int readLength;
 	private double score;
 	private String sequence;
+	private String text;
 	// getter
+public String getText(){
+	return this.text;
+}
 public String getSequence(){
 	return this.sequence;
 }
@@ -89,6 +94,9 @@ public String getQuery(){
 	 return this.referenceLength;}
  
  // setters
+ public void setText(String s){
+	 this.text = s;
+ }
  public void setSequence(String s){
 	 this.sequence = s;
  }
@@ -183,12 +191,12 @@ private void setReferenceLength(int k) {
 	 this.editDistance = d[sequence.length()][reference.length()];
  }
  
-	 public void processText(String[] text){
+	 public void processText(){
 		 String alignment="";
 		 String query ="";
 		 String reference = "";
 		 boolean first = true;
-		 for(String line : text){
+		 for(String line : text.split("\n")){
 			 if(line.startsWith(">"))
 				 setReferenceName(line.trim());
 			 if(line.contains("Query")){

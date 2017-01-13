@@ -167,7 +167,8 @@ public class RMA6BlastCrawler {
 								if(getName(blocks[i].getTaxonId()).contains(speciesName)){
 				
 									Alignment al = new Alignment();
-									al.processText(blocks[i].getText().split("\n"));
+									al.setText(blocks[i].getText());
+									al.processText();
 									al.setPIdent(blocks[i].getPercentIdentity());
 									if(collection.containsKey(blocks[i].getTaxonId())){
 										StrainMap strain = collection.get(blocks[i].getTaxonId());

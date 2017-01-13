@@ -40,12 +40,7 @@ public class RMA6TaxonNonDuplicateFilter  extends RMA6TaxonProcessor{
 					lengths.add(entry.getReadLength());
 					//get mismatches
 					if(wantAlignment){
-						String name = getName(key);
-						alignments.add(entry.getReadName()+"\t"+"Length:\t"+entry.getReadLength()+"\t");
-						alignments.add(name+"\t"+entry.getAccessionNumber()+"\t"+"Start:\t"+entry.getStart()+"\t"+"End:\t"+entry.getEnd());
-						alignments.add("Q:\t"+entry.getQuery());
-						alignments.add("A:\t"+entry.getAlignment());
-						alignments.add("R:\t"+entry.getReference()+"\n");
+						alignments.add(entry.getText());
 					}
 					if(wantReads){
 						String name = "";
@@ -87,7 +82,8 @@ public class RMA6TaxonNonDuplicateFilter  extends RMA6TaxonProcessor{
 		IMatchBlock block = blocks[0];
 		Alignment al = new Alignment();
 		al.setSequence(sequence);
-		al.processText(block.getText().split("\n"));
+		al.setText(block.getText());
+		al.processText();
 		al.setReadName(readName);
 		al.setPIdent(block.getPercentIdentity());
 		al.setReadLength(readLength);
