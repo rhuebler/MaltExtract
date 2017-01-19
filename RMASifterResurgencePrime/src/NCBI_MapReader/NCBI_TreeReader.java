@@ -9,6 +9,8 @@ import java.util.Set;
 
 import org.forester.phylogeny.Phylogeny;
 import org.forester.phylogeny.PhylogenyNode;
+
+import utility.ResourceFinder;
 /**
  * Process NCBI tre File with archeoptrix.jar
  * Process tree find child nodes to input taxID
@@ -26,7 +28,8 @@ public class NCBI_TreeReader {
 	 * @throws none thrown all caught
 	 * @return return phylogenetic tree object
 	 */
-	private String treName= "/projects1/clusterhomes/huebler/RMASifter/RMA_Extractor_Resources/ncbi.tre";//TODO how to provide System resources make relativistic
+	ResourceFinder resources = new ResourceFinder();
+	private String treName= resources.getPath("ncbi.tre");//TODO how to provide System resources make relativistic
 	int target;
 	private HashSet<Integer> positionsToKeep = new HashSet<Integer>();
 	private Phylogeny ph;
