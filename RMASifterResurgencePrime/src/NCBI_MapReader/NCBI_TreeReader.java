@@ -28,12 +28,14 @@ public class NCBI_TreeReader {
 	 * @throws none thrown all caught
 	 * @return return phylogenetic tree object
 	 */
-	ResourceFinder resources = new ResourceFinder();
-	private String treName= resources.getPath("ncbi.tre");//TODO how to provide System resources make relativistic
+	
+	private String treName= "";//TODO how to provide System resources make relativistic
 	int target;
 	private HashSet<Integer> positionsToKeep = new HashSet<Integer>();
 	private Phylogeny ph;
 	public NCBI_TreeReader(){
+		ResourceFinder resources = new ResourceFinder();
+		treName = resources.getPath("ncbi.tre");//TODO how to provide System resources make relativistic
 		try(Scanner in = new Scanner(new File(treName))){
 		String line = in.nextLine();
 		in.close();

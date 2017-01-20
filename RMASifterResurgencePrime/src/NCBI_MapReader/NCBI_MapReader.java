@@ -19,11 +19,12 @@ public class NCBI_MapReader {
 	 * @throws none thrown all caught
 	 * @return return two hashmaps with IDs to name and Name to ID
 	 */
-	ResourceFinder resources = new ResourceFinder();
-	private String mapName= resources.getPath("ncbi.map");
+	private String mapName = "";
 	 HashMap<String,Integer> ncbiNameToId;
 	 HashMap<Integer,String> ncbiIdToName;
 	public NCBI_MapReader(){
+		ResourceFinder resources = new ResourceFinder();
+		mapName = resources.getPath("ncbi.map");
 		processNcbiMap(mapName);
 	}
 	public NCBI_MapReader(String path){
