@@ -266,7 +266,6 @@ public class RMA6OutputProcessor {
 			writeReadLengthDistribution(readLengthHistogram, dir+"readDist/"+fileName+"_readLengthDist"+".txt");
 	}
 	public void process(HashMap<Integer,Future<NodeProcessor>> results){
-		
 		if(behave == Filter.NON){
 			if(alignment){
 				new File(outDir+"/default/"+"/alignments/"+fileName).mkdirs();
@@ -300,14 +299,15 @@ public class RMA6OutputProcessor {
 			}
 			prepareOutput(results,behave);
 		}else if(behave == Filter.NON_ANCIENT){
+			
 			if(alignment){
 				new File(outDir+"/ancient/"+"/alignments/"+fileName).mkdirs();
 				new File(outDir+"/default/"+"/alignments/"+fileName).mkdirs();
+			}	
 			if(reads){
 					new File(outDir+"/default/"+"/reads/"+fileName).mkdirs();
 					new File(outDir+"/ancient/"+"/reads/"+fileName).mkdirs();
 				}
-			}
 			prepareOutput(results,Filter.NON);
 			prepareOutput(results,Filter.ANCIENT);
 		}
