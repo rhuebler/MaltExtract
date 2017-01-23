@@ -100,11 +100,14 @@ public class RMA6OutputProcessor {
 	private void writeBlastHits(int taxID, ArrayList<String> summary, String outDir){
 		try{
 			String name;
-			if(mapReader.getNcbiIdToNameMap().get(taxID) != null)
+			if(mapReader.getNcbiIdToNameMap().get(taxID) != null){
 				name = mapReader.getNcbiIdToNameMap().get(taxID).replace(' ', '_');
-			else
+				name =name.replace("/", "_");
+			}else{
 				name = "unassingned_name";
+			}	
 		Path file = Paths.get(outDir+name+".txt");
+		
 		Files.write(file, summary, Charset.forName("UTF-8"));
 		}catch(IOException io){
 			warning.log(Level.SEVERE,"Cannot write file"+ fileName, io);
@@ -113,13 +116,15 @@ public class RMA6OutputProcessor {
 		}
 	}
 	private void writeReads(int taxID, ArrayList<String> summary, String outDir){
-		try{
+		try{//TODO look more into this here 
 			String name;
-			if(mapReader.getNcbiIdToNameMap().get(taxID) != null)
+			if(mapReader.getNcbiIdToNameMap().get(taxID) != null){
 				name = mapReader.getNcbiIdToNameMap().get(taxID).replace(' ', '_');
-			else
+				name =name.replace("/", "_");
+			}else{
 				name = "unassingned_name";
-		Path file = Paths.get(outDir+name+".fasta");
+			}	
+		Path file = Paths.get(outDir+name+"done"+".fasta");
 		Files.write(file, summary, Charset.forName("UTF-8"));
 		}catch(IOException io){
 			warning.log(Level.SEVERE,"Cannot write file"+ fileName, io);
