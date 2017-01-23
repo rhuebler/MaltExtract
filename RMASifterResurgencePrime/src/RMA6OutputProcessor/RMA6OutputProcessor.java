@@ -307,7 +307,7 @@ public class RMA6OutputProcessor {
 			if(reads){
 					new File(outDir+"/default/"+"/reads/"+fileName).mkdirs();
 					new File(outDir+"/ancient/"+"/reads/"+fileName).mkdirs();
-				}
+			}
 			prepareOutput(results,Filter.NON);
 			prepareOutput(results,Filter.ANCIENT);
 		}
