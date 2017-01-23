@@ -102,7 +102,9 @@ public class RMA6OutputProcessor {
 			String name;
 			if(mapReader.getNcbiIdToNameMap().get(taxID) != null){
 				name = mapReader.getNcbiIdToNameMap().get(taxID).replace(' ', '_');
-				name =name.replace("/", "_");
+				name = name.replace("/", "_");
+				name = name.replace("\\", "_");
+				name = name.replace("#", "_");
 			}else{
 				name = "unassingned_name";
 			}	
@@ -120,7 +122,9 @@ public class RMA6OutputProcessor {
 			String name;
 			if(mapReader.getNcbiIdToNameMap().get(taxID) != null){
 				name = mapReader.getNcbiIdToNameMap().get(taxID).replace(' ', '_');
-				name =name.replace("/", "_");
+				name = name.replace("/", "_");
+				name = name.replace("\\", "_");
+				name = name.replace("#", "_");
 			}else{
 				name = "unassingned_name";
 			}	
