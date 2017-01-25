@@ -46,7 +46,7 @@ public class RMAExtractor {
 	private static final Logger log = Logger.getLogger(RMAExtractor.class.getName());
 	private static final Logger warning = Logger.getLogger("Error");
 	private static ThreadPoolExecutor executor;
-	
+	// check how to produce Megan File from RMAExtractor 
 	private static void destroy(){
 		executor.shutdown();
 	}
