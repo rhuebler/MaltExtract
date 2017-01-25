@@ -15,6 +15,9 @@ public class DirectoryCreator {
  * @param reads
  */
 	public void process(Filter behave, String outDir, boolean hits, boolean crawl,boolean reads) {
+		if(!crawl){
+			new File(outDir+"/MeganSummaries/").mkdirs();
+		}
 		if(crawl){
 			new File(outDir+"/crawlResults/").mkdirs();
 			new File(outDir+"/crawlResults/damageMismatch/").mkdirs();
