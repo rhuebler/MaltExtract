@@ -25,8 +25,9 @@ public class ConcurrentRMA6Scanner implements Callable<RMA6Scanner>{
 	private NCBI_TreeReader tReader;
 	private Logger log;
 	private Logger warning;
+	private String outDir;
 	public ConcurrentRMA6Scanner(String inDir, String fileName,Taxas tax,List<Integer> Ids,NCBI_TreeReader tReader,
-			Logger log, Logger warning){
+			Logger log, Logger warning, String outDir){
 		this.inDir = inDir;
 		this.fileName = fileName;
 		this.TaxIDs =Ids;
@@ -34,10 +35,11 @@ public class ConcurrentRMA6Scanner implements Callable<RMA6Scanner>{
 		this.tReader = tReader;
 		this.log = log;
 		this.warning = warning;
+		this.outDir = outDir;
 	}
 	@Override
 	public RMA6Scanner call(){
-		RMA6Scanner scanner = new RMA6Scanner(inDir, fileName,tax,TaxIDs, tReader, log, warning); // should be implemented as callable 
+		RMA6Scanner scanner = new RMA6Scanner(inDir, fileName,tax,TaxIDs, tReader, log, warning, outDir); // should be implemented as callable 
 		return scanner;
 	}
 }

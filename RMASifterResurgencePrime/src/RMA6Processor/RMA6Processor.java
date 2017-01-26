@@ -20,6 +20,7 @@ import behaviour.Filter;
 import behaviour.Taxas;
 import megan.rma6.ClassificationBlockRMA6;
 import megan.rma6.RMA6File;
+import utility.DataSummaryWriter;
 /**
  * take care of extracting all the information for one RMA6 file and a List of taxons
  * contains functions to write its own output for supplementary information
@@ -135,6 +136,8 @@ public class RMA6Processor {
 
 public void process(List<Integer>taxIDs, double topPercent) {// processing 
 	log.log(Level.INFO,"Reading File: " +inDir+fileName);
+	DataSummaryWriter dsWriter = new DataSummaryWriter(warning);
+	dsWriter.writeSummary(inDir, fileName, outDir);
 	Set<Integer> keys = getAllKeys();
 	Set<Integer> idsToProcess = new HashSet<Integer>();
    // treeReader here to avoid synchronization issues 

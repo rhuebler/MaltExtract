@@ -13,6 +13,7 @@ import NCBI_MapReader.NCBI_TreeReader;
 import behaviour.Taxas;
 import megan.rma6.ClassificationBlockRMA6;
 import megan.rma6.RMA6File;
+import utility.DataSummaryWriter;
 
 /**
  * Class returns the keyset of a RMA6File
@@ -39,13 +40,15 @@ public class RMA6Scanner {
 	private Taxas tax;
 	private List<Integer> taxIDs;
 	private NCBI_TreeReader  treeReader;
+	private String outDir;
 	private Logger log;
 	private Logger warning;
 	// constructor
 	public RMA6Scanner(String inDir, String name, Taxas tax, List<Integer> taxIds, NCBI_TreeReader tReader,
-			Logger log, Logger warning){
+			Logger log, Logger warning,String outDir){
 		this.inDir = inDir;
 		this.fileName =  name;
+		this.outDir = outDir;
 		this.taxIDs = taxIds;
 		this.tax =  tax;
 		this.treeReader = new NCBI_TreeReader(tReader);
@@ -71,6 +74,8 @@ public class RMA6Scanner {
 	private void process(){
 		try{
 			log.log(Level.INFO, "Scanning File: "+ fileName);
+			DataSummaryWriter dsWriter = new DataSummaryWriter(warning);
+			dsWriter.writeSummary(inDir, fileName, outDir);
 			Map<Integer,Integer> map = new HashMap<Integer,Integer>();
 			RMA6File rma6File = new RMA6File(inDir+fileName, "r");
 			Long location = rma6File.getFooterSectionRMA6().getStartClassification("Taxonomy");

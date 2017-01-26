@@ -113,7 +113,7 @@ public class RMAExtractor {
 		  for(String fileName : inProcessor.getFileNames()){
 			 File f = new File(fileName);
 			 ConcurrentRMA6Scanner task = new ConcurrentRMA6Scanner(f.getParent()+"/",
-					 f.getName(),inProcessor.getTaxas(),taxIDs, treeReader, log, warning);
+					 f.getName(),inProcessor.getTaxas(),taxIDs, treeReader, log, warning,inProcessor.getOutDir());
 			 Future<RMA6Scanner> future = executor.submit(task);
 			 scannerList.add(future);
 		  }

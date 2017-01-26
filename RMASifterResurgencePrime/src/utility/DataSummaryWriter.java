@@ -16,9 +16,9 @@ import megan.core.SampleAttributeTable;
 import megan.core.SyncArchiveAndDataTable;
 import megan.data.IConnector;
 
-public class DataSummeryWriter {
+public class DataSummaryWriter {
 	Logger warning;
-	public DataSummeryWriter(Logger warning){
+	public DataSummaryWriter(Logger warning){
 		this.warning = warning;
 	}
 	public void writeSummary(String directory,String fileName, String outDir) {
