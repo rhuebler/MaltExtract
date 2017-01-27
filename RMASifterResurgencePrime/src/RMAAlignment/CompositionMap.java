@@ -74,7 +74,7 @@ private ArrayList<Alignment> markDuplicates(ArrayList<Alignment> inList){ // tha
 		}
 		if( cStart == nStart && cEnd == nEnd &&
 		 current.getReferenceLength() == next.getReferenceLength()){
-			inList.get(i).setDuplicate(true);
+			//inList.get(i).setDuplicate(true);TODO only set first Read as duplicate 
 			inList.get(i+1).setDuplicate(true);
 		}
 			i++;
