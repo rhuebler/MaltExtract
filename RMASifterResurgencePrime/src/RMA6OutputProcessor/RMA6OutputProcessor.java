@@ -72,6 +72,19 @@ public class RMA6OutputProcessor {
 	public HashMap<Integer,Integer> getAncientNonDuplicateLine(){
 		return this.ancientNonDuplicateSum;
 	}
+	private void writeFilter(ArrayList<String> summary, String outDir){
+		String header = "Node\tNumberOfUnfilteredReads\tNumberOfFiltedReads\tNumberOfUnfiltedMatches\tnumberOfMatches";
+		summary.sort(null);
+		summary.add(0,header);
+	try{
+		Path file = Paths.get(outDir);
+		Files.write(file, summary, Charset.forName("UTF-8"));
+	}catch(IOException io){
+		warning.log(Level.SEVERE, "File writing exception", io);
+	}catch(NullPointerException np){
+		warning.log(Level.SEVERE,"Cannot write file"+fileName, np);
+	}
+	}
 	private void writeMisMap(ArrayList<String> summary, String outDir){
 			String header = "Node";
 			String header_part2 ="";
@@ -209,6 +222,7 @@ public class RMA6OutputProcessor {
 		ArrayList<String> misMatches = new ArrayList<String>();
 		ArrayList<String> coverageHistogram = new ArrayList<String>();
 		ArrayList<String> readLengthHistogram = new ArrayList<String>();
+		ArrayList<String> filterInformation = new ArrayList<String>();
 		for(int id : results.keySet()){
 			RMA6TaxonProcessor taxProcessor;
 			try {
@@ -228,7 +242,7 @@ public class RMA6OutputProcessor {
 				coverageHistogram.add(taxProcessor.getCoverageLine());
 				misMatches.add(taxProcessor.getDamageLine());
 				readLengthHistogram.add(taxProcessor.getReadLengthStatistics());
-				
+				filterInformation.add(taxProcessor.getFilterLine());
 				if(switcher == Filter.ALL && alignment )
 					writeBlastHits(id,taxProcessor.getAlignments(),outDir+"/ancientNonDuplicates/alignments/"+fileName+"/");
 				if(switcher == Filter.ANCIENT && alignment)
@@ -273,6 +287,7 @@ public class RMA6OutputProcessor {
 			writePercentIdentity(percentIdentity, dir+"percentIdentity/"+fileName+"_percentIdentity"+".txt");
 			writeCoverageHistogram(coverageHistogram, dir+"readDist/"+fileName+"_coverageHist"+".txt");	
 			writeReadLengthDistribution(readLengthHistogram, dir+"readDist/"+fileName+"_readLengthDist"+".txt");
+			writeFilter(filterInformation,dir+"FilterInformation/"+fileName+"_filterTable"+".txt");
 	}
 	public void process(HashMap<Integer,Future<NodeProcessor>> results){
 		if(behave == Filter.NON){

@@ -9,16 +9,17 @@ import java.util.HashSet;
  * @author huebler
  *
  */
-public class AlignmentStatistics {
+public class GetStackedReads {
 	private ArrayList<Alignment> currentList;
 	private ArrayList<Double> generalStatistics;
 	private HashMap<Integer,Integer> coverageHistogram;
-	private ArrayList<Alignment> nonStacked = new ArrayList<Alignment>();
 	private int length;
-	public AlignmentStatistics(ArrayList<Alignment> list){
+	private ArrayList<Alignment> nonStacked = new ArrayList<Alignment>();
+	
+	//getters
+	public  GetStackedReads(ArrayList<Alignment> list){
 		this.currentList = list;
 	}
-	//getters
 	public ArrayList<Alignment> getNonStacked(){
 		return this.nonStacked;
 	}
@@ -54,37 +55,9 @@ public class AlignmentStatistics {
 		
 		ArrayList<Alignment> input = removeDuplicates(currentList);
 		if(input != null && input.size()>0){
-			ArrayList<Double> results = new ArrayList<Double>();
 			ReferenceMap refMap = new ReferenceMap(input);
 			refMap.process();
-			HashMap<Integer,Integer> coverageHistogram = refMap.getCoverageHistogram();
-			int temp = 0;
-			for(int key : coverageHistogram.keySet())
-				temp += coverageHistogram.get(key);
-			int zeros = refMap.getLength() - temp ;	
-			if(zeros<0)
-				zeros = 0;
-			coverageHistogram.put(0, zeros);	
-			int unique=coverageHistogram.get(1);
-			this.coverageHistogram = coverageHistogram;
-			results.add(unique/(refMap.getPossible()));
-			int nonDuplicates = input.size();
-		
-			results.add((double) input.size()-refMap.getStackedReads());
-			results.add((double) nonDuplicates);
-			results.add((double) currentList.size());
-			results.add((double) refMap.getLength());
-			this.generalStatistics = results;
 			this.nonStacked = refMap.getNonStacked();
-		}else{
-			HashMap<Integer,Integer> coverageHistogram = new HashMap<Integer,Integer>();
-			for(int l = 0; l<=11; l++)
-				coverageHistogram.put(l, 0);	
-			this.coverageHistogram = coverageHistogram;
-			ArrayList<Double> results =	new ArrayList<Double>();
-			for(int i = 0; i<5;  i++)
-				results.add(0.0);
-			this.generalStatistics = results;
 		}
 		
 	}

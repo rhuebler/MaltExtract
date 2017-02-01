@@ -21,10 +21,10 @@ import megan.rma6.ClassificationBlockRMA6;
 import megan.rma6.RMA6File;
 import megan.rma6.ReadBlockGetterRMA6;
 public class NodeProcessor{
-		private RMA6TaxonDamageFilter ancientProcessor;
-		private RMA6TaxonNonFilter defaultProcessor;
-		private RMA6TaxonNonDuplicateFilter nonDuplicateProcessor;
-		private RMA6TaxonAncientNonDuplicate ancientNonDuplicateProcessor;
+		private RMA6TaxonProcessor ancientProcessor;
+		private RMA6TaxonProcessor defaultProcessor;
+		private RMA6TaxonProcessor nonDuplicateProcessor;
+		private RMA6TaxonProcessor ancientNonDuplicateProcessor;
 		private String taxName;	
 		private boolean wantReads = false;
 		private NCBI_MapReader mapReader;
@@ -89,8 +89,8 @@ public class NodeProcessor{
 				}else if(behave == Filter.ALL){
 					ancientNonDuplicateProcessor = new RMA6TaxonAncientNonDuplicate(taxID, minPIdent, mapReader, verbose, log, log, wantReads, topPercent, maxLength,alignment);
 				}else if(behave == Filter.NON_ANCIENT){
-					ancientProcessor = new RMA6TaxonDamageFilter(taxID, minPIdent, mapReader, verbose, log, log, wantReads, topPercent, maxLength,alignment);
-					defaultProcessor = new RMA6TaxonNonFilter(taxID, minPIdent, mapReader, verbose, log, log, wantReads, topPercent, maxLength,alignment);
+					ancientProcessor = new ExperimentalRMA6AncientDestacker(taxID, minPIdent, mapReader, verbose, log, log, wantReads, topPercent, maxLength,alignment);
+					defaultProcessor = new ExperimentalRMA6Destacker(taxID, minPIdent, mapReader, verbose, log, log, wantReads, topPercent, maxLength,alignment);
 				}else if(behave == Filter.NONDUPLICATES ){
 					nonDuplicateProcessor = new RMA6TaxonNonDuplicateFilter(taxID, minPIdent, mapReader, verbose, log, log, wantReads, topPercent, maxLength,alignment);
 				}		

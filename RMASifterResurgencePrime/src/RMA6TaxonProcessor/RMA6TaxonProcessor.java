@@ -45,6 +45,9 @@ protected String damageLine;
 protected String coverageLine;
 protected int numOfReads = 0;
 protected int numMatches = 0;
+protected int originalNumberOfReads = 0;
+protected int originalNumberOfAlignments = 0;
+protected String filterLine = "";
 protected ArrayList<Integer> distances = new ArrayList<Integer>();
 protected ArrayList<Double> pIdents = new ArrayList<Double>();
 protected HashMap<Integer, ArrayList<Alignment>> taxonMap = new HashMap<Integer, ArrayList<Alignment>>();
@@ -89,6 +92,12 @@ public RMA6TaxonProcessor() {
 	// TODO Auto-generated constructor stub
 }
 //setters
+protected void setOriginalNumberOfAlignments(int num){
+	this.originalNumberOfAlignments = num;
+}
+protected void setOriginalNumberOfReads(int num){
+	this.originalNumberOfReads = num;
+}
 protected void setReads(ArrayList<String> list){
 	this.readList = list;
 }
@@ -181,6 +190,10 @@ protected void setNumMatches(int matches){
 
 
 //getters
+public String getFilterLine(){
+	String s = taxName+"\t"+originalNumberOfReads + "\t" +numOfReads +"\t"+originalNumberOfAlignments+"\t" + numMatches;
+	return s;
+}
 public String getCoverageLine(){
 	return this.coverageLine;
 }
@@ -249,7 +262,7 @@ public String getReadDistribution(){
 	return this.readDistribution;
 }
 
-public void processMatchBlocks(IMatchBlock[] blocks){ 
+public void processMatchBlocks(IMatchBlock[] blocks, String readName, int lenght, String readSequence){ 
 
 	}// void 
 public void process(){ 

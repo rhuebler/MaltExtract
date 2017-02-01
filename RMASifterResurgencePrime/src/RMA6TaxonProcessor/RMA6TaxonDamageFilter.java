@@ -61,7 +61,7 @@ public void processMatchBlocks(IMatchBlock[] blocks, String readName, int readLe
 				entry.add(al);
 				taxonMap.put(blocks[i].getTaxonId(),entry);
 			}
-			editDistance += al.getEditInstance();
+			editDistance += al.getEditDistance();
 			pIdent += al.getPIdent();
 			damage++;
 			k++;

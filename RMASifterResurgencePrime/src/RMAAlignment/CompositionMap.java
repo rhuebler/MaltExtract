@@ -11,6 +11,7 @@ public class CompositionMap {
 		setCompositionMap(map);
 	}
 private HashMap<Integer,ArrayList<Alignment>> compositionMap;// hashMap of ReferenceID to List of start positions
+private HashMap<String,ArrayList<Alignment>> resultsMap = new HashMap<String,ArrayList<Alignment>>();// hashMap of ReferenceID to List of start positions
 //HashMap<Integer,Integer> taxonComposition; currently unused 
 private int maxID;
 private ArrayList<Double> generalStatistics;
@@ -18,6 +19,9 @@ private HashMap<Integer,Integer> coverageHistogram;
 private int refLength = 0;
 
 //getter
+public HashMap<String,ArrayList<Alignment>> getResultsMap(){
+	return this.resultsMap;
+}
 public int getReferenceLength(){
 	return this.refLength;
 }
@@ -95,9 +99,43 @@ public void calculateStatistics(){
 	this.coverageHistogram = stats.getConverageHistogram();
 	this.generalStatistics = stats.getGenaralStatistics();
 	this.refLength = stats.getLength();
+	for(Alignment al : stats.getNonStacked()){
+		String name = al.getReadName();
+		if(resultsMap.containsKey(name)){
+			ArrayList<Alignment> list = resultsMap.get(name);
+			list.add(al);
+			resultsMap.replace(name, list);
+		}else{
+			ArrayList<Alignment> list = new ArrayList<Alignment>();
+			list.add(al);
+			resultsMap.put(name, list);
+		}
+	}
 }
 
 // process composition and find taxon with maximum number of start positions
+public void getNonStacked(){
+	for(int key : compositionMap.keySet()){
+		if(key != getMaxID()){
+			GetStackedReads reads = new GetStackedReads(compositionMap.get(key));
+			reads.calculateStatistics();
+			for(Alignment al : reads.getNonStacked()){
+				String name = al.getReadName();
+				if(resultsMap.containsKey(name)){
+					ArrayList<Alignment> list = resultsMap.get(name);
+					list.add(al);
+					resultsMap.replace(name, list);
+				}else{
+					ArrayList<Alignment> list = new ArrayList<Alignment>();
+					list.add(al);
+					resultsMap.put(name, list);
+				}
+			}
+		}
+	}
+	
+  }
+
 public void process(){
 	HashMap<Integer,ArrayList<Alignment>> map = getCompositionMap();
 	HashMap<Integer,Integer> results = new HashMap<Integer,Integer>();

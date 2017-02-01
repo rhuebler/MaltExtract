@@ -61,7 +61,7 @@ public class RMA6TaxonNonDuplicateFilter  extends RMA6TaxonProcessor{
 					numMatches++;
 					container.processAlignment(entry);
 					pIdents.add(entry.getPIdent());
-					distances.add(entry.getEditInstance());
+					distances.add(entry.getEditDistance());
 					numOfReads++;
 				}
 				

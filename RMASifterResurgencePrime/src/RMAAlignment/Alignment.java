@@ -29,7 +29,11 @@ public class Alignment {
 	private double score;
 	private String sequence;
 	private String text;
+	private boolean stacked = false;
 	// getter
+public boolean isStacked(){
+	return this.stacked;
+}	
 public String getText(){
 	return this.text;
 }
@@ -45,7 +49,7 @@ public double getScore(){
 public int getReadLength(){
 	return this.readLength;
 }	
-public int getEditInstance(){
+public int getEditDistance(){
 	return this.editDistance;
 }
 public String getReadName(){
@@ -94,6 +98,9 @@ public String getQuery(){
 	 return this.referenceLength;}
  
  // setters
+ public void setStacked(boolean b){
+	 this.stacked = b;
+ }
  public void setText(String s){
 	 this.text = s;
  }

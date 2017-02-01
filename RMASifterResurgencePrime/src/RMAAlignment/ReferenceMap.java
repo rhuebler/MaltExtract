@@ -11,10 +11,14 @@ public class ReferenceMap {
 	private double unique = 0;
 	private double possible = 0;
 	private int length = 0;
+	private ArrayList<Alignment> nonStacked = new ArrayList<Alignment>();
 	public ReferenceMap(ArrayList<Alignment> input){
 		this.input = input;
 	}
 	//getters
+	public ArrayList<Alignment> getNonStacked(){
+		return this.nonStacked;
+	}
 	public int getLength(){
 		return this.length;
 	}
@@ -31,6 +35,7 @@ public class ReferenceMap {
 		return this.coverageHistogram;
 	}
 	public void process(){
+		nonStacked.addAll(input);
 		HashMap<Integer,Integer> coverageHistogram = new HashMap<Integer,Integer>();
 		for(int l = 0; l<=11; l++)
 			coverageHistogram.put(l, 0);
@@ -97,6 +102,9 @@ public class ReferenceMap {
 			possible += (cEnd - cStart)+1;
 			for(int k = cStart; k<= cEnd; k++){
 				int coverage = coverageContainer.get(k);
+				if(coverage>1){
+					current.setStacked(true);
+				}
 				if(coverage == 1){
 					coverageHistogram.replace(1, coverageHistogram.get(1)+1);
 				}else if(coverage == 2){
@@ -134,6 +142,7 @@ public class ReferenceMap {
 			i++;
 		}
 		stackedReads+=stacked.size();
+		nonStacked.removeAll(stacked);
 	}
 
 }

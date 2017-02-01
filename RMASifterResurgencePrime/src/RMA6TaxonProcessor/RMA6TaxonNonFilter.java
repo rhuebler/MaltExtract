@@ -52,7 +52,7 @@ public class RMA6TaxonNonFilter  extends RMA6TaxonProcessor{
 				container.processAlignment(al);
 				higher = true;
 				pIdent += al.getPIdent();
-				editDistance += al.getEditInstance();
+				editDistance += al.getEditDistance();
 				if(!taxonMap.containsKey(blocks[i].getTaxonId())){
 					ArrayList<Alignment> entry =new ArrayList<Alignment>();
 					entry.add(al);
@@ -94,6 +94,7 @@ public class RMA6TaxonNonFilter  extends RMA6TaxonProcessor{
 		StrainMap strain = new StrainMap(taxName,container,numMatches);
 		setDamageLine(strain.getLine());
 		setNumberOfReads(numOfReads);
+		setNumMatches(numMatches);
 		setReadDistribution(map);
 		setEditDistanceHistogram(distances);
 		setPercentIdentityHistogram(pIdents);

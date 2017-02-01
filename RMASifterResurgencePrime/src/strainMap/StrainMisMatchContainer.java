@@ -39,7 +39,7 @@ public HashMap<Integer,Double> getNoise(){
 }	
 public void processAlignment(Alignment al){
 	if(al.getMlength() >= 20){
-		distances.add(al.getEditInstance());
+		distances.add(al.getEditDistance());
 		pIdents.add(al.getPIdent());
 		lengths.add(al.getMlength());
 		processed+=1;
@@ -110,7 +110,7 @@ public void processMisMatches(){
 					divisor+=positionContainer.get(key);
 				}
 			}
-			divident= divisor;
+			divident += divisor;
 			if(positionContainer.containsKey("GG")){
 				divident-=positionContainer.get("GG");
 			}
@@ -145,7 +145,7 @@ public void processMisMatches(){
 				if(!key.equals("GA") || !key.contains("-"))
 					divisor+=positionContainer.get(key);
 			}
-			divident= divisor;
+			divident += divisor;
 			if(positionContainer.containsKey("CC")){
 				divident-=positionContainer.get("CC");
 			}

@@ -60,7 +60,7 @@ public class RMA6TaxonAncientNonDuplicate  extends RMA6TaxonDamageFilter{
 					numMatches++;
 					container.processAlignment(entry);
 					pIdents.add(entry.getPIdent());
-					distances.add(entry.getEditInstance());
+					distances.add(entry.getEditDistance());
 					numOfReads++;
 				}
 				
