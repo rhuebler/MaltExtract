@@ -13,15 +13,11 @@ public class AlignmentStatistics {
 	private ArrayList<Alignment> currentList;
 	private ArrayList<Double> generalStatistics;
 	private HashMap<Integer,Integer> coverageHistogram;
-	private ArrayList<Alignment> nonStacked = new ArrayList<Alignment>();
 	private int length;
 	public AlignmentStatistics(ArrayList<Alignment> list){
 		this.currentList = list;
 	}
 	//getters
-	public ArrayList<Alignment> getNonStacked(){
-		return this.nonStacked;
-	}
 	public ArrayList<Double> getGenaralStatistics(){
 		return this.generalStatistics;
 	}
@@ -75,7 +71,6 @@ public class AlignmentStatistics {
 			results.add((double) currentList.size());
 			results.add((double) refMap.getLength());
 			this.generalStatistics = results;
-			this.nonStacked = refMap.getNonStacked();
 		}else{
 			HashMap<Integer,Integer> coverageHistogram = new HashMap<Integer,Integer>();
 			for(int l = 0; l<=11; l++)

@@ -99,22 +99,11 @@ public void calculateStatistics(){
 	this.coverageHistogram = stats.getConverageHistogram();
 	this.generalStatistics = stats.getGenaralStatistics();
 	this.refLength = stats.getLength();
-	for(Alignment al : stats.getNonStacked()){
-		String name = al.getReadName();
-		if(resultsMap.containsKey(name)){
-			ArrayList<Alignment> list = resultsMap.get(name);
-			list.add(al);
-			resultsMap.replace(name, list);
-		}else{
-			ArrayList<Alignment> list = new ArrayList<Alignment>();
-			list.add(al);
-			resultsMap.put(name, list);
-		}
-	}
 }
 
 // process composition and find taxon with maximum number of start positions
 public void getNonStacked(){
+	//get nonstacked Reads
 	for(int key : compositionMap.keySet()){
 			GetStackedReads reads = new GetStackedReads(compositionMap.get(key));
 			reads.calculateStatistics();
