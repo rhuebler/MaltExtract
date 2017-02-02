@@ -116,7 +116,6 @@ public void calculateStatistics(){
 // process composition and find taxon with maximum number of start positions
 public void getNonStacked(){
 	for(int key : compositionMap.keySet()){
-		if(key != getMaxID()){
 			GetStackedReads reads = new GetStackedReads(compositionMap.get(key));
 			reads.calculateStatistics();
 			for(Alignment al : reads.getNonStacked()){
@@ -133,8 +132,6 @@ public void getNonStacked(){
 			}
 		}
 	}
-	
-  }
 
 public void process(){
 	HashMap<Integer,ArrayList<Alignment>> map = getCompositionMap();
