@@ -59,10 +59,11 @@ public class RMA6Processor {
 	private ThreadPoolExecutor executor;
 	private int threads = 1;
 	private double minComplexity;
+	private boolean wantMeganSummaries;
 	// constructor
 	public RMA6Processor(String inDir, String fileName, String outDir, NCBI_MapReader mapReader,
 			NCBI_TreeReader treeReader, int maxLength, double pIdent, Filter b, Taxas t, boolean verbose,
-			Logger log, Logger warning, boolean readInf, double minCompl, boolean alignment) {
+			Logger log, Logger warning, boolean readInf, double minCompl, boolean alignment, boolean wantMeganSummaries) {
 		this.inDir = inDir;
 		this.outDir = outDir;
 		this.fileName = fileName;
@@ -78,6 +79,7 @@ public class RMA6Processor {
 		this.alignments = alignment;
 		this.reads = readInf;
 		this.minComplexity = minCompl;
+		this.wantMeganSummaries = wantMeganSummaries;
 	}
 	
 	//setters
@@ -136,8 +138,10 @@ public class RMA6Processor {
 
 public void process(List<Integer>taxIDs, double topPercent) {// processing 
 	log.log(Level.INFO,"Reading File: " +inDir+fileName);
-	DataSummaryWriter dsWriter = new DataSummaryWriter(warning);
-	dsWriter.writeSummary(inDir, fileName, outDir);
+	if(wantMeganSummaries){
+		DataSummaryWriter dsWriter = new DataSummaryWriter(warning);
+		dsWriter.writeSummary(inDir, fileName, outDir);
+	}
 	Set<Integer> keys = getAllKeys();
 	Set<Integer> idsToProcess = new HashSet<Integer>();
    // treeReader here to avoid synchronization issues 

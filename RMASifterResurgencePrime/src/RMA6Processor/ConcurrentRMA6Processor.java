@@ -33,14 +33,15 @@ public class ConcurrentRMA6Processor implements Callable<RMA6Processor>{
 	private double minPIdent;
 	private Taxas t;
 	private boolean verbose;
-	private boolean readInf = false;
+	private boolean wantReads = false;
 	private Logger log;
 	private Logger warning;
 	private double minComplexity;
-	private boolean alignments;
+	private boolean wantAlignments;
+	private  boolean wantMeganSummaries = false;
 	public ConcurrentRMA6Processor(String inDir, String fileName, String outDir, NCBI_MapReader mapReader, 
 			NCBI_TreeReader treeReader,List<Integer>taxIDs,double topPercent, int i,double minPI, Filter b,
-			Taxas t, boolean verbose, Logger log, Logger warning, boolean reads,  double minCompl, boolean alignments) {
+			Taxas t, boolean verbose, Logger log, Logger warning, boolean reads,  double minCompl, boolean alignments, boolean wantMeganSummaries) {
 		
 		this.inDir = inDir;
 		this.outDir = outDir;
@@ -56,14 +57,15 @@ public class ConcurrentRMA6Processor implements Callable<RMA6Processor>{
 		this.verbose = verbose;
 		this.log = log;
 		this.warning = warning;
-		this.readInf = reads;
-		this.alignments = alignments;
+		this.wantReads = reads;
+		this.wantAlignments = alignments;
 		this.minComplexity = minCompl;
+		this.wantMeganSummaries = false;
 	}
 	@Override
 	public RMA6Processor call(){
 		RMA6Processor processor = new RMA6Processor(inDir, fileName, outDir, mapReader,
-				treeReader,maxLength,minPIdent ,behave, t, verbose, log, warning, readInf, minComplexity,alignments); // should be implemented as callable 
+				treeReader,maxLength,minPIdent ,behave, t, verbose, log, warning, wantReads, minComplexity,wantAlignments,wantMeganSummaries); // should be implemented as callable 
     	processor.process(taxIDs, topPercent);// loop through file
 		return processor;
 	}

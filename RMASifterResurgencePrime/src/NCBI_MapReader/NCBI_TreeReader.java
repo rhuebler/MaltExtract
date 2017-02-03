@@ -68,20 +68,6 @@ public class NCBI_TreeReader {
 				assigned.add(key);
 		return assigned;
 	} 
-	private HashSet<Integer> getPath(HashSet<Integer>children, Set<Integer> keys, int target){
-		HashSet<Integer> parents = new  HashSet<Integer>();
-		
-		for(int child : children ){
-    		if(keys.contains(child)){
-    			positionsToKeep.add(child);
-    		}
-    	int id = Integer.parseInt(ph.getNode(String.valueOf(child)).getParent().getName());
-    	if(id != target){
-    		parents.add(id);
-    		}
-		}
-		return  parents;
-}
 	public ArrayList<Integer> getAllStrains(int target, Set<Integer> keys){
 		PhylogenyNode query = ph.getNode(String.valueOf(target));
 	    for(PhylogenyNode leaf : query.getAllExternalDescendants()){

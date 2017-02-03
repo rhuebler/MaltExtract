@@ -60,45 +60,46 @@ public class ExperimentalRMA6AncientDestacker extends RMA6TaxonProcessor {
 		map.getNonStacked();
 		HashMap<String,ArrayList<Alignment>> list =map.getResultsMap();
 		for(String key : list.keySet()){
-			int k = 1;
+			int k = 0;
 			double pIdent = 0;
 			int editDistance = 0;
 			String sequence = "";
 			for(Alignment al : list.get(key)){
 				numMatches++;	
 				pIdent+= al.getPIdent();
-				editDistance = al.getEditDistance();
+				editDistance += al.getEditDistance();
 				container.processAlignment(al);
 				if(wantAlignments)
-					alignments.add(al.getAlignment());
-				if(k==1){
+					alignments.add(al.getText());
+				if(k==0){
 					lengths.add(al.getReadLength());
 					if(wantReads)
 						sequence=al.getSequence();
 				}	
 				k++;
 			}
-			pIdents.add(pIdent/k);
-			distances.add(editDistance/k);
-			if(wantReads){
-				String readName =key;
-				String name = "";
-				if (!readName.startsWith(">"))
-                    name = ">"+readName;
-				else
-					name = readName;
-				lines.add(name);
-                if (!name.endsWith("\n"))
-                    name += "\n";
-                String readData = sequence;
-                if (readData != null) {
-                    if (!readData.endsWith("\n"))
-                    	readData+=("\n");
-                lines.add(readData);    
-                }
-			}    
+			if(k!=0){
+				pIdents.add(pIdent/k);
+				distances.add(editDistance/k);
+				if(wantReads){
+					String readName =key;
+					String name = "";
+					if (!readName.startsWith(">"))
+						name = ">"+readName;
+					else
+						name = readName;
+					lines.add(name);
+					if (!name.endsWith("\n"))
+						name += "\n";
+					String readData = sequence;
+					if (readData != null) {
+						if (!readData.endsWith("\n"))
+							readData+=("\n");
+						lines.add(readData);    
+					}
+				}    
+			}
 		}
-		
 		StrainMap strain = new StrainMap(taxName,container,numMatches);
 		setOriginalNumberOfAlignments(originalNumberOfAlignments);
 		setOriginalNumberOfReads(originalNumberOfReads);

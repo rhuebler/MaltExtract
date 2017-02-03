@@ -72,7 +72,7 @@ public class RMAExtractor {
 		log.log(Level.INFO, "Setting up Taxon Name and Taxon ID maps");
 		NCBI_MapReader mapReader = new NCBI_MapReader(inProcessor.getTreePath());
 		DirectoryCreator dCreator = new DirectoryCreator();
-		dCreator.process(inProcessor.getFilter(),inProcessor.getOutDir(),inProcessor.getBlastHits(),inProcessor.wantToCrawl(),inProcessor.wantReads());
+		dCreator.process(inProcessor.getFilter(),inProcessor.getOutDir(),inProcessor.getBlastHits(),inProcessor.wantToCrawl(),inProcessor.wantReads(), inProcessor.wantMeganSummaries());
 		List<Integer> taxIDs= new  ArrayList<Integer>();
 		
 		NCBI_TreeReader treeReader = new NCBI_TreeReader(inProcessor.getTreePath());
@@ -98,7 +98,7 @@ public class RMAExtractor {
 					ConcurrentRMA6Processor task = new ConcurrentRMA6Processor(f.getParent() + "/", 
 							f.getName(), inProcessor.getOutDir(), mapReader, treeReader,taxIDs, inProcessor.getTopPercent(),
 							inProcessor.getMaxLength(),inProcessor.getMinPIdent(),inProcessor.getFilter(), inProcessor.getTaxas(),
-							inProcessor.isVerbose(), log, warning,inProcessor.wantReads(), inProcessor.getMinComplexity(), inProcessor.getBlastHits());
+							inProcessor.isVerbose(), log, warning,inProcessor.wantReads(), inProcessor.getMinComplexity(), inProcessor.getBlastHits(),inProcessor.wantMeganSummaries());
 						Future<RMA6Processor> future=executor.submit(task);
 						processedFiles.add(future);
     		}//fileNames;
@@ -113,7 +113,7 @@ public class RMAExtractor {
 		  for(String fileName : inProcessor.getFileNames()){
 			 File f = new File(fileName);
 			 ConcurrentRMA6Scanner task = new ConcurrentRMA6Scanner(f.getParent()+"/",
-					 f.getName(),inProcessor.getTaxas(),taxIDs, treeReader, log, warning,inProcessor.getOutDir());
+					 f.getName(),inProcessor.getTaxas(),taxIDs, treeReader, log, warning,inProcessor.getOutDir(),inProcessor.wantMeganSummaries());
 			 Future<RMA6Scanner> future = executor.submit(task);
 			 scannerList.add(future);
 		  }

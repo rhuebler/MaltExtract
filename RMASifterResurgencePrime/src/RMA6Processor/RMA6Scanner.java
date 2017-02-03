@@ -43,9 +43,10 @@ public class RMA6Scanner {
 	private String outDir;
 	private Logger log;
 	private Logger warning;
+	private boolean wantMeganSummaries = false;
 	// constructor
 	public RMA6Scanner(String inDir, String name, Taxas tax, List<Integer> taxIds, NCBI_TreeReader tReader,
-			Logger log, Logger warning,String outDir){
+			Logger log, Logger warning,String outDir, boolean wantMeganSummaries){
 		this.inDir = inDir;
 		this.fileName =  name;
 		this.outDir = outDir;
@@ -54,6 +55,7 @@ public class RMA6Scanner {
 		this.treeReader = new NCBI_TreeReader(tReader);
 		this.log = log;
 		this.warning = warning;
+		this.wantMeganSummaries = wantMeganSummaries;
 		process();
 		}
 	// getters
@@ -74,8 +76,10 @@ public class RMA6Scanner {
 	private void process(){
 		try{
 			log.log(Level.INFO, "Scanning File: "+ fileName);
-			DataSummaryWriter dsWriter = new DataSummaryWriter(warning);
-			dsWriter.writeSummary(inDir, fileName, outDir);
+			if(wantMeganSummaries){
+				DataSummaryWriter dsWriter = new DataSummaryWriter(warning);
+				dsWriter.writeSummary(inDir, fileName, outDir);
+			}
 			Map<Integer,Integer> map = new HashMap<Integer,Integer>();
 			RMA6File rma6File = new RMA6File(inDir+fileName, "r");
 			Long location = rma6File.getFooterSectionRMA6().getStartClassification("Taxonomy");

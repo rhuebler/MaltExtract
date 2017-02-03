@@ -52,6 +52,7 @@ public class InputParameterProcessor {
 	private boolean reads = false;
 	private boolean crawl = false;
 	private double minComplexity = 0;
+	private boolean wantMeganSummaries = false;
 	// constructor
 	public double getMinComplexity(){
 		return this.minComplexity;
@@ -62,6 +63,9 @@ public class InputParameterProcessor {
 		process(params);	
 	}
 	// getters
+	public boolean wantMeganSummaries(){
+		return this.wantMeganSummaries;
+	}
 	public boolean getBlastHits(){
 		return this.alignment;
 	}
@@ -138,6 +142,7 @@ public class InputParameterProcessor {
     	    Option option_Crawl = Option.builder().longOpt("crawl").optionalArg(true).desc("Use all alignments for damage and edit distance").build();
     	    Option option_minComplexity = Option.builder().longOpt("minComp").hasArg().argName("minComplexity").optionalArg(true).desc("Use minimum complexity").build();
     	    Option option_List = Option.builder().longOpt("list").hasArg().argName("list").optionalArg(true).desc("Decide on which build in list to use (not enabled yet)").build();
+    	    Option option_MeganSummaries = Option.builder().longOpt("meganSummary").hasArg().argName("list").optionalArg(true).desc("Decide on which build in list to use (not enabled yet)").build();
     	    Options options = new Options();
     	    
     	    CommandLineParser parser = new DefaultParser();
@@ -160,6 +165,7 @@ public class InputParameterProcessor {
     	    options.addOption(option_Reads);
     	    options.addOption(option_Crawl);
     	    options.addOption(option_List);
+    	    options.addOption(option_MeganSummaries);
 
     	    try
     	    {
@@ -323,6 +329,9 @@ public class InputParameterProcessor {
     	        if(commandLine.hasOption("matches")&& behave != Filter.SCAN){
     	        	log.log(Level.INFO, "retrieve Alignments");
     	        	alignment = true;
+    	        }
+    	        if(commandLine.hasOption("meganSummary")){
+    	        	wantMeganSummaries = true;
     	        }
     	        if(commandLine.hasOption("h")){
     	        	String header = "RMAExtractor beta 0.1";

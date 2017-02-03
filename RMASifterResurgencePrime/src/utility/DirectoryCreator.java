@@ -14,8 +14,8 @@ public class DirectoryCreator {
  * @param crawl
  * @param reads
  */
-	public void process(Filter behave, String outDir, boolean hits, boolean crawl,boolean reads) {
-		if(!crawl){
+	public void process(Filter behave, String outDir, boolean hits, boolean crawl,boolean reads, boolean wantMeganSummaries) {
+		if(!crawl&&wantMeganSummaries){
 			new File(outDir+"/MeganSummaries/").mkdirs();
 		}
 		if(crawl){
