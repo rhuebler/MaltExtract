@@ -73,7 +73,7 @@ public class RMA6OutputProcessor {
 		return this.ancientNonDuplicateSum;
 	}
 	private void writeFilter(ArrayList<String> summary, String outDir){
-		String header = "Node\tNumberOfUnfilteredReads\tNumberOfFiltedReads\tNumberOfUnfiltedMatches\tnumberOfMatches";
+		String header = "Node\tNumberOfUnfilteredReads\tNumberOfFiltedReads\tNumberOfUnfiltedAlignments\tnumberOfAlignments";
 		summary.sort(null);
 		summary.add(0,header);
 	try{
@@ -166,7 +166,7 @@ public class RMA6OutputProcessor {
 			//problem is null lines in file
 			try{
 				summary.sort(null);
-				String header = "Taxon\tReference\tuniquePerReference\tnonStacked\tnonDuplicatesonReference\tTotalReadsOnReference\tReferenceLength";
+				String header = "Taxon\tReference\tuniquePerReference\tnonStacked\tnonDuplicatesonReference\tTotalAlignmentsOnReference\tReferenceLength";
 				summary.add(0, header);
 				Path file = Paths.get(outDir);
 				Files.write(file, summary, Charset.forName("UTF-8"));
@@ -282,7 +282,7 @@ public class RMA6OutputProcessor {
 			}
 			//write output
 			writeMisMap(misMatches, dir+"damageMismatch/"+fileName+"_damageMismatch"+".txt");
-			writeReadDist(readDistribution, dir+"readDist/"+fileName+"_readDist"+".txt");
+			writeReadDist(readDistribution, dir+"readDist/"+fileName+"_alignmentDist"+".txt");
 			writeEditDistance(editDistance, dir+"editDistance/"+fileName+"_editDistance"+".txt");
 			writePercentIdentity(percentIdentity, dir+"percentIdentity/"+fileName+"_percentIdentity"+".txt");
 			writeCoverageHistogram(coverageHistogram, dir+"readDist/"+fileName+"_coverageHist"+".txt");	
