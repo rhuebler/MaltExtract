@@ -83,17 +83,17 @@ public class NodeProcessor{
 		//processing
 		public void process(String inDir, String fileName, double topPercent, int maxLength){ 
 				if(behave == Filter.ANCIENT){
-					ancientProcessor = new RMA6TaxonDamageFilter(taxID, minPIdent, mapReader, verbose, log, log, wantReads, topPercent, maxLength,alignment);
+					ancientProcessor =  new ExperimentalRMA6AncientDestacker(taxID, minPIdent, mapReader, verbose, log, log, wantReads, topPercent, maxLength,alignment);
 				}else if(behave == Filter.NON){
-					defaultProcessor = new RMA6TaxonNonFilter(taxID, minPIdent, mapReader, verbose, log, log, wantReads, topPercent, maxLength,alignment);
+					defaultProcessor = new ExperimentalRMA6Destacker(taxID, minPIdent, mapReader, verbose, log, log, wantReads, topPercent, maxLength,alignment);
 				}else if(behave == Filter.ALL){
-					ancientNonDuplicateProcessor = new RMA6TaxonAncientNonDuplicate(taxID, minPIdent, mapReader, verbose, log, log, wantReads, topPercent, maxLength,alignment);
+					ancientNonDuplicateProcessor = new RMA6TaxonAncientNonDuplicate(taxID, minPIdent, mapReader, verbose, log, log, wantReads, topPercent, maxLength,alignment);//TODO depreciate
 				}else if(behave == Filter.NON_ANCIENT){
 					ancientProcessor = new ExperimentalRMA6AncientDestacker(taxID, minPIdent, mapReader, verbose, log, log, wantReads, topPercent, maxLength,alignment);
 					defaultProcessor = new ExperimentalRMA6Destacker(taxID, minPIdent, mapReader, verbose, log, log, wantReads, topPercent, maxLength,alignment);
 				}else if(behave == Filter.NONDUPLICATES ){
 					nonDuplicateProcessor = new RMA6TaxonNonDuplicateFilter(taxID, minPIdent, mapReader, verbose, log, log, wantReads, topPercent, maxLength,alignment);
-				}		
+				}		//TODO depreciated
 			this.taxName = getName(taxID);
 			// use ReadsIterator to get all Reads assigned to MegantaxID and print top percent to file
 			try(RMA6File rma6File = new RMA6File(inDir+fileName, "r")){

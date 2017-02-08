@@ -131,7 +131,7 @@ public class InputParameterProcessor {
     	    // long flags
     	    Option option_Threads = Option.builder("p").longOpt("threads").argName("1..maxNumberOfCores").hasArg().optionalArg(true).desc("How many cores to use?").build();		
     	    Option option_TopPercent = Option.builder("a").longOpt("top").argName("0.0-0.99").hasArg().optionalArg(true).desc("Use top 0.XX percent").build();
-    	    Option option_Filter = Option.builder("f").longOpt("filter").argName("default, ancient, nonduplicate, def_anc, nd_anc, scan").optionalArg(true).hasArg().desc("Use chosen filter").build();
+    	    Option option_Filter = Option.builder("f").longOpt("filter").argName("default, ancient, def_anc, scan").optionalArg(true).hasArg().desc("Use chosen filter").build();
     	    Option option_MaxLength = Option.builder().longOpt("maxReadLength").argName("maxReadLength").hasArg().optionalArg(true).desc("Set maximum read length").build();
     	    Option option_minPercentIdent = Option.builder().longOpt("minPI").argName("minPI").hasArg().optionalArg(true).desc("Set minimum percent identity to XX.X").build(); 
     	    Option option_Help = Option.builder("h").longOpt("help").optionalArg(true).desc("Print Help").build();
@@ -247,17 +247,17 @@ public class InputParameterProcessor {
     	            }else if(Pattern.compile(Pattern.quote("ancient"), Pattern.CASE_INSENSITIVE).matcher(commandLine.getOptionValue("filter")).find()){
     	            	this.behave = Filter.ANCIENT;
     	            	log.log(Level.INFO,"Custom Behaviour set to: "+commandLine.getOptionValue("filter"));
-    	            }else if(Pattern.compile(Pattern.quote("nonduplicate"), Pattern.CASE_INSENSITIVE).matcher(commandLine.getOptionValue("filter")).find()){
-    	            	this.behave = Filter.NONDUPLICATES;
-    	            	log.log(Level.INFO,"Custom Behaviour set to: "+commandLine.getOptionValue("filter"));
     	            }else if(Pattern.compile(Pattern.quote("scan"), Pattern.CASE_INSENSITIVE).matcher(commandLine.getOptionValue("filter")).find()){
     	            	this.behave = Filter.SCAN;
     	            	log.log(Level.INFO,"Custom Behaviour set to: "+commandLine.getOptionValue("filter"));
     	            }
-    	            else if(Pattern.compile(Pattern.quote("nd_anc"), Pattern.CASE_INSENSITIVE).matcher(commandLine.getOptionValue("filter")).find()){
-    	            	this.behave = Filter.ALL;
-    	            	log.log(Level.INFO,"Custom Behaviour set to: "+commandLine.getOptionValue("filter"));
-    	            }
+//    	            else if(Pattern.compile(Pattern.quote("nd_anc"), Pattern.CASE_INSENSITIVE).matcher(commandLine.getOptionValue("filter")).find()){
+//    	            	this.behave = Filter.ALL;
+//    	            	log.log(Level.INFO,"Custom Behaviour set to: "+commandLine.getOptionValue("filter"));
+//    	            }else if(Pattern.compile(Pattern.quote("nonduplicate"), Pattern.CASE_INSENSITIVE).matcher(commandLine.getOptionValue("filter")).find()){
+//    	            	this.behave = Filter.NONDUPLICATES;
+//    	            	log.log(Level.INFO,"Custom Behaviour set to: "+commandLine.getOptionValue("filter"));
+//    	            }
     	            else if(Pattern.compile(Pattern.quote("def_anc"), Pattern.CASE_INSENSITIVE).matcher(commandLine.getOptionValue("filter")).find()){
     	            	this.behave = Filter.NON_ANCIENT;
     	            	log.log(Level.INFO,"Custom Behaviour set to: "+commandLine.getOptionValue("filter"));
