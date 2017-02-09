@@ -37,6 +37,7 @@ public class ExperimentalRMA6Destacker extends RMA6TaxonProcessor {
 				al.setReadName(readName);
 				al.setReadLength(readLength);
 				al.setAcessionNumber(blocks[i].getRefSeqId());	
+				al.setSequence(sequence);
 				originalNumberOfAlignments++;
 				if(minPIdent <= al.getPIdent()){ // check for minPercentIdentity
 								//get mismatches
