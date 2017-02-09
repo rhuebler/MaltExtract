@@ -141,7 +141,7 @@ public class RMA6OutputProcessor {
 			}else{
 				name = "unassingned_name";
 			}	
-		Path file = Paths.get(outDir+name+"done"+".fasta");
+		Path file = Paths.get(outDir+name+".fasta");
 		Files.write(file, summary, Charset.forName("UTF-8"));
 		}catch(IOException io){
 			warning.log(Level.SEVERE,"Cannot write file"+ fileName, io);

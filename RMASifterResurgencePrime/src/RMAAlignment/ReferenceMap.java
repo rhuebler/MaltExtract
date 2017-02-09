@@ -12,10 +12,15 @@ public class ReferenceMap {
 	private double possible = 0;
 	private int length = 0;
 	private ArrayList<Alignment> nonStacked = new ArrayList<Alignment>();
+	private boolean turnedOn = true;
+	
 	public ReferenceMap(ArrayList<Alignment> input){
 		this.input = input;
 	}
 	//getters
+	public boolean wasTurnedOn(){
+		return this.turnedOn;
+	}
 	public ArrayList<Alignment> getNonStacked(){
 		return this.nonStacked;
 	}
@@ -102,7 +107,7 @@ public class ReferenceMap {
 			possible += (cEnd - cStart)+1;
 			for(int k = cStart; k<= cEnd; k++){
 				int coverage = coverageContainer.get(k);
-				if(coverage>1){
+				if(coverage>1 && turnedOn){
 					current.setStacked(true);
 				}
 				if(coverage == 1){

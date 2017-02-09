@@ -15,8 +15,12 @@ public class GetStackedReads {
 	private HashMap<Integer,Integer> coverageHistogram;
 	private int length;
 	private ArrayList<Alignment> nonStacked = new ArrayList<Alignment>();
+	private boolean turnedOn = false;
 	
 	//getters
+	public boolean wasTurnedOn(){
+		return this.turnedOn;
+	}
 	public  GetStackedReads(ArrayList<Alignment> list){
 		this.currentList = list;
 	}
@@ -58,6 +62,7 @@ public class GetStackedReads {
 			ReferenceMap refMap = new ReferenceMap(input);
 			refMap.process();
 			this.nonStacked = refMap.getNonStacked();
+			this.turnedOn = refMap.wasTurnedOn();
 		}
 		
 	}
