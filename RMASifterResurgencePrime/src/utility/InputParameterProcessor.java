@@ -113,7 +113,7 @@ public class InputParameterProcessor {
 		try {
 			 Scanner	in = new Scanner(f.getCanonicalFile());
 			 while(in.hasNext()){
-				 taxNames.add(in.nextLine().trim());
+				 taxNames.add(in.nextLine().trim().replace('_', ' '));
 			 }
 			 in.close();
 		 	}catch (FileNotFoundException e) {
@@ -219,7 +219,7 @@ public class InputParameterProcessor {
     	     				}else{
 							   log.info("Added Taxon: ");
 							   log.info(tax +" to analysis");
-							   taxNames.add(tax); 
+							   taxNames.add(tax.replace('_', ' ')); 
     	     				}
     	            	} catch (IOException e) {
 						warning.log(Level.WARNING,"IOException",e);
