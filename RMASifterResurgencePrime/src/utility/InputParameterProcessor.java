@@ -142,7 +142,7 @@ public class InputParameterProcessor {
     	    Option option_Crawl = Option.builder().longOpt("crawl").optionalArg(true).desc("Use all alignments for damage and edit distance").build();
     	    Option option_minComplexity = Option.builder().longOpt("minComp").hasArg().argName("minComplexity").optionalArg(true).desc("Use minimum complexity").build();
     	    Option option_List = Option.builder().longOpt("list").hasArg().argName("list").optionalArg(true).desc("Decide on which build in list to use (not enabled yet)").build();
-    	    Option option_MeganSummaries = Option.builder().longOpt("meganSummary").hasArg().argName("list").optionalArg(true).desc("Decide on which build in list to use (not enabled yet)").build();
+    	    Option option_MeganSummaries = Option.builder().longOpt("meganSummary").hasArg().argName("meganSummary").optionalArg(true).desc("Decide on which build in list to use (not enabled yet)").build();
     	    Options options = new Options();
     	    
     	    CommandLineParser parser = new DefaultParser();
