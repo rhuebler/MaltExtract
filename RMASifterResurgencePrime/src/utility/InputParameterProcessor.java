@@ -53,7 +53,11 @@ public class InputParameterProcessor {
 	private boolean crawl = false;
 	private double minComplexity = 0;
 	private boolean wantMeganSummaries = false;
+	private boolean destackOff = false;
 	// constructor
+	public boolean turnDestackingOff(){
+		return this.destackOff;
+	}
 	public double getMinComplexity(){
 		return this.minComplexity;
 	}
@@ -142,7 +146,8 @@ public class InputParameterProcessor {
     	    Option option_Crawl = Option.builder().longOpt("crawl").optionalArg(true).desc("Use all alignments for damage and edit distance").build();
     	    Option option_minComplexity = Option.builder().longOpt("minComp").hasArg().argName("minComplexity").optionalArg(true).desc("Use minimum complexity").build();
     	    Option option_List = Option.builder().longOpt("list").hasArg().argName("list").optionalArg(true).desc("Decide on which build in list to use (not enabled yet)").build();
-    	    Option option_MeganSummaries = Option.builder().longOpt("meganSummary").hasArg().argName("meganSummary").optionalArg(true).desc("Decide on which build in list to use (not enabled yet)").build();
+    	    Option option_MeganSummaries = Option.builder().longOpt("meganSummary").hasArg().argName("meganSummary").optionalArg(true).desc("Return Megan Summary Files").build();
+    	    Option option_DeStackOff = Option.builder().longOpt("destackingOff").hasArg().argName("turn off sestaking").optionalArg(true).desc("Turn Off automated stacked Read Removal only useful in >1 coverage data").build();
     	    Options options = new Options();
     	    
     	    CommandLineParser parser = new DefaultParser();
@@ -166,6 +171,7 @@ public class InputParameterProcessor {
     	    options.addOption(option_Crawl);
     	    options.addOption(option_List);
     	    options.addOption(option_MeganSummaries);
+    	    options.addOption(option_DeStackOff);
 
     	    try
     	    {
@@ -196,6 +202,7 @@ public class InputParameterProcessor {
     	            	}	
     	            }  
     	        }
+    	        
     	        if (commandLine.hasOption("output"))
     	        {
     	        	log.log(Level.INFO,"Output Directory set to: "+commandLine.getOptionValue("output"));
@@ -332,6 +339,9 @@ public class InputParameterProcessor {
     	        }
     	        if(commandLine.hasOption("meganSummary")){
     	        	wantMeganSummaries = true;
+    	        }
+    	        if(commandLine.hasOption("destackingOff")){
+    	        	this.destackOff = true;
     	        }
     	        if(commandLine.hasOption("h")){
     	        	String header = "RMAExtractor beta 0.1";

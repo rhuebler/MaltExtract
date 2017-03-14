@@ -98,7 +98,8 @@ public class RMAExtractor {
 					ConcurrentRMA6Processor task = new ConcurrentRMA6Processor(f.getParent() + "/", 
 							f.getName(), inProcessor.getOutDir(), mapReader, treeReader,taxIDs, inProcessor.getTopPercent(),
 							inProcessor.getMaxLength(),inProcessor.getMinPIdent(),inProcessor.getFilter(), inProcessor.getTaxas(),
-							inProcessor.isVerbose(), log, warning,inProcessor.wantReads(), inProcessor.getMinComplexity(), inProcessor.getBlastHits(),inProcessor.wantMeganSummaries());
+							inProcessor.isVerbose(), log, warning,inProcessor.wantReads(), inProcessor.getMinComplexity(), 
+							inProcessor.getBlastHits(),inProcessor.wantMeganSummaries(),inProcessor.turnDestackingOff());
 						Future<RMA6Processor> future=executor.submit(task);
 						processedFiles.add(future);
     		}//fileNames;
@@ -148,10 +149,10 @@ public class RMAExtractor {
 	
 }//class
 
-//TODO default plot all function 
+
 //TODO get RMAExtracterBeta into tools 
 //TODO What is acquiring the extra memory an error
-//TODO okay how to get the complete taxonomy path? works for now but slooowly
+
 //TODO plot Node distribution function
 //TODO resurrect GC content
-//TODO should I use the Blast format for alignment that Daniel uses?
+

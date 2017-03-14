@@ -7,8 +7,13 @@ import java.util.HashMap;
  *  Mainly serves as a Storage to identify the reference to calculate Read distribution and to mark duplicates 
  */
 public class CompositionMap {
+	private boolean turnOffDestacking= false;
 	public CompositionMap(HashMap<Integer,ArrayList<Alignment>> map){
 		setCompositionMap(map);
+	}
+	public CompositionMap(HashMap<Integer,ArrayList<Alignment>> map,boolean turnOffDestacking){
+		setCompositionMap(map);
+		this.turnOffDestacking = turnOffDestacking;
 	}
 private HashMap<Integer,ArrayList<Alignment>> compositionMap;// hashMap of ReferenceID to List of start positions
 private HashMap<String,ArrayList<Alignment>> resultsMap = new HashMap<String,ArrayList<Alignment>>();// hashMap of ReferenceID to List of start positions
@@ -105,6 +110,20 @@ public void calculateStatistics(){
 public void getNonStacked(){
 	//get nonstacked Reads
 	for(int key : compositionMap.keySet()){
+		if(turnOffDestacking){
+			for(Alignment al : compositionMap.get(key)){
+				String name = al.getReadName();
+				if(resultsMap.containsKey(name)){
+					ArrayList<Alignment> list = resultsMap.get(name);
+					list.add(al);
+					resultsMap.replace(name, list);
+				}else{
+					ArrayList<Alignment> list = new ArrayList<Alignment>();
+					list.add(al);
+					resultsMap.put(name, list);
+					}
+			}
+		}else{
 			GetStackedReads reads = new GetStackedReads(compositionMap.get(key));
 			reads.calculateStatistics();
 			for(Alignment al : reads.getNonStacked()){
@@ -117,6 +136,7 @@ public void getNonStacked(){
 					ArrayList<Alignment> list = new ArrayList<Alignment>();
 					list.add(al);
 					resultsMap.put(name, list);
+					}
 				}
 			}
 		}

@@ -36,9 +36,10 @@ public class NodeProcessor{
 		private double minPIdent;
 		private double minComplexity;
 		private boolean alignment = false;
+		private boolean turnOffDestacking = false;
 		//constructors
 		public NodeProcessor(int id, double minPIdent, NCBI_MapReader reader, boolean v, Logger log, Logger warning,
-				boolean reads, Filter behave, double minCompl,boolean alignment) {
+				boolean reads, Filter behave, double minCompl,boolean alignment,boolean turnOffDestacking) {
 			this.taxID = id;
 			this.minPIdent = minPIdent;
 			this.mapReader = reader;
@@ -49,7 +50,7 @@ public class NodeProcessor{
 			this.behave = behave;
 			this.minComplexity = minCompl;
 			this.alignment = alignment;
-			
+			this.turnOffDestacking = turnOffDestacking;
 		}
 		//getters
 		// calculate complexity of read from Megan code
@@ -83,14 +84,14 @@ public class NodeProcessor{
 		//processing
 		public void process(String inDir, String fileName, double topPercent, int maxLength){ 
 				if(behave == Filter.ANCIENT){
-					ancientProcessor =  new ExperimentalRMA6AncientDestacker(taxID, minPIdent, mapReader, verbose, log, log, wantReads, topPercent, maxLength,alignment);
+					ancientProcessor =  new ExperimentalRMA6AncientDestacker(taxID, minPIdent, mapReader, verbose, log, log, wantReads, topPercent, maxLength,alignment,turnOffDestacking);
 				}else if(behave == Filter.NON){
-					defaultProcessor = new ExperimentalRMA6Destacker(taxID, minPIdent, mapReader, verbose, log, log, wantReads, topPercent, maxLength,alignment);
+					defaultProcessor = new ExperimentalRMA6Destacker(taxID, minPIdent, mapReader, verbose, log, log, wantReads, topPercent, maxLength,alignment,turnOffDestacking);
 				}else if(behave == Filter.ALL){
 					ancientNonDuplicateProcessor = new RMA6TaxonAncientNonDuplicate(taxID, minPIdent, mapReader, verbose, log, log, wantReads, topPercent, maxLength,alignment);//TODO depreciate
 				}else if(behave == Filter.NON_ANCIENT){
-					ancientProcessor = new ExperimentalRMA6AncientDestacker(taxID, minPIdent, mapReader, verbose, log, log, wantReads, topPercent, maxLength,alignment);
-					defaultProcessor = new ExperimentalRMA6Destacker(taxID, minPIdent, mapReader, verbose, log, log, wantReads, topPercent, maxLength,alignment);
+					ancientProcessor = new ExperimentalRMA6AncientDestacker(taxID, minPIdent, mapReader, verbose, log, log, wantReads, topPercent, maxLength,alignment,turnOffDestacking);
+					defaultProcessor = new ExperimentalRMA6Destacker(taxID, minPIdent, mapReader, verbose, log, log, wantReads, topPercent, maxLength,alignment,turnOffDestacking);
 				}else if(behave == Filter.NONDUPLICATES ){
 					nonDuplicateProcessor = new RMA6TaxonNonDuplicateFilter(taxID, minPIdent, mapReader, verbose, log, log, wantReads, topPercent, maxLength,alignment);
 				}		//TODO depreciated

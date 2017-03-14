@@ -60,10 +60,11 @@ public class RMA6Processor {
 	private int threads = 1;
 	private double minComplexity;
 	private boolean wantMeganSummaries;
+	private boolean turnOffDestacking;
 	// constructor
 	public RMA6Processor(String inDir, String fileName, String outDir, NCBI_MapReader mapReader,
 			NCBI_TreeReader treeReader, int maxLength, double pIdent, Filter b, Taxas t, boolean verbose,
-			Logger log, Logger warning, boolean readInf, double minCompl, boolean alignment, boolean wantMeganSummaries) {
+			Logger log, Logger warning, boolean readInf, double minCompl, boolean alignment, boolean wantMeganSummaries, boolean turnOffDestacking) {
 		this.inDir = inDir;
 		this.outDir = outDir;
 		this.fileName = fileName;
@@ -80,6 +81,7 @@ public class RMA6Processor {
 		this.reads = readInf;
 		this.minComplexity = minCompl;
 		this.wantMeganSummaries = wantMeganSummaries;
+		this.turnOffDestacking = turnOffDestacking;
 	}
 	
 	//setters
@@ -158,7 +160,7 @@ public void process(List<Integer>taxIDs, double topPercent) {// processing
 	executor=(ThreadPoolExecutor) Executors.newFixedThreadPool(threads);
 	HashMap<Integer,Future<NodeProcessor>> results =  new HashMap<Integer,Future<NodeProcessor>>();
 		for(Integer id : idsToProcess){
-			NodeProcessor nodeProcessor = new NodeProcessor(id, minPIdent, mapReader, verbose,log, warning,reads,behave, minComplexity,alignments);
+			NodeProcessor nodeProcessor = new NodeProcessor(id, minPIdent, mapReader, verbose,log, warning,reads,behave, minComplexity,alignments,turnOffDestacking);
 			ConcurrentNodeProcessor task = new ConcurrentNodeProcessor(nodeProcessor,inDir, fileName, topPercent, maxLength);
 			Future<NodeProcessor> future = executor.submit(task);
 			results.put(id, future);
