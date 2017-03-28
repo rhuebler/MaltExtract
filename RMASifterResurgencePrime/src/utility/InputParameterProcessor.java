@@ -124,6 +124,17 @@ public class InputParameterProcessor {
 		 warning.log(Level.WARNING,"File Not Found",e);
 		}		
 	}	
+	private void readFileList(File f) throws IOException{
+		try {
+			 Scanner	in = new Scanner(f.getCanonicalFile());
+			 while(in.hasNext()){
+				 fileNames.add(in.nextLine());
+			 }
+			 in.close();
+		 	}catch (FileNotFoundException e) {
+		 warning.log(Level.WARNING,"File Not Found",e);
+		}		
+	}	
 	private void process(String[] parameters){	
     	 CommandLine commandLine;
     	 	// Short Flags
@@ -195,7 +206,7 @@ public class InputParameterProcessor {
     	            				this.fileNames.add(inFile.getPath()+"/" + name);
     	            		}else if(inFile.isFile()){// is File
     	            			log.info(inFile.getPath());
-    	            			this.fileNames.add(inFile.getPath());
+    	            			readFileList(inFile);
     	            		}
     	            	}catch(IOException io){
     	            		warning.log(Level.SEVERE,"Can't open File", io);
