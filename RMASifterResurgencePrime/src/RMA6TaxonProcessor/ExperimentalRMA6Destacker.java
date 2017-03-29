@@ -115,5 +115,7 @@ public class ExperimentalRMA6Destacker extends RMA6TaxonProcessor {
 		setReads(lines);
 		setAlignments(alignments);
 		calculateReadLengthDistribution();
+		strain = null;
+		
 	}//process
 }

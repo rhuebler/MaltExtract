@@ -122,6 +122,7 @@ protected void setReadDistribution(CompositionMap map){
 		for(int k : histogram.keySet())
 			line += "\t" + histogram.get(k);
 		this.coverageLine = line;
+		map=null; // unassign Map at the end 
 	}else{
 		this.readDistribution = taxName+"\tNA\t0\t0\t0\t0\t0";
 		this.coverageLine = taxName+"\tNA\t0\t0\t0\t0\t0\t0\t0\t0\t0\t0\t0\t0";
