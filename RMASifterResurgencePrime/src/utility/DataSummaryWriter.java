@@ -31,8 +31,8 @@ public class DataSummaryWriter {
 			if(f.canRead() && f.canRead()){
 				file.setFileFromExistingFile(f.getCanonicalPath(), true);
 				file.setReadOnly(true);
-				IConnector connector = file.getDataConnector();
-				SyncArchiveAndDataTable.syncArchive2Summary(file.getFileName(), connector, table, sampleAttributeTable);
+				IConnector connector = file.getConnector();
+				SyncArchiveAndDataTable.syncArchive2Summary(false, file.getFileName(), connector, table, sampleAttributeTable);
 				if(!fileName.endsWith(".rma6"))
 					fileName+=".rma6";
 				ArrayList<String> output = new ArrayList<String>();

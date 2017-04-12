@@ -194,19 +194,22 @@ public class InputParameterProcessor {
     	            for(String arg :commandLine.getOptionValues("input")){
     	            	try{
     	            		File inFile = null;
-    	            		if(new File(arg).getParent()!=null){
+    	            		if(new File(arg).getParent()!=null){//get Path of inFile either by getting the canonical Path from the parent
     	            			inFile = new File(new File(arg).getParentFile().getCanonicalPath()+"/"+ new File(arg).getName());
-    	            		}else {
+    	            		}else {// or by pathching together the Path
     	            			inFile = new File(System.getProperty("user.dir")+"/"+arg);
     	            		}
-    	            		if(inFile.isDirectory()){
+    	            		if(inFile.isDirectory()){ // if the file is an directory
     	            			 log.info(arg);
-    	            			for(String name : inFile.list())
+    	            			for(String name : inFile.list())//if file ends with RMA6 or is as a soft link at to files
     	            				if(name.endsWith("rma6")|| Files.isSymbolicLink(new File(inFile.getPath()+"/" + name).toPath()))
     	            				this.fileNames.add(inFile.getPath()+"/" + name);
     	            		}else if(inFile.isFile()){// is File
-    	            			log.info(inFile.getPath());
-    	            			readFileList(inFile);
+    	            			if(arg.endsWith("rma6")||Files.isSymbolicLink(new File(inFile.getPath()).toPath())){ // test if file can be read as if text file that contains names
+    	            				log.info(inFile.getPath());
+    	            				fileNames.add(inFile.getPath());
+    	            			}else{
+    	            			readFileList(inFile);}
     	            		}
     	            	}catch(IOException io){
     	            		warning.log(Level.SEVERE,"Can't open File", io);

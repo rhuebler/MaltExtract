@@ -23,6 +23,7 @@ import RMA6Processor.RMA6Processor;
 import RMA6Processor.RMA6Scanner;
 import behaviour.Filter;
 import behaviour.Taxas;
+import jloda.util.PeakMemoryUsageMonitor;
 import utility.DirectoryCreator;
 import utility.InputParameterProcessor;
 import utility.ScanSummaryWriter;
@@ -52,6 +53,7 @@ public class RMAExtractor {
 	}
 	public static void main(String[] args){
 		long startTime = System.nanoTime();
+		 PeakMemoryUsageMonitor.start();
 		InputParameterProcessor inProcessor = new InputParameterProcessor(args ,log, warning);
 		new File(inProcessor.getOutDir()).mkdirs();// make outdir before
 		Handler handler = null;
@@ -145,6 +147,8 @@ public class RMAExtractor {
 	  }
 		long endTime = System.nanoTime();
 		log.log(Level.INFO,"Runtime: "+ (endTime - startTime)/1000000000 +" Seconds");
+		log.log(Level.INFO,"Total time:  " + PeakMemoryUsageMonitor.getSecondsSinceStartString());
+		log.log(Level.INFO,"Peak memory: " + PeakMemoryUsageMonitor.getPeakUsageString());
 	}//main
 	
 }//class
