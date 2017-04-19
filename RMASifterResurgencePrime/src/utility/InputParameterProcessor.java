@@ -158,7 +158,7 @@ public class InputParameterProcessor {
     	    Option option_minComplexity = Option.builder().longOpt("minComp").hasArg().argName("minComplexity").optionalArg(true).desc("Use minimum complexity").build();
     	    Option option_List = Option.builder().longOpt("list").hasArg().argName("list").optionalArg(true).desc("Decide on which build in list to use (not enabled yet)").build();
     	    Option option_MeganSummaries = Option.builder().longOpt("meganSummary").hasArg().argName("meganSummary").optionalArg(true).desc("Return Megan Summary Files").build();
-    	    Option option_DeStackOff = Option.builder().longOpt("destackingOff").hasArg().argName("turn off sestaking").optionalArg(true).desc("Turn Off automated stacked Read Removal only useful in >1 coverage data").build();
+    	    Option option_DeStackOff = Option.builder().longOpt("destackingOff").hasArg().argName("turn off destaking").optionalArg(true).desc("Turn Off automated stacked Read Removal only useful in >1 coverage data").build();
     	    Options options = new Options();
     	    
     	    CommandLineParser parser = new DefaultParser();
