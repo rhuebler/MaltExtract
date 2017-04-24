@@ -147,8 +147,9 @@ public class RMAExtractor {
 	  }
 		long endTime = System.nanoTime();
 		log.log(Level.INFO,"Runtime: "+ (endTime - startTime)/1000000000 +" Seconds");
-		log.log(Level.INFO,"Total time:  " + PeakMemoryUsageMonitor.getSecondsSinceStartString());
 		log.log(Level.INFO,"Peak memory: " + PeakMemoryUsageMonitor.getPeakUsageString());
+		log.log(Level.INFO,"Shutdown");
+		System.exit(0);// shutdown
 	}//main
 	
 }//class
