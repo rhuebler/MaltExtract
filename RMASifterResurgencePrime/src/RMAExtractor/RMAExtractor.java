@@ -137,8 +137,10 @@ public class RMAExtractor {
 				future.get();
 			} catch (InterruptedException e) {
 				e.printStackTrace();
+				System.exit(1);
 			} catch (ExecutionException e) {
 				e.printStackTrace();
+				System.exit(1);
 			}
 			  }
 		  }	  

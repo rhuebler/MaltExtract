@@ -125,8 +125,10 @@ public class SummaryWriter {
 				  
 			}catch (InterruptedException e) {
 				warning.log(Level.SEVERE, "Interuption Error" , e);
+				System.exit(1);
 			} catch (ExecutionException e) {
 				warning.log(Level.SEVERE, "Execution Error", e);
+				System.exit(1);
 			}
 			   
 		   }//for
@@ -150,6 +152,7 @@ public class SummaryWriter {
 		Files.write(file, summary, Charset.forName("UTF-8"));
 		}catch(IOException io){
 			warning.log(Level.SEVERE, "Error", io);
+			System.exit(1);
 		}
 	}
 }
