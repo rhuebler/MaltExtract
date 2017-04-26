@@ -56,7 +56,6 @@ public class ExperimentalRMA6Destacker extends RMA6TaxonProcessor {
 			}
 	}		
 	public void process(){ 
-		
 		CompositionMap map = new CompositionMap(taxonMap,turnOffDestacking);
 		map.process();
 		map.getNonStacked();
@@ -66,13 +65,17 @@ public class ExperimentalRMA6Destacker extends RMA6TaxonProcessor {
 			double pIdent = 0;
 			int editDistance = 0;
 			String sequence = "";
+			
 			for(Alignment al : list.get(key)){
+				if(wantAlignments&&k==0)
+					
 				numMatches++;	
 				pIdent+= al.getPIdent();
 				editDistance += al.getEditDistance();
 				container.processAlignment(al);
-				if(wantAlignments)
-					alignments.add(al.getText());
+				if(wantAlignments){
+					alignments.add(al.getReadName());
+					alignments.add(al.getText());}
 				if(k==0){
 					lengths.add(al.getReadLength());
 					if(wantReads)

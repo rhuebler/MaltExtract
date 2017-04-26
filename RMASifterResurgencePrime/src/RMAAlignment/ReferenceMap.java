@@ -39,6 +39,7 @@ public class ReferenceMap {
 	public HashMap<Integer,Integer> getCoverageHistogram(){
 		return this.coverageHistogram;
 	}
+	//differentiate different plasmids and chromosomes by length and calculate total length 
 	public void process(){
 		nonStacked.addAll(input);
 		HashMap<Integer,Integer> coverageHistogram = new HashMap<Integer,Integer>();
@@ -58,13 +59,13 @@ public class ReferenceMap {
 			}
 		}
 		for(int key : totalReferences.keySet()){
-			calculate(totalReferences.get(key));
+			calculate(totalReferences.get(key),key);
 			length+=key;
 		}		
 		
 	}
 	
-	private void calculate (ArrayList<Alignment> alignments){
+	private void calculate (ArrayList<Alignment> alignments, int length){
 		int i = 0; // better solution implemented
 		HashMap<Integer,Integer> coverageContainer = new HashMap<Integer,Integer>();
 		while(i<alignments.size()){
@@ -92,6 +93,14 @@ public class ReferenceMap {
 		i = 0;
 		HashSet<Alignment> stacked = new HashSet<Alignment>();
 		
+		//calculate average coverage on reference and turnOff stackedReadRemoval if too high
+		double averageCoverage = 0;
+		for(int k: coverageContainer.keySet())
+			averageCoverage+=coverageContainer.get(k);
+		averageCoverage/=length;
+		if(averageCoverage>=5)
+			turnedOn = false;
+		
 		while(i<alignments.size()){
 		//calculate unique positions per read plus average distance between current and next read
 			Alignment current = alignments.get(i);
@@ -105,43 +114,19 @@ public class ReferenceMap {
 				cEnd = current.getEnd();		
 			}
 			possible += (cEnd - cStart)+1;
+			
+			
 			for(int k = cStart; k<= cEnd; k++){
 				int coverage = coverageContainer.get(k);
 				if(coverage>1 && turnedOn){
 					current.setStacked(true);
+					stacked.add(current);
 				}
-				if(coverage == 1){
-					coverageHistogram.replace(1, coverageHistogram.get(1)+1);
-				}else if(coverage == 2){
-					coverageHistogram.replace(2, coverageHistogram.get(2)+1);
-					stacked.add(current);
-				}else if(coverage == 3){
-					coverageHistogram.replace(3, coverageHistogram.get(3)+1);
-					stacked.add(current);
-				}else if(coverage == 4){
-					coverageHistogram.replace(4, coverageHistogram.get(4)+1);
-					stacked.add(current);
-				}else if(coverage == 5){
-					coverageHistogram.replace(5, coverageHistogram.get(5)+1);
-					stacked.add(current);
-				}else if(coverage == 6){
-					coverageHistogram.replace(6, coverageHistogram.get(6)+1);
-					stacked.add(current);
-				}else if(coverage == 7){
-					coverageHistogram.replace(7, coverageHistogram.get(7)+1);
-					stacked.add(current);
-				}else if(coverage == 8){
-					coverageHistogram.replace(8, coverageHistogram.get(8)+1);
-					stacked.add(current);
-				}else if(coverage == 9){
-					coverageHistogram.replace(9, coverageHistogram.get(9)+1);
-					stacked.add(current);
-				}else if(coverage == 10){
-					coverageHistogram.replace(10, coverageHistogram.get(10)+1);
-					stacked.add(current);
+				if(coverage <= 10){
+					coverageHistogram.replace(coverage, coverageHistogram.get(coverage)+1);	
 				}else if(coverage >= 11){
 					coverageHistogram.replace(11, coverageHistogram.get(11)+1);
-					stacked.add(current);
+					
 				}
 			}
 			i++;

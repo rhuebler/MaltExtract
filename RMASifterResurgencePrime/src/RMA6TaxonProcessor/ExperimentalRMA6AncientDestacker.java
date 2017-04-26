@@ -70,8 +70,9 @@ public class ExperimentalRMA6AncientDestacker extends RMA6TaxonProcessor {
 				pIdent+= al.getPIdent();
 				editDistance += al.getEditDistance();
 				container.processAlignment(al);
-				if(wantAlignments)
-					alignments.add(al.getText());
+				if(wantAlignments){
+					alignments.add(al.getReadName());
+					alignments.add(al.getText());}
 				if(k==0){
 					lengths.add(al.getReadLength());
 					if(wantReads)
