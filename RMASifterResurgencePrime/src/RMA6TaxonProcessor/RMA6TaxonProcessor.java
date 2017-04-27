@@ -56,6 +56,7 @@ protected StrainMisMatchContainer container = new StrainMisMatchContainer();
 protected String readLengthStatistics;
 protected int refLength = 0;
 protected ArrayList<Integer> lengths = new ArrayList<Integer>();
+protected boolean turnedOn = true;
 //constructor
 public RMA6TaxonProcessor(Integer id, double pID, NCBI_MapReader reader, boolean v, Logger log, Logger warning, double topPercent, int maxLength){
 	this.mapReader = reader;
@@ -191,6 +192,9 @@ protected void setNumMatches(int matches){
 
 
 //getters
+public boolean wasTurnedOn(){
+	return this.turnedOn;
+}
 public String getFilterLine(){
 	String s = taxName+"\t"+originalNumberOfReads + "\t" +numOfReads +"\t"+originalNumberOfAlignments+"\t" + numMatches;
 	return s;
@@ -262,7 +266,9 @@ public int getNumberOfReads(){
 public String getReadDistribution(){
 	return this.readDistribution;
 }
-
+public void setTurnedOn(boolean b){
+	this.turnedOn = b;
+}
 public void processMatchBlocks(IMatchBlock[] blocks, String readName, int lenght, String readSequence){ 
 
 	}// void 

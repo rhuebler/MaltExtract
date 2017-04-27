@@ -15,7 +15,7 @@ public class GetStackedReads {
 	private HashMap<Integer,Integer> coverageHistogram;
 	private int length;
 	private ArrayList<Alignment> nonStacked = new ArrayList<Alignment>();
-	private boolean turnedOn = false;
+	private boolean turnedOn = true;
 	
 	//getters
 	public boolean wasTurnedOn(){

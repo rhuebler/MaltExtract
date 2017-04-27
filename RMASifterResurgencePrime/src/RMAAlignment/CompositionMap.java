@@ -22,8 +22,11 @@ private int maxID;
 private ArrayList<Double> generalStatistics;
 private HashMap<Integer,Integer> coverageHistogram;
 private int refLength = 0;
-
+private boolean turnedOn = true;
 //getter
+public boolean wasTurnedOn(){
+	return this.turnedOn;
+}
 public HashMap<String,ArrayList<Alignment>> getResultsMap(){
 	return this.resultsMap;
 }
@@ -126,6 +129,8 @@ public void getNonStacked(){
 		}else{
 			GetStackedReads reads = new GetStackedReads(compositionMap.get(key));
 			reads.calculateStatistics();
+			if(!reads.wasTurnedOn())
+				turnedOn = false;
 			for(Alignment al : reads.getNonStacked()){
 				String name = al.getReadName();
 				if(resultsMap.containsKey(name)){

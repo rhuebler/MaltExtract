@@ -13,7 +13,7 @@ import strainMap.StrainMap;
 public class ExperimentalRMA6AncientDestacker extends RMA6TaxonProcessor {
 	protected boolean wantReads = false;
 	protected boolean wantAlignments = false;
-	protected boolean turnOffDestacking = false;
+	
 	public ExperimentalRMA6AncientDestacker(Integer id, double pID, NCBI_MapReader reader, boolean v, Logger log, Logger warning,double tp,int mL) {
 		super(id, pID, reader, v, log, warning,tp,mL);
 	}
@@ -22,7 +22,6 @@ public class ExperimentalRMA6AncientDestacker extends RMA6TaxonProcessor {
 		super(id,pID, reader, v, log, warning,tp,mL);
 		this.wantReads =reads;
 		this.wantAlignments = wantAls;
-		this.turnOffDestacking =  turnOffDestacking;
 	}
 	
 	public void processMatchBlocks(IMatchBlock[] blocks, String readName, int readLength, String sequence){
@@ -56,7 +55,7 @@ public class ExperimentalRMA6AncientDestacker extends RMA6TaxonProcessor {
 	}		
 	public void process(){ 
 		
-		CompositionMap map = new CompositionMap(taxonMap,turnOffDestacking);
+		CompositionMap map = new CompositionMap(taxonMap);
 		map.process();
 		map.getNonStacked();
 		HashMap<String,ArrayList<Alignment>> list =map.getResultsMap();
@@ -70,9 +69,8 @@ public class ExperimentalRMA6AncientDestacker extends RMA6TaxonProcessor {
 				pIdent+= al.getPIdent();
 				editDistance += al.getEditDistance();
 				container.processAlignment(al);
-				if(wantAlignments){
-					alignments.add(al.getReadName());
-					alignments.add(al.getText());}
+				if(wantAlignments)
+					alignments.add(al.getText());
 				if(k==0){
 					lengths.add(al.getReadLength());
 					if(wantReads)
@@ -113,7 +111,7 @@ public class ExperimentalRMA6AncientDestacker extends RMA6TaxonProcessor {
 		setPercentIdentityHistogram(pIdents);
 		setReads(lines);
 		setAlignments(alignments);
+		setTurnedOn(map.wasTurnedOn());
 		calculateReadLengthDistribution();
-		strain = null;
 	}//process
 }

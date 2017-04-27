@@ -98,7 +98,7 @@ public class ReferenceMap {
 		for(int k: coverageContainer.keySet())
 			averageCoverage+=coverageContainer.get(k);
 		averageCoverage/=length;
-		if(averageCoverage>=5)
+		if(averageCoverage>=10)
 			turnedOn = false;
 		
 		while(i<alignments.size()){
