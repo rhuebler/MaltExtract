@@ -153,7 +153,7 @@ public void process(){
 	int max=0; int maxKey=0;
 	for(int key : map.keySet()){
 		results.put(key, map.get(key).size());
-		if(map.get(key).size()>=max){
+		if(map.get(key).size()>max){
 			maxKey=key;
 			max= map.get(key).size();
 			}
