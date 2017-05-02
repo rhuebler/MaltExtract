@@ -93,7 +93,7 @@ public class ExperimentalRMA6Destacker extends RMA6TaxonProcessor {
 	                    name = ">"+readName;
 					else
 						name = readName;
-					lines.add(name);
+					lines.add(name+"\t"+Math.round(editDistance/k));
 	                if (!name.endsWith("\n"))
 	                    name += "\n";
 	                String readData = sequence;

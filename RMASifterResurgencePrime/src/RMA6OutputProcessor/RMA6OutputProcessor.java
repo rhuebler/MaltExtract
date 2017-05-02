@@ -73,7 +73,7 @@ public class RMA6OutputProcessor {
 		return this.ancientNonDuplicateSum;
 	}
 	private void writeFilter(ArrayList<String> summary, String outDir){
-		String header = "Node\tNumberOfUnfilteredReads\tNumberOfFiltedReads\tNumberOfUnfiltedAlignments\tnumberOfAlignments";
+		String header = "Node\tNumberOfUnfilteredReads\tNumberOfFiltedReads\tNumberOfUnfiltedAlignments\tnumberOfAlignments\tturnedOn?";
 		summary.sort(null);
 		summary.add(0,header);
 	try{

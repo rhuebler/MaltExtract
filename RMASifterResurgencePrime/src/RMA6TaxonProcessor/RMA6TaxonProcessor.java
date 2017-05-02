@@ -196,7 +196,11 @@ public boolean wasTurnedOn(){
 	return this.turnedOn;
 }
 public String getFilterLine(){
-	String s = taxName+"\t"+originalNumberOfReads + "\t" +numOfReads +"\t"+originalNumberOfAlignments+"\t" + numMatches;
+	String s;
+	if(turnedOn)
+		s = taxName+"\t"+originalNumberOfReads + "\t" +numOfReads +"\t"+originalNumberOfAlignments+"\t" + numMatches+"\t"+"On";
+	else
+		s = taxName+"\t"+originalNumberOfReads + "\t" +numOfReads +"\t"+originalNumberOfAlignments+"\t" + numMatches+"\t"+"Off";
 	return s;
 }
 public String getCoverageLine(){
