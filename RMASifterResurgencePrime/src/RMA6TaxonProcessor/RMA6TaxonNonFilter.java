@@ -11,7 +11,7 @@ import strainMap.StrainMap;
 /**
  * Default filter that just outputs additional proofs without any filtering
  * @author huebler
- *
+ * @deprecated
  */
 public class RMA6TaxonNonFilter  extends RMA6TaxonProcessor{
 	protected boolean wantReads = false;
@@ -95,7 +95,7 @@ public class RMA6TaxonNonFilter  extends RMA6TaxonProcessor{
 		setDamageLine(strain.getLine());
 		setNumberOfReads(numOfReads);
 		setNumMatches(numMatches);
-		setReadDistribution(map);
+		processCompositionMap(map);
 		setEditDistanceHistogram(distances);
 		setPercentIdentityHistogram(pIdents);
 		setReads(lines);

@@ -176,6 +176,20 @@ public class RMA6OutputProcessor {
 				warning.log(Level.SEVERE,"Cannot write file "+ outDir, np);
 			}
 	}
+	private void writeAdditionalEntries(List<String> summary, String outDir){
+		//problem is null lines in file
+		try{
+			summary.sort(null);
+			String header = "TargetNode\tadditionalEntries";
+			summary.add(0, header);
+			Path file = Paths.get(outDir);
+			Files.write(file, summary, Charset.forName("UTF-8"));
+		}catch(IOException io){
+			warning.log(Level.SEVERE,"Cannot write file " + outDir, io);
+		}catch(NullPointerException np){
+			warning.log(Level.SEVERE,"Cannot write file "+ outDir, np);
+		}
+}
 	private void writeEditDistance(List<String> histo, String outDir){
 		try{
 			String header = "Node\t0\t1\t2\t3\t4\t5\thigher";
@@ -283,6 +297,7 @@ public class RMA6OutputProcessor {
 			//write output
 			writeMisMap(misMatches, dir+"damageMismatch/"+fileName+"_damageMismatch"+".txt");
 			writeReadDist(readDistribution, dir+"readDist/"+fileName+"_alignmentDist"+".txt");
+			writeAdditionalEntries(readDistribution, dir+"readDist/"+fileName+"_additionalNodeEntries"+".txt");
 			writeEditDistance(editDistance, dir+"editDistance/"+fileName+"_editDistance"+".txt");
 			writePercentIdentity(percentIdentity, dir+"percentIdentity/"+fileName+"_percentIdentity"+".txt");
 			writeCoverageHistogram(coverageHistogram, dir+"readDist/"+fileName+"_coverageHist"+".txt");	

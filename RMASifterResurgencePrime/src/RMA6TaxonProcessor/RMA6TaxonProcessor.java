@@ -57,6 +57,7 @@ protected String readLengthStatistics;
 protected int refLength = 0;
 protected ArrayList<Integer> lengths = new ArrayList<Integer>();
 protected boolean turnedOn = true;
+protected String additionalEntries = "none";
 //constructor
 public RMA6TaxonProcessor(Integer id, double pID, NCBI_MapReader reader, boolean v, Logger log, Logger warning, double topPercent, int maxLength){
 	this.mapReader = reader;
@@ -108,21 +109,33 @@ protected void setAlignments(ArrayList<String> list){
 protected void setDamageLine(String s){
 	this.damageLine = s;
 }
-protected void setReadDistribution(CompositionMap map){
+protected void processCompositionMap(CompositionMap map){
 	DecimalFormat df = new DecimalFormat("#.###");
 	if(map != null){
 		map.calculateStatistics();
+		//setReadDist
 		String maxReference = getName(map.getMaxID());
 		String s = taxName +"\t" + maxReference;;
 		for(double d : map.getGenaralStatistics())
 			s += "\t" + df.format(d);
 		this.readDistribution=s;
-	
+		
+		//set coverage Line
 		HashMap<Integer,Integer> histogram = map.getConverageHistogram();
 		String line = taxName+"\t" + maxReference;
 		for(int k : histogram.keySet())
 			line += "\t" + histogram.get(k);
 		this.coverageLine = line;
+		ArrayList<Integer> list = map.getAllTopReferences();
+		String addEntries = taxName;
+		if(list.size()>0){
+			for(int reference : list){
+				addEntries+="\t"+getName(reference);
+			}
+		}else{
+			addEntries = addEntries+="\t"+"none";
+		}
+		this.additionalEntries = addEntries;
 		map=null; // unassign Map at the end 
 	}else{
 		this.readDistribution = taxName+"\tNA\t0\t0\t0\t0\t0";
@@ -189,7 +202,9 @@ protected void setPercentIdentityHistogram(ArrayList<Double> list){
 protected void setNumMatches(int matches){
 	this.numMatches = matches;
 }
-
+public void setTurnedOn(boolean b){
+	this.turnedOn = b;
+}
 
 //getters
 public boolean wasTurnedOn(){
@@ -270,9 +285,10 @@ public int getNumberOfReads(){
 public String getReadDistribution(){
 	return this.readDistribution;
 }
-public void setTurnedOn(boolean b){
-	this.turnedOn = b;
+public String getAdditionalEntries(){
+	return this.additionalEntries;
 }
+
 public void processMatchBlocks(IMatchBlock[] blocks, String readName, int lenght, String readSequence){ 
 
 	}// void 

@@ -13,7 +13,7 @@ import strainMap.StrainMap;
  * Due to technical constraints at the moment we only use the highest scoring BLast it when we remove duplicates at the moment
  * Runtime should be longer for duplicate removal due to passing all data one additional time 
  * @author huebler
- *
+ * @deprecated
  */
 public class RMA6TaxonAncientNonDuplicate  extends RMA6TaxonDamageFilter{
 	/**
@@ -31,7 +31,7 @@ public class RMA6TaxonAncientNonDuplicate  extends RMA6TaxonDamageFilter{
 		CompositionMap map = new CompositionMap(taxonMap);
 		map.process();
 		map.markAllDuplicates();
-		setReadDistribution(map);
+		processCompositionMap(map);
 		taxonMap = map.getCompositionMap();
 		for(int key : taxonMap.keySet()){
 			for(Alignment entry : taxonMap.get(key)){
@@ -70,7 +70,7 @@ public class RMA6TaxonAncientNonDuplicate  extends RMA6TaxonDamageFilter{
 		StrainMap strain = new StrainMap(taxName,container,numMatches);
 		setDamageLine(strain.getLine());
 		setNumberOfReads(numOfReads);
-		setReadDistribution(map);
+		processCompositionMap(map);
 		setEditDistanceHistogram(distances);
 		setPercentIdentityHistogram(pIdents);
 		setReads(lines);

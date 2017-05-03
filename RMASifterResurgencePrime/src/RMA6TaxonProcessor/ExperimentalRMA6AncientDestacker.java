@@ -106,7 +106,7 @@ public class ExperimentalRMA6AncientDestacker extends RMA6TaxonProcessor {
 		setDamageLine(strain.getLine());
 		setNumMatches(numMatches);
 		setNumberOfReads(list.keySet().size());
-		setReadDistribution(map);
+		processCompositionMap(map);
 		setEditDistanceHistogram(distances);
 		setPercentIdentityHistogram(pIdents);
 		setReads(lines);

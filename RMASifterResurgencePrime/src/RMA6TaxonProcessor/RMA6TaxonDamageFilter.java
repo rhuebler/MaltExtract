@@ -13,7 +13,7 @@ import strainMap.StrainMap;
  * in RMA6Processor this taxon processor only processes reads that have at least one match that hints at c-> end substitutions 
  * it will be used to replace the non filtering taxon processor within RMA6Processor when filtering for damaged Reads 
  * @author huebler
- *
+ * @deprecated
  */
 public class RMA6TaxonDamageFilter extends RMA6TaxonProcessor{
 	protected boolean wantReads = false;
@@ -100,7 +100,7 @@ public void processMatchBlocks(IMatchBlock[] blocks, String readName, int readLe
 		CompositionMap map = new CompositionMap(taxonMap);
 		map.process();
 		setDamageLine(strain.getLine());
-		setReadDistribution(map);
+		processCompositionMap(map);
 		setNumberOfReads(numOfReads);
 		setEditDistanceHistogram(distances);
 		setPercentIdentityHistogram(pIdents);
