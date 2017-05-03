@@ -237,6 +237,7 @@ public class RMA6OutputProcessor {
 		ArrayList<String> coverageHistogram = new ArrayList<String>();
 		ArrayList<String> readLengthHistogram = new ArrayList<String>();
 		ArrayList<String> filterInformation = new ArrayList<String>();
+		ArrayList<String> additionalEntries = new ArrayList<String>();
 		for(int id : results.keySet()){
 			RMA6TaxonProcessor taxProcessor;
 			try {
@@ -257,6 +258,7 @@ public class RMA6OutputProcessor {
 				misMatches.add(taxProcessor.getDamageLine());
 				readLengthHistogram.add(taxProcessor.getReadLengthStatistics());
 				filterInformation.add(taxProcessor.getFilterLine());
+				additionalEntries.add(taxProcessor.getAdditionalEntries());
 				if(switcher == Filter.ALL && alignment )
 					writeBlastHits(id,taxProcessor.getAlignments(),outDir+"/ancientNonDuplicates/alignments/"+fileName+"/");
 				if(switcher == Filter.ANCIENT && alignment)
@@ -297,7 +299,7 @@ public class RMA6OutputProcessor {
 			//write output
 			writeMisMap(misMatches, dir+"damageMismatch/"+fileName+"_damageMismatch"+".txt");
 			writeReadDist(readDistribution, dir+"readDist/"+fileName+"_alignmentDist"+".txt");
-			writeAdditionalEntries(readDistribution, dir+"readDist/"+fileName+"_additionalNodeEntries"+".txt");
+			writeAdditionalEntries(additionalEntries, dir+"readDist/"+fileName+"_additionalNodeEntries"+".txt");
 			writeEditDistance(editDistance, dir+"editDistance/"+fileName+"_editDistance"+".txt");
 			writePercentIdentity(percentIdentity, dir+"percentIdentity/"+fileName+"_percentIdentity"+".txt");
 			writeCoverageHistogram(coverageHistogram, dir+"readDist/"+fileName+"_coverageHist"+".txt");	

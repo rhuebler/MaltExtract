@@ -148,7 +148,7 @@ public void getNonStacked(){
 	}
 
 public void process(){
-	HashMap<Integer,ArrayList<Alignment>> map = getCompositionMap();
+	HashMap<Integer,ArrayList<Alignment>> map = compositionMap;
 	HashMap<Integer,Integer> results = new HashMap<Integer,Integer>();
 	int max=0; int maxKey=0;
 	for(int key : map.keySet()){
@@ -164,9 +164,9 @@ public void process(){
   }
 public ArrayList<Integer> getAllTopReferences(){
 	ArrayList<Integer> additional = new ArrayList<Integer>();
-	HashMap<Integer,ArrayList<Alignment>> map = getCompositionMap();
-	int maxSize = map.get(getMaxID()).size();
+	HashMap<Integer,ArrayList<Alignment>> map = compositionMap;
 	if(map.size()>1){
+		int maxSize = map.get(maxID).size();
 		for(int key : map.keySet()){
 			if(key != getMaxID() && map.get(key).size()>= (maxSize-maxSize*0.25)){
 				additional.add(key);
