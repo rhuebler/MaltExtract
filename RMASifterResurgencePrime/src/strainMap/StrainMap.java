@@ -10,7 +10,7 @@ public class StrainMap {
 	 */
 	private String name;
 	private StrainMisMatchContainer container;
-	private int numMatches;
+	private int numMatches=0;
 	
 	//constructor
 	public StrainMap(String s,StrainMisMatchContainer container, int n){
@@ -111,6 +111,7 @@ public class StrainMap {
 	public String getLine(){ // process Map Into Damage Output Line
 			if(container.getProcessed()!=0){
 				container.processMisMatches();
+				numMatches = container.getProcessed();
 				HashMap<Integer,Double> damage = container.getDamage(); 
 				HashMap<Integer,Double> noise =container.getNoise();
 		

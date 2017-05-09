@@ -17,7 +17,7 @@ public class StrainMisMatchContainer {
 	private ArrayList<Integer> distances = new ArrayList<Integer>();
 	private ArrayList<Double> pIdents = new ArrayList<Double>();
 	private ArrayList<Integer> lengths = new ArrayList<Integer>();
-	private int processed;
+	private int processed = 0;
 //getters
 	public int getProcessed(){
 		return this.processed;
