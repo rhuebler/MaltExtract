@@ -6,7 +6,7 @@ import java.util.Comparator;
  * @author huebler
  *
  */
-// readnamen, Node, wieviele Reads fallen da hon wo sie hinfallen und wieviele von denen target reads sind echt  
+
 public class Alignment {
 	private String readName;
 	private double pIdent;

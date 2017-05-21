@@ -180,7 +180,7 @@ public class RMA6OutputProcessor {
 		//problem is null lines in file
 		try{
 			summary.sort(null);
-			String header = "TargetNode\tadditionalEntries";
+			String header = "TargetNode\t1.0\t0.9\t0.8\t0.7\t0.6\t0.5\t0.4\t0.3\t0.2\t0.1";
 			summary.add(0, header);
 			Path file = Paths.get(outDir);
 			Files.write(file, summary, Charset.forName("UTF-8"));

@@ -162,16 +162,21 @@ public void process(){
 	markAllDuplicates();
 	//setTaxonCompositionMap(results);
   }
-public ArrayList<Integer> getAllTopReferences(){
-	ArrayList<Integer> additional = new ArrayList<Integer>();
+public HashMap<Double,ArrayList<Integer>> getAllTopReferences(){
+	HashMap<Double,ArrayList<Integer>> additional = new HashMap<Double,ArrayList<Integer>>();
 	HashMap<Integer,ArrayList<Alignment>> map = compositionMap;
 	if(map.size()>1){
 		int maxSize = map.get(maxID).size();
-		for(int key : map.keySet()){
-			if(key != getMaxID() && map.get(key).size()>= (maxSize-maxSize*0.25)){
-				additional.add(key);
+		for(double x = 0.0;0<=1.0;x+=0.1){
+			ArrayList<Integer> margin = new ArrayList<Integer>();
+			for(int key : map.keySet()){
+				if(key != getMaxID() && map.get(key).size()>= (maxSize-maxSize*x) 
+						&& map.get(key).size()< maxSize-maxSize*(x+0.1)){
+				margin.add(key);
+				}	
 			}
-		}
+			additional.put(x, margin);
+		}	
 	}
 	return additional;
 }
