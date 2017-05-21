@@ -170,7 +170,7 @@ public HashMap<Double,ArrayList<Integer>> getAllTopReferences(){
 		for(double x = 1.0;x>=0.0;x-=0.1){
 			ArrayList<Integer> margin = new ArrayList<Integer>();
 			for(int key : map.keySet()){
-				if(map.get(key).size()>= (maxSize*x) && map.get(key).size()< maxSize*(x+0.1)){
+				if(map.get(key).size()> (maxSize*x) && map.get(key).size()<= maxSize*(x+0.1)){
 				margin.add(key);
 				}	
 			}
