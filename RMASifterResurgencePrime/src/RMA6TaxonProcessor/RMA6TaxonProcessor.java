@@ -129,11 +129,11 @@ protected void processCompositionMap(CompositionMap map){
 		HashMap<Double,ArrayList<Integer>> list = map.getAllTopReferences();
 		String addEntries = taxName;
 		if(list.size()>0){
-			for(double x = 0.0;x<=1.0;x+=0.1){
+			for(double x = 1.0;x>=0.0;x-=0.1){
 				ArrayList<Integer> margin = list.get(x);
 				addEntries+="\t";
 				for(int reference : margin){
-					addEntries+=";"+getName(reference);
+					addEntries+=getName(reference)+";";
 				}
 			}
 		}else{

@@ -167,11 +167,10 @@ public HashMap<Double,ArrayList<Integer>> getAllTopReferences(){
 	HashMap<Integer,ArrayList<Alignment>> map = compositionMap;
 	if(map.size()>1){
 		int maxSize = map.get(maxID).size();
-		for(double x = 0.0;0<=1.0;x+=0.1){
+		for(double x = 1.0;x>=0.0;x-=0.1){
 			ArrayList<Integer> margin = new ArrayList<Integer>();
 			for(int key : map.keySet()){
-				if(key != getMaxID() && map.get(key).size()>= (maxSize-maxSize*x) 
-						&& map.get(key).size()< maxSize-maxSize*(x+0.1)){
+				if(map.get(key).size()>= (maxSize*x) && map.get(key).size()< maxSize*(x+0.1)){
 				margin.add(key);
 				}	
 			}
