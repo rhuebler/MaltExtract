@@ -5,6 +5,7 @@ import java.util.logging.Logger;
 import NCBI_MapReader.NCBI_MapReader;
 import RMAAlignment.Alignment;
 import RMAAlignment.CompositionMap;
+import behaviour.Filter;
 import megan.data.IMatchBlock;
 import strainMap.StrainMap;
 
@@ -24,8 +25,8 @@ public class RMA6TaxonDamageFilter extends RMA6TaxonProcessor{
 	 * @return int numMatches, String readDistribution, HashMap EditDistance, HashMap Percent Identity
 	 */ 
 public RMA6TaxonDamageFilter(int id ,double pID, NCBI_MapReader reader,
-		boolean v,Logger log, Logger warning, boolean reads,double tp,int mL,boolean wantAls) {
-	super(id,pID, reader, v, log, warning, tp, mL);
+		boolean v,Logger log, Logger warning, boolean reads,double tp,int mL,boolean wantAls, Filter behave) {
+	super(id,pID, reader, v, log, warning, tp, mL, behave);
 	this.wantReads =reads;
 	this.wantAlignments = wantAls;
 }

@@ -14,11 +14,11 @@ public class DirectoryCreator {
  * @param crawl
  * @param reads
  */
-	public void process(Filter behave, String outDir, boolean hits, boolean crawl,boolean reads, boolean wantMeganSummaries) {
-		if(!crawl&&wantMeganSummaries){
+	public void process(Filter behave, String outDir, boolean hits,boolean reads, boolean wantMeganSummaries) {
+		if(behave != Filter.CRAWL && wantMeganSummaries){
 			new File(outDir+"/MeganSummaries/").mkdirs();
 		}
-		if(crawl){
+		if(behave == Filter.CRAWL){
 			new File(outDir+"/crawlResults/").mkdirs();
 			new File(outDir+"/crawlResults/damageMismatch/").mkdirs();
 			new File(outDir+"/crawlResults/readDist/").mkdirs();

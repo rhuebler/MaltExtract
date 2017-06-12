@@ -4,13 +4,16 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import RMAAlignment.Alignment;
+import behaviour.Filter;
 /**
  * Functions that collects all misMatches and processes them 
  * also serves as a container 
  * @author huebler
  *
  */
-public class StrainMisMatchContainer {
+
+public class StrainMisMatchContainer{
+	
 	private HashMap<Integer,HashMap<String,Integer>> container = new HashMap<Integer,HashMap<String,Integer>>();
 	private HashMap<Integer,Double> damage; 
 	private HashMap<Integer,Double> noise;
@@ -18,6 +21,11 @@ public class StrainMisMatchContainer {
 	private ArrayList<Double> pIdents = new ArrayList<Double>();
 	private ArrayList<Integer> lengths = new ArrayList<Integer>();
 	private int processed = 0;
+	private Filter filter;
+	// constructor
+	public  StrainMisMatchContainer(Filter filter) {
+		this.filter = filter;
+	}
 //getters
 	public int getProcessed(){
 		return this.processed;
@@ -39,9 +47,11 @@ public HashMap<Integer,Double> getNoise(){
 }	
 public void processAlignment(Alignment al){
 	if(al.getMlength() >= 20){
+		if(filter == Filter.CRAWL){
 		distances.add(al.getEditDistance());
 		pIdents.add(al.getPIdent());
-		lengths.add(al.getMlength());
+		lengths.add(al.getMlength());}
+		
 		processed+=1;
 		String q = al.getQuery();
 		String r = al.getReference();

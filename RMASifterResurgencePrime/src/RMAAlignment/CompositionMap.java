@@ -165,7 +165,7 @@ public void process(){
 public HashMap<Double,ArrayList<Integer>> getAllTopReferences(){
 	HashMap<Double,ArrayList<Integer>> additional = new HashMap<Double,ArrayList<Integer>>();
 	HashMap<Integer,ArrayList<Alignment>> map = compositionMap;
-	if(map.size()>1){
+	if(map.size()>=1){
 		int maxSize = map.get(maxID).size();
 		for(double x = 1.0;x>=0.0;x-=0.1){
 			ArrayList<Integer> margin = new ArrayList<Integer>();

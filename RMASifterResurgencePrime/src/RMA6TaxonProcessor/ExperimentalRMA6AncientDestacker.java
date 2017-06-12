@@ -7,6 +7,7 @@ import java.util.logging.Logger;
 import NCBI_MapReader.NCBI_MapReader;
 import RMAAlignment.Alignment;
 import RMAAlignment.CompositionMap;
+import behaviour.Filter;
 import megan.data.IMatchBlock;
 import strainMap.StrainMap;
 
@@ -14,12 +15,12 @@ public class ExperimentalRMA6AncientDestacker extends RMA6TaxonProcessor {
 	protected boolean wantReads = false;
 	protected boolean wantAlignments = false;
 	
-	public ExperimentalRMA6AncientDestacker(Integer id, double pID, NCBI_MapReader reader, boolean v, Logger log, Logger warning,double tp,int mL) {
-		super(id, pID, reader, v, log, warning,tp,mL);
+	public ExperimentalRMA6AncientDestacker(Integer id, double pID, NCBI_MapReader reader, boolean v, Logger log, Logger warning,double tp,int mL, Filter behave) {
+		super(id, pID, reader, v, log, warning,tp,mL, behave);
 	}
 	public ExperimentalRMA6AncientDestacker(int id ,double pID, NCBI_MapReader reader,
-			boolean v,Logger log, Logger warning, boolean reads,double tp,int mL,boolean wantAls, boolean turnOffDestacking) {
-		super(id,pID, reader, v, log, warning,tp,mL);
+			boolean v,Logger log, Logger warning, boolean reads,double tp,int mL,boolean wantAls, boolean turnOffDestacking, Filter behave) {
+		super(id,pID, reader, v, log, warning,tp,mL, behave);
 		this.wantReads =reads;
 		this.wantAlignments = wantAls;
 	}

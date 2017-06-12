@@ -16,6 +16,7 @@ import java.util.logging.Logger;
 import NCBI_MapReader.NCBI_MapReader;
 import NCBI_MapReader.NCBI_TreeReader;
 import RMAAlignment.Alignment;
+import behaviour.Filter;
 import jloda.util.ListOfLongs;
 import megan.data.IMatchBlock;
 import megan.data.IReadBlock;
@@ -45,7 +46,9 @@ public class RMA6BlastCrawler {
 	private ArrayList<String> editDistances = new ArrayList<String>();
 	private ArrayList<String> percentIdentities = new ArrayList<String>();
 	private ArrayList<String> readDistributions = new ArrayList<String>();
-	public RMA6BlastCrawler(String dir, String name, String species, String out, NCBI_MapReader reader ,Logger warning,NCBI_TreeReader treeReader){
+	private Filter filter = Filter.CRAWL;
+	public RMA6BlastCrawler(String dir, String name, String species, String out, NCBI_MapReader reader ,Logger warning,NCBI_TreeReader treeReader,
+			Filter filter){
 		this.inDir = dir;
 		this.fileName = name;
 		this.speciesName = species;
@@ -53,6 +56,7 @@ public class RMA6BlastCrawler {
 		this.outDir = out;
 		this.warning = warning;
 		this.treeReader = new NCBI_TreeReader(treeReader);
+		this.filter = filter;
 	}
 
 	private void writeReadLengthDistribution(List<String> histo){
@@ -179,7 +183,7 @@ public class RMA6BlastCrawler {
 										collection.replace(blocks[i].getTaxonId(), strain);
 							
 									}else{
-										StrainMisMatchContainer container = new StrainMisMatchContainer();
+										StrainMisMatchContainer container = new StrainMisMatchContainer(filter);
 										container.processAlignment(al);
 										StrainMap strain = new StrainMap(getName(blocks[i].getTaxonId()),
 										container,1);

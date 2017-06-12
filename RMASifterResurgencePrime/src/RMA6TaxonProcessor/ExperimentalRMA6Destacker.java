@@ -2,11 +2,13 @@ package RMA6TaxonProcessor;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import NCBI_MapReader.NCBI_MapReader;
 import RMAAlignment.Alignment;
 import RMAAlignment.CompositionMap;
+import behaviour.Filter;
 import megan.data.IMatchBlock;
 import strainMap.StrainMap;
 
@@ -15,12 +17,12 @@ public class ExperimentalRMA6Destacker extends RMA6TaxonProcessor {
 	protected boolean wantAlignments = false;
 	protected boolean turnOffDestacking = false;
 	
-	public ExperimentalRMA6Destacker(Integer id, double pID, NCBI_MapReader reader, boolean v, Logger log, Logger warning,double tp,int mL) {
-		super(id, pID, reader, v, log, warning,tp,mL);
+	public ExperimentalRMA6Destacker(Integer id, double pID, NCBI_MapReader reader, boolean v, Logger log, Logger warning,double tp,int mL, Filter behave) {
+		super(id, pID, reader, v, log, warning,tp,mL, behave);
 	}
 	public ExperimentalRMA6Destacker(int id ,double pID, NCBI_MapReader reader,
-			boolean v,Logger log, Logger warning, boolean reads,double tp,int mL,boolean wantAls,boolean turnOffDestacking) {
-		super(id,pID, reader, v, log, warning,tp,mL);
+			boolean v,Logger log, Logger warning, boolean reads,double tp,int mL,boolean wantAls,boolean turnOffDestacking,Filter behave) {
+		super(id,pID, reader, v, log, warning,tp,mL, behave);
 		this.wantReads =reads;
 		this.wantAlignments = wantAls;
 		this.turnOffDestacking = turnOffDestacking;
@@ -56,6 +58,7 @@ public class ExperimentalRMA6Destacker extends RMA6TaxonProcessor {
 			}
 	}		
 	public void process(){ 
+		log.log(Level.INFO,"Analyzing data");
 		CompositionMap map = new CompositionMap(taxonMap,turnOffDestacking);
 		map.process();
 		map.getNonStacked();
@@ -105,7 +108,7 @@ public class ExperimentalRMA6Destacker extends RMA6TaxonProcessor {
 				}
 			}	
 		}
-		
+		log.log(Level.INFO,"Analyzed data");
 		StrainMap strain = new StrainMap(taxName,container,numMatches);
 		setOriginalNumberOfAlignments(originalNumberOfAlignments);
 		setOriginalNumberOfReads(originalNumberOfReads);

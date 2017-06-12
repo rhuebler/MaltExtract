@@ -74,7 +74,7 @@ public class RMAExtractor {
 		log.log(Level.INFO, "Setting up Taxon Name and Taxon ID maps");
 		NCBI_MapReader mapReader = new NCBI_MapReader(inProcessor.getTreePath());
 		DirectoryCreator dCreator = new DirectoryCreator();
-		dCreator.process(inProcessor.getFilter(),inProcessor.getOutDir(),inProcessor.getBlastHits(),inProcessor.wantToCrawl(),inProcessor.wantReads(), inProcessor.wantMeganSummaries());
+		dCreator.process(inProcessor.getFilter(),inProcessor.getOutDir(),inProcessor.getBlastHits(),inProcessor.wantReads(), inProcessor.wantMeganSummaries());
 		List<Integer> taxIDs= new  ArrayList<Integer>();
 		
 		NCBI_TreeReader treeReader = new NCBI_TreeReader(inProcessor.getTreePath());
@@ -93,7 +93,7 @@ public class RMAExtractor {
 		log.log(Level.INFO, "Setting up Phylogenetic Tree");
 		
 		
-		if(inProcessor.getFilter() != Filter.SCAN  && !inProcessor.wantToCrawl()){
+		if(inProcessor.getFilter() != Filter.SCAN  && inProcessor.getFilter() != Filter.CRAWL ){
 			List<Future<RMA6Processor>> processedFiles = new ArrayList<>();
     		for(String fileName : inProcessor.getFileNames()){
     			File f = new File(fileName);
@@ -110,7 +110,7 @@ public class RMAExtractor {
 	    SummaryWriter sumWriter = new SummaryWriter(processedFiles,mapReader,inProcessor.getOutDir(), warning,inProcessor.getFilter()); 
 	    sumWriter.process();
 	    log.log(Level.INFO, "Writing Summary File");
-	  }else if(inProcessor.getFilter() == Filter.SCAN && !inProcessor.wantToCrawl()){
+	  }else if(inProcessor.getFilter() == Filter.SCAN && inProcessor.getFilter() != Filter.CRAWL){
 		  List<Future<RMA6Scanner>> scannerList = new ArrayList<Future<RMA6Scanner>>();
 		  // every tree has its own copy of this now to avoid concurrency issues
 		  for(String fileName : inProcessor.getFileNames()){
@@ -124,14 +124,14 @@ public class RMAExtractor {
 		  ScanSummaryWriter writer = new ScanSummaryWriter(scannerList, mapReader, warning);
 		  log.log(Level.INFO, "Writing Scan Summary File");
 		  writer.write(inProcessor.getOutDir());
-	  }else if(inProcessor.wantToCrawl()){
+	  }else if(inProcessor.getFilter() == Filter.CRAWL ){
 		  for(String fileName : inProcessor.getFileNames()){
 			  File f = new File(fileName);
 			  log.log(Level.INFO, "Crawl for file " + fileName);
 			  for(int taxID:taxIDs){
 			  ConcurrentRMA6Crawler crawler = new ConcurrentRMA6Crawler(f.getParent()+"/",f.getName(),
 					  mapReader.getNcbiIdToNameMap().get(taxID),
-					  inProcessor.getOutDir(),mapReader, warning, treeReader);
+					  inProcessor.getOutDir(),mapReader, warning, treeReader, inProcessor.getFilter());
 			  Future<RMA6BlastCrawler> future =  executor.submit(crawler);
 			  try {
 				future.get();

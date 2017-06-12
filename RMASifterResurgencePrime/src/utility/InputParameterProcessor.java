@@ -50,7 +50,6 @@ public class InputParameterProcessor {
 	private Logger warning;
 	private boolean alignment = false;
 	private boolean reads = false;
-	private boolean crawl = false;
 	private double minComplexity = 0;
 	private boolean wantMeganSummaries = false;
 	private boolean destackOff = false;
@@ -107,9 +106,7 @@ public class InputParameterProcessor {
 	public boolean isVerbose(){
 		return this.verbose;
 	}
-	public boolean wantToCrawl(){
-		return this.crawl;
-	}
+
 	public boolean wantReads(){
 		return this.reads;
 	}
@@ -271,7 +268,10 @@ public class InputParameterProcessor {
     	            }else if(Pattern.compile(Pattern.quote("scan"), Pattern.CASE_INSENSITIVE).matcher(commandLine.getOptionValue("filter")).find()){
     	            	this.behave = Filter.SCAN;
     	            	log.log(Level.INFO,"Custom Behaviour set to: "+commandLine.getOptionValue("filter"));
-    	            }
+    	            }else if(Pattern.compile(Pattern.quote("crawl"), Pattern.CASE_INSENSITIVE).matcher(commandLine.getOptionValue("filter")).find()){
+        	        	this.behave = Filter.CRAWL;
+        	        	log.log(Level.INFO,"Custom Behaviour set to: "+commandLine.getOptionValue("filter"));
+        	        }
 //    	            else if(Pattern.compile(Pattern.quote("nd_anc"), Pattern.CASE_INSENSITIVE).matcher(commandLine.getOptionValue("filter")).find()){
 //    	            	this.behave = Filter.ALL;
 //    	            	log.log(Level.INFO,"Custom Behaviour set to: "+commandLine.getOptionValue("filter"));
@@ -324,9 +324,7 @@ public class InputParameterProcessor {
     	        	log.log(Level.INFO, "Verbose");
     	        	this.verbose = true;
     	        }
-    	        if(commandLine.hasOption("crawl")){
-    	        	this.crawl = true;
-    	        }
+    	        
     	        if((commandLine.hasOption("reads") && behave != Filter.SCAN)){
     	        	log.log(Level.INFO, "Rerieve filtered Reads");
     	        	this.reads = true;

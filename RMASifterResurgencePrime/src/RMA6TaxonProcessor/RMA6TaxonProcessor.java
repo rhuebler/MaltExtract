@@ -11,6 +11,7 @@ import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 import NCBI_MapReader.NCBI_MapReader;
 import RMAAlignment.Alignment;
 import RMAAlignment.CompositionMap;
+import behaviour.Filter;
 import megan.data.IMatchBlock;
 import strainMap.StrainMisMatchContainer;
 
@@ -51,15 +52,15 @@ protected String filterLine = "";
 protected ArrayList<Integer> distances = new ArrayList<Integer>();
 protected ArrayList<Double> pIdents = new ArrayList<Double>();
 protected HashMap<Integer, ArrayList<Alignment>> taxonMap = new HashMap<Integer, ArrayList<Alignment>>();
-
-protected StrainMisMatchContainer container = new StrainMisMatchContainer();
+protected Filter filter = Filter.NON;
+protected StrainMisMatchContainer container = new StrainMisMatchContainer(filter);
 protected String readLengthStatistics;
 protected int refLength = 0;
 protected ArrayList<Integer> lengths = new ArrayList<Integer>();
 protected boolean turnedOn = true;
 protected String additionalEntries = "none";
 //constructor
-public RMA6TaxonProcessor(Integer id, double pID, NCBI_MapReader reader, boolean v, Logger log, Logger warning, double topPercent, int maxLength){
+public RMA6TaxonProcessor(Integer id, double pID, NCBI_MapReader reader, boolean v, Logger log, Logger warning, double topPercent, int maxLength, Filter f){
 	this.mapReader = reader;
 	this.minPIdent = pID;
 	this.taxID = id;
@@ -69,6 +70,7 @@ public RMA6TaxonProcessor(Integer id, double pID, NCBI_MapReader reader, boolean
 	this.topPercent = topPercent;
 	this.maxLength = maxLength;
 	this.taxName = getName(id);
+	this.filter = f;
 	//initlaize with default values for output
 	this.readLengthStatistics = taxName+"\t0\t0\t0\t0";
 	this.coverageLine = taxName+"\tNA\t0\t0\t0\t0\t0\t0\t0\t0\t0\t0\t0\t0";

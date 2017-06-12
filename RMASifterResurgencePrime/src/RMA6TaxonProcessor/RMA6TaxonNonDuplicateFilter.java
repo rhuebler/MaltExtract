@@ -6,6 +6,7 @@ import java.util.logging.Logger;
 import NCBI_MapReader.NCBI_MapReader;
 import RMAAlignment.Alignment;
 import RMAAlignment.CompositionMap;
+import behaviour.Filter;
 import megan.data.IMatchBlock;
 import strainMap.StrainMap;
 /**
@@ -23,8 +24,8 @@ public class RMA6TaxonNonDuplicateFilter  extends RMA6TaxonProcessor{
 	protected boolean wantReads = false;
 	protected boolean wantAlignment = false;
 	public RMA6TaxonNonDuplicateFilter(int id ,double pID, NCBI_MapReader reader,
-			boolean v,Logger log, Logger warning, boolean reads,double tp,int mL,boolean wantAlignments) {
-		super(id,pID, reader, v, log, warning, tp, mL);
+			boolean v,Logger log, Logger warning, boolean reads,double tp,int mL,boolean wantAlignments, Filter behave) {
+		super(id,pID, reader, v, log, warning, tp, mL, behave);
 		this.wantReads = reads;
 		this.wantAlignment = wantAlignments;
 	}

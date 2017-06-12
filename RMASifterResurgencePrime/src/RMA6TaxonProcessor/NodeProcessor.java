@@ -84,16 +84,16 @@ public class NodeProcessor{
 		//processing
 		public void process(String inDir, String fileName, double topPercent, int maxLength){ 
 				if(behave == Filter.ANCIENT){
-					ancientProcessor =  new ExperimentalRMA6AncientDestacker(taxID, minPIdent, mapReader, verbose, log, log, wantReads, topPercent, maxLength,alignment,turnOffDestacking);
+					ancientProcessor =  new ExperimentalRMA6AncientDestacker(taxID, minPIdent, mapReader, verbose, log, log, wantReads, topPercent, maxLength,alignment,turnOffDestacking, behave);
 				}else if(behave == Filter.NON){
-					defaultProcessor = new ExperimentalRMA6Destacker(taxID, minPIdent, mapReader, verbose, log, log, wantReads, topPercent, maxLength,alignment,turnOffDestacking);
+					defaultProcessor = new ExperimentalRMA6Destacker(taxID, minPIdent, mapReader, verbose, log, log, wantReads, topPercent, maxLength,alignment,turnOffDestacking, behave);
 				}else if(behave == Filter.ALL){
-					ancientNonDuplicateProcessor = new RMA6TaxonAncientNonDuplicate(taxID, minPIdent, mapReader, verbose, log, log, wantReads, topPercent, maxLength,alignment);//TODO depreciate
+					System.out.println("Filter no longer supported");
 				}else if(behave == Filter.NON_ANCIENT){
-					ancientProcessor = new ExperimentalRMA6AncientDestacker(taxID, minPIdent, mapReader, verbose, log, log, wantReads, topPercent, maxLength,alignment,turnOffDestacking);
-					defaultProcessor = new ExperimentalRMA6Destacker(taxID, minPIdent, mapReader, verbose, log, log, wantReads, topPercent, maxLength,alignment,turnOffDestacking);
+					ancientProcessor = new ExperimentalRMA6AncientDestacker(taxID, minPIdent, mapReader, verbose, log, log, wantReads, topPercent, maxLength,alignment,turnOffDestacking,  behave);
+					defaultProcessor = new ExperimentalRMA6Destacker(taxID, minPIdent, mapReader, verbose, log, log, wantReads, topPercent, maxLength,alignment,turnOffDestacking, behave);
 				}else if(behave == Filter.NONDUPLICATES ){
-					nonDuplicateProcessor = new RMA6TaxonNonDuplicateFilter(taxID, minPIdent, mapReader, verbose, log, log, wantReads, topPercent, maxLength,alignment);
+					System.out.println("Filter no longer supported");
 				}		//TODO depreciated
 			this.taxName = getName(taxID);
 			// use ReadsIterator to get all Reads assigned to MegantaxID and print top percent to file
@@ -107,6 +107,7 @@ public class NodeProcessor{
 					   classificationBlockRMA6.readLocations(location, rma6File.getReader(), taxID, list);
 				   }
 				 }
+				//System.out.println("Found: "+ list.size()+" positions");
 				IReadBlockIterator classIt  = new ReadBlockIterator(list, new ReadBlockGetterRMA6(rma6File, true, true, (float) 1.0,(float) 100.00,false,true));
 				if(!classIt.hasNext()){ // check if reads are assigned to TaxID if not print to console and skip and set all values to default
 					if(verbose)
@@ -114,7 +115,10 @@ public class NodeProcessor{
 				}else{
 					if(verbose)
 						log.log(Level.INFO,"Processing Taxon "+taxName+" in File " +fileName); 
+					double i= 0;
 					while(classIt.hasNext()){
+						if((i%10000)==0)
+							log.log(Level.INFO,"Processed: "+(i/(double)list.size()));
 						IReadBlock current = classIt.next();
 						if(current.getReadLength() <= maxLength || maxLength == 0){
 							if(minComplexity<=getComplexity(current.getReadSequence())){
@@ -131,7 +135,9 @@ public class NodeProcessor{
 								}
 							}
 						}// if  
+						i++;
 					}// while
+					System.out.println("All positions processed");
 				classIt.close();
 				rma6File.close();
 				if(behave == Filter.ANCIENT ){

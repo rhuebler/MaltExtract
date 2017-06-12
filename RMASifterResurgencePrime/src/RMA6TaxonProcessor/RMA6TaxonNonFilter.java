@@ -6,6 +6,7 @@ import java.util.logging.Logger;
 import NCBI_MapReader.NCBI_MapReader;
 import RMAAlignment.Alignment;
 import RMAAlignment.CompositionMap;
+import behaviour.Filter;
 import megan.data.IMatchBlock;
 import strainMap.StrainMap;
 /**
@@ -16,12 +17,12 @@ import strainMap.StrainMap;
 public class RMA6TaxonNonFilter  extends RMA6TaxonProcessor{
 	protected boolean wantReads = false;
 	protected boolean wantAlignments = false;
-	public RMA6TaxonNonFilter(Integer id, double pID, NCBI_MapReader reader, boolean v, Logger log, Logger warning,double tp,int mL) {
-		super(id, pID, reader, v, log, warning,tp,mL);
+	public RMA6TaxonNonFilter(Integer id, double pID, NCBI_MapReader reader, boolean v, Logger log, Logger warning,double tp,int mL, Filter behave) {
+		super(id, pID, reader, v, log, warning,tp,mL, behave);
 	}
 	public RMA6TaxonNonFilter(int id ,double pID, NCBI_MapReader reader,
-			boolean v,Logger log, Logger warning, boolean reads,double tp,int mL,boolean wantAls) {
-		super(id,pID, reader, v, log, warning,tp,mL);
+			boolean v,Logger log, Logger warning, boolean reads,double tp,int mL,boolean wantAls, Filter behave) {
+		super(id,pID, reader, v, log, warning,tp,mL, behave);
 		this.wantReads =reads;
 		this.wantAlignments = wantAls;
 	}
