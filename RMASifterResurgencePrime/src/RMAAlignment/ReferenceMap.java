@@ -13,11 +13,14 @@ public class ReferenceMap {
 	private int length = 0;
 	private ArrayList<Alignment> nonStacked = new ArrayList<Alignment>();
 	private boolean turnedOn = true;
-	
+	private double averageCoverage = 0;
 	public ReferenceMap(ArrayList<Alignment> input){
 		this.input = input;
 	}
 	//getters
+	public double getAverageCoverage(){
+		return averageCoverage;
+	}
 	public boolean wasTurnedOn(){
 		return this.turnedOn;
 	}
@@ -98,6 +101,7 @@ public class ReferenceMap {
 		for(int k: coverageContainer.keySet())
 			averageCoverage+=coverageContainer.get(k);
 		averageCoverage/=length;
+		this.averageCoverage = averageCoverage;
 		if(averageCoverage>=10)
 			turnedOn = false;
 		

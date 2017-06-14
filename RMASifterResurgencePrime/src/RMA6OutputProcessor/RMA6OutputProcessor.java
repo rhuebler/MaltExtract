@@ -166,7 +166,7 @@ public class RMA6OutputProcessor {
 			//problem is null lines in file
 			try{
 				summary.sort(null);
-				String header = "Taxon\tReference\tuniquePerReference\tnonStacked\tnonDuplicatesonReference\tTotalAlignmentsOnReference\tReferenceLength";
+				String header = "Taxon\tReference\tuniquePerReference\tnonStacked\tnonDuplicatesonReference\tTotalAlignmentsOnReference\tReferenceLength\tAverageCoverage";
 				summary.add(0, header);
 				Path file = Paths.get(outDir);
 				Files.write(file, summary, Charset.forName("UTF-8"));

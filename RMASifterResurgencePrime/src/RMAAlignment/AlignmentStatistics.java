@@ -70,6 +70,7 @@ public class AlignmentStatistics {
 			results.add((double) nonDuplicates);
 			results.add((double) currentList.size());
 			results.add((double) refMap.getLength());
+			results.add(refMap.getAverageCoverage());
 			this.generalStatistics = results;
 		}else{
 			HashMap<Integer,Integer> coverageHistogram = new HashMap<Integer,Integer>();
