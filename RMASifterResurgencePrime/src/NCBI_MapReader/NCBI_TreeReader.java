@@ -63,6 +63,8 @@ public class NCBI_TreeReader {
 	}
 	private ArrayList<Integer> getAssigned( Collection<Integer> children,Set<Integer> keys){
 		ArrayList<Integer> assigned = new ArrayList<Integer>();
+		if(keys==null)
+			System.err.println("Danger empty keys in File");
 		for(int key : keys)
 			if(children.contains(key))
 				assigned.add(key);

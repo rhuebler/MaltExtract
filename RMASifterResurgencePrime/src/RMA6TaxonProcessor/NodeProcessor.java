@@ -6,6 +6,10 @@ package RMA6TaxonProcessor;
  * @author huebler
  */
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -107,7 +111,15 @@ public class NodeProcessor{
 					   classificationBlockRMA6.readLocations(location, rma6File.getReader(), taxID, list);
 				   }
 				 }
-				
+				// Downsample list if necessary and write log 
+				if(list.size()>100000){
+					warning.log(Level.WARNING,"For" + taxName + " " + "downsampling was turned on");
+					ArrayList<Long> longList = new ArrayList<Long>();
+					longList.addAll((Collection<? extends Long>) list);
+					Collections.shuffle(longList);
+					list.clear();
+					list.addAll((ListOfLongs) longList.toArray()[0-100000]);
+				}
 				IReadBlockIterator classIt  = new ReadBlockIterator(list, new ReadBlockGetterRMA6(rma6File, true, true, (float) 1.0,(float) 100.00,false,true));
 				if(!classIt.hasNext()){ // check if reads are assigned to TaxID if not print to console and skip and set all values to default
 					if(verbose)
@@ -115,7 +127,6 @@ public class NodeProcessor{
 				}else{
 					if(verbose)
 						log.log(Level.INFO,"Processing Taxon "+taxName+" in File " +fileName); 
-					double i= 0;
 					while(classIt.hasNext()){
 						IReadBlock current = classIt.next();
 						if(current.getReadLength() <= maxLength || maxLength == 0){
@@ -133,9 +144,7 @@ public class NodeProcessor{
 								}
 							}
 						}// if  
-						i++;
 					}// while
-				
 				classIt.close();
 				rma6File.close();
 				if(behave == Filter.ANCIENT ){
@@ -150,11 +159,9 @@ public class NodeProcessor{
 					ancientProcessor.process();
 					defaultProcessor.process();
 				}	
-				
 			}
 		}catch(Exception e){
 			warning.log(Level.SEVERE,mapReader.getNcbiIdToNameMap().get(taxID), e);	
-				
 		}
 	}// void
 		
