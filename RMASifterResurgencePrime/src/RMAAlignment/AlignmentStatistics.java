@@ -78,7 +78,7 @@ public class AlignmentStatistics {
 				coverageHistogram.put(l, 0);	
 			this.coverageHistogram = coverageHistogram;
 			ArrayList<Double> results =	new ArrayList<Double>();
-			for(int i = 0; i<5;  i++)
+			for(int i = 0; i<6;  i++)
 				results.add(0.0);
 			this.generalStatistics = results;
 		}

@@ -113,12 +113,14 @@ public class NodeProcessor{
 				 }
 				// Downsample list if necessary and write log 
 				if(list.size()>100000){
-					warning.log(Level.WARNING,"For" + taxName + " " + "downsampling was turned on");
+					warning.log(Level.WARNING,"For " + taxName + " in file "+fileName+ " downsampling was turned on");
 					ArrayList<Long> longList = new ArrayList<Long>();
-					longList.addAll((Collection<? extends Long>) list);
+					for(int i = 0; i<list.size(); i++)
+						longList.add(list.get(i));
 					Collections.shuffle(longList);
 					list.clear();
-					list.addAll((ListOfLongs) longList.toArray()[0-100000]);
+					for(long l : longList.subList(0, 100000))
+						list.add(l);
 				}
 				IReadBlockIterator classIt  = new ReadBlockIterator(list, new ReadBlockGetterRMA6(rma6File, true, true, (float) 1.0,(float) 100.00,false,true));
 				if(!classIt.hasNext()){ // check if reads are assigned to TaxID if not print to console and skip and set all values to default

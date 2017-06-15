@@ -58,7 +58,7 @@ public class ExperimentalRMA6Destacker extends RMA6TaxonProcessor {
 			}
 	}		
 	public void process(){ 
-		log.log(Level.INFO,"Analyzing data");
+		//log.log(Level.INFO,"Analyzing data");
 		CompositionMap map = new CompositionMap(taxonMap,turnOffDestacking);
 		map.process();
 		map.getNonStacked();
@@ -108,7 +108,6 @@ public class ExperimentalRMA6Destacker extends RMA6TaxonProcessor {
 				}
 			}	
 		}
-		log.log(Level.INFO,"Analyzed data");
 		StrainMap strain = new StrainMap(taxName,container,numMatches);
 		setOriginalNumberOfAlignments(originalNumberOfAlignments);
 		setOriginalNumberOfReads(originalNumberOfReads);
