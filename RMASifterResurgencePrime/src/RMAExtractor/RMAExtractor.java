@@ -82,7 +82,8 @@ public class RMAExtractor {
 			for(String name : inProcessor.getTaxNames()){
 				if(mapReader.getNcbiNameToIdMap().get(name) != null){// catch if there is a mistake
 					taxIDs.add(mapReader.getNcbiNameToIdMap().get(name));
-					treeReader.getParents(mapReader.getNcbiNameToIdMap().get(name));
+					if(inProcessor.isVerbose())
+						log.log(Level.INFO, mapReader.getNcbiNameToIdMap().get(name)+" added to analysis");
 				}else{
 					warning.log(Level.SEVERE, name + " has no assigned taxID and cannot be processed!");
 				}
