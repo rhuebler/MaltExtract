@@ -39,9 +39,10 @@ public class NodeProcessor{
 		private double minComplexity;
 		private boolean alignment = false;
 		private boolean turnOffDestacking = false;
+		private boolean turnOffDeDuping = false;
 		//constructors
 		public NodeProcessor(int id, double minPIdent, NCBI_MapReader reader, boolean v, Logger log, Logger warning,
-				boolean reads, Filter behave, double minCompl,boolean alignment,boolean turnOffDestacking) {
+				boolean reads, Filter behave, double minCompl,boolean alignment,boolean turnOffDestacking, boolean turnOffDeDuping) {
 			this.taxID = id;
 			this.minPIdent = minPIdent;
 			this.mapReader = reader;
@@ -53,6 +54,7 @@ public class NodeProcessor{
 			this.minComplexity = minCompl;
 			this.alignment = alignment;
 			this.turnOffDestacking = turnOffDestacking;
+			this.turnOffDeDuping = turnOffDeDuping;
 		}
 		//getters
 		// calculate complexity of read from Megan code
@@ -86,14 +88,14 @@ public class NodeProcessor{
 		//processing
 		public void process(String inDir, String fileName, double topPercent, int maxLength){ 
 				if(behave == Filter.ANCIENT){
-					ancientProcessor =  new ExperimentalRMA6AncientDestacker(taxID, minPIdent, mapReader, verbose, log, log, wantReads, topPercent, maxLength,alignment,turnOffDestacking, behave);
+					ancientProcessor =  new ExperimentalRMA6AncientDestacker(taxID, minPIdent, mapReader, verbose, log, log, wantReads, topPercent, maxLength,alignment,turnOffDestacking,turnOffDeDuping, behave);
 				}else if(behave == Filter.NON){
-					defaultProcessor = new ExperimentalRMA6Destacker(taxID, minPIdent, mapReader, verbose, log, log, wantReads, topPercent, maxLength,alignment,turnOffDestacking, behave);
+					defaultProcessor = new ExperimentalRMA6Destacker(taxID, minPIdent, mapReader, verbose, log, log, wantReads, topPercent, maxLength,alignment,turnOffDestacking,turnOffDeDuping, behave);
 				}else if(behave == Filter.ALL){
 					System.out.println("Filter no longer supported");
 				}else if(behave == Filter.NON_ANCIENT){
-					ancientProcessor = new ExperimentalRMA6AncientDestacker(taxID, minPIdent, mapReader, verbose, log, log, wantReads, topPercent, maxLength,alignment,turnOffDestacking,  behave);
-					defaultProcessor = new ExperimentalRMA6Destacker(taxID, minPIdent, mapReader, verbose, log, log, wantReads, topPercent, maxLength,alignment,turnOffDestacking, behave);
+					ancientProcessor = new ExperimentalRMA6AncientDestacker(taxID, minPIdent, mapReader, verbose, log, log, wantReads, topPercent, maxLength,alignment,turnOffDestacking,turnOffDeDuping,  behave);
+					defaultProcessor = new ExperimentalRMA6Destacker(taxID, minPIdent, mapReader, verbose, log, log, wantReads, topPercent, maxLength,alignment,turnOffDestacking,turnOffDeDuping,  behave);
 				}else if(behave == Filter.NONDUPLICATES ){
 					System.out.println("Filter no longer supported");
 				}		//TODO depreciated

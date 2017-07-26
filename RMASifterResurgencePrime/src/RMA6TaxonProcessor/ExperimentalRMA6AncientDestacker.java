@@ -14,15 +14,19 @@ import strainMap.StrainMap;
 public class ExperimentalRMA6AncientDestacker extends RMA6TaxonProcessor {
 	protected boolean wantReads = false;
 	protected boolean wantAlignments = false;
+	protected boolean turnOffDestacking = false;
+	protected boolean turnOffDeDuping = false;
 	
 	public ExperimentalRMA6AncientDestacker(Integer id, double pID, NCBI_MapReader reader, boolean v, Logger log, Logger warning,double tp,int mL, Filter behave) {
 		super(id, pID, reader, v, log, warning,tp,mL, behave);
 	}
 	public ExperimentalRMA6AncientDestacker(int id ,double pID, NCBI_MapReader reader,
-			boolean v,Logger log, Logger warning, boolean reads,double tp,int mL,boolean wantAls, boolean turnOffDestacking, Filter behave) {
+			boolean v,Logger log, Logger warning, boolean reads,double tp,int mL,boolean wantAls, boolean turnOffDestacking,boolean turnOffDeDuping, Filter behave) {
 		super(id,pID, reader, v, log, warning,tp,mL, behave);
 		this.wantReads =reads;
 		this.wantAlignments = wantAls;
+		this.turnOffDestacking = turnOffDestacking;
+		this.turnOffDeDuping = turnOffDeDuping;
 	}
 	
 	public void processMatchBlocks(IMatchBlock[] blocks, String readName, int readLength, String sequence){
@@ -56,7 +60,7 @@ public class ExperimentalRMA6AncientDestacker extends RMA6TaxonProcessor {
 	}		
 	public void process(){ 
 		
-		CompositionMap map = new CompositionMap(taxonMap);
+		CompositionMap map = new CompositionMap(taxonMap,turnOffDestacking,turnOffDeDuping);
 		map.process();
 		map.getNonStacked();
 		HashMap<String,ArrayList<Alignment>> list =map.getResultsMap();

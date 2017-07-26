@@ -14,8 +14,12 @@ public class AlignmentStatistics {
 	private ArrayList<Double> generalStatistics;
 	private HashMap<Integer,Integer> coverageHistogram;
 	private int length;
-	public AlignmentStatistics(ArrayList<Alignment> list){
+	private boolean turnOffDestacking = false;
+	private boolean turnOffDeDupping = false;
+	public AlignmentStatistics(ArrayList<Alignment> list, boolean urnOffDestacking, boolean turnOffDeDupping){
 		this.currentList = list;
+		this.turnOffDestacking = turnOffDestacking;
+		this.turnOffDeDupping = turnOffDeDupping;
 	}
 	//getters
 	public ArrayList<Double> getGenaralStatistics(){
@@ -27,6 +31,7 @@ public class AlignmentStatistics {
 	public int getLength(){
 		return this.length;
 	}
+	
 	private ArrayList<Alignment> removeDuplicates(ArrayList<Alignment> input){
 		HashSet<Integer> length = new HashSet<Integer>();
 		if(input != null && input.size() > 2){
@@ -48,10 +53,14 @@ public class AlignmentStatistics {
 	// process best list of start positions
 	public void calculateStatistics(){
 		
-		ArrayList<Alignment> input = removeDuplicates(currentList);
+		ArrayList<Alignment> input = new ArrayList<Alignment>();
+		if(!turnOffDeDupping)
+			input =removeDuplicates(currentList);
+		else
+			input = currentList;
 		if(input != null && input.size()>0){
 			ArrayList<Double> results = new ArrayList<Double>();
-			ReferenceMap refMap = new ReferenceMap(input);
+			ReferenceMap refMap = new ReferenceMap(input,turnOffDestacking);
 			refMap.process();
 			HashMap<Integer,Integer> coverageHistogram = refMap.getCoverageHistogram();
 			int temp = 0;

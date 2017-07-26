@@ -8,12 +8,14 @@ import java.util.HashMap;
  */
 public class CompositionMap {
 	private boolean turnOffDestacking= false;
+	private boolean turnOffDeDupping = false;
 	public CompositionMap(HashMap<Integer,ArrayList<Alignment>> map){
 		setCompositionMap(map);
 	}
-	public CompositionMap(HashMap<Integer,ArrayList<Alignment>> map,boolean turnOffDestacking){
+	public CompositionMap(HashMap<Integer,ArrayList<Alignment>> map,boolean turnOffDestacking, boolean turnOffDeDupping){
 		setCompositionMap(map);
 		this.turnOffDestacking = turnOffDestacking;
+		this.turnOffDeDupping = turnOffDeDupping;
 	}
 private HashMap<Integer,ArrayList<Alignment>> compositionMap;// hashMap of ReferenceID to List of start positions
 private HashMap<String,ArrayList<Alignment>> resultsMap = new HashMap<String,ArrayList<Alignment>>();// hashMap of ReferenceID to List of start positions

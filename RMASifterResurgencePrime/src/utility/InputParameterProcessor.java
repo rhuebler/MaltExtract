@@ -53,6 +53,7 @@ public class InputParameterProcessor {
 	private double minComplexity = 0;
 	private boolean wantMeganSummaries = false;
 	private boolean destackOff = false;
+	private boolean deDupOff=false;
 	// constructor
 	public boolean turnDestackingOff(){
 		return this.destackOff;
@@ -110,6 +111,9 @@ public class InputParameterProcessor {
 	public boolean wantReads(){
 		return this.reads;
 	}
+	public boolean getDeDupOff(){
+		return this.deDupOff;
+	}
 	private void readTaxList(File f) throws IOException{
 		try {
 			 Scanner	in = new Scanner(f.getCanonicalFile());
@@ -156,7 +160,9 @@ public class InputParameterProcessor {
     	    Option option_List = Option.builder().longOpt("list").hasArg().argName("list").optionalArg(true).desc("Decide on which build in list to use (not enabled yet)").build();
     	    Option option_MeganSummaries = Option.builder().longOpt("meganSummary").hasArg().argName("meganSummary").optionalArg(true).desc("Return Megan Summary Files").build();
     	    Option option_DeStackOff = Option.builder().longOpt("destackingOff").hasArg().argName("turn off destaking").optionalArg(true).desc("Turn Off automated stacked Read Removal only useful in >1 coverage data").build();
+    	    Option option_DeDupOff = Option.builder().longOpt("dupRemOff").hasArg().argName("turn off duplicate removal").optionalArg(true).desc("Turn Off automated pcr duplicate removal usefil in >1 coverage data").build();
     	    Options options = new Options();
+    	    
     	    
     	    CommandLineParser parser = new DefaultParser();
 
@@ -180,6 +186,7 @@ public class InputParameterProcessor {
     	    options.addOption(option_List);
     	    options.addOption(option_MeganSummaries);
     	    options.addOption(option_DeStackOff);
+    	    options.addOption(option_DeDupOff);
 
     	    try
     	    {
@@ -354,6 +361,9 @@ public class InputParameterProcessor {
     	        }
     	        if(commandLine.hasOption("destackingOff")){
     	        	this.destackOff = true;
+    	        }
+    	        if(commandLine.hasOption("dupRemOff")){
+    	        	this.deDupOff = true;
     	        }
     	        if(commandLine.hasOption("h")){
     	        	String header = "RMAExtractor beta 0.1";

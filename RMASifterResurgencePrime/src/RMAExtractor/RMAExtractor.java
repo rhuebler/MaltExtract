@@ -102,7 +102,7 @@ public class RMAExtractor {
 							f.getName(), inProcessor.getOutDir(), mapReader, treeReader,taxIDs, inProcessor.getTopPercent(),
 							inProcessor.getMaxLength(),inProcessor.getMinPIdent(),inProcessor.getFilter(), inProcessor.getTaxas(),
 							inProcessor.isVerbose(), log, warning,inProcessor.wantReads(), inProcessor.getMinComplexity(), 
-							inProcessor.getBlastHits(),inProcessor.wantMeganSummaries(),inProcessor.turnDestackingOff());
+							inProcessor.getBlastHits(),inProcessor.wantMeganSummaries(),inProcessor.turnDestackingOff(),inProcessor.getDeDupOff());
 						Future<RMA6Processor> future=executor.submit(task);
 						processedFiles.add(future);
     		}//fileNames;
