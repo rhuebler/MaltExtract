@@ -14,8 +14,10 @@ public class ReferenceMap {
 	private ArrayList<Alignment> nonStacked = new ArrayList<Alignment>();
 	private boolean turnedOn = true;
 	private double averageCoverage = 0;
-	public ReferenceMap(ArrayList<Alignment> input){
+	private boolean turnOffDestacking = false;
+	public ReferenceMap(ArrayList<Alignment> input, boolean turnOffDestacking){
 		this.input = input;
+		this.turnOffDestacking = turnOffDestacking;
 	}
 	//getters
 	public double getAverageCoverage(){
@@ -102,7 +104,7 @@ public class ReferenceMap {
 			averageCoverage+=coverageContainer.get(k);
 		averageCoverage/=length;
 		this.averageCoverage = averageCoverage;
-		if(averageCoverage>=10)
+		if(averageCoverage>=10 && !turnOffDestacking)
 			turnedOn = false;
 		
 		while(i<alignments.size()){

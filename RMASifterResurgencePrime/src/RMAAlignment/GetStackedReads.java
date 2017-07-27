@@ -16,8 +16,11 @@ public class GetStackedReads {
 	private int length;
 	private ArrayList<Alignment> nonStacked = new ArrayList<Alignment>();
 	private boolean turnedOn = true;
-	
+	private boolean turnOffDeDupping = false;
 	//getters
+	public GetStackedReads(boolean turnOffDeDupping){
+		this.turnOffDeDupping = turnOffDeDupping;
+	}
 	public boolean wasTurnedOn(){
 		return this.turnedOn;
 	}
@@ -59,7 +62,7 @@ public class GetStackedReads {
 		
 		ArrayList<Alignment> input = removeDuplicates(currentList);
 		if(input != null && input.size()>0){
-			ReferenceMap refMap = new ReferenceMap(input);
+			ReferenceMap refMap = new ReferenceMap(input,turnOffDeDupping);
 			refMap.process();
 			this.nonStacked = refMap.getNonStacked();
 			this.turnedOn = refMap.wasTurnedOn();

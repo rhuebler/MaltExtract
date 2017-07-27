@@ -104,7 +104,7 @@ public void markAllDuplicates(){
 	}
 }
 public void calculateStatistics(){
-	AlignmentStatistics stats = new AlignmentStatistics(this.compositionMap.get(getMaxID()));
+	AlignmentStatistics stats = new AlignmentStatistics(this.compositionMap.get(getMaxID()),turnOffDestacking, turnOffDeDupping);
 	stats.calculateStatistics();
 	this.coverageHistogram = stats.getConverageHistogram();
 	this.generalStatistics = stats.getGenaralStatistics();
