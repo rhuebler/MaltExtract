@@ -16,7 +16,7 @@ public class AlignmentStatistics {
 	private int length;
 	private boolean turnOffDestacking = false;
 	private boolean turnOffDeDupping = false;
-	public AlignmentStatistics(ArrayList<Alignment> list, boolean urnOffDestacking, boolean turnOffDeDupping){
+	public AlignmentStatistics(ArrayList<Alignment> list, boolean turnOffDestacking, boolean turnOffDeDupping){
 		this.currentList = list;
 		this.turnOffDestacking = turnOffDestacking;
 		this.turnOffDeDupping = turnOffDeDupping;
