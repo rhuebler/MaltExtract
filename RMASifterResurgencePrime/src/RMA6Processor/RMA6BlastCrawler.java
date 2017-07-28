@@ -34,7 +34,7 @@ public class RMA6BlastCrawler {
 	 * one line per strain currently only works with Strains that contain species name and won't
 	 * work for anything for that is higher than species level
 	 */
-	
+	//Initilaize attributes
 	private String inDir;
 	private String fileName;
 	private String speciesName;
@@ -47,6 +47,7 @@ public class RMA6BlastCrawler {
 	private ArrayList<String> percentIdentities = new ArrayList<String>();
 	private ArrayList<String> readDistributions = new ArrayList<String>();
 	private Filter filter = Filter.CRAWL;
+	//set values at construction
 	public RMA6BlastCrawler(String dir, String name, String species, String out, NCBI_MapReader reader ,Logger warning,NCBI_TreeReader treeReader,
 			Filter filter){
 		this.inDir = dir;
@@ -59,6 +60,7 @@ public class RMA6BlastCrawler {
 		this.filter = filter;
 	}
 
+	//  Output writers here 
 	private void writeReadLengthDistribution(List<String> histo){
 		try{
 			String header = "Node\tMean\tGeometricMean\tMedian\tStandardDev";
@@ -123,6 +125,8 @@ public class RMA6BlastCrawler {
 	}
  
 }
+	
+	// get all keys from a file
 	private Set<Integer> getAllKeys(String fileName){
 		Set<Integer> keys = null;
 		try(RMA6File rma6File = new RMA6File(fileName, "r")){
@@ -139,8 +143,12 @@ public class RMA6BlastCrawler {
 		
 		return keys;
 	}
+	
+	
+	
+	// Process RMA6 file by crawling 
 	public void process(){
-		
+		// retrieve IDs from file and intilaize StrainMap
 		HashMap<Integer, StrainMap> collection = new HashMap<Integer, StrainMap>();
 		HashSet<Integer> idsToProcess = new HashSet<Integer>();
 		int taxID = mapReader.getNcbiNameToIdMap().get(speciesName);
@@ -160,7 +168,8 @@ public class RMA6BlastCrawler {
 				   }
 				 }
 				IReadBlockIterator classIt  = new ReadBlockIterator(list, new ReadBlockGetterRMA6(rma6File, true, true, (float) 1.0,(float) 100.00,false,true));
-				// get all stuff
+				
+				// iterate through all nodes and store information in strain Map to process and retrieve at later use
 				while(classIt.hasNext()){
 					IReadBlock current = classIt.next();
 							IMatchBlock[] blocks = current.getMatchBlocks();
@@ -204,7 +213,7 @@ public class RMA6BlastCrawler {
 		percentIdentities.add(collection.get(key).getPercentIdentityHistogram());
 		readDistributions.add(collection.get(key).getReadLengthDistribution());
 		}
-		
+		// write output 
 		writeMisMap(summary);
 		writeEditDistance(editDistances);
 		writePercentIdentity(percentIdentities);

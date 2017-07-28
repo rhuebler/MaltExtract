@@ -21,6 +21,7 @@ public class ConcurrentRMA6Processor implements Callable<RMA6Processor>{
 	 * @return RMA6Processor
 	 * @throws none thrown all caughteName, Taxas enum, List<Intefer> UserIds, NCBI_TreeReader reader,Logger log, Logger warning
 	 */
+	//intilaize attributes
 	private String outDir;
 	private String fileName;
 	private String inDir;
@@ -44,7 +45,7 @@ public class ConcurrentRMA6Processor implements Callable<RMA6Processor>{
 	public ConcurrentRMA6Processor(String inDir, String fileName, String outDir, NCBI_MapReader mapReader, 
 			NCBI_TreeReader treeReader,List<Integer>taxIDs,double topPercent, int i,double minPI, Filter b,
 			Taxas t, boolean verbose, Logger log, Logger warning, boolean reads,  double minCompl, boolean alignments, boolean wantMeganSummaries, boolean turnOffDestacking, boolean dedupOff) {
-		
+		// set atrributes to value
 		this.inDir = inDir;
 		this.outDir = outDir;
 		this.fileName = fileName;
@@ -68,6 +69,7 @@ public class ConcurrentRMA6Processor implements Callable<RMA6Processor>{
 	}
 	@Override
 	public RMA6Processor call(){
+		//initialize RMA6Processor and process RMA6 file
 		RMA6Processor processor = new RMA6Processor(inDir, fileName, outDir, mapReader,
 				treeReader,maxLength,minPIdent ,behave, t, verbose, log, warning, wantReads, minComplexity,wantAlignments,wantMeganSummaries, turnOffDestacking,turnOffDeDuping); // should be implemented as callable 
     	processor.process(taxIDs, topPercent);// loop through file

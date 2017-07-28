@@ -48,28 +48,28 @@ public class RMA6OutputProcessor {
 		this.alignment = alignment;
 		this.reads =  reads;
 	}
-	private void setSumLine(HashMap<Integer,Integer> list)
+	private void setSumLine(HashMap<Integer,Integer> list)// set Sumline
 	{	this.defaultSum = list;
 	}
-	public HashMap<Integer,Integer> getSumLine(){
+	public HashMap<Integer,Integer> getSumLine(){//get SumLine
 		return this.defaultSum;
 	}
-	private void setAncientLine(HashMap<Integer,Integer> list){
+	private void setAncientLine(HashMap<Integer,Integer> list){// get ancient sum Sumline
 		this.ancientSum = list;
 	}
-	public HashMap<Integer,Integer> getAncientLine(){
+	public HashMap<Integer,Integer> getAncientLine(){ //get Ancient Line
 		return this.ancientSum;
 	}
-	private void setNonDuplicateLine(HashMap<Integer,Integer> list){
+	private void setNonDuplicateLine(HashMap<Integer,Integer> list){// non duplicate line
 		this.nonDuplicateSum = list;
 	}
-	public HashMap<Integer,Integer> getNonDuplicateLine(){
+	public HashMap<Integer,Integer> getNonDuplicateLine(){// get nonduplicate line
 		return this.nonDuplicateSum;
 	}
-	private void setAncientNonDuplicateLine(HashMap<Integer,Integer> list){
+	private void setAncientNonDuplicateLine(HashMap<Integer,Integer> list){// set ancient non duplicate line
 		this.ancientNonDuplicateSum = list;
 	}
-	public HashMap<Integer,Integer> getAncientNonDuplicateLine(){
+	public HashMap<Integer,Integer> getAncientNonDuplicateLine(){// get ancient non duplicate line
 		return this.ancientNonDuplicateSum;
 	}
 	private void writeFilter(ArrayList<String> summary, String outDir){
@@ -227,7 +227,7 @@ public class RMA6OutputProcessor {
 			warning.log(Level.SEVERE,"Cannot write file", io);
 		}
 	}
-	private void prepareOutput(HashMap<Integer,Future<NodeProcessor>> results, Filter switcher){
+	private void prepareOutput(HashMap<Integer,Future<NodeProcessor>> results, Filter switcher){// Gather information from node list and write ouput by preparing the information
 		
 		HashMap<Integer,Integer> overallSum = new HashMap<Integer,Integer>();
 		ArrayList<String> editDistance = new ArrayList<String>();
@@ -306,8 +306,9 @@ public class RMA6OutputProcessor {
 			writeReadLengthDistribution(readLengthHistogram, dir+"readDist/"+fileName+"_readLengthDist"+".txt");
 			writeFilter(filterInformation,dir+"FilterInformation/"+fileName+"_filterTable"+".txt");
 	}
-	public void process(HashMap<Integer,Future<NodeProcessor>> results){
-		if(behave == Filter.NON){
+	public void process(HashMap<Integer,Future<NodeProcessor>> results){ // process NodeProcessorts depending on files 
+		if(behave == Filter.NON){// retrieve the filter that was used and process accordingly
+			// do not use ancient filter
 			if(alignment){
 				new File(outDir+"/default/"+"/alignments/"+fileName).mkdirs();
 			}
@@ -315,7 +316,7 @@ public class RMA6OutputProcessor {
 				new File(outDir+"/default/"+"/reads/"+fileName).mkdirs();
 			}
 			prepareOutput(results,behave);
-		}else if(behave == Filter.ANCIENT){
+		}else if(behave == Filter.ANCIENT){// just use ancient filter
 			if(alignment){
 				new File(outDir+"/ancient/"+"/alignments/"+fileName).mkdirs();
 			}
@@ -323,23 +324,7 @@ public class RMA6OutputProcessor {
 				new File(outDir+"/ancient/"+"/reads/"+fileName).mkdirs();
 			}
 			prepareOutput(results,behave);
-		}else if(behave == Filter.NONDUPLICATES){
-			if(alignment){
-				new File(outDir+"/nonDuplicates/"+"/alignments/"+fileName).mkdirs();
-			}
-			if(reads){
-				new File(outDir+"/nonDuplicates/"+"/reads/"+fileName).mkdirs();
-			}
-			prepareOutput(results,behave);
-		}else if(behave == Filter.ALL){
-			if(alignment){
-				new File(outDir+"/ancientNonDuplicates/"+"/alignments/"+fileName).mkdirs();
-			}
-			if(reads){
-				new File(outDir+"/ancientNonDuplicates/"+"/reads/"+fileName).mkdirs();	
-			}
-			prepareOutput(results,behave);
-		}else if(behave == Filter.NON_ANCIENT){
+		}else if(behave == Filter.NON_ANCIENT){// more or less the default case
 			
 			if(alignment){
 				new File(outDir+"/ancient/"+"/alignments/"+fileName).mkdirs();

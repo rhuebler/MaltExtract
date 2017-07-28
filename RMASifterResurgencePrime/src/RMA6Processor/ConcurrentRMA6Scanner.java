@@ -18,6 +18,7 @@ public class ConcurrentRMA6Scanner implements Callable<RMA6Scanner>{
 	 * @return ap<Integer,Integer> assignmentMap
 	 * @throws none thrown all caughteName, Taxas enum, List<Intefer> UserIds, NCBI_TreeReader reader,Logger log, Logger warning
 	 */
+	//Initlaize attributes
 	private String inDir;
 	private String fileName;
 	private List<Integer> TaxIDs;
@@ -27,6 +28,7 @@ public class ConcurrentRMA6Scanner implements Callable<RMA6Scanner>{
 	private Logger warning;
 	private String outDir;
 	private boolean wantMeganSummaries;
+	// set attribute values at object construction
 	public ConcurrentRMA6Scanner(String inDir, String fileName,Taxas tax,List<Integer> Ids,NCBI_TreeReader tReader,
 			Logger log, Logger warning, String outDir, boolean wantMeganSummaries){
 		this.inDir = inDir;
@@ -40,7 +42,7 @@ public class ConcurrentRMA6Scanner implements Callable<RMA6Scanner>{
 		this.wantMeganSummaries = wantMeganSummaries;
 	}
 	@Override
-	public RMA6Scanner call(){
+	public RMA6Scanner call(){//execute RMA6scanner
 		RMA6Scanner scanner = new RMA6Scanner(inDir, fileName,tax,TaxIDs, tReader, log, warning, outDir,wantMeganSummaries); // should be implemented as callable 
 		return scanner;
 	}

@@ -10,8 +10,14 @@ import RMAAlignment.CompositionMap;
 import behaviour.Filter;
 import megan.data.IMatchBlock;
 import strainMap.StrainMap;
-
+/**
+ * RMA6 processor that automatically removes PCR duplicated and stacked reads and needs at least one C>T or G>A in the tailing bases
+ * 
+ * @author huebler
+ *
+ */
 public class ExperimentalRMA6AncientDestacker extends RMA6TaxonProcessor {
+	//attributes
 	protected boolean wantReads = false;
 	protected boolean wantAlignments = false;
 	protected boolean turnOffDestacking = false;
@@ -22,13 +28,14 @@ public class ExperimentalRMA6AncientDestacker extends RMA6TaxonProcessor {
 	}
 	public ExperimentalRMA6AncientDestacker(int id ,double pID, NCBI_MapReader reader,
 			boolean v,Logger log, Logger warning, boolean reads,double tp,int mL,boolean wantAls, boolean turnOffDestacking,boolean turnOffDeDuping, Filter behave) {
+		//intialize Nodeanalyzer
 		super(id,pID, reader, v, log, warning,tp,mL, behave);
 		this.wantReads =reads;
 		this.wantAlignments = wantAls;
 		this.turnOffDestacking = turnOffDestacking;
 		this.turnOffDeDuping = turnOffDeDuping;
 	}
-	
+	// process matchblocks
 	public void processMatchBlocks(IMatchBlock[] blocks, String readName, int readLength, String sequence){
 		originalNumberOfReads++;
 		float topScore = blocks[0].getBitScore();
@@ -59,7 +66,7 @@ public class ExperimentalRMA6AncientDestacker extends RMA6TaxonProcessor {
 			}
 	}		
 	public void process(){ 
-		
+		//process collected information
 		CompositionMap map = new CompositionMap(taxonMap,turnOffDestacking,turnOffDeDuping);
 		map.process();
 		map.getNonStacked();

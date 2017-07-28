@@ -57,8 +57,8 @@ public class NodeProcessor{
 			this.turnOffDeDuping = turnOffDeDuping;
 		}
 		//getters
-		// calculate complexity of read from Megan code
-		public double getComplexity(String sequence){
+		
+		public double getComplexity(String sequence){// calculate read complexity
 			return DNAComplexityMeasure.getMinimumDNAComplexityWoottenFederhen(sequence);
 		}
 		private String getName(int taxId){
@@ -85,7 +85,7 @@ public class NodeProcessor{
 			return  this.ancientNonDuplicateProcessor;
 			
 		}
-		//processing
+		//processing through node initialize taxon processors based on input parameters
 		public void process(String inDir, String fileName, double topPercent, int maxLength){ 
 				if(behave == Filter.ANCIENT){
 					ancientProcessor =  new ExperimentalRMA6AncientDestacker(taxID, minPIdent, mapReader, verbose, log, log, wantReads, topPercent, maxLength,alignment,turnOffDestacking,turnOffDeDuping, behave);
@@ -129,7 +129,7 @@ public class NodeProcessor{
 				}else{
 					if(verbose)
 						log.log(Level.INFO,"Processing Taxon "+taxName+" in File " +fileName); 
-					while(classIt.hasNext()){
+					while(classIt.hasNext()){// get Alignments and pass to filters
 						IReadBlock current = classIt.next();
 						if(current.getReadLength() <= maxLength || maxLength == 0){
 							if(minComplexity<=getComplexity(current.getReadSequence())){
@@ -149,6 +149,7 @@ public class NodeProcessor{
 					}// while
 				classIt.close();
 				rma6File.close();
+				// process taxonprocessors
 				if(behave == Filter.ANCIENT ){
 					ancientProcessor.process();
 				}else if(behave == Filter.NON ){

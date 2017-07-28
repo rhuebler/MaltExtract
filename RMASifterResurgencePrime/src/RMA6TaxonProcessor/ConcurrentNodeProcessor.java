@@ -1,5 +1,6 @@
 package RMA6TaxonProcessor;
-//@depracted
+//@deprecated
+// cocnurrent version of Node processor nor realy used
 import java.util.concurrent.Callable;
 
 public class ConcurrentNodeProcessor implements Callable<NodeProcessor> {

@@ -55,8 +55,9 @@ public class RMAExtractor {
 		long startTime = System.nanoTime();
 		 PeakMemoryUsageMonitor.start();
 		InputParameterProcessor inProcessor = new InputParameterProcessor(args ,log, warning);
-		new File(inProcessor.getOutDir()).mkdirs();// make outdir before
+		new File(inProcessor.getOutDir()).mkdirs();// make outdir before log handlers
 		Handler handler = null;
+		//Initialize Output Handler and Error Handler
 		try {
 			handler = new FileHandler(inProcessor.getOutDir()+"log.txt");
 		} catch (SecurityException | IOException e) {
@@ -71,6 +72,8 @@ public class RMAExtractor {
 			 warning.log(Level.SEVERE,"Interuption",e);
 		}
 		warning.addHandler(error);
+		
+		//Set taxon and ID maps
 		log.log(Level.INFO, "Setting up Taxon Name and Taxon ID maps");
 		NCBI_MapReader mapReader = new NCBI_MapReader(inProcessor.getTreePath());
 		DirectoryCreator dCreator = new DirectoryCreator();
@@ -78,6 +81,8 @@ public class RMAExtractor {
 		List<Integer> taxIDs= new  ArrayList<Integer>();
 		
 		NCBI_TreeReader treeReader = new NCBI_TreeReader(inProcessor.getTreePath());
+		
+		//read in taxa list and convert to numbers
 		if(inProcessor.getTaxas() == Taxas.USER){
 			for(String name : inProcessor.getTaxNames()){
 				if(mapReader.getNcbiNameToIdMap().get(name) != null){// catch if there is a mistake
@@ -90,10 +95,11 @@ public class RMAExtractor {
 			}
     	}
 		
+		//intialize  thread pool executor
 		executor=(ThreadPoolExecutor) Executors.newFixedThreadPool(inProcessor.getNumThreads());//intialize concurrent thread executor 
 		log.log(Level.INFO, "Setting up Phylogenetic Tree");
 		
-		
+		// run normal mode if neither crawl nor scan are used
 		if(inProcessor.getFilter() != Filter.SCAN  && inProcessor.getFilter() != Filter.CRAWL ){
 			List<Future<RMA6Processor>> processedFiles = new ArrayList<>();
     		for(String fileName : inProcessor.getFileNames()){
@@ -111,7 +117,7 @@ public class RMAExtractor {
 	    SummaryWriter sumWriter = new SummaryWriter(processedFiles,mapReader,inProcessor.getOutDir(), warning,inProcessor.getFilter()); 
 	    sumWriter.process();
 	    log.log(Level.INFO, "Writing Summary File");
-	  }else if(inProcessor.getFilter() == Filter.SCAN && inProcessor.getFilter() != Filter.CRAWL){
+	  }else if(inProcessor.getFilter() == Filter.SCAN && inProcessor.getFilter() != Filter.CRAWL){// run scan if crawl is not set
 		  List<Future<RMA6Scanner>> scannerList = new ArrayList<Future<RMA6Scanner>>();
 		  // every tree has its own copy of this now to avoid concurrency issues
 		  for(String fileName : inProcessor.getFileNames()){
@@ -125,7 +131,7 @@ public class RMAExtractor {
 		  ScanSummaryWriter writer = new ScanSummaryWriter(scannerList, mapReader, warning);
 		  log.log(Level.INFO, "Writing Scan Summary File");
 		  writer.write(inProcessor.getOutDir());
-	  }else if(inProcessor.getFilter() == Filter.CRAWL ){
+	  }else if(inProcessor.getFilter() == Filter.CRAWL ){// run crawl filter
 		  for(String fileName : inProcessor.getFileNames()){
 			  File f = new File(fileName);
 			  log.log(Level.INFO, "Crawl for file " + fileName);
@@ -147,7 +153,7 @@ public class RMAExtractor {
 		  }	  
 		  log.log(Level.INFO, "Crawling Done");
 		  destroy();
-	  }
+	  }// get runtime 
 		long endTime = System.nanoTime();
 		log.log(Level.INFO,"Runtime: "+ (endTime - startTime)/1000000000 +" Seconds");
 		log.log(Level.INFO,"Peak memory: " + PeakMemoryUsageMonitor.getPeakUsageString());

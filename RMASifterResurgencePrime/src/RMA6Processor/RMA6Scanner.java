@@ -86,7 +86,7 @@ public class RMA6Scanner {
 		    if (location != null) {
 		        ClassificationBlockRMA6 cl = new ClassificationBlockRMA6("Taxonomy");
 		        cl.read(location, rma6File.getReader());
-		        if(tax == Taxas.USER){
+		        if(tax == Taxas.USER){ //evaluate user taxa list
 		        	Set<Integer> idsToProcess = new HashSet<Integer>();
 		        	for(Integer taxID : taxIDs){
 		        		idsToProcess.add(taxID);
@@ -96,11 +96,11 @@ public class RMA6Scanner {
 		        	}
 		        	this.keySet =  idsToProcess;
 		        	this.allKeys = cl.getKeySet();
-		        }else{
+		        }else{//if no taxa list provided use all taxa 
 		        	this.keySet = cl.getKeySet();
 		        	this.allKeys = cl.getKeySet();
 				}
-		        this.readCount = (int) rma6File.getFooterSectionRMA6().getNumberOfReads();
+		        this.readCount = (int) rma6File.getFooterSectionRMA6().getNumberOfReads();// read in all counts
 		        for(int key : keySet){
 		        		if(allKeys.contains(key))
 		        			map.put(key, cl.getSum(key));

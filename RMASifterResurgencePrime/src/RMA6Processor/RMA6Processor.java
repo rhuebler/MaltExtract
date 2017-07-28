@@ -36,6 +36,7 @@ public class RMA6Processor {
 	 * @return HashMap<Integer,Integer> HashMap<taxID,numOfMatches>
 	 * @throws none thrown all caught
 	 */
+	//set attributes
 	private HashMap<Integer,Integer> overallSum;
 	private HashMap<Integer,Integer> ancientSum;
 	private HashMap<Integer,Integer> nonDuplicateSum;
@@ -62,7 +63,8 @@ public class RMA6Processor {
 	private boolean wantMeganSummaries;
 	private boolean turnOffDestacking;
 	private boolean turnOffDeDuping;
-	// constructor
+	
+	// constructor and intilaize attributes
 	public RMA6Processor(String inDir, String fileName, String outDir, NCBI_MapReader mapReader,
 			NCBI_TreeReader treeReader, int maxLength, double pIdent, Filter b, Taxas t, boolean verbose,
 			Logger log, Logger warning, boolean readInf, double minCompl, boolean alignment, boolean wantMeganSummaries, boolean turnOffDestacking, boolean dedupOff) {
@@ -86,7 +88,20 @@ public class RMA6Processor {
 		this.turnOffDeDuping = dedupOff;
 	}
 	
+
 	//setters
+	private void setContainedIDs(Set<Integer> set){
+		this.containedIDs = set;
+	}
+	private void setSumLine(HashMap<Integer,Integer> list){	
+		this.overallSum = list;
+	}
+	// private utility functions
+	private void destroy(){
+		executor.shutdown();
+	}
+	
+	//getters
 	private Set<Integer> getAllKeys(){
 		Set<Integer> keys = null;
 		try(RMA6File rma6File = new RMA6File(inDir+fileName, "r")){
@@ -104,19 +119,6 @@ public class RMA6Processor {
 		
 		return keys;
 	}
-	
-	private void setContainedIDs(Set<Integer> set){
-		this.containedIDs = set;
-	}
-	private void setSumLine(HashMap<Integer,Integer> list){	
-		this.overallSum = list;
-	}
-	// private utility functions
-	private void destroy(){
-		executor.shutdown();
-	}
-	
-	//getter
 	public HashMap<Integer,Integer> getAncientLine(){
 		return this.ancientSum;
 	}
@@ -140,7 +142,7 @@ public class RMA6Processor {
 		return this.fileName;
 	}
 
-public void process(List<Integer>taxIDs, double topPercent) {// processing 
+public void process(List<Integer>taxIDs, double topPercent) {// processing through file 
 	log.log(Level.INFO,"Reading File: " +inDir+fileName);
 	if(wantMeganSummaries){
 		DataSummaryWriter dsWriter = new DataSummaryWriter(warning);
@@ -148,17 +150,17 @@ public void process(List<Integer>taxIDs, double topPercent) {// processing
 	}
 	Set<Integer> keys = getAllKeys();
 	Set<Integer> idsToProcess = new HashSet<Integer>();
-   // treeReader here to avoid synchronization issues 
-	if(taxas == Taxas.USER){
+ 
+	if(taxas == Taxas.USER){// use user specified taxas 
 		for(Integer taxID : taxIDs){
 			idsToProcess.add(taxID);
 			idsToProcess.addAll(treeReader.getAllStrains(taxID, keys));
 		}
 	}
-	else if(taxas == Taxas.ALL){
+	else if(taxas == Taxas.ALL){// or use all taxas here has to be triggered at program initialization
 		idsToProcess.addAll(keys);
 	}
-	setContainedIDs(idsToProcess);
+	setContainedIDs(idsToProcess);// write down contained IDs
 	executor=(ThreadPoolExecutor) Executors.newFixedThreadPool(threads);
 	HashMap<Integer,Future<NodeProcessor>> results =  new HashMap<Integer,Future<NodeProcessor>>();
 		for(Integer id : idsToProcess){
@@ -168,9 +170,9 @@ public void process(List<Integer>taxIDs, double topPercent) {// processing
 			results.put(id, future);
 	  }//TaxIDs	
 	destroy();
-	RMA6OutputProcessor outProcessor = new RMA6OutputProcessor(fileName, outDir,mapReader,warning, behave,alignments, reads);
-	outProcessor.process(results);
-	if(behave==Filter.NON_ANCIENT || behave==Filter.NON){
+	RMA6OutputProcessor outProcessor = new RMA6OutputProcessor(fileName, outDir,mapReader,warning, behave,alignments, reads);// initilaize output processor here 
+	outProcessor.process(results); 
+	if(behave==Filter.NON_ANCIENT || behave==Filter.NON){// sort results accorindg to used filters
 		setSumLine(outProcessor.getSumLine());
 	}
 	if(behave==Filter.NON_ANCIENT || behave==Filter.ANCIENT){

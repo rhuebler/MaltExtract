@@ -29,13 +29,13 @@ public class NCBI_TreeReader {
 	 * @return return phylogenetic tree object
 	 */
 	
-	private String treName= "";//TODO how to provide System resources make relativistic
+	private String treName= "";
 	int target;
 	private HashSet<Integer> positionsToKeep = new HashSet<Integer>();
 	private Phylogeny ph;
 	public NCBI_TreeReader(){
 		ResourceFinder resources = new ResourceFinder();
-		treName = resources.getPath("ncbi.tre");//TODO how to provide System resources make relativistic
+		treName = resources.getPath("ncbi.tre");//if path isn't provided try to find resources
 		try(Scanner in = new Scanner(new File(treName))){
 		String line = in.nextLine();
 		in.close();
@@ -45,7 +45,7 @@ public class NCBI_TreeReader {
 	    }
 	}
 	public NCBI_TreeReader(String path){
-		this.treName = path + "ncbi.tre";
+		this.treName = path + "ncbi.tre";// if path is provided use path
 		try{
 			Scanner in = new Scanner(new File(treName));
 			String line = in.nextLine();
@@ -55,13 +55,14 @@ public class NCBI_TreeReader {
 		    	io.printStackTrace();
 		    }
 	}
+	// get files by downloading 
 	public NCBI_TreeReader(NCBI_TreeReader copyInstance){
 		this.ph = copyInstance.getPhylogeny();
 	}
 	private Phylogeny getPhylogeny(){
 		return ph;
 	}
-	private ArrayList<Integer> getAssigned( Collection<Integer> children,Set<Integer> keys){
+	private ArrayList<Integer> getAssigned( Collection<Integer> children,Set<Integer> keys){// get assinged nodes in files
 		ArrayList<Integer> assigned = new ArrayList<Integer>();
 		if(keys==null)
 			System.err.println("Danger empty keys in File");
@@ -70,7 +71,7 @@ public class NCBI_TreeReader {
 				assigned.add(key);
 		return assigned;
 	} 
-	public ArrayList<Integer> getAllStrains(int target, Set<Integer> keys){
+	public ArrayList<Integer> getAllStrains(int target, Set<Integer> keys){// get all strains of a node
 		PhylogenyNode query = ph.getNode(String.valueOf(target));
 	    for(PhylogenyNode leaf : query.getAllExternalDescendants()){
 	    	HashSet<Integer> children = new HashSet<Integer>();
@@ -91,7 +92,7 @@ public class NCBI_TreeReader {
 		return results;
 	   
 	}
-		public ArrayList<Integer>  getParents(int target){
+		public ArrayList<Integer>  getParents(int target){// get parents of leaves
 			ArrayList<Integer> ids = new ArrayList<Integer>();
 			ids.add(target);
 			int id = target;

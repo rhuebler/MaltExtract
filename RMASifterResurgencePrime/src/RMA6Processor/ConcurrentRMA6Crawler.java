@@ -6,7 +6,7 @@ import java.util.logging.Logger;
 import NCBI_MapReader.NCBI_MapReader;
 import NCBI_MapReader.NCBI_TreeReader;
 import behaviour.Filter;
-
+// Concurrent version of RMACrawler initalizes and processes a version of RMA crawler
 public class ConcurrentRMA6Crawler implements Callable<RMA6BlastCrawler> {
 	private String inDir;
 	private String fileName;

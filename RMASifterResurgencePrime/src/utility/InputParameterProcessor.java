@@ -35,7 +35,8 @@ public class InputParameterProcessor {
 	 * @throws none thrown all caught
 	 * @return return values and parameters to run and control the program
 	 */
-	private double topPercent = 0.01; // initialize with standard values;	
+	// initialize class with standard values;	
+	private double topPercent = 0.01; 
 	private List<String> fileNames = new ArrayList<String>();
 	private List<String> taxNames = new ArrayList<String>();
 	private String outDir;
@@ -55,18 +56,19 @@ public class InputParameterProcessor {
 	private boolean destackOff = false;
 	private boolean deDupOff=false;
 	// constructor
+
+	public InputParameterProcessor(String[] params ,Logger log, Logger warning){
+		this.log = log;
+		this.warning =  warning;
+		process(params);	
+	}
+	// getters for parameters
 	public boolean turnDestackingOff(){
 		return this.destackOff;
 	}
 	public double getMinComplexity(){
 		return this.minComplexity;
 	}
-	public InputParameterProcessor(String[] params ,Logger log, Logger warning){
-		this.log = log;
-		this.warning =  warning;
-		process(params);	
-	}
-	// getters
 	public boolean wantMeganSummaries(){
 		return this.wantMeganSummaries;
 	}
@@ -138,8 +140,7 @@ public class InputParameterProcessor {
 	}	
 	private void process(String[] parameters){	
     	 CommandLine commandLine;
-    	 	// Short Flags
-    	 	// edit distance 
+    	 	// Short Flags Are necessary parameters that are necessary for any run
     	    Option option_Input = Option.builder("i").longOpt("input").argName("Path/to/inDir or RMA6Files").hasArgs().desc("Specify input directory or files").build();
     	    Option option_Output = Option.builder("o").longOpt("output").argName("Path/to/outDir").hasArg().desc("Specify out directory").build();
     	    Option option_Taxons = Option.builder("t").longOpt("taxa").argName("Path/to/taxFile or Taxon in \"\"").hasArgs().desc("Target species or list of targets").build();
@@ -163,7 +164,7 @@ public class InputParameterProcessor {
     	    Option option_DeDupOff = Option.builder().longOpt("dupRemOff").hasArg().argName("turn off duplicate removal").optionalArg(true).desc("Turn Off automated pcr duplicate removal usefil in >1 coverage data").build();
     	    Options options = new Options();
     	    
-    	    
+    	    // add all parameters to the parser
     	    CommandLineParser parser = new DefaultParser();
 
     	    options.addOption(option_Input);
@@ -188,11 +189,11 @@ public class InputParameterProcessor {
     	    options.addOption(option_DeStackOff);
     	    options.addOption(option_DeDupOff);
 
-    	    try
+    	    try //evaluate commandline
     	    {
     	        commandLine = parser.parse(options, parameters);
 
-    	        if (commandLine.hasOption("input"))
+    	        if (commandLine.hasOption("input"))//evaluate input directorty
     	        {
     	        	log.log(Level.INFO,"Input Set to: ");
     	            for(String arg :commandLine.getOptionValues("input")){
@@ -221,7 +222,7 @@ public class InputParameterProcessor {
     	            }  
     	        }
     	        
-    	        if (commandLine.hasOption("output"))
+    	        if (commandLine.hasOption("output"))//set output directorty
     	        {
     	        	log.log(Level.INFO,"Output Directory set to: "+commandLine.getOptionValue("output"));
     	        	try{
@@ -232,7 +233,7 @@ public class InputParameterProcessor {
     	        		}
     	        }
     	        
-    	        if (commandLine.hasOption("taxa"))
+    	        if (commandLine.hasOption("taxa"))//evaluate node list
     	        {	this.taxas = Taxas.USER;
     	            for(String tax : commandLine.getOptionValues("taxa")){
     	            	log.info("Taxon File: ");
@@ -253,7 +254,7 @@ public class InputParameterProcessor {
     			}
     					        
     	        
-    	        if (commandLine.hasOption("threads"))
+    	        if (commandLine.hasOption("threads"))//set set number of threads
     	        {	
     	        	log.info("Trying to use "+commandLine.getOptionValue("threads")+" threads");
     	            this.numThreads=Integer.parseInt(commandLine.getOptionValue("threads"));
@@ -264,7 +265,7 @@ public class InputParameterProcessor {
     	    		log.log(Level.INFO,"Using " + numThreads +" threads");
     	        }
 
-    	        if (commandLine.hasOption("filter"))
+    	        if (commandLine.hasOption("filter"))// set filters to trigger specific behaviour 
     	        {
     	            if(Pattern.compile(Pattern.quote("default"), Pattern.CASE_INSENSITIVE).matcher(commandLine.getOptionValue("filter")).find()){
     	            	this.behave = Filter.NON;
@@ -279,13 +280,6 @@ public class InputParameterProcessor {
         	        	this.behave = Filter.CRAWL;
         	        	log.log(Level.INFO,"Custom Behaviour set to: "+commandLine.getOptionValue("filter"));
         	        }
-//    	            else if(Pattern.compile(Pattern.quote("nd_anc"), Pattern.CASE_INSENSITIVE).matcher(commandLine.getOptionValue("filter")).find()){
-//    	            	this.behave = Filter.ALL;
-//    	            	log.log(Level.INFO,"Custom Behaviour set to: "+commandLine.getOptionValue("filter"));
-//    	            }else if(Pattern.compile(Pattern.quote("nonduplicate"), Pattern.CASE_INSENSITIVE).matcher(commandLine.getOptionValue("filter")).find()){
-//    	            	this.behave = Filter.NONDUPLICATES;
-//    	            	log.log(Level.INFO,"Custom Behaviour set to: "+commandLine.getOptionValue("filter"));
-//    	            }
     	            else if(Pattern.compile(Pattern.quote("def_anc"), Pattern.CASE_INSENSITIVE).matcher(commandLine.getOptionValue("filter")).find()){
     	            	this.behave = Filter.NON_ANCIENT;
     	            	log.log(Level.INFO,"Custom Behaviour set to: "+commandLine.getOptionValue("filter"));
@@ -356,7 +350,7 @@ public class InputParameterProcessor {
     	        	log.log(Level.INFO, "retrieve Alignments");
     	        	alignment = true;
     	        }
-    	        if(commandLine.hasOption("meganSummary")){
+    	        if(commandLine.hasOption("meganSummary")){//request megan summary files
     	        	wantMeganSummaries = true;
     	        }
     	        if(commandLine.hasOption("destackingOff")){
@@ -365,29 +359,29 @@ public class InputParameterProcessor {
     	        if(commandLine.hasOption("dupRemOff")){
     	        	this.deDupOff = true;
     	        }
-    	        if(commandLine.hasOption("h")){
-    	        	String header = "RMAExtractor beta 0.1";
+    	        if(commandLine.hasOption("h")){////help
+    	        	String header = "RMAExtractor beta 0.9";
     	    	    String footer = "In case you encounter an error drop an email to huebler@shh.mpg.de with useful description";
     	    	    HelpFormatter formatter = new HelpFormatter();
     	    	    formatter.setWidth(500);
     	    	    formatter.printHelp("RMAExtractor", header, options, footer, true);   
     	    	    System.exit(0);
     	        }
-    	        if(!commandLine.hasOption("h")  && (!commandLine.hasOption("output") || !commandLine.hasOption("input"))){
+    	        if(!commandLine.hasOption("h")  && (!commandLine.hasOption("output") || !commandLine.hasOption("input"))){// use if output is missing
     	        	warning.log(Level.SEVERE,"Please, specifiy input files or input directories and output directory");
     	        	System.exit(1);
     	        }
-    	        String[] remainder = commandLine.getArgs();
+    	        String[] remainder = commandLine.getArgs();// check if unrecognised parameters are missing 
     	        if(remainder.length != 0){
     	           warning.log(Level.SEVERE,"Remaining arguments: ");
     	            for (String argument : remainder){
     	              warning.log(Level.WARNING,argument);
     	            }
     	          }
-    	        if(!commandLine.hasOption("taxa") && behave != Filter.SCAN){
+    	        if(!commandLine.hasOption("taxa") && behave != Filter.SCAN){//stop if taxa list is missing
     	        	warning.log(Level.SEVERE,"No target species provided for filtering");
     	        	System.exit(1);
-    	        }
+    	        }//stop if parameters are missing
     	        if(commandLine.hasOption("taxa") && commandLine.hasOption("list")){
     	        	warning.log(Level.SEVERE,"Use either list for build in lists or use taxa not both");
     	        	System.exit(1);

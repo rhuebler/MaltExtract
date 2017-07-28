@@ -11,12 +11,18 @@ import RMAAlignment.CompositionMap;
 import behaviour.Filter;
 import megan.data.IMatchBlock;
 import strainMap.StrainMap;
-
+/**
+ * RMA6 processor that automatically removes PCR duplicated and stacked reads
+ * @author huebler
+ *
+ */
 public class ExperimentalRMA6Destacker extends RMA6TaxonProcessor {
+	// initialize attributes
 	protected boolean wantReads = false;
 	protected boolean wantAlignments = false;
 	protected boolean turnOffDestacking = false;
 	protected boolean turnOffDeDuping = false;
+	//construvters and set values
 	public ExperimentalRMA6Destacker(Integer id, double pID, NCBI_MapReader reader, boolean v, Logger log, Logger warning,double tp,int mL, Filter behave) {
 		super(id, pID, reader, v, log, warning,tp,mL, behave);
 	}
@@ -28,7 +34,7 @@ public class ExperimentalRMA6Destacker extends RMA6TaxonProcessor {
 		this.turnOffDestacking = turnOffDestacking;
 		this.turnOffDeDuping = turnOffDeDuping;
 	}
-	
+	//process each Marchblock
 	public void processMatchBlocks(IMatchBlock[] blocks, String readName, int readLength, String sequence){
 		originalNumberOfReads++;
 		float topScore = blocks[0].getBitScore();
@@ -59,7 +65,7 @@ public class ExperimentalRMA6Destacker extends RMA6TaxonProcessor {
 			}
 	}		
 	public void process(){ 
-		//log.log(Level.INFO,"Analyzing data");
+		//analyze collected data 
 		CompositionMap map = new CompositionMap(taxonMap,turnOffDestacking,turnOffDeDuping);
 		map.process();
 		map.getNonStacked();
