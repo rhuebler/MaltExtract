@@ -6,6 +6,7 @@ import java.util.HashMap;
  *  of the ID of the matching species and a List of the Hits 
  *  Mainly serves as a Storage to identify the reference to calculate Read distribution and to mark duplicates 
  */
+// set Composition Map
 public class CompositionMap {
 	private boolean turnOffDestacking= false;
 	private boolean turnOffDeDupping = false;
@@ -17,9 +18,9 @@ public class CompositionMap {
 		this.turnOffDestacking = turnOffDestacking;
 		this.turnOffDeDupping = turnOffDeDupping;
 	}
+	// initialize values
 private HashMap<Integer,ArrayList<Alignment>> compositionMap;// hashMap of ReferenceID to List of start positions
 private HashMap<String,ArrayList<Alignment>> resultsMap = new HashMap<String,ArrayList<Alignment>>();// hashMap of ReferenceID to List of start positions
-//HashMap<Integer,Integer> taxonComposition; currently unused 
 private int maxID;
 private ArrayList<Double> generalStatistics;
 private HashMap<Integer,Integer> coverageHistogram;
@@ -149,6 +150,8 @@ public void getNonStacked(){
 		}
 	}
 
+
+// process compostion map
 public void process(){
 	HashMap<Integer,ArrayList<Alignment>> map = compositionMap;
 	HashMap<Integer,Integer> results = new HashMap<Integer,Integer>();
@@ -162,8 +165,9 @@ public void process(){
 	}
 	setMaxID(maxKey);
 	markAllDuplicates();
-	//setTaxonCompositionMap(results);
   }
+
+//calculate and get all top references
 public HashMap<Double,ArrayList<Integer>> getAllTopReferences(){
 	HashMap<Double,ArrayList<Integer>> additional = new HashMap<Double,ArrayList<Integer>>();
 	HashMap<Integer,ArrayList<Alignment>> map = compositionMap;

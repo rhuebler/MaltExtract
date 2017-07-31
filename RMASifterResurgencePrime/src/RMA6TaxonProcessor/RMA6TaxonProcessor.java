@@ -61,6 +61,7 @@ protected boolean turnedOn = true;
 protected String additionalEntries = "none";
 //constructor
 public RMA6TaxonProcessor(Integer id, double pID, NCBI_MapReader reader, boolean v, Logger log, Logger warning, double topPercent, int maxLength, Filter f){
+	// set input values
 	this.mapReader = reader;
 	this.minPIdent = pID;
 	this.taxID = id;
@@ -92,9 +93,6 @@ public RMA6TaxonProcessor(Integer id, double pID, NCBI_MapReader reader, boolean
 	setDamageLine(s);
 	this.readDistribution = taxName+"\tNA\t0\t0\t0\t0\t0\t0";
 }
-public RMA6TaxonProcessor() {
-	// TODO Auto-generated constructor stub
-}
 //setters
 protected void setOriginalNumberOfAlignments(int num){
 	this.originalNumberOfAlignments = num;
@@ -111,6 +109,7 @@ protected void setAlignments(ArrayList<String> list){
 protected void setDamageLine(String s){
 	this.damageLine = s;
 }
+// setter for compostion map that retrieves information on read distribution and node composition
 protected void processCompositionMap(CompositionMap map){
 	DecimalFormat df = new DecimalFormat("#.###");
 	if(map != null){
@@ -152,6 +151,7 @@ protected void processCompositionMap(CompositionMap map){
 protected void setNumberOfReads(int n){
 	this.numOfReads=n;
 }
+// set and process edit distance distribution
 protected void setEditDistanceHistogram(ArrayList<Integer> list){
 	HashMap<Integer,Integer> histo = new HashMap<Integer,Integer> ();
 	for(int i = 0;i < 7;i++){
@@ -172,6 +172,7 @@ protected void setEditDistanceHistogram(ArrayList<Integer> list){
 	}
 	this.editHistogram = histo;
 }
+// process percent identity
 protected void setPercentIdentityHistogram(ArrayList<Double> list){
 	HashMap<Integer,Integer> histo = new HashMap<Integer,Integer> ();
 	for(int i = 0;i < 5; i++){
@@ -230,6 +231,7 @@ public String getCoverageLine(){
 public String getDamageLine(){
 	return this.damageLine;
 }
+// get Name of class
 protected String getName(int taxId){
 	String name;
 	if(mapReader.getNcbiIdToNameMap().get(taxId) != null)
@@ -267,6 +269,7 @@ protected double getGcContent(String sequence){
 	}
 	return gcContent;
 }
+//calculate read length distribtuion
 protected void calculateReadLengthDistribution(){
 	if(lengths.size() != 0){
 		DescriptiveStatistics stats = new DescriptiveStatistics();
@@ -280,7 +283,6 @@ protected void calculateReadLengthDistribution(){
 		this.readLengthStatistics = line;
 	}
 }
-//getters
 public String getReadLengthStatistics(){
 	return this.readLengthStatistics;
 }

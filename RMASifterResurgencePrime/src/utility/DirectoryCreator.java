@@ -7,7 +7,7 @@ import behaviour.Filter;
 public class DirectoryCreator {
 /**
  * @author huebler
- * Create all directories associated with RMAextractor depending on input behavaviour
+ * Create all directories associated with RMAextractor depending on input parameters
  * @param behave
  * @param outDir
  * @param hits

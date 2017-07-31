@@ -12,7 +12,11 @@ import java.nio.file.Paths;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
-
+/**
+ * Tjis class is used to locate the NCBI Map and NCBI tre
+ * @author huebler
+ *
+ */
 public class ResourceFinder {
 	public String getPath(String pattern){
 		ArrayList<Path> files = new ArrayList<Path>();

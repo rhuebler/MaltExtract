@@ -2,12 +2,13 @@ package RMAAlignment;
 
 import java.util.Comparator;
 /**
- * This class Represents an MatchBlock from Megan but has more Slots available
+ * This class Represents an MatchBlock from Megan but has more Slots available and processes part of the alignment into statistics
  * @author huebler
  *
  */
 
 public class Alignment {
+	// slots
 	private String readName;
 	private double pIdent;
 	private String query;
@@ -30,7 +31,7 @@ public class Alignment {
 	private String sequence;
 	private String text;
 	private boolean stacked = false;
-	// getter
+// getter
 public boolean isStacked(){
 	return this.stacked;
 }	
@@ -157,7 +158,7 @@ private void setReferenceLength(int k) {
 
  private void setNumGaps(int k){
 	 this.numGaps = k;}
- 
+ //utility
  private boolean misMatchFivePrime(int i){
 	 if((reference.charAt(i) == 'C' && query.charAt(i) == 'T')||
 		(reference.charAt(i) == 'c' && query.charAt(i) == 't')){
@@ -174,6 +175,7 @@ private void setReferenceLength(int k) {
 		 return false;
 	 }
  }
+ //calcultate edit distance between reference and query
  private void calculateEditDistance(String sequence, String reference){
 	 int len1 = sequence.length();
 		int len2 = reference.length();
@@ -197,7 +199,7 @@ private void setReferenceLength(int k) {
 			 }	 
 	 this.editDistance = d[sequence.length()][reference.length()];
  }
- 
+ 	//get information from match block
 	 public void processText(){
 		 String alignment="";
 		 String query ="";

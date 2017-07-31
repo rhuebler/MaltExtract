@@ -7,13 +7,13 @@ import RMAAlignment.Alignment;
 import behaviour.Filter;
 /**
  * Functions that collects all misMatches and processes them 
- * also serves as a container 
+ * also serves as a container for alignmets
  * @author huebler
  *
  */
 
 public class StrainMisMatchContainer{
-	
+	// initialize attributes
 	private HashMap<Integer,HashMap<String,Integer>> container = new HashMap<Integer,HashMap<String,Integer>>();
 	private HashMap<Integer,Double> damage; 
 	private HashMap<Integer,Double> noise;
@@ -45,6 +45,7 @@ public HashMap<Integer,Double> getDamage(){
 public HashMap<Integer,Double> getNoise(){
 	return this.noise;
 }	
+//retrieve information from alignment
 public void processAlignment(Alignment al){
 	if(al.getMlength() >= 20){
 		if(filter == Filter.CRAWL){
@@ -91,6 +92,7 @@ public void processAlignment(Alignment al){
 		}
 	}
 }
+// get mismatches
 public void processMisMatches(){
 	HashMap<Integer,Double> damage = new HashMap<Integer,Double>();
 	HashMap<Integer,Double> noise = new HashMap<Integer,Double>();

@@ -7,7 +7,9 @@ import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 public class StrainMap {
 	/**
 	 * Containter of StrainMisMatchContainer and other information for one strain 
+	 * 
 	 */
+	//Initialize attributes
 	private String name;
 	private StrainMisMatchContainer container;
 	private int numMatches=0;
@@ -20,6 +22,7 @@ public class StrainMap {
 		
 	}
 	//setters
+	//get edit edit distance and process edi distances
 	public String getEditDistanceHistogram(){
 		HashMap<Integer,Integer> histo = new HashMap<Integer,Integer> ();
 		for(int i = 0;i < 7;i++){
@@ -42,6 +45,7 @@ public class StrainMap {
 		
 		return name.replace(" ", "_")+"\t"+ histo.get(0)+"\t"+histo.get(1)+"\t"+histo.get(2)+"\t"+histo.get(3)+"\t"+histo.get(4)+"\t"+histo.get(5)+"\t"+histo.get(6);
 	}
+	// get and process percent identity
 	public String getPercentIdentityHistogram(){
 		HashMap<Integer,Integer> histo = new HashMap<Integer,Integer> ();
 		for(int i = 0;i < 5; i++){
@@ -75,6 +79,7 @@ public class StrainMap {
 		}
 		return name.replace(" ", "_")+"\t"+histo.get(0)+"\t"+histo.get(1)+"\t"+histo.get(2)+"\t"+histo.get(3)+"\t"+histo.get(4);
 	}
+	// produce and get read distances
 	public String getReadLengthDistribution(){
 		ArrayList<Integer> lengths = container.getLengths();
 		if(lengths.size() != 0){
@@ -91,14 +96,7 @@ public class StrainMap {
 			return name.replace(" ", "_")+"\t0\t0\t0\t0";
 		}
 	}
-	public void setStrainMisMatchContainer(StrainMisMatchContainer container){
-		this.container = container;
-	}
-	public void setNumberOfMatches(int n){
-		this.numMatches = n;
-	}
-	
-	// getters
+	//get strain mismatch container
 	public StrainMisMatchContainer getStrainMisMatchContainer(){
 		return this.container;
 	}
@@ -108,7 +106,7 @@ public class StrainMap {
 	public int getNumberOfMatches(){
 		return this.numMatches;
 	}
-	public String getLine(){ // process Map Into Damage Output Line
+	public String getLine(){ // process Map Into Damage Output Line 
 			if(container.getProcessed()!=0){
 				container.processMisMatches();
 				numMatches = container.getProcessed();
@@ -142,4 +140,14 @@ public class StrainMap {
 			return part1;
 		}
 	}
+	//setters
+	public void setStrainMisMatchContainer(StrainMisMatchContainer container){
+		this.container = container;
+	}
+	public void setNumberOfMatches(int n){
+		this.numMatches = n;
+	}
+	
+	
+	
 }

@@ -6,16 +6,19 @@ import java.util.HashMap;
 import java.util.HashSet;
 /**
  * This class is used to compute some Statistics from a List of Alignments. Alignments should come from CompositionMap and must have their duplicates marked
+ * Usually duplicates will be removed unless the off switch is turned on. And stacking reads is removed also retrieve information whether filter was turned off or not
  * @author huebler
  *
  */
 public class AlignmentStatistics {
+	// initialize attributes
 	private ArrayList<Alignment> currentList;
 	private ArrayList<Double> generalStatistics;
 	private HashMap<Integer,Integer> coverageHistogram;
 	private int length;
 	private boolean turnOffDestacking = false;
 	private boolean turnOffDeDupping = false;
+	//constructor and set values
 	public AlignmentStatistics(ArrayList<Alignment> list, boolean turnOffDestacking, boolean turnOffDeDupping){
 		this.currentList = list;
 		this.turnOffDestacking = turnOffDestacking;
@@ -31,7 +34,7 @@ public class AlignmentStatistics {
 	public int getLength(){
 		return this.length;
 	}
-	
+	// remove reads that are flagged as duplicates
 	private ArrayList<Alignment> removeDuplicates(ArrayList<Alignment> input){
 		HashSet<Integer> length = new HashSet<Integer>();
 		if(input != null && input.size() > 2){
@@ -60,6 +63,7 @@ public class AlignmentStatistics {
 			input = currentList;
 		if(input != null && input.size()>0){
 			ArrayList<Double> results = new ArrayList<Double>();
+			// initialize reference map
 			ReferenceMap refMap = new ReferenceMap(input,turnOffDestacking);
 			refMap.process();
 			HashMap<Integer,Integer> coverageHistogram = refMap.getCoverageHistogram();

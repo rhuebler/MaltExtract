@@ -15,7 +15,11 @@ import megan.core.MeganFile;
 import megan.core.SampleAttributeTable;
 import megan.core.SyncArchiveAndDataTable;
 import megan.data.IConnector;
-
+/**
+ *  This class gets the Megan summary files from the RMA6Files
+ * @author huebler
+ *
+ */
 public class DataSummaryWriter {
 	Logger warning;
 	public DataSummaryWriter(Logger warning){

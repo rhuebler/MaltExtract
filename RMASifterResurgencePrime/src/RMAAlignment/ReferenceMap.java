@@ -3,8 +3,13 @@ package RMAAlignment;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
-
+/**
+ * This class is used to get the coverage Histogram and to mark and remove stacked reads based oninut parameters
+ * @author huebler
+ *
+ */
 public class ReferenceMap {
+	//initialize atttributes
 	private ArrayList<Alignment> input;
 	private HashMap<Integer,Integer> coverageHistogram;
 	private int stackedReads = 0;
@@ -15,6 +20,7 @@ public class ReferenceMap {
 	private boolean turnedOn = true;
 	private double averageCoverage = 0;
 	private boolean turnOffDestacking = false;
+	// constructor
 	public ReferenceMap(ArrayList<Alignment> input, boolean turnOffDestacking){
 		this.input = input;
 		this.turnOffDestacking = turnOffDestacking;
@@ -44,7 +50,7 @@ public class ReferenceMap {
 	public HashMap<Integer,Integer> getCoverageHistogram(){
 		return this.coverageHistogram;
 	}
-	//differentiate different plasmids and chromosomes by length and calculate total length 
+	//differentiate different plasmids and chromosomes by length and calculate total length  while processing the alignments
 	public void process(){
 		nonStacked.addAll(input);
 		HashMap<Integer,Integer> coverageHistogram = new HashMap<Integer,Integer>();

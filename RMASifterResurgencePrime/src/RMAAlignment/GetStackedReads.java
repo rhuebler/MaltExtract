@@ -5,11 +5,13 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 /**
- * This class is used to compute some Statistics from a List of Alignments. Alignments should come from CompositionMap and must have their duplicates marked
+ * This class is used to mark and remove stacked reads from alignments. Alignments should come from CompositionMap and must have their duplicates marked. 
+ * Return list with removed stakced reads and coverage distribution. Is an version of alignment statistics 
  * @author huebler
  *
  */
 public class GetStackedReads {
+	// intilaize with values
 	private ArrayList<Alignment> currentList;
 	private ArrayList<Double> generalStatistics;
 	private HashMap<Integer,Integer> coverageHistogram;
@@ -17,10 +19,13 @@ public class GetStackedReads {
 	private ArrayList<Alignment> nonStacked = new ArrayList<Alignment>();
 	private boolean turnedOn = true;
 	private boolean turnOffDeDupping = false;
-	//getters
-	public GetStackedReads(boolean turnOffDeDupping){
+	private boolean turnOffDestacking = false;
+
+	public GetStackedReads(boolean turnOffDeDupping, boolean turnOffDestacking){
 		this.turnOffDeDupping = turnOffDeDupping;
+		this.turnOffDestacking = turnOffDestacking;
 	}
+	//getters
 	public boolean wasTurnedOn(){
 		return this.turnedOn;
 	}
@@ -39,6 +44,7 @@ public class GetStackedReads {
 	public int getLength(){
 		return this.length;
 	}
+	//remove duplicate alignments
 	private ArrayList<Alignment> removeDuplicates(ArrayList<Alignment> input){
 		HashSet<Integer> length = new HashSet<Integer>();
 		if(input != null && input.size() > 2){
@@ -59,10 +65,13 @@ public class GetStackedReads {
 	
 	// process best list of start positions
 	public void calculateStatistics(){
-		
-		ArrayList<Alignment> input = removeDuplicates(currentList);
+		ArrayList<Alignment> input = new ArrayList<Alignment>();
+		if(!turnOffDeDupping)
+			input = removeDuplicates(currentList);
+		else
+			 input = removeDuplicates(currentList);
 		if(input != null && input.size()>0){
-			ReferenceMap refMap = new ReferenceMap(input,turnOffDeDupping);
+			ReferenceMap refMap = new ReferenceMap(input,turnOffDestacking);
 			refMap.process();
 			this.nonStacked = refMap.getNonStacked();
 			this.turnedOn = refMap.wasTurnedOn();
