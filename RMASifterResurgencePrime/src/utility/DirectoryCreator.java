@@ -24,7 +24,7 @@ public class DirectoryCreator {
 			new File(outDir+"/crawlResults/readDist/").mkdirs();
 			new File(outDir+"/crawlResults/editDistance/").mkdirs();
 			new File(outDir+"/crawlResults/percentIdentity/").mkdirs();
-			
+			new File(outDir+"/crawlResults/reads/").mkdirs();
 		}
 		if(behave == Filter.NON){
 			new File(outDir+"/default/").mkdirs();

@@ -47,7 +47,10 @@ public class RMA6BlastCrawler {
 	private ArrayList<String> percentIdentities = new ArrayList<String>();
 	private ArrayList<String> readDistributions = new ArrayList<String>();
 	private Filter filter = Filter.CRAWL;
+	private ArrayList<String> reads =new ArrayList<String>();
+	private ArrayList<String> headers =new ArrayList<String>();
 	//set values at construction
+	//TODO get Reads
 	public RMA6BlastCrawler(String dir, String name, String species, String out, NCBI_MapReader reader ,Logger warning,NCBI_TreeReader treeReader,
 			Filter filter){
 		this.inDir = dir;
@@ -125,7 +128,19 @@ public class RMA6BlastCrawler {
 	}
  
 }
-	
+	private void writeReads(List<String>reads,List<String>headers){
+		try{
+			ArrayList<String> summary = new ArrayList<String>();
+			for(int i = 0; i<= reads.size();i++){
+				summary.add(headers.get(i));
+				summary.add(headers.get(i));
+			}
+			Path file = Paths.get(outDir+"/crawlResults/reads/"+fileName+"_"+"_reads.fa");
+			Files.write(file, summary, Charset.forName("UTF-8"));
+		}catch(IOException io){
+			warning.log(Level.SEVERE,"Cannot write file", io);
+		}
+	} 	
 	// get all keys from a file
 	private Set<Integer> getAllKeys(String fileName){
 		Set<Integer> keys = null;
@@ -178,7 +193,10 @@ public class RMA6BlastCrawler {
 								if(blocks[i].getBitScore()/topScore < 1-0.01){
 									break;}
 								if(getName(blocks[i].getTaxonId()).contains(speciesName)){
-				
+									if(!reads.contains(current.getReadSequence())&&!headers.contains(current.getReadHeader())){
+										reads.add(current.getReadSequence());
+										headers.add(current.getReadHeader());
+									}
 									Alignment al = new Alignment();
 									al.setText(blocks[i].getText());
 									al.processText();
@@ -218,5 +236,6 @@ public class RMA6BlastCrawler {
 		writeEditDistance(editDistances);
 		writePercentIdentity(percentIdentities);
 		writeReadLengthDistribution(readDistributions);
+		writeReads(reads,headers);
 	}
 }
