@@ -135,7 +135,7 @@ public class RMA6BlastCrawler {
 				summary.add(headers.get(i));
 				summary.add(headers.get(i));
 			}
-			Path file = Paths.get(outDir+"/crawlResults/reads/"+fileName+"_"+"_reads.fa");
+			Path file = Paths.get(outDir+"/crawlResults/reads/"+fileName+"_"+speciesName+"_reads.fa");
 			Files.write(file, summary, Charset.forName("UTF-8"));
 		}catch(IOException io){
 			warning.log(Level.SEVERE,"Cannot write file", io);
