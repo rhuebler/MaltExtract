@@ -31,7 +31,11 @@ public class Alignment {
 	private String sequence;
 	private String text;
 	private boolean stacked = false;
+	private int taxID = 0;
 // getter
+public int getTaxID(){
+	return this.taxID;
+}	
 public boolean isStacked(){
 	return this.stacked;
 }	
@@ -99,6 +103,9 @@ public String getQuery(){
 	 return this.referenceLength;}
  
  // setters
+ public void setTaxID(int ID){
+	this.taxID = ID;
+ }
  public void setStacked(boolean b){
 	 this.stacked = b;
  }

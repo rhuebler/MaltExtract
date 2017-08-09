@@ -52,14 +52,25 @@ public class ExperimentalRMA6Destacker extends RMA6TaxonProcessor {
 				originalNumberOfAlignments++;
 				if(minPIdent <= al.getPIdent()){ // check for minPercentIdentity
 								//get mismatches
-					if(!taxonMap.containsKey(blocks[i].getTaxonId())){
+					if(!taxonMap.containsKey(al.getTaxID())){
+						HashMap<String,ArrayList<Alignment>> list = new HashMap<String,ArrayList<Alignment>>();
 						ArrayList<Alignment> entry =new ArrayList<Alignment>();
 						entry.add(al);
-						taxonMap.put(blocks[i].getTaxonId(), entry);
+						list.put(al.getAccessionNumber(), entry);
+						taxonMap.put(al.getTaxID(), list);
 					}else{
-						ArrayList<Alignment> entry = taxonMap.get(blocks[i].getTaxonId());
-						entry.add(al);
-						taxonMap.put(blocks[i].getTaxonId(),entry);
+						HashMap<String,ArrayList<Alignment>> list =  taxonMap.get(al.getTaxID());
+						if(!list.containsKey(al.getAccessionNumber())){
+							ArrayList<Alignment> entry = new ArrayList<Alignment>();
+							entry.add(al);
+							list.put(al.getAccessionNumber(), entry);
+						}else{
+							ArrayList<Alignment> entry = list.get(al.getTaxID());
+							entry.add(al);
+							list.replace(al.getAccessionNumber(),entry);
+						}
+						
+						taxonMap.replace(al.getTaxID(),list);
 					}
 				}
 			}

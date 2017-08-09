@@ -51,7 +51,7 @@ protected int originalNumberOfAlignments = 0;
 protected String filterLine = "";
 protected ArrayList<Integer> distances = new ArrayList<Integer>();
 protected ArrayList<Double> pIdents = new ArrayList<Double>();
-protected HashMap<Integer, ArrayList<Alignment>> taxonMap = new HashMap<Integer, ArrayList<Alignment>>();
+protected HashMap<Integer,HashMap<String, ArrayList<Alignment>>> taxonMap = new HashMap<Integer,HashMap<String, ArrayList<Alignment>>>();
 protected Filter filter = Filter.NON;
 protected StrainMisMatchContainer container = new StrainMisMatchContainer(filter);
 protected String readLengthStatistics;

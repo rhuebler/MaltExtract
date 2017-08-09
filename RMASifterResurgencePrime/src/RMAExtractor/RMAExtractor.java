@@ -1,4 +1,8 @@
 package RMAExtractor;
+//TODO load tree and Map file direkte benutzbarkeit durch unkundigen users 
+//TODO add ability to retireve output in SAM
+//TODO add larger intervals
+//TODO add %higher than X covered
 
 import java.io.File; 
 import java.io.IOException;

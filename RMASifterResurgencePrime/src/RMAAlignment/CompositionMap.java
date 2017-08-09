@@ -10,16 +10,16 @@ import java.util.HashMap;
 public class CompositionMap {
 	private boolean turnOffDestacking= false;
 	private boolean turnOffDeDupping = false;
-	public CompositionMap(HashMap<Integer,ArrayList<Alignment>> map){
-		setCompositionMap(map);
-	}
-	public CompositionMap(HashMap<Integer,ArrayList<Alignment>> map,boolean turnOffDestacking, boolean turnOffDeDupping){
-		setCompositionMap(map);
+//	public CompositionMap(HashMap<Integer,ArrayList<Alignment>> map){
+//		setCompositionMap(map);
+//	}
+	public CompositionMap(HashMap<Integer, HashMap<String, ArrayList<Alignment>>> taxonMap,boolean turnOffDestacking, boolean turnOffDeDupping){
+		setCompositionMap(taxonMap);
 		this.turnOffDestacking = turnOffDestacking;
 		this.turnOffDeDupping = turnOffDeDupping;
 	}
 	// initialize values
-private HashMap<Integer,ArrayList<Alignment>> compositionMap;// hashMap of ReferenceID to List of start positions
+private HashMap<Integer, HashMap<String, ArrayList<Alignment>>> compositionMap;// hashMap of ReferenceID to List of start positions
 private HashMap<String,ArrayList<Alignment>> resultsMap = new HashMap<String,ArrayList<Alignment>>();// hashMap of ReferenceID to List of start positions
 private int maxID;
 private ArrayList<Double> generalStatistics;
@@ -39,7 +39,7 @@ public int getReferenceLength(){
 public int getMaxID(){
 	return this.maxID;}
 
-public HashMap<Integer,ArrayList<Alignment>> getCompositionMap(){
+public HashMap<Integer, HashMap<String, ArrayList<Alignment>>> getCompositionMap(){
 	return this.compositionMap;}
 public ArrayList<Double> getGenaralStatistics(){
 	return this.generalStatistics;
@@ -48,8 +48,8 @@ public HashMap<Integer,Integer> getConverageHistogram(){
 	return this.coverageHistogram;
 }
 //setters
-private void setCompositionMap(HashMap<Integer,ArrayList<Alignment>> map){// technically not required
-	this.compositionMap = map;}
+private void setCompositionMap(HashMap<Integer, HashMap<String, ArrayList<Alignment>>> taxonMap){// technically not required
+	this.compositionMap = taxonMap;}
 
 private void setMaxID(int i){
 	this.maxID = i;
