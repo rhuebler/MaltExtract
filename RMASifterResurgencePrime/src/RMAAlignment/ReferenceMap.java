@@ -9,9 +9,11 @@ import java.util.HashSet;
  *
  */
 public class ReferenceMap {
-	//initialize atttributes
+	//initialize attributes
 	private ArrayList<Alignment> input;
+	private double coverageDeviation=0.0;
 	private HashMap<Integer,Integer> coverageHistogram;
+	private HashMap<Integer,Double> coverageMap = new HashMap<Integer,Double>();
 	private int stackedReads = 0;
 	private double unique = 0;
 	private double possible = 0;
@@ -26,6 +28,12 @@ public class ReferenceMap {
 		this.turnOffDestacking = turnOffDestacking;
 	}
 	//getters
+	public double getCoverageDeviation(){
+		return this.coverageDeviation;
+	}
+	public HashMap<Integer,Double>  getCoveragePositions(){
+		return coverageMap;
+	}
 	public double getAverageCoverage(){
 		return averageCoverage;
 	}
@@ -105,11 +113,36 @@ public class ReferenceMap {
 		HashSet<Alignment> stacked = new HashSet<Alignment>();
 		
 		//calculate average coverage on reference and turnOff stackedReadRemoval if too high
-		double averageCoverage = 0;
-		for(int k: coverageContainer.keySet())
-			averageCoverage+=coverageContainer.get(k);
+		double averageCoverage = 0;//Get information on coverage
+		for(i=0;i<5;i++)
+			coverageMap.put(0,0.0);
+		// get percentage higher than x
+		for(int k: coverageContainer.keySet()){
+			double coverage = coverageContainer.get(k);
+			averageCoverage+=coverage;
+			if(coverage>1){
+				coverageMap.replace(0, coverageMap.get(0)+1);
+			}else if(coverage>2){
+				coverageMap.replace(1, coverageMap.get(1)+1);
+			}else if(coverage>3){
+				coverageMap.replace(2, coverageMap.get(2)+1);
+			}else if(coverage>4){
+				coverageMap.replace(3, coverageMap.get(3)+1);
+			}else if(coverage>5){
+				coverageMap.replace(4, coverageMap.get(4)+1);
+			}
+		}
 		averageCoverage/=length;
+		// calculate standard deviation
+		double temp = 0.0;
 		this.averageCoverage = averageCoverage;
+		for(int k: coverageContainer.keySet()){
+			double coverage = coverageContainer.get(k);
+			temp+=(coverage-averageCoverage)*(coverage-averageCoverage);
+		}	
+		temp+=(averageCoverage*(length-coverageContainer.size()));
+		temp/=length;
+		this.coverageDeviation = temp;
 		if(averageCoverage>=10 && !turnOffDestacking)
 			turnedOn = false;
 		

@@ -22,11 +22,16 @@ public class CompositionMap {
 private HashMap<Integer, HashMap<String, ArrayList<Alignment>>> compositionMap;// hashMap of ReferenceID to List of start positions
 private HashMap<String,ArrayList<Alignment>> resultsMap = new HashMap<String,ArrayList<Alignment>>();// hashMap of ReferenceID to List of start positions
 private int maxID;
+private String maxReference;
 private ArrayList<Double> generalStatistics;
 private HashMap<Integer,Integer> coverageHistogram;
+private ArrayList<String> coveragePositions;
 private int refLength = 0;
 private boolean turnedOn = true;
 //getter
+public ArrayList<String> getCoveragePositions(){
+	return this.coveragePositions;
+}
 public boolean wasTurnedOn(){
 	return this.turnedOn;
 }
@@ -54,47 +59,54 @@ private void setCompositionMap(HashMap<Integer, HashMap<String, ArrayList<Alignm
 private void setMaxID(int i){
 	this.maxID = i;
 }
+private void setMaxReference(String reference){
+	this.maxReference = reference;
+}
 //utility
-private ArrayList<Alignment> markDuplicates(ArrayList<Alignment> inList){ // that seems to be correct may be the ordering works better and therefore more stacking reads can be found
+private HashMap<String,ArrayList<Alignment>> markDuplicates(HashMap<String,ArrayList<Alignment>> map){ // that seems to be correct may be the ordering works better and therefore more stacking reads can be found
 	AlignmentComparator comp = new AlignmentComparator(); // should theoretically sort my alignments according to start positions
-	inList.sort(comp);
-	int i =0;
-	while(i < inList.size() - 1){// array size is 47 last 46
-		Alignment current = inList.get(i);
-		Alignment next = inList.get(i+1);
-		int cStart = 0;
-		int cEnd = 0;
-		int nStart = 0;
-		int nEnd = 0;
-		if(!current.isReversed() == !next.isReversed()){
-			cStart = current.getStart();
-			cEnd = current.getEnd();
-			nStart = next.getStart();
-			nEnd = next.getEnd();
-		}else if(current.isReversed() == !next.isReversed()){
-			cStart = current.getEnd();
-			cEnd = current.getStart();
-			nStart = next.getStart();
-			nEnd = next.getEnd();
-		}else if(!current.isReversed() == next.isReversed()){
-			cStart = current.getStart();
-			cEnd = current.getEnd();
-			nStart = next.getEnd();
-			nEnd = next.getStart();
-		}else{
-			cStart = current.getEnd();
-			cEnd = current.getStart();
-			nStart = next.getEnd();
-			nEnd = next.getStart();
+	for(String key : map.keySet()){
+		ArrayList<Alignment> inList = map.get(key);
+		inList.sort(comp);
+		int i =0;
+		while(i < inList.size() - 1){// array size is 47 last 46
+			Alignment current = inList.get(i);
+			Alignment next = inList.get(i+1);
+			int cStart = 0;
+			int cEnd = 0;
+			int nStart = 0;
+			int nEnd = 0;
+			if(!current.isReversed() == !next.isReversed()){
+				cStart = current.getStart();
+				cEnd = current.getEnd();
+				nStart = next.getStart();
+				nEnd = next.getEnd();
+			}else if(current.isReversed() == !next.isReversed()){
+				cStart = current.getEnd();
+				cEnd = current.getStart();
+				nStart = next.getStart();
+				nEnd = next.getEnd();
+			}else if(!current.isReversed() == next.isReversed()){
+				cStart = current.getStart();
+				cEnd = current.getEnd();
+				nStart = next.getEnd();
+				nEnd = next.getStart();
+			}else{
+				cStart = current.getEnd();
+				cEnd = current.getStart();
+				nStart = next.getEnd();
+				nEnd = next.getStart();
+			}
+			if( cStart == nStart && cEnd == nEnd &&
+			 current.getReferenceLength() == next.getReferenceLength()){
+				//inList.get(i).setDuplicate(true);TODO only set first Read as duplicate 
+				inList.get(i+1).setDuplicate(true);
+			}
+				i++;
 		}
-		if( cStart == nStart && cEnd == nEnd &&
-		 current.getReferenceLength() == next.getReferenceLength()){
-			//inList.get(i).setDuplicate(true);TODO only set first Read as duplicate 
-			inList.get(i+1).setDuplicate(true);
-		}
-			i++;
+		map.replace(key, inList);
 	}
-	return inList;
+	return map;
 }
 public void markReferenceDuplicates(){
 	this.compositionMap.put(getMaxID(), markDuplicates(this.compositionMap.get(getMaxID())));
@@ -105,32 +117,35 @@ public void markAllDuplicates(){
 	}
 }
 public void calculateStatistics(){
-	AlignmentStatistics stats = new AlignmentStatistics(this.compositionMap.get(getMaxID()),turnOffDestacking, turnOffDeDupping);
+	AlignmentStatistics stats = new AlignmentStatistics(this.compositionMap.get(getMaxID()).get(maxReference),turnOffDestacking, turnOffDeDupping);
 	stats.calculateStatistics();
 	this.coverageHistogram = stats.getConverageHistogram();
 	this.generalStatistics = stats.getGenaralStatistics();
 	this.refLength = stats.getLength();
+	this.coveragePositions = stats.getCoveragePositions();
 }
 
 // process composition and find taxon with maximum number of start positions
 public void getNonStacked(){
 	//get nonstacked Reads
 	for(int key : compositionMap.keySet()){
-		if(turnOffDestacking){
-			for(Alignment al : compositionMap.get(key)){
-				String name = al.getReadName();
-				if(resultsMap.containsKey(name)){
-					ArrayList<Alignment> list = resultsMap.get(name);
-					list.add(al);
-					resultsMap.replace(name, list);
-				}else{
-					ArrayList<Alignment> list = new ArrayList<Alignment>();
-					list.add(al);
-					resultsMap.put(name, list);
+		HashMap<String,ArrayList<Alignment>> rMap = compositionMap.get(key);
+		for(String reference : rMap.keySet()){
+			if(turnOffDestacking){
+				for(Alignment al : rMap.get(reference)){
+					String name = al.getReadName();
+					if(resultsMap.containsKey(name)){
+						ArrayList<Alignment> list = resultsMap.get(name);
+						list.add(al);
+						resultsMap.replace(name, list);
+					}else{
+						ArrayList<Alignment> list = new ArrayList<Alignment>();
+						list.add(al);
+						resultsMap.put(name, list);
+						}
 					}
-			}
 		}else{
-			GetStackedReads reads = new GetStackedReads(compositionMap.get(key));
+			GetStackedReads reads = new GetStackedReads(rMap.get(reference));
 			reads.calculateStatistics();
 			if(!reads.wasTurnedOn())
 				turnedOn = false;
@@ -149,34 +164,44 @@ public void getNonStacked(){
 			}
 		}
 	}
+}
 
 
 // process compostion map
 public void process(){
-	HashMap<Integer,ArrayList<Alignment>> map = compositionMap;
-	HashMap<Integer,Integer> results = new HashMap<Integer,Integer>();
-	int max=0; int maxKey=0;
-	for(int key : map.keySet()){
-		results.put(key, map.get(key).size());
-		if(map.get(key).size()>max){
-			maxKey=key;
-			max= map.get(key).size();
+	HashMap<Integer,HashMap<String,ArrayList<Alignment>>> cMap = compositionMap;
+	int max=0; 
+	int maxKey=0; 
+	String maxReference="";
+	for(int id: cMap.keySet()){
+		HashMap<String,ArrayList<Alignment>> map = cMap.get(id);
+		for(String key : map.keySet()){
+			if(map.get(key).size()>max){
+				maxKey=id;
+				max= map.get(key).size();
+				maxReference=key;
 			}
+		}
 	}
 	setMaxID(maxKey);
+	setMaxReference(maxReference);
 	markAllDuplicates();
   }
 
 //calculate and get all top references
 public HashMap<Double,ArrayList<Integer>> getAllTopReferences(){
 	HashMap<Double,ArrayList<Integer>> additional = new HashMap<Double,ArrayList<Integer>>();
-	HashMap<Integer,ArrayList<Alignment>> map = compositionMap;
+	HashMap<Integer,HashMap<String,ArrayList<Alignment>>> map = compositionMap;
 	if(map.size()>=1){
-		int maxSize = map.get(maxID).size();
+		int maxSize = map.get(maxID).get(maxReference).size();
 		for(double x = 1.0;x>=0.0;x-=0.1){
 			ArrayList<Integer> margin = new ArrayList<Integer>();
 			for(int key : map.keySet()){
-				if(map.get(key).size()> (maxSize*x) && map.get(key).size()<= maxSize*(x+0.1)){
+				int size = 0;
+				for(String ref : map.get(key).keySet()){
+					size += map.get(key).get(ref).size();
+				}		
+				if(size > (maxSize*x) && size <= maxSize*(x+0.1)){
 				margin.add(key);
 				}	
 			}

@@ -1,6 +1,7 @@
 package RMAAlignment;
 
 
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -18,6 +19,7 @@ public class AlignmentStatistics {
 	private int length;
 	private boolean turnOffDestacking = false;
 	private boolean turnOffDeDupping = false;
+	private ArrayList<String> coverage;
 	//constructor and set values
 	public AlignmentStatistics(ArrayList<Alignment> list, boolean turnOffDestacking, boolean turnOffDeDupping){
 		this.currentList = list;
@@ -25,6 +27,9 @@ public class AlignmentStatistics {
 		this.turnOffDeDupping = turnOffDeDupping;
 	}
 	//getters
+	public ArrayList<String> getCoveragePositions(){
+		return this.coverage;
+	}
 	public ArrayList<Double> getGenaralStatistics(){
 		return this.generalStatistics;
 	}
@@ -83,7 +88,14 @@ public class AlignmentStatistics {
 			results.add((double) nonDuplicates);
 			results.add((double) currentList.size());
 			results.add((double) refMap.getLength());
-			results.add(refMap.getAverageCoverage());
+
+
+			DecimalFormat df = new DecimalFormat("#.###");
+			coverage.add(df.format(refMap.getAverageCoverage()));
+			coverage.add(df.format(refMap.getCoverageDeviation()));
+			for(int key:refMap.getCoveragePositions().keySet()){
+				coverage.add(df.format(refMap.getCoveragePositions().get(key)/refMap.getLength()));
+			}
 			this.generalStatistics = results;
 		}else{
 			HashMap<Integer,Integer> coverageHistogram = new HashMap<Integer,Integer>();
