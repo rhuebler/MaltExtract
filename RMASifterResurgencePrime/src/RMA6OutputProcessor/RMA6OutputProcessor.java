@@ -192,7 +192,7 @@ public class RMA6OutputProcessor {
 }
 	private void writeEditDistance(List<String> histo, String outDir){
 		try{
-			String header = "Node\t0\t1\t2\t3\t4\t5\thigher";
+			String header = "Node\t0\t1\t2\t3\t4\t5\t6\t7\t8\t9\t10\thigher";
 			histo.sort(null);
 			histo.add(0,header);
 			Path file = Paths.get(outDir);
@@ -227,6 +227,17 @@ public class RMA6OutputProcessor {
 			warning.log(Level.SEVERE,"Cannot write file", io);
 		}
 	}
+	private void writeCoveragePostitions(List<String> histo, String outDir){
+		try{
+			String header = "Taxon\tReference\tAverageCoverage\tCoverge_StandardDeviation\tpercCoveredHigher1\tpercCoveredHigher2\tpercCoveredHigher3\tpercCoveredHigher4\tpercCoveredHigher5";
+			histo.sort(null);
+			histo.add(0,header);
+			Path file = Paths.get(outDir);
+			Files.write(file, histo, Charset.forName("UTF-8"));
+		}catch(IOException io){
+			warning.log(Level.SEVERE,"Cannot write file", io);
+		}
+	}
 	private void prepareOutput(HashMap<Integer,Future<NodeProcessor>> results, Filter switcher){// Gather information from node list and write ouput by preparing the information
 		
 		HashMap<Integer,Integer> overallSum = new HashMap<Integer,Integer>();
@@ -238,6 +249,7 @@ public class RMA6OutputProcessor {
 		ArrayList<String> readLengthHistogram = new ArrayList<String>();
 		ArrayList<String> filterInformation = new ArrayList<String>();
 		ArrayList<String> additionalEntries = new ArrayList<String>();
+		ArrayList<String> coveragePositions = new ArrayList<String>();
 		for(int id : results.keySet()){
 			RMA6TaxonProcessor taxProcessor;
 			try {
@@ -259,6 +271,7 @@ public class RMA6OutputProcessor {
 				readLengthHistogram.add(taxProcessor.getReadLengthStatistics());
 				filterInformation.add(taxProcessor.getFilterLine());
 				additionalEntries.add(taxProcessor.getAdditionalEntries());
+				coveragePositions.add(taxProcessor.getCoveragePositions());
 				if(switcher == Filter.ALL && alignment )
 					writeBlastHits(id,taxProcessor.getAlignments(),outDir+"/ancientNonDuplicates/alignments/"+fileName+"/");
 				if(switcher == Filter.ANCIENT && alignment)
@@ -305,6 +318,7 @@ public class RMA6OutputProcessor {
 			writeCoverageHistogram(coverageHistogram, dir+"readDist/"+fileName+"_coverageHist"+".txt");	
 			writeReadLengthDistribution(readLengthHistogram, dir+"readDist/"+fileName+"_readLengthDist"+".txt");
 			writeFilter(filterInformation,dir+"FilterInformation/"+fileName+"_filterTable"+".txt");
+			writeCoveragePostitions(coveragePositions, dir+"readDist/"+fileName+"_postionsCovered"+".txt");
 	}
 	public void process(HashMap<Integer,Future<NodeProcessor>> results){ // process NodeProcessorts depending on files 
 		if(behave == Filter.NON){// retrieve the filter that was used and process accordingly

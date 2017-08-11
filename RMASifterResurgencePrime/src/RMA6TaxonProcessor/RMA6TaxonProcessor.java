@@ -59,6 +59,7 @@ protected int refLength = 0;
 protected ArrayList<Integer> lengths = new ArrayList<Integer>();
 protected boolean turnedOn = true;
 protected String additionalEntries = "none";
+protected String covPositions = "none";
 //constructor
 public RMA6TaxonProcessor(Integer id, double pID, NCBI_MapReader reader, boolean v, Logger log, Logger warning, double topPercent, int maxLength, Filter f){
 	// set input values
@@ -91,7 +92,7 @@ public RMA6TaxonProcessor(Integer id, double pID, NCBI_MapReader reader, boolean
 		s+="\t"+0;
 	}
 	setDamageLine(s);
-	this.readDistribution = taxName+"\tNA\t0\t0\t0\t0\t0\t0";
+	this.readDistribution = taxName+"\tNA\t0\t0\t0\t0\t0";
 }
 //setters
 protected void setOriginalNumberOfAlignments(int num){
@@ -141,10 +142,19 @@ protected void processCompositionMap(CompositionMap map){
 			addEntries = addEntries+="\t"+"none";
 		}
 		this.additionalEntries = addEntries;
+		//get coveragePositions
+		String covPosLine="taxName"+"\t" + maxReference;
+		for(String cov :map.getCoveragePositions()){
+			covPosLine+="\t"+cov;
+		}
+		this.covPositions = covPosLine;
+		
+		
 		map=null; // unassign Map at the end 
 	}else{
-		this.readDistribution = taxName+"\tNA\t0\t0\t0\t0\t0";
+		this.readDistribution = taxName+"\tNA\t0\t0\t0\t0";
 		this.coverageLine = taxName+"\tNA\t0\t0\t0\t0\t0\t0\t0\t0\t0\t0\t0\t0";
+		this.covPositions=taxName+"\tNA\t0\t0\t0\t0\t0\t0\t0";
 	}
 }
 
@@ -214,6 +224,9 @@ public void setTurnedOn(boolean b){
 }
 
 //getters
+public String getCoveragePositions(){
+	return this.covPositions;
+}
 public boolean wasTurnedOn(){
 	return this.turnedOn;
 }
