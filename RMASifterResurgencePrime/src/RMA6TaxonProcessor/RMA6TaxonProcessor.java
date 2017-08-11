@@ -164,19 +164,19 @@ protected void setNumberOfReads(int n){
 // set and process edit distance distribution
 protected void setEditDistanceHistogram(ArrayList<Integer> list){
 	HashMap<Integer,Integer> histo = new HashMap<Integer,Integer> ();
-	for(int i = 0;i < 7;i++){
+	for(int i = 0;i < 12;i++){
 		histo.put(i, 0);
 	}
 	if(list != null){
 		for(int d : list){
-			if(d<=5){
+			if(d<=10){
 				int value = histo.get(d);
 				value++;
 				histo.put(d, value);
 			}else{
-				int value = histo.get(6);
+				int value = histo.get(11);
 				value++;
-				histo.put(6, value);
+				histo.put(11, value);
 			}	
 		}
 	}
@@ -263,7 +263,8 @@ public ArrayList<String> getReads(){
 }
 public String getEditDistanceHistogram(){
 	HashMap<Integer,Integer> histo = this.editHistogram;
-	return taxName+"\t"+ histo.get(0)+"\t"+histo.get(1)+"\t"+histo.get(2)+"\t"+histo.get(3)+"\t"+histo.get(4)+"\t"+histo.get(5)+"\t"+histo.get(6);
+	return taxName+"\t"+ histo.get(0)+"\t"+histo.get(1)+"\t"+histo.get(2)+"\t"+histo.get(3)+"\t"+histo.get(4)+"\t"+histo.get(5)+"\t"
+			+histo.get(6)+"\t"+histo.get(7)+"\t"+histo.get(8)+"\t"+histo.get(9)+"\t"+histo.get(10)+"\t"+histo.get(11);
 }
 public String getPercentIdentityHistogram(){
 	HashMap<Integer,Integer> histo = this.pIdentHistogram;
