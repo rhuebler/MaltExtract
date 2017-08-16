@@ -37,17 +37,20 @@ public class ExperimentalRMA6Destacker extends RMA6TaxonProcessor {
 	//process each Marchblock
 	public void processMatchBlocks(IMatchBlock[] blocks, String readName, int readLength, String sequence){
 		originalNumberOfReads++;
+		
 		float topScore = blocks[0].getBitScore();
 			for(int i = 0; i< blocks.length;i++){
 				if(blocks[i].getBitScore()/topScore < 1-topPercent){
 					break;}		
+			
 				Alignment al = new Alignment();
 				al.setText(blocks[i].getText());
 				al.processText();
 				al.setPIdent(blocks[i].getPercentIdentity());
 				al.setReadName(readName);
 				al.setReadLength(readLength);
-				al.setAcessionNumber(blocks[i].getRefSeqId());	
+				al.setAcessionNumber(blocks[i].getTextFirstWord().split("\\|")[0].substring(1));
+			
 				al.setSequence(sequence);
 				originalNumberOfAlignments++;
 				if(minPIdent <= al.getPIdent()){ // check for minPercentIdentity
@@ -65,7 +68,7 @@ public class ExperimentalRMA6Destacker extends RMA6TaxonProcessor {
 							entry.add(al);
 							list.put(al.getAccessionNumber(), entry);
 						}else{
-							ArrayList<Alignment> entry = list.get(al.getTaxID());
+							ArrayList<Alignment> entry = list.get(al.getAccessionNumber());
 							entry.add(al);
 							list.replace(al.getAccessionNumber(),entry);
 						}
@@ -76,6 +79,7 @@ public class ExperimentalRMA6Destacker extends RMA6TaxonProcessor {
 			}
 	}		
 	public void process(){ 
+		
 		//analyze collected data 
 		CompositionMap map = new CompositionMap(taxonMap,turnOffDestacking,turnOffDeDuping);
 		map.process();

@@ -128,7 +128,7 @@ public class NodeProcessor{
 						warning.log(Level.WARNING,"TaxID: " + taxID +  " not assigned in File " + fileName+"\n");
 				}else{
 					if(verbose)
-						log.log(Level.INFO,"Processing Taxon "+taxName+" in File " +fileName); 
+						log.log(Level.INFO,"Processing Taxon "+taxName+" in File " +fileName);
 					while(classIt.hasNext()){// get Alignments and pass to filters
 						IReadBlock current = classIt.next();
 						if(current.getReadLength() <= maxLength || maxLength == 0){

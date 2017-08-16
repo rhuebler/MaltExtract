@@ -19,7 +19,7 @@ public class AlignmentStatistics {
 	private int length;
 	private boolean turnOffDestacking = false;
 	private boolean turnOffDeDupping = false;
-	private ArrayList<String> coverage;
+	private ArrayList<String> coverage = new ArrayList<String>();
 	//constructor and set values
 	public AlignmentStatistics(ArrayList<Alignment> list, boolean turnOffDestacking, boolean turnOffDeDupping){
 		this.currentList = list;

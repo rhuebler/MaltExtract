@@ -49,7 +49,7 @@ public class ExperimentalRMA6AncientDestacker extends RMA6TaxonProcessor {
 				al.setPIdent(blocks[i].getPercentIdentity());
 				al.setReadName(readName);
 				al.setReadLength(readLength);
-				al.setAcessionNumber(blocks[i].getRefSeqId());	
+				al.setAcessionNumber(blocks[i].getTextFirstWord().split("\\|")[0].substring(1));	
 				al.setSequence(sequence);
 				if(al.getFivePrimeDamage()&&minPIdent <= al.getPIdent()){ // check for minPercentIdentity
 					originalNumberOfAlignments++;
@@ -67,7 +67,7 @@ public class ExperimentalRMA6AncientDestacker extends RMA6TaxonProcessor {
 							entry.add(al);
 							list.put(al.getAccessionNumber(), entry);
 						}else{
-							ArrayList<Alignment> entry = list.get(al.getTaxID());
+							ArrayList<Alignment> entry = list.get(al.getAccessionNumber());
 							entry.add(al);
 							list.replace(al.getAccessionNumber(),entry);
 						}
@@ -82,7 +82,7 @@ public class ExperimentalRMA6AncientDestacker extends RMA6TaxonProcessor {
 		CompositionMap map = new CompositionMap(taxonMap,turnOffDestacking,turnOffDeDuping);
 		map.process();
 		map.getNonStacked();
-		HashMap<String,ArrayList<Alignment>> list =map.getResultsMap();
+		HashMap<String,ArrayList<Alignment>> list = map.getResultsMap();
 		for(String key : list.keySet()){
 			int k = 0;
 			double pIdent = 0;
