@@ -74,7 +74,6 @@ public RMA6TaxonProcessor(Integer id, double pID, NCBI_MapReader reader, boolean
 	this.taxName = getName(id);
 	this.filter = f;
 	//initlaize with default values for output
-	this.readLengthStatistics = taxName+"\t0\t0\t0\t0";
 	this.coverageLine = taxName+"\tNA\t0\t0\t0\t0\t0\t0\t0\t0\t0\t0\t0\t0";
 	ArrayList<Double> pIdents = new ArrayList<Double>();
 	ArrayList<Integer> distances = new ArrayList<Integer>();
@@ -93,6 +92,10 @@ public RMA6TaxonProcessor(Integer id, double pID, NCBI_MapReader reader, boolean
 	}
 	setDamageLine(s);
 	this.readDistribution = taxName+"\tNA\t0\t0\t0\t0\t0";
+	String rlstatistics = taxName;
+	for(int i = 25;i<=200;i+=5)
+		rlstatistics+="\t0";
+	this.readLengthStatistics = rlstatistics;
 }
 //setters
 protected void setOriginalNumberOfAlignments(int num){
@@ -285,15 +288,17 @@ protected double getGcContent(String sequence){
 }
 //calculate read length distribtuion
 protected void calculateReadLengthDistribution(){
+	HashMap<Integer,Integer> intervals = new HashMap<Integer,Integer>();
+	for(int i = 25;i<=200;i+=5)
+		intervals.put(0, 0);
 	if(lengths.size() != 0){
-		DescriptiveStatistics stats = new DescriptiveStatistics();
-		for(int i : lengths)
-			stats.addValue(i);
+		for(int i : lengths){// round to the closest number dividable by 5 to get the intervals
+			intervals.replace(round(i, 5), intervals.get((round(i, 5))+1));
+		}
 		String line = taxName;
-		line += "\t"+stats.getMean();
-		line += "\t"+stats.getGeometricMean();
-		line += "\t"+stats.getPercentile(50);
-		line += "\t"+stats.getStandardDeviation();
+		for(int key:intervals.keySet()){
+			line+="\t"+intervals.get(key);
+		}
 		this.readLengthStatistics = line;
 	}
 }
@@ -310,7 +315,9 @@ public String getReadDistribution(){
 public String getAdditionalEntries(){
 	return this.additionalEntries;
 }
-
+private int round(double i, int v){
+    return (int) (Math.round(i/v) * v);
+}
 public void processMatchBlocks(IMatchBlock[] blocks, String readName, int lenght, String readSequence){ 
 
 	}// void 

@@ -248,7 +248,8 @@ public class InputParameterProcessor {
 							   taxNames.add(tax.replace('_', ' ')); 
     	     				}
     	            	} catch (IOException e) {
-						warning.log(Level.WARNING,"IOException",e);
+    	            	System.exit(1);
+						warning.log(Level.WARNING,"IOException taxa list cannot be resolved",e);
 					}
     	           }	   
     			}
