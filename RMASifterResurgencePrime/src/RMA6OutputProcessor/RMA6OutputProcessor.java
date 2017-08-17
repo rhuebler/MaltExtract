@@ -221,7 +221,7 @@ public class RMA6OutputProcessor {
 			String header = "Taxon";
 			for(int i = 25;i<=200;i+=5){
 				header+="\t"+i+"bp";
-				}
+			}
 			histo.sort(null);
 			histo.add(0,header);
 			Path file = Paths.get(outDir);

@@ -73,6 +73,7 @@ public class SummaryWriter {
 		   List<String> summary = new ArrayList<String>();
 		   String header ="Node"; // could and should be its own function 
 		   String reads = "Total_Count";
+		   ArrayList<String> totalReads = new  ArrayList<String>();
 		   boolean first = true;	   
 		   for(Future<RMA6Processor> future : processedFiles){
 			   RMA6Processor current;
@@ -132,18 +133,23 @@ public class SummaryWriter {
 			}
 			   
 		   }//for
+		   totalReads.add(header);
+		   totalReads.add(reads);
 		   summary.sort(null);
-		   summary.add(0,reads);
 		   summary.add(0,header);
-		   if(switcher==Filter.NON)
+		   if(switcher==Filter.NON){
+			   writeSummary(totalReads,outDir+"/default/"+"TotalReads"+".txt");
 			   writeSummary(summary,outDir+"/default/"+"RunSummary"+".txt");
-		   else if(switcher==Filter.ANCIENT)
+		   }else if(switcher==Filter.ANCIENT){
+			   writeSummary(totalReads,outDir+"/ancient/"+"TotalReads"+".txt");
 			   writeSummary(summary,outDir+"/ancient/"+"RunSummary"+".txt");
-		   else if(switcher==Filter.NONDUPLICATES)
+		   }else if(switcher==Filter.NONDUPLICATES){
+			   writeSummary(totalReads,outDir+"/nonDuplicates/"+"TotalReads"+".txt");
 			   writeSummary(summary,outDir+"/nonDuplicates/"+"RunSummary"+".txt");
-		   else if(switcher==Filter.ALL)
+		   }else if(switcher==Filter.ALL){
+			   writeSummary(totalReads,outDir+"/ancientNonDuplicates/"+"TotalReads"+".txt");
 			   writeSummary(summary,outDir+"/ancientNonDuplicates/"+"RunSummary"+".txt");
-		   
+		   }
 	}
 
 	private void writeSummary(List<String> summary,String outDir) {
@@ -155,4 +161,5 @@ public class SummaryWriter {
 			System.exit(1);
 		}
 	}
+	
 }
