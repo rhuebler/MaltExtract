@@ -166,9 +166,7 @@ public class RMA6OutputProcessor {
 			//problem is null lines in file
 			try{
 				summary.sort(null);
-				String header = "Taxon";
-				for(int i = 25;i<=200;i+=5)
-					header+="\t"+i+"bp";
+				String header = "Taxon\tReference\tuniquePerReference\tnonStacked\tnonDuplicatesonReference\tTotalAlignmentsOnReference\tReferenceLength\tAverageCoverage";
 				summary.add(0, header);
 				Path file = Paths.get(outDir);
 				Files.write(file, summary, Charset.forName("UTF-8"));
@@ -220,7 +218,10 @@ public class RMA6OutputProcessor {
 	} 
 	private void writeReadLengthDistribution(List<String> histo, String outDir){
 		try{
-			String header = "Node\tMean\tGeometricMean\tMedian\tStandardDev";
+			String header = "Taxon";
+			for(int i = 25;i<=200;i+=5){
+				header+="\t"+i+"bp";
+				}
 			histo.sort(null);
 			histo.add(0,header);
 			Path file = Paths.get(outDir);
