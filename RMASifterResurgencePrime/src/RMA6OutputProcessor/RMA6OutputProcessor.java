@@ -218,7 +218,7 @@ public class RMA6OutputProcessor {
 	} 
 	private void writeReadLengthDistribution(List<String> histo, String outDir){
 		try{
-			String header = "Taxon";
+			String header = "Node\tMean\tGeometricMean\tMedian\tStandardDev";
 			for(int i = 25;i<=200;i+=5){
 				header+="\t"+i+"bp";
 			}
