@@ -288,16 +288,22 @@ protected double getGcContent(String sequence){
 }
 //calculate read length distribtuion
 protected void calculateReadLengthDistribution(){
+	DescriptiveStatistics stats = new DescriptiveStatistics();
 	HashMap<Integer,Integer> intervals = new HashMap<Integer,Integer>();
 	for(int i = 25;i<=200;i+=5)
 		intervals.put(i, 0);
 	if(lengths.size() > 0){
 		for(int i : lengths){// round to the closest number dividable by 5 to get the intervals
+			stats.addValue(i);
 			int value = intervals.get(round(i, 5));
 			value++;
 			intervals.replace(round(i, 5), value);
 		}
 		String line = taxName;
+		line += "\t"+stats.getMean();
+		line += "\t"+stats.getGeometricMean();
+		line += "\t"+stats.getPercentile(50);
+		line += "\t"+stats.getStandardDeviation();
 		for(int key:intervals.keySet()){
 			line+="\t"+intervals.get(key);
 		}
