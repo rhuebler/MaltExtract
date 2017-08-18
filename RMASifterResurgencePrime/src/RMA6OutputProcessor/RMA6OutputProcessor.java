@@ -9,8 +9,6 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Future;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -241,7 +239,7 @@ public class RMA6OutputProcessor {
 			warning.log(Level.SEVERE,"Cannot write file", io);
 		}
 	}
-	private void prepareOutput(HashMap<Integer,Future<NodeProcessor>> results, Filter switcher){// Gather information from node list and write ouput by preparing the information
+	private void prepareOutput(HashMap<Integer, NodeProcessor> hashMap, Filter switcher){// Gather information from node list and write ouput by preparing the information
 		
 		HashMap<Integer,Integer> overallSum = new HashMap<Integer,Integer>();
 		ArrayList<String> editDistance = new ArrayList<String>();
@@ -253,17 +251,16 @@ public class RMA6OutputProcessor {
 		ArrayList<String> filterInformation = new ArrayList<String>();
 		ArrayList<String> additionalEntries = new ArrayList<String>();
 		ArrayList<String> coveragePositions = new ArrayList<String>();
-		for(int id : results.keySet()){
+		for(int id : hashMap.keySet()){
 			RMA6TaxonProcessor taxProcessor;
-			try {
 				if(switcher == Filter.NON){
-					taxProcessor = results.get(id).get().getDefault();
+					taxProcessor = hashMap.get(id).getDefault();
 				}else if(switcher == Filter.ANCIENT){
-					taxProcessor = results.get(id).get().getAncient();
+					taxProcessor = hashMap.get(id).getAncient();
 				}else if(switcher == Filter.NONDUPLICATES){
-					taxProcessor = results.get(id).get().getNonDuplicate();
+					taxProcessor = hashMap.get(id).getNonDuplicate();
 				}else {
-					taxProcessor = results.get(id).get().getAncientNonDuplicate();
+					taxProcessor = hashMap.get(id).getAncientNonDuplicate();
 				}
 				overallSum.put(id,taxProcessor.getNumberOfReads());
 				readDistribution.add(taxProcessor.getReadDistribution());	
@@ -293,10 +290,7 @@ public class RMA6OutputProcessor {
 				if(switcher == Filter.NONDUPLICATES && reads)
 					writeReads(id,taxProcessor.getReads(),outDir+"/nonDuplicates/reads/"+fileName+"/");
 				
-			} catch (InterruptedException | ExecutionException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+			
 		}	
 			String dir = "";
 			if(switcher == Filter.NON){
@@ -323,7 +317,7 @@ public class RMA6OutputProcessor {
 			writeFilter(filterInformation,dir+"FilterInformation/"+fileName+"_filterTable"+".txt");
 			writeCoveragePostitions(coveragePositions, dir+"readDist/"+fileName+"_postionsCovered"+".txt");
 	}
-	public void process(HashMap<Integer,Future<NodeProcessor>> results){ // process NodeProcessorts depending on files 
+	public void process(HashMap<Integer, NodeProcessor> hashMap){ // process NodeProcessorts depending on files 
 		if(behave == Filter.NON){// retrieve the filter that was used and process accordingly
 			// do not use ancient filter
 			if(alignment){
@@ -332,7 +326,7 @@ public class RMA6OutputProcessor {
 			if(reads){
 				new File(outDir+"/default/"+"/reads/"+fileName).mkdirs();
 			}
-			prepareOutput(results,behave);
+			prepareOutput(hashMap,behave);
 		}else if(behave == Filter.ANCIENT){// just use ancient filter
 			if(alignment){
 				new File(outDir+"/ancient/"+"/alignments/"+fileName).mkdirs();
@@ -340,7 +334,7 @@ public class RMA6OutputProcessor {
 			if(reads){
 				new File(outDir+"/ancient/"+"/reads/"+fileName).mkdirs();
 			}
-			prepareOutput(results,behave);
+			prepareOutput(hashMap,behave);
 		}else if(behave == Filter.NON_ANCIENT){// more or less the default case
 			
 			if(alignment){
@@ -351,8 +345,8 @@ public class RMA6OutputProcessor {
 					new File(outDir+"/default/"+"/reads/"+fileName).mkdirs();
 					new File(outDir+"/ancient/"+"/reads/"+fileName).mkdirs();
 			}
-			prepareOutput(results,Filter.NON);
-			prepareOutput(results,Filter.ANCIENT);
+			prepareOutput(hashMap,Filter.NON);
+			prepareOutput(hashMap,Filter.ANCIENT);
 		}
 	}
 }

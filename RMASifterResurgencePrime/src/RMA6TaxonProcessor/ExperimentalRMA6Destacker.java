@@ -2,7 +2,6 @@ package RMA6TaxonProcessor;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import NCBI_MapReader.NCBI_MapReader;

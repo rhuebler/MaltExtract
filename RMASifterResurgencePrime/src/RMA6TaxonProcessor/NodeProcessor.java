@@ -40,6 +40,7 @@ public class NodeProcessor{
 		private boolean alignment = false;
 		private boolean turnOffDestacking = false;
 		private boolean turnOffDeDuping = false;
+		private String fileName ="";
 		//constructors
 		public NodeProcessor(int id, double minPIdent, NCBI_MapReader reader, boolean v, Logger log, Logger warning,
 				boolean reads, Filter behave, double minCompl,boolean alignment,boolean turnOffDestacking, boolean turnOffDeDuping) {
@@ -85,6 +86,12 @@ public class NodeProcessor{
 			return  this.ancientNonDuplicateProcessor;
 			
 		}
+		public int getTaxId(){
+			return this.taxID;
+		}
+		public String getFileName(){
+			return this.fileName;
+		}
 		//processing through node initialize taxon processors based on input parameters
 		public void process(String inDir, String fileName, double topPercent, int maxLength){ 
 				if(behave == Filter.ANCIENT){
@@ -101,6 +108,7 @@ public class NodeProcessor{
 				}		//TODO depreciated
 			this.taxName = getName(taxID);
 			// use ReadsIterator to get all Reads assigned to MegantaxID and print top percent to file
+			this.fileName =fileName;
 			try(RMA6File rma6File = new RMA6File(inDir+fileName, "r")){
 				ListOfLongs list = new ListOfLongs();
 				Long location = rma6File.getFooterSectionRMA6().getStartClassification("Taxonomy");
