@@ -290,10 +290,12 @@ protected double getGcContent(String sequence){
 protected void calculateReadLengthDistribution(){
 	HashMap<Integer,Integer> intervals = new HashMap<Integer,Integer>();
 	for(int i = 25;i<=200;i+=5)
-		intervals.put(0, 0);
-	if(lengths.size() != 0){
+		intervals.put(i, 0);
+	if(lengths.size() > 0){
 		for(int i : lengths){// round to the closest number dividable by 5 to get the intervals
-			intervals.replace(round(i, 5), intervals.get((round(i, 5))+1));
+			int value = intervals.get(round(i, 5));
+			value++;
+			intervals.replace(round(i, 5), value);
 		}
 		String line = taxName;
 		for(int key:intervals.keySet()){
