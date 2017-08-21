@@ -9,13 +9,11 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Future;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import NCBI_MapReader.NCBI_MapReader;
-import RMA6Processor.RMA6Processor;
+
 import behaviour.Filter;
 /**
  * Write overall Summy file from processed RMA6Files
@@ -29,13 +27,18 @@ public class SummaryWriter {
 	 * @throws none thrown all caught
 	 */
 	private NCBI_MapReader mapReader;
-	private List<Future<RMA6Processor>> processedFiles;
 	private Set<Integer> processedIDs;
 	private String outDir;
 	private Logger warning;
 	private Filter behave;
-	public SummaryWriter(List<Future<RMA6Processor>> pFiles, NCBI_MapReader mReader, String oDir, Logger warning, Filter behave){
-		this.processedFiles = pFiles;
+	private HashMap<String, HashMap<Integer,Integer>> overallSum;
+	private HashMap<String, HashMap<Integer,Integer>> ancientSum;
+	private HashMap<String,Integer> totalCounts;
+	public SummaryWriter(HashMap<String, HashMap<Integer,Integer>> overallSum, HashMap<String, HashMap<Integer,Integer>> ancientSum, HashMap<String,Integer> totalCounts, 
+			HashSet<Integer> containedIDs, NCBI_MapReader mReader, String oDir, Logger warning, Filter behave){
+		this.overallSum = overallSum;
+		this.ancientSum = ancientSum;
+		this.totalCounts = totalCounts;
 		this.mapReader = mReader;
 		this.outDir = oDir;
 		this.warning = warning;
@@ -43,69 +46,58 @@ public class SummaryWriter {
 		
 	}
 	public void process(){
-		setProcessedIds();
-		if(behave == Filter.NON){
-			prepareOutput(behave);
-		}else if(behave == Filter.ANCIENT){
-			prepareOutput(behave);
-		}else if(behave == Filter.ALL){
-			prepareOutput(behave);
-		}else if(behave == Filter.NONDUPLICATES){
-			prepareOutput(behave);
+
+		if(behave == Filter.NON_ANCIENT){
+			prepareOutput(Filter.NON, overallSum);
+			prepareOutput(Filter.NON_ANCIENT, ancientSum);
+			prepareTotalReads(Filter.NON);
+		}else if(behave == Filter.NON){
+			prepareOutput(Filter.NON, overallSum);
+			prepareTotalReads(Filter.NON);
 		}else if(behave == Filter.NON_ANCIENT){
-			prepareOutput(Filter.NON);
-			prepareOutput(Filter.ANCIENT);
+			prepareOutput(Filter.NON_ANCIENT, ancientSum);
+			prepareTotalReads(Filter.NON_ANCIENT);
 		}
 	}
-	private void setProcessedIds(){
-		Set<Integer> pIDs = new HashSet<>();
-		try{
-		for(Future<RMA6Processor> future : processedFiles)
-			pIDs.addAll(future.get().getContainedIDs());
-		this.processedIDs = pIDs;
-		}catch(InterruptedException ie){
-			warning.log(Level.SEVERE, "Error", ie);
-		}catch(ExecutionException ee){
-			warning.log(Level.SEVERE, "Error", ee);
+	private void prepareTotalReads(Filter switcher){
+		ArrayList<String> totalReads = new  ArrayList<String>();
+		String reads = "Total_Count";
+		String header ="FileName";
+		for(String fileName:totalCounts.keySet()){
+			header += "\t"+fileName;
+			reads += "\t" + totalCounts.get(fileName);
 		}
+		totalReads.add(header);
+		totalReads.add(reads);
+		 if(switcher==Filter.NON){
+			 writeSummary(totalReads,outDir+"/default/"+"RunSummary"+".txt");
+		 }else if(switcher==Filter.ANCIENT){
+			 writeSummary(totalReads,outDir+"/ancient/"+"RunSummary"+".txt");
+		 }
 	}
-	private void prepareOutput(Filter switcher) {
+	private void prepareOutput(Filter switcher, HashMap<String, HashMap<Integer,Integer>> sumlines) {
 		   List<String> summary = new ArrayList<String>();
 		   String header ="Node"; // could and should be its own function 
-		   String reads = "Total_Count";
-		   ArrayList<String> totalReads = new  ArrayList<String>();
+		  
 		   boolean first = true;	   
-		   for(Future<RMA6Processor> future : processedFiles){
-			   RMA6Processor current;
-			   try {
-				   current = future.get();
-				   header+="\t" + current.getfileName();
-				   reads += "\t" + current.getTotalCount();
-				   HashMap<Integer,Integer> fileResults = new  HashMap<Integer,Integer>();
-				   if(switcher==Filter.NON)
-					   fileResults = current.getSumLine();
-				   else if(switcher==Filter.ANCIENT)
-					   fileResults = current.getAncientLine();
-				   else if(switcher==Filter.NONDUPLICATES)
-					   fileResults = current.getNonDuplicateLine();
-				   else if(switcher==Filter.ALL)
-					   fileResults = current.getAncientNonDuplicateLine();
-				  
-				   if(first ==true){
-					   for(int id : processedIDs){
-						   String line;
-							if( mapReader.getNcbiIdToNameMap().get(id) != null){
-								line = mapReader.getNcbiIdToNameMap().get(id).replace(' ', '_');
-							}else{
-								line = "unasigned";
-							}
-						   if(fileResults.containsKey(id)){
-							   line+= "\t"+fileResults.get(id);
-							   summary.add(line);
-						   }else{
-							   line+= "\t"+0;
-							   summary.add(line);
-						   }
+		   for(String fileName:sumlines.keySet()){
+				  header+="\t" + fileName;
+				  HashMap<Integer,Integer> fileResults = sumlines.get(fileName);			  
+				  if(first ==true){
+					  for(int id : processedIDs){
+						  String line;
+						if( mapReader.getNcbiIdToNameMap().get(id) != null){
+							line = mapReader.getNcbiIdToNameMap().get(id).replace(' ', '_');
+						}else{
+							line = "unasigned";
+						}
+						if(fileResults.containsKey(id)){
+							line+= "\t"+fileResults.get(id);
+							summary.add(line);
+						}else{
+							line+= "\t"+0;
+							summary.add(line);
+						}
 					   first = false;
 					   }//for
 				   	}else{
@@ -123,32 +115,15 @@ public class SummaryWriter {
 						   i++;
 					   }
 				   	}
-				  
-			}catch (InterruptedException e) {
-				warning.log(Level.SEVERE, "Interuption Error" , e);
-				System.exit(1);
-			} catch (ExecutionException e) {
-				warning.log(Level.SEVERE, "Execution Error", e);
-				System.exit(1);
-			}
+		   }
 			   
-		   }//for
-		   totalReads.add(header);
-		   totalReads.add(reads);
+		  
 		   summary.sort(null);
 		   summary.add(0,header);
 		   if(switcher==Filter.NON){
-			   writeSummary(totalReads,outDir+"/default/"+"TotalReads"+".txt");
 			   writeSummary(summary,outDir+"/default/"+"RunSummary"+".txt");
 		   }else if(switcher==Filter.ANCIENT){
-			   writeSummary(totalReads,outDir+"/ancient/"+"TotalReads"+".txt");
 			   writeSummary(summary,outDir+"/ancient/"+"RunSummary"+".txt");
-		   }else if(switcher==Filter.NONDUPLICATES){
-			   writeSummary(totalReads,outDir+"/nonDuplicates/"+"TotalReads"+".txt");
-			   writeSummary(summary,outDir+"/nonDuplicates/"+"RunSummary"+".txt");
-		   }else if(switcher==Filter.ALL){
-			   writeSummary(totalReads,outDir+"/ancientNonDuplicates/"+"TotalReads"+".txt");
-			   writeSummary(summary,outDir+"/ancientNonDuplicates/"+"RunSummary"+".txt");
 		   }
 	}
 

@@ -20,11 +20,10 @@ import java.util.logging.Logger;
 import NCBI_MapReader.NCBI_MapReader;
 import NCBI_MapReader.NCBI_TreeReader;
 import RMA6Processor.ConcurrentRMA6Crawler;
-import RMA6Processor.ConcurrentRMA6Processor;
 import RMA6Processor.ConcurrentRMA6Scanner;
 import RMA6Processor.RMA6BlastCrawler;
-import RMA6Processor.RMA6Processor;
 import RMA6Processor.RMA6Scanner;
+import RMA6Processor.parallelFileNodeProcessor;
 import behaviour.Filter;
 import behaviour.Taxas;
 import jloda.util.PeakMemoryUsageMonitor;
@@ -100,61 +99,55 @@ public class RMAExtractor {
     	}
 		
 		//intialize  thread pool executor
-		executor=(ThreadPoolExecutor) Executors.newFixedThreadPool(inProcessor.getNumThreads());//intialize concurrent thread executor 
+		
 		log.log(Level.INFO, "Setting up Phylogenetic Tree");
 		
 		// run normal mode if neither crawl nor scan are used
 		if(inProcessor.getFilter() != Filter.SCAN  && inProcessor.getFilter() != Filter.CRAWL ){
-			List<Future<RMA6Processor>> processedFiles = new ArrayList<>();
-    		for(String fileName : inProcessor.getFileNames()){
-    			File f = new File(fileName);
-					ConcurrentRMA6Processor task = new ConcurrentRMA6Processor(f.getParent() + "/", 
-							f.getName(), inProcessor.getOutDir(), mapReader, treeReader,taxIDs, inProcessor.getTopPercent(),
-							inProcessor.getMaxLength(),inProcessor.getMinPIdent(),inProcessor.getFilter(), inProcessor.getTaxas(),
-							inProcessor.isVerbose(), log, warning,inProcessor.wantReads(), inProcessor.getMinComplexity(), 
-							inProcessor.getBlastHits(),inProcessor.wantMeganSummaries(),inProcessor.turnDestackingOff(),inProcessor.getDeDupOff());
-						Future<RMA6Processor> future=executor.submit(task);
-						processedFiles.add(future);
-    		}//fileNames;
+    		parallelFileNodeProcessor fileProcessor = new parallelFileNodeProcessor(inProcessor,(ArrayList<Integer>) taxIDs,mapReader,treeReader, log, warning);
+    		fileProcessor.process();
 	    // wait for all threads to finish here currently no concurrency errors or deadlocks but this would be the place where it would fall apart 
-	    destroy();
-	    SummaryWriter sumWriter = new SummaryWriter(processedFiles,mapReader,inProcessor.getOutDir(), warning,inProcessor.getFilter()); 
-	    sumWriter.process();
+	    //SummaryWriter sumWriter = new SummaryWriter(processedFiles,mapReader,inProcessor.getOutDir(), warning,inProcessor.getFilter()); 
+	    //sumWriter.process();
 	    log.log(Level.INFO, "Writing Summary File");
-	  }else if(inProcessor.getFilter() == Filter.SCAN && inProcessor.getFilter() != Filter.CRAWL){// run scan if crawl is not set
-		  List<Future<RMA6Scanner>> scannerList = new ArrayList<Future<RMA6Scanner>>();
-		  // every tree has its own copy of this now to avoid concurrency issues
-		  for(String fileName : inProcessor.getFileNames()){
-			 File f = new File(fileName);
-			 ConcurrentRMA6Scanner task = new ConcurrentRMA6Scanner(f.getParent()+"/",
-					 f.getName(),inProcessor.getTaxas(),taxIDs, treeReader, log, warning,inProcessor.getOutDir(),inProcessor.wantMeganSummaries());
-			 Future<RMA6Scanner> future = executor.submit(task);
-			 scannerList.add(future);
-		  }
-		  destroy();
-		  ScanSummaryWriter writer = new ScanSummaryWriter(scannerList, mapReader, warning);
-		  log.log(Level.INFO, "Writing Scan Summary File");
-		  writer.write(inProcessor.getOutDir());
+	  }else{ 
+			  if(inProcessor.getFilter() == Filter.SCAN && inProcessor.getFilter() != Filter.CRAWL){// run scan if crawl is not set
+			  executor=(ThreadPoolExecutor) Executors.newFixedThreadPool(inProcessor.getNumThreads());//intialize concurrent thread executor 
+			  List<Future<RMA6Scanner>> scannerList = new ArrayList<Future<RMA6Scanner>>();
+			  // every tree has its own copy of this now to avoid concurrency issues
+			  for(String fileName : inProcessor.getFileNames()){
+				 File f = new File(fileName);
+				 ConcurrentRMA6Scanner task = new ConcurrentRMA6Scanner(f.getParent()+"/",
+						 f.getName(),inProcessor.getTaxas(),taxIDs, treeReader, log, warning,inProcessor.getOutDir(),inProcessor.wantMeganSummaries());
+				 Future<RMA6Scanner> future = executor.submit(task);
+				 scannerList.add(future);
+			  }
+			  destroy();
+			  ScanSummaryWriter writer = new ScanSummaryWriter(scannerList, mapReader, warning);
+			  log.log(Level.INFO, "Writing Scan Summary File");
+			  writer.write(inProcessor.getOutDir());
 	  }else if(inProcessor.getFilter() == Filter.CRAWL ){// run crawl filter
+		  executor=(ThreadPoolExecutor) Executors.newFixedThreadPool(inProcessor.getNumThreads());//intialize concurrent thread executor 
 		  for(String fileName : inProcessor.getFileNames()){
 			  File f = new File(fileName);
 			  log.log(Level.INFO, "Crawl for file " + fileName);
-			  for(int taxID:taxIDs){
-			  ConcurrentRMA6Crawler crawler = new ConcurrentRMA6Crawler(f.getParent()+"/",f.getName(),
-					  mapReader.getNcbiIdToNameMap().get(taxID),
-					  inProcessor.getOutDir(),mapReader, warning, treeReader, inProcessor.getFilter());
-			  Future<RMA6BlastCrawler> future =  executor.submit(crawler);
-			  try {
-				future.get();
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-				System.exit(1);
-			} catch (ExecutionException e) {
-				e.printStackTrace();
-				System.exit(1);
-			}
-			  }
-		  }	  
+				 for(int taxID:taxIDs){
+					 ConcurrentRMA6Crawler crawler = new ConcurrentRMA6Crawler(f.getParent()+"/",f.getName(),
+							  mapReader.getNcbiIdToNameMap().get(taxID),
+							  inProcessor.getOutDir(),mapReader, warning, treeReader, inProcessor.getFilter());
+					  Future<RMA6BlastCrawler> future =  executor.submit(crawler);
+					  try {
+						future.get();
+					} catch (InterruptedException e) {
+						e.printStackTrace();
+						System.exit(1);
+					} catch (ExecutionException e) {
+						e.printStackTrace();
+						System.exit(1);
+					}
+				}
+		  }	
+	  } 
 		  log.log(Level.INFO, "Crawling Done");
 		  destroy();
 	  }// get runtime 
@@ -166,11 +159,3 @@ public class RMAExtractor {
 	}//main
 	
 }//class
-
-
-//TODO get RMAExtracterBeta into tools 
-//TODO What is acquiring the extra memory an error
-
-//TODO plot Node distribution function
-//TODO resurrect GC content
-

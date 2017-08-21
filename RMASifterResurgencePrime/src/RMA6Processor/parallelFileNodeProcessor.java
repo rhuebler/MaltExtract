@@ -24,6 +24,8 @@ import behaviour.Taxas;
 import megan.rma6.ClassificationBlockRMA6;
 import megan.rma6.RMA6File;
 import utility.DataSummaryWriter;
+import utility.InputParameterProcessor;
+import utility.SummaryWriter;
 /**
  * take care of extracting all the information for one RMA6 file and a List of taxons
  * contains functions to write its own output for supplementary information
@@ -44,10 +46,10 @@ public class parallelFileNodeProcessor {
 	private HashMap<String, HashMap<Integer,Integer>> ancientSum = new HashMap<String, HashMap<Integer,Integer>>();
 	
 	private String outDir;
-	private String[] inFiles;
+	private ArrayList<String> inFiles;
 	private NCBI_MapReader mapReader;
 	private NCBI_TreeReader treeReader;
-	private Set<Integer> containedIDs;
+	private HashSet<Integer> containedIDs = new HashSet<Integer>();
 	private Filter behave;
 	private int maxLength;
 	private double minPIdent;
@@ -64,28 +66,31 @@ public class parallelFileNodeProcessor {
 	private boolean wantMeganSummaries;
 	private boolean turnOffDestacking;
 	private boolean turnOffDeDuping;
-	
+	private List<Integer>taxIDs; 
+	private double topPercent;
 	// constructor and intilaize attributes
-	public parallelFileNodeProcessor(String[] inFiles, String outDir, NCBI_MapReader mapReader,
-			NCBI_TreeReader treeReader, int maxLength, double pIdent, Filter b, Taxas t, boolean verbose,
-			Logger log, Logger warning, boolean readInf, double minCompl, boolean alignment, boolean wantMeganSummaries, boolean turnOffDestacking, boolean dedupOff) {
-		this.inFiles = inFiles;
-		this.outDir = outDir;
+	public parallelFileNodeProcessor(InputParameterProcessor inputParameterProcessor, ArrayList<Integer> taxIDs, NCBI_MapReader mapReader,NCBI_TreeReader treeReader,
+			Logger log, Logger warning) {
+		this.inFiles = (ArrayList<String>) inputParameterProcessor.getFileNames();
+		this.outDir = inputParameterProcessor.getOutDir();
 		this.mapReader = mapReader;
 		this.treeReader = new NCBI_TreeReader(treeReader);
-		this.behave = b;
-		this.maxLength = maxLength;
-		this.minPIdent = pIdent;
-		this.taxas = t;
-		this.verbose = verbose;
+		this.behave = inputParameterProcessor.getFilter();
+		this.maxLength = inputParameterProcessor.getMaxLength();
+		this.minPIdent = inputParameterProcessor.getMinPIdent();
+		this.taxas = inputParameterProcessor.getTaxas();
+		this.verbose = inputParameterProcessor.isVerbose();
 		this.log = log;
 		this.warning = warning;
-		this.alignments = alignment;
-		this.reads = readInf;
-		this.minComplexity = minCompl;
-		this.wantMeganSummaries = wantMeganSummaries;
-		this.turnOffDestacking = turnOffDestacking;
-		this.turnOffDeDuping = dedupOff;
+		this.alignments = inputParameterProcessor.getBlastHits();
+		this.reads = inputParameterProcessor.wantReads();
+		this.minComplexity =inputParameterProcessor.getMinComplexity();
+		this.wantMeganSummaries = inputParameterProcessor.wantMeganSummaries();
+		this.turnOffDestacking = inputParameterProcessor.turnDestackingOff();
+		this.turnOffDeDuping = inputParameterProcessor.getDeDupOff();
+		this.threads = inputParameterProcessor.getNumThreads();
+		this.taxIDs = taxIDs;
+		this.topPercent = inputParameterProcessor.getTopPercent();
 	}
 	
 
@@ -112,7 +117,7 @@ public class parallelFileNodeProcessor {
 		
 		return keys;
 	}
-public void process(List<Integer>taxIDs, double topPercent) {// processing through file 
+public void process() {// processing through file 
 	executor=(ThreadPoolExecutor) Executors.newFixedThreadPool(threads);
 	ArrayList<Future<NodeProcessor>> results =  new ArrayList<Future<NodeProcessor>>();
 	for(String file: inFiles){
@@ -177,5 +182,7 @@ public void process(List<Integer>taxIDs, double topPercent) {// processing throu
 					overallSum.put(fileName, outProcessor.getSumLine());
 				}
 			} 
+		SummaryWriter writer = new SummaryWriter(overallSum, ancientSum, totalCounts, containedIDs, mapReader, outDir, log, behave);
+		writer.process();
 	}
  }
