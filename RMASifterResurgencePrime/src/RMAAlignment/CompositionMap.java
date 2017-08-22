@@ -69,8 +69,17 @@ private HashMap<String,ArrayList<Alignment>> markDuplicates(HashMap<String,Array
 		ArrayList<Alignment> inList = map.get(key);
 		inList.sort(comp);
 		int i =0;
+		HashMap<String, Integer> timesViewed =  new HashMap<String, Integer>();
 		while(i < inList.size() - 1){// array size is 47 last 46
+			
 			Alignment current = inList.get(i);
+			if(timesViewed.containsKey(current.getQuery())){
+				int k=timesViewed.get(current.getQuery());
+				timesViewed.replace(current.getQuery(),k );
+			}else{
+				timesViewed.put(current.getQuery(), 1);
+			}
+			
 			Alignment next = inList.get(i+1);
 			int cStart = 0;
 			int cEnd = 0;
@@ -97,10 +106,10 @@ private HashMap<String,ArrayList<Alignment>> markDuplicates(HashMap<String,Array
 				nStart = next.getEnd();
 				nEnd = next.getStart();
 			}
-			if( cStart == nStart && cEnd == nEnd &&
-			 current.getReferenceLength() == next.getReferenceLength()){
-				//inList.get(i).setDuplicate(true);TODO only set first Read as duplicate 
+			if( cStart == nStart && cEnd == nEnd && current.getReferenceLength() == next.getReferenceLength()){
+				if(timesViewed.containsKey(next.getQuery())||current.getQuery().equals(next.getQuery())){
 				inList.get(i+1).setDuplicate(true);
+				}
 			}
 				i++;
 		}
