@@ -99,12 +99,12 @@ public class NodeProcessor{
 				}else if(behave == Filter.NON){
 					defaultProcessor = new ExperimentalRMA6Destacker(taxID, minPIdent, mapReader, verbose, log, log, wantReads, topPercent, maxLength,alignment,turnOffDestacking,turnOffDeDuping, behave);
 				}else if(behave == Filter.ALL){
-					System.out.println("Filter no longer supported");
+					System.err.println("Filter no longer supported");
 				}else if(behave == Filter.NON_ANCIENT){
 					ancientProcessor = new ExperimentalRMA6AncientDestacker(taxID, minPIdent, mapReader, verbose, log, log, wantReads, topPercent, maxLength,alignment,turnOffDestacking,turnOffDeDuping,  behave);
 					defaultProcessor = new ExperimentalRMA6Destacker(taxID, minPIdent, mapReader, verbose, log, log, wantReads, topPercent, maxLength,alignment,turnOffDestacking,turnOffDeDuping,  behave);
 				}else if(behave == Filter.NONDUPLICATES ){
-					System.out.println("Filter no longer supported");
+					System.err.println("Filter no longer supported");
 				}		//TODO depreciated
 			this.taxName = getName(taxID);
 			// use ReadsIterator to get all Reads assigned to MegantaxID and print top percent to file
@@ -122,13 +122,18 @@ public class NodeProcessor{
 				// Downsample list if necessary and write log 
 				if(list.size()>100000){
 					warning.log(Level.WARNING,"For " + taxName + " in file "+fileName+ " downsampling was turned on");
-					ArrayList<Long> longList = new ArrayList<Long>();
-					for(int i = 0; i<list.size(); i++)
-						longList.add(list.get(i));
-					Collections.shuffle(longList);
-					list.clear();
-					for(long l : longList.subList(0, 100000))
-						list.add(l);
+//					ArrayList<Long> longList = new ArrayList<Long>();
+//					for(int i = 0; i<list.size(); i++)
+//						longList.add(list.get(i));
+//					Collections.shuffle(longList);
+//					list.clear();
+//					for(long l : longList.subList(0, 100000))
+//						list.add(l);
+					ListOfLongs temp = new ListOfLongs();//TODO remove shuffeling to speed up
+					for(int i = 0; i<=50000;i++){
+						temp.add(list.get(i));
+					}
+					list= temp;
 				}
 				IReadBlockIterator classIt  = new ReadBlockIterator(list, new ReadBlockGetterRMA6(rma6File, true, true, (float) 1.0,(float) 100.00,false,true));
 				if(!classIt.hasNext()){ // check if reads are assigned to TaxID if not print to console and skip and set all values to default

@@ -36,7 +36,7 @@ public class ExperimentalRMA6Destacker extends RMA6TaxonProcessor {
 	//process each Marchblock
 	public void processMatchBlocks(IMatchBlock[] blocks, String readName, int readLength, String sequence){
 		originalNumberOfReads++;
-		
+		System.out.println(blocks.length);
 		float topScore = blocks[0].getBitScore();
 			for(int i = 0; i< blocks.length;i++){
 				if(blocks[i].getBitScore()/topScore < 1-topPercent){
@@ -46,6 +46,8 @@ public class ExperimentalRMA6Destacker extends RMA6TaxonProcessor {
 				al.setText(blocks[i].getText());
 				al.processText();
 				al.setPIdent(blocks[i].getPercentIdentity());
+				System.out.println(blocks[i].getPercentIdentity());
+				System.out.println(blocks[i].getText());
 				al.setReadName(readName);
 				al.setReadLength(readLength);
 				al.setAcessionNumber(blocks[i].getTextFirstWord().split("\\|")[0].substring(1));

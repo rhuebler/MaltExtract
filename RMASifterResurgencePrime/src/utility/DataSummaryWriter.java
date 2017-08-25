@@ -11,6 +11,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import megan.core.DataTable;
+import megan.core.Document.ReadAssignmentMode;
 import megan.core.MeganFile;
 import megan.core.SampleAttributeTable;
 import megan.core.SyncArchiveAndDataTable;
@@ -26,7 +27,6 @@ public class DataSummaryWriter {
 		this.warning = warning;
 	}
 	public void writeSummary(String directory,String fileName, String outDir) {
-		// TODO Auto-generated method stub
 		try {
 			SampleAttributeTable sampleAttributeTable = new SampleAttributeTable();
 			DataTable table = new DataTable();
@@ -36,7 +36,7 @@ public class DataSummaryWriter {
 				file.setFileFromExistingFile(f.getCanonicalPath(), true);
 				file.setReadOnly(true);
 				IConnector connector = file.getConnector();
-				SyncArchiveAndDataTable.syncArchive2Summary(false, file.getFileName(), connector, table, sampleAttributeTable);
+				SyncArchiveAndDataTable.syncArchive2Summary(ReadAssignmentMode.readCount, file.getFileName(), connector, table, sampleAttributeTable);
 				if(!fileName.endsWith(".rma6"))
 					fileName+=".rma6";
 				ArrayList<String> output = new ArrayList<String>();
