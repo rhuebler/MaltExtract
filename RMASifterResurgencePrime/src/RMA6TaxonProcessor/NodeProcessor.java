@@ -12,6 +12,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import NCBI_MapReader.NCBI_MapReader;
+import RMA6Match.MatchBlockRMA6;
 import behaviour.Filter;
 import jloda.util.DNAComplexityMeasure;
 import jloda.util.ListOfLongs;
@@ -146,7 +147,7 @@ public class NodeProcessor{
 						IReadBlock current = classIt.next();
 						if(current.getReadLength() <= maxLength || maxLength == 0){
 							if(minComplexity<=getComplexity(current.getReadSequence())){
-								IMatchBlock[] blocks=current.getMatchBlocks();
+								IMatchBlock[] blocks = current.getMatchBlocks();
 								if(behave == Filter.NON_ANCIENT ||behave == Filter.ANCIENT ){
 									ancientProcessor.processMatchBlocks(blocks, current.getReadName(), current.getReadLength(),current.getReadSequence());
 								} 

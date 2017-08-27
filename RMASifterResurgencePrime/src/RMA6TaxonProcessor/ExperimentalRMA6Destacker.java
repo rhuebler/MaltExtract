@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.logging.Logger;
 
 import NCBI_MapReader.NCBI_MapReader;
+import RMA6Match.MatchBlockRMA6;
 import RMAAlignment.Alignment;
 import RMAAlignment.CompositionMap;
 import behaviour.Filter;
@@ -46,7 +47,7 @@ public class ExperimentalRMA6Destacker extends RMA6TaxonProcessor {
 				al.setText(blocks[i].getText());
 				al.processText();
 				al.setPIdent(blocks[i].getPercentIdentity());
-				System.out.println(blocks[i].getPercentIdentity());
+				System.out.println((int)blocks[i].getPercentIdentity());
 				System.out.println(blocks[i].getText());
 				al.setReadName(readName);
 				al.setReadLength(readLength);
