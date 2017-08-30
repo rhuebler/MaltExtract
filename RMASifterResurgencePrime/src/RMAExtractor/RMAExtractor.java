@@ -30,7 +30,6 @@ import jloda.util.PeakMemoryUsageMonitor;
 import utility.DirectoryCreator;
 import utility.InputParameterProcessor;
 import utility.ScanSummaryWriter;
-import utility.SummaryWriter;
 /**
  * Essentially the Main Class of RMA Extractor is a concurrent Program
  * At start up passes all command line arguments into InputProcessor
@@ -106,9 +105,6 @@ public class RMAExtractor {
 		if(inProcessor.getFilter() != Filter.SCAN  && inProcessor.getFilter() != Filter.CRAWL ){
     		parallelFileNodeProcessor fileProcessor = new parallelFileNodeProcessor(inProcessor,(ArrayList<Integer>) taxIDs,mapReader,treeReader, log, warning);
     		fileProcessor.process();
-	    // wait for all threads to finish here currently no concurrency errors or deadlocks but this would be the place where it would fall apart 
-	    //SummaryWriter sumWriter = new SummaryWriter(processedFiles,mapReader,inProcessor.getOutDir(), warning,inProcessor.getFilter()); 
-	    //sumWriter.process();
 	    log.log(Level.INFO, "Writing Summary File");
 	  }else{ 
 			  if(inProcessor.getFilter() == Filter.SCAN && inProcessor.getFilter() != Filter.CRAWL){// run scan if crawl is not set

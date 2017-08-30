@@ -54,7 +54,8 @@ protected ArrayList<Double> pIdents = new ArrayList<Double>();
 protected HashMap<Integer,HashMap<String, ArrayList<Alignment>>> taxonMap = new HashMap<Integer,HashMap<String, ArrayList<Alignment>>>();
 protected Filter filter = Filter.NON;
 protected StrainMisMatchContainer container = new StrainMisMatchContainer(filter);
-protected String readLengthStatistics;
+protected String readLengthDistribution;
+protected String readLengthDistribution;
 protected int refLength = 0;
 protected ArrayList<Integer> lengths = new ArrayList<Integer>();
 protected boolean turnedOn = true;
@@ -92,10 +93,10 @@ public RMA6TaxonProcessor(Integer id, double pID, NCBI_MapReader reader, boolean
 	}
 	setDamageLine(s);
 	this.readDistribution = taxName+"\tNA\t0\t0\t0\t0\t0";
-	String rlstatistics = taxName;
+	String rldist = taxName;
 	for(int i = 25;i<=200;i+=5)
-		rlstatistics+="\t0";
-	this.readLengthStatistics = rlstatistics;
+		rldist+="\t0";
+	this.readLengthDistribution = rldist;
 }
 //setters
 protected void setOriginalNumberOfAlignments(int num){
@@ -152,7 +153,6 @@ protected void processCompositionMap(CompositionMap map){
 		}
 		this.covPositions = covPosLine;
 		
-		
 		map=null; // unassign Map at the end 
 	}else{
 		this.readDistribution = taxName+"\tNA\t0\t0\t0\t0";
@@ -184,6 +184,7 @@ protected void setEditDistanceHistogram(ArrayList<Integer> list){
 		}
 	}
 	this.editHistogram = histo;
+	list = null;
 }
 // process percent identity
 protected void setPercentIdentityHistogram(ArrayList<Double> list){
@@ -217,6 +218,7 @@ protected void setPercentIdentityHistogram(ArrayList<Double> list){
 		}
 	}
 	this.pIdentHistogram =  histo;
+	list = null;
 }
 
 protected void setNumMatches(int matches){
@@ -299,16 +301,24 @@ protected void calculateReadLengthDistribution(){
 			value++;
 			intervals.replace(round(i, 5), value);
 		}
-		String line = taxName;
-		line += "\t"+stats.getMean();
-		line += "\t"+stats.getGeometricMean();
-		line += "\t"+stats.getPercentile(50);
-		line += "\t"+stats.getStandardDeviation();
+		String rlStat = taxName;
+		
+		rlStat += "\t"+stats.getMean();
+		rlStat += "\t"+stats.getGeometricMean();
+		rlStat += "\t"+stats.getPercentile(50);
+		rlStat += "\t"+stats.getStandardDeviation();
+		
+		this.readLengthDistribution = rlStat;
+		String rlDist = taxName;
 		for(int key:intervals.keySet()){
-			line+="\t"+intervals.get(key);
+			rlDist+="\t"+intervals.get(key);
 		}
-		this.readLengthStatistics = line;
+		this.readDistribution = rlDist;
+		stats=null;
 	}
+}
+public String getReadLengthDistribution(){
+	return this.readLengthDistribution;
 }
 public String getReadLengthStatistics(){
 	return this.readLengthStatistics;

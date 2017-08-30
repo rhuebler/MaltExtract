@@ -6,13 +6,9 @@ package RMA6TaxonProcessor;
  * @author huebler
  */
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
 import NCBI_MapReader.NCBI_MapReader;
-import RMA6Match.MatchBlockRMA6;
 import behaviour.Filter;
 import jloda.util.DNAComplexityMeasure;
 import jloda.util.ListOfLongs;

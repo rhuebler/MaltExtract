@@ -160,8 +160,8 @@ public class InputParameterProcessor {
     	    Option option_minComplexity = Option.builder().longOpt("minComp").hasArg().argName("minComplexity").optionalArg(true).desc("Use minimum complexity").build();
     	    Option option_List = Option.builder().longOpt("list").hasArg().argName("list").optionalArg(true).desc("Decide on which build in list to use (not enabled yet)").build();
     	    Option option_MeganSummaries = Option.builder().longOpt("meganSummary").hasArg().argName("meganSummary").optionalArg(true).desc("Return Megan Summary Files").build();
-    	    Option option_DeStackOff = Option.builder().longOpt("destackingOff").hasArg().argName("turn off destaking").optionalArg(true).desc("Turn Off automated stacked Read Removal only useful in >1 coverage data").build();
-    	    Option option_DeDupOff = Option.builder().longOpt("dupRemOff").hasArg().argName("turn off duplicate removal").optionalArg(true).desc("Turn Off automated pcr duplicate removal usefil in >1 coverage data").build();
+    	    Option option_DeStackOff = Option.builder().longOpt("destackingOff").hasArg().argName("turn off destacking").optionalArg(true).desc("Turn Off automated stacked Read Removal only useful in >1 coverage data").build();
+    	    Option option_DeDupOff = Option.builder().longOpt("dupRemOff").hasArg().argName("turn off duplicate removal").optionalArg(true).desc("Turn Off automated pcr duplicate removal useful in >1 coverage data").build();
     	    Options options = new Options();
     	    
     	    // add all parameters to the parser
@@ -361,8 +361,8 @@ public class InputParameterProcessor {
     	        	this.deDupOff = true;
     	        }
     	        if(commandLine.hasOption("h")){////help
-    	        	String header = "RMAExtractor beta 0.9";
-    	    	    String footer = "In case you encounter an error drop an email to huebler@shh.mpg.de with useful description";
+    	        	String header = "RMAExtractor beta 1.1";
+    	    	    String footer = "In case you encounter an error drop an email to huebler@shh.mpg.de with a useful description";
     	    	    HelpFormatter formatter = new HelpFormatter();
     	    	    formatter.setWidth(500);
     	    	    formatter.printHelp("RMAExtractor", header, options, footer, true);   
