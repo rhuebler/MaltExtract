@@ -151,16 +151,18 @@ public class RMA6OutputProcessor {
 	}
 	private void prepareOutput(HashMap<Integer, NodeProcessor> hashMap, Filter switcher){// Gather information from node list and write ouput by preparing the information
 		HashMap<Integer,Integer> overallSum = new HashMap<Integer,Integer>();
+		
+		ArrayList<String> additionalEntries = new ArrayList<String>();
+		ArrayList<String> coverageHistogram = new ArrayList<String>();
+		ArrayList<String> coveragePositions = new ArrayList<String>();
 		ArrayList<String> editDistance = new ArrayList<String>();
+		ArrayList<String> misMatches = new ArrayList<String>();
 		ArrayList<String> percentIdentity = new ArrayList<String>();
 		ArrayList<String> readDistribution = new ArrayList<String>();
-		ArrayList<String> misMatches = new ArrayList<String>();
-		ArrayList<String> coverageHistogram = new ArrayList<String>();
 		ArrayList<String> readLengthHistogram = new ArrayList<String>();
+		ArrayList<String> readLengthStatistics = new ArrayList<String>();
 		ArrayList<String> filterInformation = new ArrayList<String>();
-		ArrayList<String> additionalEntries = new ArrayList<String>();
-		ArrayList<String> coveragePositions = new ArrayList<String>();
-		
+				
 		String dir = "";
 		if(switcher == Filter.NON){
 			dir = outDir+"/default/";
@@ -188,15 +190,16 @@ public class RMA6OutputProcessor {
 					taxProcessor = hashMap.get(id).getAncientNonDuplicate();
 				}
 				overallSum.put(id,taxProcessor.getNumberOfReads());
-				readDistribution.add(taxProcessor.getReadDistribution());	
-				editDistance.add(taxProcessor.getEditDistanceHistogram());
-				percentIdentity.add(taxProcessor.getPercentIdentityHistogram());
-				coverageHistogram.add(taxProcessor.getCoverageLine());
-				misMatches.add(taxProcessor.getDamageLine());
-				readLengthHistogram.add(taxProcessor.getReadLengthStatistics());
-				filterInformation.add(taxProcessor.getFilterLine());
 				additionalEntries.add(taxProcessor.getAdditionalEntries());
+				coverageHistogram.add(taxProcessor.getCoverageLine());
 				coveragePositions.add(taxProcessor.getCoveragePositions());
+				editDistance.add(taxProcessor.getEditDistanceHistogram());
+				filterInformation.add(taxProcessor.getFilterLine());
+				misMatches.add(taxProcessor.getDamageLine());
+				percentIdentity.add(taxProcessor.getPercentIdentityHistogram());
+				readDistribution.add(taxProcessor.getReadDistribution());	
+				readLengthHistogram.add(taxProcessor.getReadLengthDistribution());
+				readLengthStatistics.add(taxProcessor.getReadLengthStatistics());	
 				if(alignment )
 					writeOutput(taxProcessor.getAlignments(),dir+"/alignments/"+fileName+"/",OutputType.ALIGNMENTS, id);
 				if(reads)
@@ -214,8 +217,7 @@ public class RMA6OutputProcessor {
 			writeOutput(filterInformation,dir,OutputType.FILTER, 0);
 			writeOutput(percentIdentity, dir,OutputType.PERCENTIDENTITY, 0);
 			writeOutput(readLengthHistogram, dir,OutputType.READLENGTH_DIST, 0);
-			
-			
+			writeOutput(readLengthStatistics, dir, OutputType.READLENGTH_STATISTICS, 0);
 	}
 	public void process(HashMap<Integer, NodeProcessor> hashMap){ // process NodeProcessorts depending on files 
 		if(behave == Filter.NON){// retrieve the filter that was used and process accordingly

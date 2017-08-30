@@ -55,7 +55,7 @@ protected HashMap<Integer,HashMap<String, ArrayList<Alignment>>> taxonMap = new 
 protected Filter filter = Filter.NON;
 protected StrainMisMatchContainer container = new StrainMisMatchContainer(filter);
 protected String readLengthDistribution;
-protected String readLengthDistribution;
+protected String readLengthStatistics;
 protected int refLength = 0;
 protected ArrayList<Integer> lengths = new ArrayList<Integer>();
 protected boolean turnedOn = true;
@@ -97,6 +97,7 @@ public RMA6TaxonProcessor(Integer id, double pID, NCBI_MapReader reader, boolean
 	for(int i = 25;i<=200;i+=5)
 		rldist+="\t0";
 	this.readLengthDistribution = rldist;
+	readLengthStatistics =taxName+"\t0\t0\t0\t0";
 }
 //setters
 protected void setOriginalNumberOfAlignments(int num){
@@ -308,7 +309,7 @@ protected void calculateReadLengthDistribution(){
 		rlStat += "\t"+stats.getPercentile(50);
 		rlStat += "\t"+stats.getStandardDeviation();
 		
-		this.readLengthDistribution = rlStat;
+		this.readLengthStatistics = rlStat;
 		String rlDist = taxName;
 		for(int key:intervals.keySet()){
 			rlDist+="\t"+intervals.get(key);
