@@ -90,9 +90,7 @@ public class ExperimentalRMA6Destacker extends RMA6TaxonProcessor {
 			int editDistance = 0;
 			String sequence = "";
 			
-			for(Alignment al : list.get(key)){
-				if(wantAlignments&&k==0)
-					
+			for(Alignment al : list.get(key)){	
 				numMatches++;	
 				pIdent+= al.getPIdent();
 				editDistance += al.getEditDistance();

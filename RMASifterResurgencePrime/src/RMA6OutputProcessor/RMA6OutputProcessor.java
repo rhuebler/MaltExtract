@@ -150,7 +150,7 @@ public class RMA6OutputProcessor {
 			warning.log(Level.SEVERE,"Cannot write file", io);
 		}
 	}
-	private void prepareOutput(HashMap<Integer, Future<NodeProcessor>> hashMap, Filter switcher){// Gather information from node list and write ouput by preparing the information
+	private void prepareOutput(HashMap<Integer, NodeProcessor> hashMap, Filter switcher){// Gather information from node list and write ouput by preparing the information
 		HashMap<Integer,Integer> overallSum = new HashMap<Integer,Integer>();
 		
 		ArrayList<String> additionalEntries = new ArrayList<String>();
@@ -163,34 +163,43 @@ public class RMA6OutputProcessor {
 		ArrayList<String> readLengthHistogram = new ArrayList<String>();
 		ArrayList<String> readLengthStatistics = new ArrayList<String>();
 		ArrayList<String> filterInformation = new ArrayList<String>();
-				
 		String dir = "";
-		if(switcher == Filter.NON){
+		switch (switcher) {
+		case NON:
 			dir = outDir+"default/";
 			setSumLine(overallSum);
-		}else if(switcher == Filter.ANCIENT){
+			break;
+		case ANCIENT:
 			setAncientLine(overallSum);
 			dir = outDir+"ancient/";
-		}else if(switcher == Filter.NONDUPLICATES){
+			break;
+		case NONDUPLICATES:
 			dir = outDir+"nonDuplicates/";
 			setNonDuplicateLine(overallSum);
-		}else if(switcher == Filter.ALL){
+			break;
+		case ALL:
 			dir = outDir+"ancientNonDuplicates/";
 			setAncientNonDuplicateLine(overallSum);
+			break;
+		default:
+			warning.log(Level.SEVERE,"Filter not implemented");
+			break;
 		}
-		
 		for(int id : hashMap.keySet()){
-			try{
-				NodeProcessor nodeProcessor = hashMap.get(id).get();
+				NodeProcessor nodeProcessor = hashMap.get(id);
 				RMA6TaxonProcessor taxProcessor;
-					if(switcher == Filter.NON){
+				switch(switcher){ 
+					case NON: 
 						taxProcessor = nodeProcessor.getDefault();
-					}else if(switcher == Filter.ANCIENT){
+						break;
+					case ANCIENT:
 						taxProcessor = nodeProcessor.getAncient();
-					}else{
+						break;
+					default:
 						taxProcessor=null;
 						warning.log(Level.SEVERE, "Filter no longer supported");
-						System.exit(1);
+						
+						break;
 					}
 					overallSum.put(id,taxProcessor.getNumberOfReads());
 					additionalEntries.add(taxProcessor.getAdditionalEntries());
@@ -207,9 +216,7 @@ public class RMA6OutputProcessor {
 						writeOutput(taxProcessor.getAlignments(),dir+"/alignments/"+fileName+"/",OutputType.ALIGNMENTS, id);
 					if(reads)
 						writeOutput(taxProcessor.getReads(),dir+"/reads/"+fileName+"/",OutputType.READS, id);
-			}catch(InterruptedException | ExecutionException  e){
-				warning.log(Level.SEVERE,"Error", e);
-			}
+			
 		}
 			
 			//write output
@@ -223,38 +230,58 @@ public class RMA6OutputProcessor {
 			writeOutput(percentIdentity, dir,OutputType.PERCENTIDENTITY, 0);
 			writeOutput(readLengthHistogram, dir,OutputType.READLENGTH_DIST, 0);
 			writeOutput(readLengthStatistics, dir, OutputType.READLENGTH_STATISTICS, 0);
-			hashMap.clear();
 	}
 	public void process(HashMap<Integer, Future<NodeProcessor>> hashMap){ // process NodeProcessorts depending on files 
-		if(behave == Filter.NON){// retrieve the filter that was used and process accordingly
-			// do not use ancient filter
-			if(alignment){
-				new File(outDir+"/default/"+"/alignments/"+fileName).mkdirs();
+		HashMap<Integer, NodeProcessor> processedMap = new HashMap<Integer, NodeProcessor>();
+		try{
+			for(int id : hashMap.keySet()){
+				NodeProcessor nodeProcessor = hashMap.get(id).get();
+				processedMap.put(id, nodeProcessor); 
+				}
+			}catch(InterruptedException | ExecutionException  e){
+				warning.log(Level.SEVERE,"Error", e);
 			}
-			if(reads){
-				new File(outDir+"/default/"+"/reads/"+fileName).mkdirs();
-			}
-			prepareOutput(hashMap,behave);
-		}else if(behave == Filter.ANCIENT){// just use ancient filter
-			if(alignment){
-				new File(outDir+"/ancient/"+"/alignments/"+fileName).mkdirs();
-			}
-			if(reads){
-				new File(outDir+"/ancient/"+"/reads/"+fileName).mkdirs();
-			}
-			prepareOutput(hashMap,behave);
-		}else if(behave == Filter.NON_ANCIENT){// more or less the default case
-			
-			if(alignment){
-				new File(outDir+"/ancient/"+"/alignments/"+fileName).mkdirs();
-				new File(outDir+"/default/"+"/alignments/"+fileName).mkdirs();
-			}	
-			if(reads){
+		hashMap.clear();
+		switch(behave){ 
+			case NON:{// retrieve the filter that was used and process accordingly
+				if(alignment){
+					new File(outDir+"/default/"+"/alignments/"+fileName).mkdirs();
+				}
+				if(reads){
 					new File(outDir+"/default/"+"/reads/"+fileName).mkdirs();
-					new File(outDir+"/ancient/"+"/reads/"+fileName).mkdirs();
+				}
+				prepareOutput(processedMap,behave);
+				break;
 			}
-			prepareOutput(hashMap,Filter.NON);
-			prepareOutput(hashMap,Filter.ANCIENT);
-		}
+			case ANCIENT:{// just use ancient filter
+				if(alignment){
+					new File(outDir+"/ancient/"+"/alignments/"+fileName).mkdirs();
+				}
+				if(reads){
+					new File(outDir+"/ancient/"+"/reads/"+fileName).mkdirs();
+				}
+				prepareOutput(processedMap,behave);
+				break;
+			}
+			case NON_ANCIENT:{// more or less the default case
+				if(alignment){
+					new File(outDir+"/ancient/"+"/alignments/"+fileName).mkdirs();
+					new File(outDir+"/default/"+"/alignments/"+fileName).mkdirs();
+				}	
+				if(reads){
+						new File(outDir+"/default/"+"/reads/"+fileName).mkdirs();
+						new File(outDir+"/ancient/"+"/reads/"+fileName).mkdirs();
+				}
+			prepareOutput(processedMap,Filter.NON);
+			prepareOutput(processedMap,Filter.ANCIENT);
+			
+			processedMap.clear();
+			break;
+			}
+		default:	
+			warning.log(Level.SEVERE, "Filter no longer supported");
+			System.exit(1);
+			break;
+		}	
 	}
 }

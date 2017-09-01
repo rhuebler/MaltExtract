@@ -144,10 +144,10 @@ public class NodeProcessor{
 						if(current.getReadLength() <= maxLength || maxLength == 0){
 							if(minComplexity<=getComplexity(current.getReadSequence())){
 								IMatchBlock[] blocks = current.getMatchBlocks();
-								if(behave == Filter.NON_ANCIENT ||behave == Filter.ANCIENT ){
+								if(behave == Filter.NON_ANCIENT || behave == Filter.ANCIENT ){
 									ancientProcessor.processMatchBlocks(blocks, current.getReadName(), current.getReadLength(),current.getReadSequence());
 								} 
-								if(behave == Filter.NON_ANCIENT ||behave == Filter.NON ){
+								if(behave == Filter.NON_ANCIENT || behave == Filter.NON ){
 									defaultProcessor.processMatchBlocks(blocks, current.getReadName(), current.getReadLength(), current.getReadSequence());
 								}else if(behave == Filter.ALL){
 									ancientNonDuplicateProcessor.processMatchBlocks(blocks, current.getReadName(), current.getReadLength(), current.getReadSequence());
