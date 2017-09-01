@@ -68,6 +68,7 @@ public class parallelFileNodeProcessor {
 	private boolean turnOffDeDuping;
 	private List<Integer>taxIDs; 
 	private double topPercent;
+	private HashMap<String,HashMap<Integer,Future<NodeProcessor>>> sortedNodes = new HashMap<String,HashMap<Integer,Future<NodeProcessor>>>();
 	// constructor and intilaize attributes
 	public parallelFileNodeProcessor(InputParameterProcessor inputParameterProcessor, ArrayList<Integer> taxIDs, NCBI_MapReader mapReader,NCBI_TreeReader treeReader,
 			Logger log, Logger warning) {
@@ -119,7 +120,7 @@ public class parallelFileNodeProcessor {
 	}
 public void process() {// processing through file 
 	executor=(ThreadPoolExecutor) Executors.newFixedThreadPool(threads);
-	ArrayList<Future<NodeProcessor>> results =  new ArrayList<Future<NodeProcessor>>();
+	
 	for(String file: inFiles){
 		 File f = new File(file);
 		 String inDir = f.getParent() +"/";
@@ -140,36 +141,20 @@ public void process() {// processing through file
 				idsToProcess.addAll(keys);
 		}
 		containedIDs.addAll(idsToProcess);// write down contained IDs
+		HashMap<Integer,Future<NodeProcessor>> map = new HashMap<Integer,Future<NodeProcessor>>();
 		for(Integer id : idsToProcess){
 			NodeProcessor nodeProcessor = new NodeProcessor(id, minPIdent, mapReader, verbose,log, warning,reads,behave, minComplexity,alignments,turnOffDestacking,turnOffDeDuping);
 			ConcurrentNodeProcessor task = new ConcurrentNodeProcessor(nodeProcessor,inDir, fileName, topPercent, maxLength);
 			Future<NodeProcessor> future = executor.submit(task);
-			results.add(future);
-		}//TaxIDs	
-	  }
-	destroy();
-	HashMap<String,HashMap<Integer,NodeProcessor>> sortedNodes = new HashMap<String,HashMap<Integer,NodeProcessor>>();
-	for(Future<NodeProcessor> futureNode:results){
-		try {
-			NodeProcessor node = futureNode.get();
-			String fileName = node.getFileName();
-			if(sortedNodes.containsKey(fileName)){
-				HashMap<Integer,NodeProcessor> map = sortedNodes.get(fileName);
-				map.put(node.getTaxId(),node);
-				sortedNodes.replace(fileName, map);
-			}else{
-				HashMap<Integer,NodeProcessor> map = new HashMap<Integer,NodeProcessor>();
-				map.put(node.getTaxId(),node);
-				sortedNodes.replace(fileName, map);
+				map.put(id,future);
+				
 			}
-		} catch (InterruptedException | ExecutionException e) {
-			
-			warning.log(Level.SEVERE,"Severe Error",e);
-			
-		}
-	  }
+		sortedNodes.put(fileName, map);
+		}//TaxIDs	
+	destroy();
+	calculateRunOutput(sortedNodes);
 	}
-	public void calculateRunOutpu(HashMap<String,HashMap<Integer,NodeProcessor>> sortedNodes){
+	public void calculateRunOutput(HashMap<String,HashMap<Integer,Future<NodeProcessor>>> sortedNodes){
 		for(String fileName:sortedNodes.keySet()){
 			RMA6OutputProcessor outProcessor = new RMA6OutputProcessor(fileName, outDir,mapReader,warning, behave,alignments, reads);// initilaize output processor here 
 			outProcessor.process(sortedNodes.get(fileName));

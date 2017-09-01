@@ -148,7 +148,7 @@ protected void processCompositionMap(CompositionMap map){
 		}
 		this.additionalEntries = addEntries;
 		//get coveragePositions
-		String covPosLine="taxName"+"\t" + maxReference;
+		String covPosLine=taxName+"\t" + maxReference;
 		for(String cov :map.getCoveragePositions()){
 			covPosLine+="\t"+cov;
 		}
@@ -185,6 +185,7 @@ protected void setEditDistanceHistogram(ArrayList<Integer> list){
 		}
 	}
 	this.editHistogram = histo;
+	list.clear();
 	list = null;
 }
 // process percent identity
@@ -219,6 +220,7 @@ protected void setPercentIdentityHistogram(ArrayList<Double> list){
 		}
 	}
 	this.pIdentHistogram =  histo;
+	list.clear();
 	list = null;
 }
 
@@ -314,8 +316,9 @@ protected void calculateReadLengthDistribution(){
 		for(int key:intervals.keySet()){
 			rlDist+="\t"+intervals.get(key);
 		}
-		this.readDistribution = rlDist;
+		this.readLengthDistribution = rlDist;
 		stats=null;
+		lengths.clear();
 	}
 }
 public String getReadLengthDistribution(){
@@ -343,4 +346,7 @@ public void processMatchBlocks(IMatchBlock[] blocks, String readName, int lenght
 public void process(){ 
 
 }// void 
+public void clear(){
+	
+}
 }// class 

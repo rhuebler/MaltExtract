@@ -183,16 +183,17 @@ public void process(){
 	int max=0; 
 	int maxKey=0; 
 	String maxReference="";
-	for(int id: cMap.keySet()){
+	for(Integer id: cMap.keySet()){
 		HashMap<String,ArrayList<Alignment>> map = cMap.get(id);
 		for(String key : map.keySet()){
 			if(map.get(key).size()>max){
-				maxKey=id;
+				maxKey = id;
 				max= map.get(key).size();
 				maxReference=key;
 			}
 		}
 	}
+	//System.out.println(maxKey);
 	setMaxID(maxKey);
 	setMaxReference(maxReference);
 	markAllDuplicates();

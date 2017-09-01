@@ -116,7 +116,13 @@ public String getQuery(){
 	 this.sequence = s;
  }
  public void setAcessionNumber(String s){
-	 this.accessionNumber =s;
+	 String accesion = "";
+	 String[] parts =s.split("\\|");
+	 if(parts[0].contains("gi"))
+		accesion =  parts[0].substring(1)+parts[1];
+	 else
+		 accesion=parts[0].substring(1);
+	 this.accessionNumber = accesion;
  }
 public void setReadLength(int d){
 	this.readLength = d;
@@ -213,8 +219,9 @@ private void setReferenceLength(int k) {
 		 String reference = "";
 		 boolean first = true;
 		 for(String line : text.split("\n")){
-			 if(line.startsWith(">"))
+			 if(line.startsWith(">")){
 				 setReferenceName(line.trim());
+			 }
 			 if(line.contains("Query")){
 				 for(String frag:line.split(":|\\s")){
 					 if(frag.trim().matches("[ATGCNatgcn-]+")){

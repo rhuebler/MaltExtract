@@ -49,7 +49,7 @@ public class ExperimentalRMA6AncientDestacker extends RMA6TaxonProcessor {
 				al.setPIdent(blocks[i].getPercentIdentity());
 				al.setReadName(readName);
 				al.setReadLength(readLength);
-				al.setAcessionNumber(blocks[i].getTextFirstWord().split("\\|")[0].substring(1));	
+				al.setAcessionNumber(blocks[i].getTextFirstWord());	
 				al.setSequence(sequence);
 				if(al.getFivePrimeDamage()&&minPIdent <= al.getPIdent()){ // check for minPercentIdentity
 					originalNumberOfAlignments++;
@@ -137,5 +137,12 @@ public class ExperimentalRMA6AncientDestacker extends RMA6TaxonProcessor {
 		setAlignments(alignments);
 		setTurnedOn(map.wasTurnedOn());
 		calculateReadLengthDistribution();
+		map = null;
+		strain = null;
 	}//process
+	public void clear(){
+		container = null;
+		pIdents.clear();
+		distances.clear();
+	}
 }

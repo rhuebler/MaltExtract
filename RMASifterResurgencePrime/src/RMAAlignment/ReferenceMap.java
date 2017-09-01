@@ -114,22 +114,33 @@ public class ReferenceMap {
 		
 		//calculate average coverage on reference and turnOff stackedReadRemoval if too high
 		double averageCoverage = 0;//Get information on coverage
-		for(i=0;i<5;i++)
-			coverageMap.put(0,0.0);
+		for(i=0;i<5;i++){
+			coverageMap.put(i,0.0);
+		}	
 		// get percentage higher than x
 		for(int k: coverageContainer.keySet()){
 			double coverage = coverageContainer.get(k);
 			averageCoverage+=coverage;
 			if(coverage>1){
-				coverageMap.replace(0, coverageMap.get(0)+1);
-			}else if(coverage>2){
-				coverageMap.replace(1, coverageMap.get(1)+1);
-			}else if(coverage>3){
-				coverageMap.replace(2, coverageMap.get(2)+1);
-			}else if(coverage>4){
-				coverageMap.replace(3, coverageMap.get(3)+1);
-			}else if(coverage>5){
-				coverageMap.replace(4, coverageMap.get(4)+1);
+				Double count = coverageMap.get(0);
+				count++;
+				coverageMap.replace(0, count);
+			}if(coverage>2){
+				Double count = coverageMap.get(1);
+				count++;
+				coverageMap.replace(1, count);
+			}if(coverage>3){
+				Double count = coverageMap.get(2);
+				count++;
+				coverageMap.replace(2, count);
+			}if(coverage>4){
+				Double count = coverageMap.get(3);
+				count++;
+				coverageMap.replace(3, count);
+			}if(coverage>5){
+				Double count = coverageMap.get(4);
+				count++;
+				coverageMap.replace(4, count);
 			}
 		}
 		averageCoverage/=length;

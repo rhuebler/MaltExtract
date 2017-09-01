@@ -43,20 +43,22 @@ public class SummaryWriter {
 		this.outDir = oDir;
 		this.warning = warning;
 		this.behave = behave;
-		
+		this.processedIDs = containedIDs;
 	}
 	public void process(){
 
 		if(behave == Filter.NON_ANCIENT){
 			prepareOutput(Filter.NON, overallSum);
-			prepareOutput(Filter.NON_ANCIENT, ancientSum);
+			prepareOutput(Filter.ANCIENT, ancientSum);
 			prepareTotalReads(Filter.NON);
+		
 		}else if(behave == Filter.NON){
 			prepareOutput(Filter.NON, overallSum);
 			prepareTotalReads(Filter.NON);
-		}else if(behave == Filter.NON_ANCIENT){
-			prepareOutput(Filter.NON_ANCIENT, ancientSum);
-			prepareTotalReads(Filter.NON_ANCIENT);
+	
+		}else if(behave == Filter.ANCIENT){
+			prepareOutput(Filter.ANCIENT, ancientSum);
+			prepareTotalReads(Filter.ANCIENT);
 		}
 	}
 	private void prepareTotalReads(Filter switcher){
@@ -70,9 +72,9 @@ public class SummaryWriter {
 		totalReads.add(header);
 		totalReads.add(reads);
 		 if(switcher==Filter.NON){
-			 writeSummary(totalReads,outDir+"/default/"+"RunSummary"+".txt");
+			 writeSummary(totalReads,outDir+"/default/"+"TotalReadsSummary"+".txt");
 		 }else if(switcher==Filter.ANCIENT){
-			 writeSummary(totalReads,outDir+"/ancient/"+"RunSummary"+".txt");
+			 writeSummary(totalReads,outDir+"/ancient/"+"TotalReadsSummary"+".txt");
 		 }
 	}
 	private void prepareOutput(Filter switcher, HashMap<String, HashMap<Integer,Integer>> sumlines) {

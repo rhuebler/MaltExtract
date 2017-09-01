@@ -36,7 +36,6 @@ public class ExperimentalRMA6Destacker extends RMA6TaxonProcessor {
 	//process each Marchblock
 	public void processMatchBlocks(IMatchBlock[] blocks, String readName, int readLength, String sequence){
 		originalNumberOfReads++;
-		System.out.println(blocks.length);
 		float topScore = blocks[0].getBitScore();
 			for(int i = 0; i< blocks.length;i++){
 				if(blocks[i].getBitScore()/topScore < 1-topPercent){
@@ -44,13 +43,12 @@ public class ExperimentalRMA6Destacker extends RMA6TaxonProcessor {
 			
 				Alignment al = new Alignment();
 				al.setText(blocks[i].getText());
+				al.setTaxID(blocks[i].getTaxonId());
 				al.processText();
 				al.setPIdent(blocks[i].getPercentIdentity());
-				System.out.println((int)blocks[i].getPercentIdentity());//TODO Remove
-				System.out.println(blocks[i].getText());
 				al.setReadName(readName);
 				al.setReadLength(readLength);
-				al.setAcessionNumber(blocks[i].getTextFirstWord().split("\\|")[0].substring(1));
+				al.setAcessionNumber(blocks[i].getTextFirstWord());
 			
 				al.setSequence(sequence);
 				originalNumberOfAlignments++;
@@ -144,7 +142,13 @@ public class ExperimentalRMA6Destacker extends RMA6TaxonProcessor {
 		setAlignments(alignments);
 		setTurnedOn(map.wasTurnedOn());
 		calculateReadLengthDistribution();
-		strain = null;
 		
+		map = null;
+		strain = null;
 	}//process
+	public void clear(){
+		container = null;
+		pIdents.clear();
+		distances.clear();
+	}
 }

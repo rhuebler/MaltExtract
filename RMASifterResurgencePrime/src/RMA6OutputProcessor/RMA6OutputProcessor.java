@@ -9,6 +9,8 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -96,11 +98,8 @@ public class RMA6OutputProcessor {
 			case ALIGNMENTDISTRIBUTION: header = "Taxon\tReference\tuniquePerReference\tnonStacked\tnonDuplicatesonReference\tTotalAlignmentsOnReference\tReferenceLength\tAverageCoverage";
 										outDir+= "readDist/"+fileName+"_alignmentDist"+".txt";
 									break;
-			case COVERAGE: 	header = "Taxon\tReference\tAverageCoverage\tCoverge_StandardDeviation\tpercCoveredHigher1\tpercCoveredHigher2\tpercCoveredHigher3\tpercCoveredHigher4\tpercCoveredHigher5";
-							outDir += "readDist/"+fileName+"_postionsCovered"+".txt";
-									break;
 			case COVERAGEHISTOGRAM: header = "Taxon\tReference\t0\t1\t2\t3\t4\t5\t6\t7\t8\t9\t10\thigher";
-									outDir += "readDist/"+fileName+"_coverageHist"+".txt";
+									outDir += "coverage/"+fileName+"_coverageHist"+".txt";
 									break;
 			case DAMAGE: header = "Node";
 						 String header_part2 ="";
@@ -130,13 +129,15 @@ public class RMA6OutputProcessor {
 									outDir+="readDist/"+fileName+"_readLengthDist"+".txt";
 									break;
 			case READLENGTH_STATISTICS:	header = "Taxon\tMean\tGeometricMean\tMedian\tStandardDev";
+									outDir+="readDist/"+fileName+"_readLengthStat"+".txt";
 									break;
 			
 			case PERCENTIDENTITY:	header = "Taxon\t80\t85\t90\t95\t100";
 									outDir += "percentIdentity/"+fileName+"_percentIdentity"+".txt";
 									break;
-			case POS_COVERED:
-				break;
+			case POS_COVERED:	header = "Taxon\tReference\tAverageCoverage\tCoverge_StandardDeviation\tpercCoveredHigher1\tpercCoveredHigher2\tpercCoveredHigher3\tpercCoveredHigher4\tpercCoveredHigher5";
+								outDir += "coverage/"+fileName+"_postionsCovered"+".txt";
+									break;
 			default:
 				warning.log(Level.SEVERE,"No output specified");
 				break;
@@ -149,7 +150,7 @@ public class RMA6OutputProcessor {
 			warning.log(Level.SEVERE,"Cannot write file", io);
 		}
 	}
-	private void prepareOutput(HashMap<Integer, NodeProcessor> hashMap, Filter switcher){// Gather information from node list and write ouput by preparing the information
+	private void prepareOutput(HashMap<Integer, Future<NodeProcessor>> hashMap, Filter switcher){// Gather information from node list and write ouput by preparing the information
 		HashMap<Integer,Integer> overallSum = new HashMap<Integer,Integer>();
 		
 		ArrayList<String> additionalEntries = new ArrayList<String>();
@@ -165,52 +166,56 @@ public class RMA6OutputProcessor {
 				
 		String dir = "";
 		if(switcher == Filter.NON){
-			dir = outDir+"/default/";
+			dir = outDir+"default/";
 			setSumLine(overallSum);
 		}else if(switcher == Filter.ANCIENT){
 			setAncientLine(overallSum);
-			dir = outDir+"/ancient/";
+			dir = outDir+"ancient/";
 		}else if(switcher == Filter.NONDUPLICATES){
-			dir = outDir+"/nonDuplicates/";
+			dir = outDir+"nonDuplicates/";
 			setNonDuplicateLine(overallSum);
 		}else if(switcher == Filter.ALL){
-			dir = outDir+"/ancientNonDuplicates/";
+			dir = outDir+"ancientNonDuplicates/";
 			setAncientNonDuplicateLine(overallSum);
 		}
 		
 		for(int id : hashMap.keySet()){
-			RMA6TaxonProcessor taxProcessor;
-				if(switcher == Filter.NON){
-					taxProcessor = hashMap.get(id).getDefault();
-				}else if(switcher == Filter.ANCIENT){
-					taxProcessor = hashMap.get(id).getAncient();
-				}else if(switcher == Filter.NONDUPLICATES){
-					taxProcessor = hashMap.get(id).getNonDuplicate();
-				}else {
-					taxProcessor = hashMap.get(id).getAncientNonDuplicate();
-				}
-				overallSum.put(id,taxProcessor.getNumberOfReads());
-				additionalEntries.add(taxProcessor.getAdditionalEntries());
-				coverageHistogram.add(taxProcessor.getCoverageLine());
-				coveragePositions.add(taxProcessor.getCoveragePositions());
-				editDistance.add(taxProcessor.getEditDistanceHistogram());
-				filterInformation.add(taxProcessor.getFilterLine());
-				misMatches.add(taxProcessor.getDamageLine());
-				percentIdentity.add(taxProcessor.getPercentIdentityHistogram());
-				readDistribution.add(taxProcessor.getReadDistribution());	
-				readLengthHistogram.add(taxProcessor.getReadLengthDistribution());
-				readLengthStatistics.add(taxProcessor.getReadLengthStatistics());	
-				if(alignment )
-					writeOutput(taxProcessor.getAlignments(),dir+"/alignments/"+fileName+"/",OutputType.ALIGNMENTS, id);
-				if(reads)
-					writeOutput(taxProcessor.getReads(),dir+"/reads/"+fileName+"/",OutputType.READS, id);
-		}	
+			try{
+				NodeProcessor nodeProcessor = hashMap.get(id).get();
+				RMA6TaxonProcessor taxProcessor;
+					if(switcher == Filter.NON){
+						taxProcessor = nodeProcessor.getDefault();
+					}else if(switcher == Filter.ANCIENT){
+						taxProcessor = nodeProcessor.getAncient();
+					}else{
+						taxProcessor=null;
+						warning.log(Level.SEVERE, "Filter no longer supported");
+						System.exit(1);
+					}
+					overallSum.put(id,taxProcessor.getNumberOfReads());
+					additionalEntries.add(taxProcessor.getAdditionalEntries());
+					coverageHistogram.add(taxProcessor.getCoverageLine());
+					coveragePositions.add(taxProcessor.getCoveragePositions());
+					editDistance.add(taxProcessor.getEditDistanceHistogram());
+					filterInformation.add(taxProcessor.getFilterLine());
+					misMatches.add(taxProcessor.getDamageLine());
+					percentIdentity.add(taxProcessor.getPercentIdentityHistogram());
+					readDistribution.add(taxProcessor.getReadDistribution());	
+					readLengthHistogram.add(taxProcessor.getReadLengthDistribution());
+					readLengthStatistics.add(taxProcessor.getReadLengthStatistics());	
+					if(alignment )
+						writeOutput(taxProcessor.getAlignments(),dir+"/alignments/"+fileName+"/",OutputType.ALIGNMENTS, id);
+					if(reads)
+						writeOutput(taxProcessor.getReads(),dir+"/reads/"+fileName+"/",OutputType.READS, id);
+			}catch(InterruptedException | ExecutionException  e){
+				warning.log(Level.SEVERE,"Error", e);
+			}
+		}
 			
 			//write output
-			
 			writeOutput(additionalEntries, dir,OutputType.ADDIDTIONALENTRIES, 0);
 			writeOutput(readDistribution, dir,OutputType.ALIGNMENTDISTRIBUTION, 0);
-			writeOutput(coveragePositions, dir,OutputType.COVERAGE, 0);
+			writeOutput(coveragePositions, dir,OutputType.POS_COVERED, 0);
 			writeOutput(coverageHistogram, dir,OutputType.COVERAGEHISTOGRAM, 0);
 			writeOutput(misMatches, dir,OutputType.DAMAGE, 0);
 			writeOutput(editDistance, dir,OutputType.EDITDISTANCE, 0);
@@ -218,8 +223,9 @@ public class RMA6OutputProcessor {
 			writeOutput(percentIdentity, dir,OutputType.PERCENTIDENTITY, 0);
 			writeOutput(readLengthHistogram, dir,OutputType.READLENGTH_DIST, 0);
 			writeOutput(readLengthStatistics, dir, OutputType.READLENGTH_STATISTICS, 0);
+			hashMap.clear();
 	}
-	public void process(HashMap<Integer, NodeProcessor> hashMap){ // process NodeProcessorts depending on files 
+	public void process(HashMap<Integer, Future<NodeProcessor>> hashMap){ // process NodeProcessorts depending on files 
 		if(behave == Filter.NON){// retrieve the filter that was used and process accordingly
 			// do not use ancient filter
 			if(alignment){

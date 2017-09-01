@@ -29,6 +29,7 @@ public class DirectoryCreator {
 		if(behave == Filter.NON){
 			new File(outDir+"/default/").mkdirs();
 			new File(outDir+"/default/"+"/readDist/").mkdirs(); //TODO could break potentially on Windows systems
+			new File(outDir+"/default/"+"/coverage/").mkdirs();
 			new File(outDir+"/default/"+"/editDistance/").mkdirs();
 			new File(outDir+"/default/"+"/percentIdentity/").mkdirs();
 			new File(outDir+"/default/"+"/damageMismatch/").mkdirs();
@@ -41,6 +42,7 @@ public class DirectoryCreator {
 			new File(outDir+"/ancient/"+"/readDist/").mkdirs(); 
 			new File(outDir+"/ancient/"+"/editDistance/").mkdirs();
 			new File(outDir+"/ancient/"+"/percentIdentity/").mkdirs();
+			new File(outDir+"/ancient/"+"/coverage/").mkdirs();
 			new File(outDir+"/ancient/"+"/damageMismatch/").mkdirs();
 			if(hits)
 				new File(outDir+"/ancient/"+"/alignments/").mkdirs();
@@ -52,6 +54,7 @@ public class DirectoryCreator {
 			new File(outDir+"/nonDuplicates/"+"/editDistance/").mkdirs();
 			new File(outDir+"/nonDuplicates/"+"/percentIdentity/").mkdirs();
 			new File(outDir+"/nonDuplicates/"+"/damageMismatch/").mkdirs();
+			new File(outDir+"/nonDuplicates/"+"/coverage/").mkdirs();
 			if(hits)
 				new File(outDir+"/nonDuplicates/"+"/alignments/").mkdirs();
 			if(reads)
@@ -62,6 +65,7 @@ public class DirectoryCreator {
 			new File(outDir+"/ancientNonDuplicates/"+"/editDistance/").mkdirs();
 			new File(outDir+"/ancientNonDuplicates/"+"/percentIdentity/").mkdirs();
 			new File(outDir+"/ancientNonDuplicates/"+"/damageMismatch/").mkdirs();
+			new File(outDir+"/ancientNonDuplicates/"+"/coverage/").mkdirs();
 			if(hits)
 				new File(outDir+"/ancientNonDuplicates/"+"/alignments/").mkdirs();
 			if(reads)
@@ -73,12 +77,14 @@ public class DirectoryCreator {
 			new File(outDir+"/ancient/"+"/percentIdentity/").mkdirs();
 			new File(outDir+"/ancient/"+"/damageMismatch/").mkdirs();
 			new File(outDir+"/ancient/"+"/FilterInformation/").mkdirs();
+			new File(outDir+"/ancient/"+"/coverage/").mkdirs();
 			
 			new File(outDir+"/default/"+"/readDist/").mkdirs(); 
 			new File(outDir+"/default/"+"/editDistance/").mkdirs();
 			new File(outDir+"/default/"+"/percentIdentity/").mkdirs();
 			new File(outDir+"/default/"+"/damageMismatch/").mkdirs();
 			new File(outDir+"/default/"+"/FilterInformation/").mkdirs();
+			new File(outDir+"/default/"+"/coverage/").mkdirs();
 			if(hits){
 				new File(outDir+"/default/"+"/alignments/").mkdirs();
 				new File(outDir+"/ancient/"+"/alignments/").mkdirs();

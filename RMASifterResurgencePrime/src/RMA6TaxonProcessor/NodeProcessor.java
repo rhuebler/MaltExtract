@@ -162,8 +162,10 @@ public class NodeProcessor{
 				// process taxonprocessors
 				if(behave == Filter.ANCIENT ){
 					ancientProcessor.process();
+					ancientProcessor.clear();
 				}else if(behave == Filter.NON ){
 					defaultProcessor.process();
+					defaultProcessor.clear();
 				}else if(behave == Filter.ALL){
 					ancientNonDuplicateProcessor.process();
 				}else if(behave == Filter.NONDUPLICATES){
@@ -171,6 +173,8 @@ public class NodeProcessor{
 				}else if(behave == Filter.NON_ANCIENT) {
 					ancientProcessor.process();
 					defaultProcessor.process();
+					ancientProcessor.clear();
+					defaultProcessor.clear();
 				}	
 			}
 		}catch(Exception e){
