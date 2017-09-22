@@ -46,6 +46,8 @@ public class ExperimentalRMA6AncientDestacker extends RMA6TaxonProcessor {
 				al.setText(blocks[i].getText());
 				al.processText();
 				al.setTaxID(blocks[i].getTaxonId());
+				System.out.println(blocks[i].getText());
+				System.out.println("Modified Percent Identity"+ blocks[i].getPercentIdentity());
 				al.setPIdent(blocks[i].getPercentIdentity());
 				al.setReadName(readName);
 				al.setReadLength(readLength);

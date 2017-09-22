@@ -226,7 +226,13 @@ public class InputParameterProcessor {
     	        {
     	        	log.log(Level.INFO,"Output Directory set to: "+commandLine.getOptionValue("output"));
     	        	try{
-    	        		File f = new File(commandLine.getOptionValue("output"));
+    	        		String path = commandLine.getOptionValue("output");
+    	        		if(path.contains("\n")||path.contains("$")||path.contains("\'")||path.contains("=")|| path.contains("\"")){
+    	        			warning.log(Level.SEVERE,"Illegal character used in path for out dir");
+    	        			System.exit(1);
+    	        		}
+    	        		File f = new File(path);
+    	        		f.isDirectory();
     	        		this.outDir = f.getCanonicalPath()+"/";
     	        		}catch(IOException io){
     	        			warning.log(Level.SEVERE,"no valid outdir", io);
