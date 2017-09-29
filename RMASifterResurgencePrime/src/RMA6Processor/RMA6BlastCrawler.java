@@ -99,7 +99,7 @@ public class RMA6BlastCrawler {
 			case FILTER: header= "Node\tNumberOfUnfilteredReads\tNumberOfFilteredReads\tNumberOfUnfilteredAlignments\tnumberOfAlignments\tturnedOn?";
 						 outDir += "FilterInformation/"+fileName+"_filterTable"+".txt";			
 									break;
-			case READS:	outDir += getName(taxID)+".fasta";
+			case READS:	outDir += "/reads/"+fileName+"_"+getName(taxID)+".fasta";
 						break;
 			case READLENGTH_DIST: for(int i = 25;i<=200;i+=5){
 									header+="\t"+i+"bp";
@@ -120,8 +120,10 @@ public class RMA6BlastCrawler {
 				warning.log(Level.SEVERE,"No output specified");
 				break;
 			};
-			histo.sort(null);
-			histo.add(0,header);
+			if(type!=OutputType.READS && type!=OutputType.ALIGNMENTS){
+				histo.sort(null);
+				histo.add(0,header);
+			}
 			Path file = Paths.get(outDir);
 			Files.write(file, histo, Charset.forName("UTF-8"));
 		}catch(IOException io){

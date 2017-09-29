@@ -142,8 +142,10 @@ public class RMA6OutputProcessor {
 				warning.log(Level.SEVERE,"No output specified");
 				break;
 			};
-			histo.sort(null);
-			histo.add(0,header);
+			if(type!=OutputType.READS && type!=OutputType.ALIGNMENTS){
+				histo.sort(null);
+				histo.add(0,header);
+			}
 			Path file = Paths.get(outDir);
 			Files.write(file, histo, Charset.forName("UTF-8"));
 		}catch(IOException io){
