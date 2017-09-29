@@ -17,6 +17,7 @@ import NCBI_MapReader.NCBI_MapReader;
 import NCBI_MapReader.NCBI_TreeReader;
 import RMAAlignment.Alignment;
 import behaviour.Filter;
+import behaviour.OutputType;
 import jloda.util.ListOfLongs;
 import megan.data.IMatchBlock;
 import megan.data.IReadBlock;
@@ -45,6 +46,7 @@ public class RMA6BlastCrawler {
 	private NCBI_TreeReader treeReader;
 	private ArrayList<String> editDistances = new ArrayList<String>();
 	private ArrayList<String> percentIdentities = new ArrayList<String>();
+	private ArrayList<String> readLengthDistributions = new ArrayList<String>();
 	private ArrayList<String> readDistributions = new ArrayList<String>();
 	private Filter filter = Filter.CRAWL;
 	private ArrayList<String> reads =new ArrayList<String>();
@@ -57,90 +59,78 @@ public class RMA6BlastCrawler {
 		this.fileName = name;
 		this.speciesName = species;
 		this.mapReader = reader;
-		this.outDir = out;
+		this.outDir = out+"/crawlResults/";
 		this.warning = warning;
 		this.treeReader = new NCBI_TreeReader(treeReader);
 		this.filter = filter;
 	}
-
+	private void writeOutput(List<String> histo, String dir,OutputType type,int taxID){
+		try{
+			String  header ="Taxon";
+			String outDir = dir;
+			switch (type) {
+			case ADDIDTIONALENTRIES: header = "TargetNode\t1.0\t0.9\t0.8\t0.7\t0.6\t0.5\t0.4\t0.3\t0.2\t0.1";
+									outDir += "readDist/"+fileName+"_additionalNodeEntries"+".txt";
+									break;
+			case ALIGNMENTS:		outDir += getName(taxID)+".fasta";
+									break;
+			case ALIGNMENTDISTRIBUTION: header = "Taxon\tReference\tuniquePerReference\tnonStacked\tnonDuplicatesonReference\tTotalAlignmentsOnReference\tReferenceLength\tAverageCoverage";
+										outDir+= "readDist/"+fileName+"_alignmentDist"+".txt";
+									break;
+			case COVERAGEHISTOGRAM: header = "Taxon\tReference\t0\t1\t2\t3\t4\t5\t6\t7\t8\t9\t10\thigher";
+									outDir += "coverage/"+fileName+"_coverageHist"+".txt";
+									break;
+			case DAMAGE: header = "Node";
+						 String header_part2 ="";
+						 	for(int i = 0; i < 20; i++){
+						 		if(i<10){
+						 			header+="\t"+"C>T_"+(i+1);
+						 			header_part2+="\t"+"D>V(11Substitution)_"+(i+1);
+						 		}else{
+						 			header+="\t"+"G>A_"+(i+1);
+						 			header_part2+="\t"+"H>B(11Substitution)_"+(i+1);
+						 		}
+						 	}
+						 	header+=header_part2+"\tconsidered_Matches";
+						 	outDir += "damageMismatch/"+fileName+"_damageMismatch"+".txt";
+						 			break;
+			case EDITDISTANCE: header="Taxon\tReference\t0\t1\t2\t3\t4\t5\t6\t7\t8\t9\t10\thigher";
+								outDir += "editDistance/"+fileName+"_editDistance"+".txt";
+									break;
+			case FILTER: header= "Node\tNumberOfUnfilteredReads\tNumberOfFilteredReads\tNumberOfUnfilteredAlignments\tnumberOfAlignments\tturnedOn?";
+						 outDir += "FilterInformation/"+fileName+"_filterTable"+".txt";			
+									break;
+			case READS:	outDir += getName(taxID)+".fasta";
+						break;
+			case READLENGTH_DIST: for(int i = 25;i<=200;i+=5){
+									header+="\t"+i+"bp";
+									}
+									outDir+="readDist/"+fileName+"_readLengthDist"+".txt";
+									break;
+			case READLENGTH_STATISTICS:	header = "Taxon\tMean\tGeometricMean\tMedian\tStandardDev";
+									outDir+="readDist/"+fileName+"_readLengthStat"+".txt";
+									break;
+			
+			case PERCENTIDENTITY:	header = "Taxon\t80\t85\t90\t95\t100";
+									outDir += "percentIdentity/"+fileName+"_percentIdentity"+".txt";
+									break;
+			case POS_COVERED:	header = "Taxon\tReference\tAverageCoverage\tCoverge_StandardDeviation\tpercCoveredHigher1\tpercCoveredHigher2\tpercCoveredHigher3\tpercCoveredHigher4\tpercCoveredHigher5";
+								outDir += "coverage/"+fileName+"_postionsCovered"+".txt";
+									break;
+			default:
+				warning.log(Level.SEVERE,"No output specified");
+				break;
+			};
+			histo.sort(null);
+			histo.add(0,header);
+			Path file = Paths.get(outDir);
+			Files.write(file, histo, Charset.forName("UTF-8"));
+		}catch(IOException io){
+			warning.log(Level.SEVERE,"Cannot write file", io);
+		}
+	}
 	//  Output writers here 
-	private void writeReadLengthDistribution(List<String> histo){
-		try{
-			String header = "Node\tMean\tGeometricMean\tMedian\tStandardDev";
-			histo.sort(null);
-			histo.add(0,header);
-			Path file = Paths.get(outDir+"/crawlResults/readDist/"+fileName+"_"+speciesName.replace(' ', '_')+"_readDist.txt");
-			Files.write(file, histo, Charset.forName("UTF-8"));
-		}catch(IOException io){
-			warning.log(Level.SEVERE,"Cannot write file", io);
-		}
-	}
-	private void writeEditDistance(List<String> histo){
-		try{
-			String header = "Node\t0\t1\t2\t3\t4\t5\thigher";
-			histo.sort(null);
-			histo.add(0,header);
-			Path file = Paths.get(outDir+"/crawlResults/editDistance/"+fileName+"_"+speciesName.replace(' ', '_')+"_editDistance.txt");
-			Files.write(file, histo, Charset.forName("UTF-8"));
-		}catch(IOException io){
-			warning.log(Level.SEVERE,"Cannot write file", io);
-		}
-	}
-	private void writePercentIdentity(List<String> histo){
-		try{
-			String header = "Node\t80\t85\t90\t95\t100";
-			histo.sort(null);
-			histo.add(0,header);
-			Path file = Paths.get(outDir+"/crawlResults/percentIdentity/"+fileName+"_"+speciesName.replace(' ', '_')+"_percentIdentity.txt");
-			Files.write(file, histo, Charset.forName("UTF-8"));
-		}catch(IOException io){
-			warning.log(Level.SEVERE,"Cannot write file", io);
-		}
-	} 
-	private String getName(int taxId){
-		String name;
-		if(mapReader.getNcbiIdToNameMap().get(taxId) != null)
-			name = mapReader.getNcbiIdToNameMap().get(taxId);
-		else
-			name = "unassignedName";
-		return name;
-	}
-	private void writeMisMap(ArrayList<String> summary){
-		String header = "Node";
-		String header_part2 ="";
-		for(int i = 0; i < 20; i++){
-			if(i<10){
-				header+="\t"+"C>T_"+(i+1);
-				header_part2+="\t"+"D>V(11Substitution)_"+(i+1);
-			}else{
-				header+="\t"+"G>A_"+(i+1);
-				header_part2+="\t"+"H>B(11Substitution)_"+(i+1);
-			}
-		}
-		header+=header_part2+"\tconsidered_Matches";
-		summary.sort(null);
-		summary.add(0,header);
-	try{
-		Path file = Paths.get(outDir+"/crawlResults/damageMismatch/"+fileName+"_"+speciesName.replace(' ', '_')+"_misMatch.txt");
-		Files.write(file, summary, Charset.forName("UTF-8"));
-	}catch(IOException io){
-		warning.log(Level.SEVERE,"Can't write File" ,io);
-	}
- 
-}
-	private void writeReads(List<String>reads,List<String>headers){
-		try{
-			ArrayList<String> summary = new ArrayList<String>();
-			for(int i = 0; i<= reads.size();i++){
-				summary.add(headers.get(i));
-				summary.add(headers.get(i));
-			}
-			Path file = Paths.get(outDir+"/crawlResults/reads/"+fileName+"_"+speciesName+"_reads.fa");
-			Files.write(file, summary, Charset.forName("UTF-8"));
-		}catch(IOException io){
-			warning.log(Level.SEVERE,"Cannot write file", io);
-		}
-	} 	
+	
 	// get all keys from a file
 	private Set<Integer> getAllKeys(String fileName){
 		Set<Integer> keys = null;
@@ -159,7 +149,14 @@ public class RMA6BlastCrawler {
 		return keys;
 	}
 	
-	
+	private String getName(int taxId){
+		String name;
+		if(mapReader.getNcbiIdToNameMap().get(taxId) != null)
+			name = mapReader.getNcbiIdToNameMap().get(taxId);
+		else
+			name = "unassignedName";
+		return name;
+	}
 	
 	// Process RMA6 file by crawling 
 	public void process(){
@@ -226,16 +223,16 @@ public class RMA6BlastCrawler {
 			}
 		}// for all IDs
 		for(int key :collection.keySet()){// write output here 
-		summary.add(collection.get(key).getLine());
+		summary.add(collection.get(key).getDamageLine());
 		editDistances.add(collection.get(key).getEditDistanceHistogram());
 		percentIdentities.add(collection.get(key).getPercentIdentityHistogram());
-		readDistributions.add(collection.get(key).getReadLengthDistribution());
+		readLengthDistributions.add(collection.get(key).getReadLengthDistribution());
 		}
-		// write output 
-		writeMisMap(summary);
-		writeEditDistance(editDistances);
-		writePercentIdentity(percentIdentities);
-		writeReadLengthDistribution(readDistributions);
-		writeReads(reads,headers);
+		writeOutput(readLengthDistributions, outDir,OutputType.ALIGNMENTDISTRIBUTION, 0);
+		writeOutput(summary, outDir,OutputType.DAMAGE, 0);
+		writeOutput(editDistances, outDir,OutputType.EDITDISTANCE, 0);
+		writeOutput(percentIdentities, outDir,OutputType.PERCENTIDENTITY, 0);
+		writeOutput(readLengthDistributions, outDir, OutputType.READLENGTH_STATISTICS, 0);
+		writeOutput(reads,outDir,OutputType.READS,0);
 	}
 }

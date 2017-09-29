@@ -22,28 +22,29 @@ public class StrainMap {
 		
 	}
 	//setters
-	//get edit edit distance and process edi distances
+	//get edit edit distance and process edidistances
 	public String getEditDistanceHistogram(){
 		HashMap<Integer,Integer> histo = new HashMap<Integer,Integer> ();
-		for(int i = 0;i < 7;i++){
+		for(int i = 0;i < 11;i++){
 			histo.put(i, 0);
 		}
 		ArrayList<Integer> list = container.getEditDistances();
 		if(list != null){
 			for(int d : list){
-				if(d<=5){
+				if(d<=10){
 					int value = histo.get(d);
 					value++;
 					histo.put(d, value);
 				}else{
-					int value = histo.get(6);
+					int value = histo.get(11);
 					value++;
-					histo.put(6, value);
+					histo.put(11, value);
 				}	
 			}
 		}
 		
-		return name.replace(" ", "_")+"\t"+ histo.get(0)+"\t"+histo.get(1)+"\t"+histo.get(2)+"\t"+histo.get(3)+"\t"+histo.get(4)+"\t"+histo.get(5)+"\t"+histo.get(6);
+		return name.replace(" ", "_")+"\t"+ histo.get(0)+"\t"+histo.get(1)+"\t"+histo.get(2)+"\t"+histo.get(3)+"\t"+histo.get(4)+
+				"\t"+histo.get(5)+"\t"+histo.get(6)+"\t"+histo.get(7)+"\t"+histo.get(8)+"\t"+histo.get(9)+"\t"+histo.get(10)+"\t"+histo.get(11);
 	}
 	// get and process percent identity
 	public String getPercentIdentityHistogram(){
@@ -106,7 +107,7 @@ public class StrainMap {
 	public int getNumberOfMatches(){
 		return this.numMatches;
 	}
-	public String getLine(){ // process Map Into Damage Output Line 
+	public String getDamageLine(){ // process Map Into Damage Output Line 
 			if(container.getProcessed()!=0){
 				container.processMisMatches();
 				numMatches = container.getProcessed();

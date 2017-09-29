@@ -129,7 +129,7 @@ public class ExperimentalRMA6AncientDestacker extends RMA6TaxonProcessor {
 		StrainMap strain = new StrainMap(taxName,container,numMatches);
 		setOriginalNumberOfAlignments(originalNumberOfAlignments);
 		setOriginalNumberOfReads(originalNumberOfReads);
-		setDamageLine(strain.getLine());
+		setDamageLine(strain.getDamageLine());
 		setNumMatches(numMatches);
 		setNumberOfReads(list.keySet().size());
 		processCompositionMap(map);
