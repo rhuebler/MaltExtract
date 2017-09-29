@@ -1,4 +1,5 @@
 package strainMap;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -23,6 +24,13 @@ public class StrainMap {
 	}
 	//setters
 	//get edit edit distance and process edidistances
+	public String getReadDistribution(){
+		DecimalFormat df = new DecimalFormat("#.###");
+		String readDist = name +"\t" + name;
+		for(double d : container.getReadDistribution())
+			readDist += "\t" + df.format(d);
+		return readDist;
+	}
 	public String getEditDistanceHistogram(){
 		HashMap<Integer,Integer> histo = new HashMap<Integer,Integer> ();
 		for(int i = 0;i < 11;i++){

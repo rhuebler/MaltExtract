@@ -42,15 +42,14 @@ public class RMA6BlastCrawler {
 	private NCBI_MapReader mapReader;
 	private String outDir;
 	private Logger warning;
-	private ArrayList<String> summary= new ArrayList<String>();
+	private ArrayList<String> damageLines= new ArrayList<String>();
 	private NCBI_TreeReader treeReader;
 	private ArrayList<String> editDistances = new ArrayList<String>();
 	private ArrayList<String> percentIdentities = new ArrayList<String>();
 	private ArrayList<String> readLengthDistributions = new ArrayList<String>();
 	private ArrayList<String> readDistributions = new ArrayList<String>();
 	private Filter filter = Filter.CRAWL;
-	private ArrayList<String> reads =new ArrayList<String>();
-	private ArrayList<String> headers =new ArrayList<String>();
+	private HashMap<String,String> reads = new HashMap<String,String>();
 	//set values at construction
 	//TODO get Reads
 	public RMA6BlastCrawler(String dir, String name, String species, String out, NCBI_MapReader reader ,Logger warning,NCBI_TreeReader treeReader,
@@ -190,9 +189,8 @@ public class RMA6BlastCrawler {
 								if(blocks[i].getBitScore()/topScore < 1-0.01){
 									break;}
 								if(getName(blocks[i].getTaxonId()).contains(speciesName)){
-									if(!reads.contains(current.getReadSequence())&&!headers.contains(current.getReadHeader())){
-										reads.add(current.getReadSequence());
-										headers.add(current.getReadHeader());
+									if( !reads.containsKey(current.getReadHeader())){
+										reads.put(current.getReadHeader(),current.getReadSequence());
 									}
 									Alignment al = new Alignment();
 									al.setText(blocks[i].getText());
@@ -223,16 +221,22 @@ public class RMA6BlastCrawler {
 			}
 		}// for all IDs
 		for(int key :collection.keySet()){// write output here 
-		summary.add(collection.get(key).getDamageLine());
+		damageLines.add(collection.get(key).getDamageLine());
 		editDistances.add(collection.get(key).getEditDistanceHistogram());
 		percentIdentities.add(collection.get(key).getPercentIdentityHistogram());
 		readLengthDistributions.add(collection.get(key).getReadLengthDistribution());
+		readDistributions.add(collection.get(key).getReadDistribution());
 		}
-		writeOutput(readLengthDistributions, outDir,OutputType.ALIGNMENTDISTRIBUTION, 0);
-		writeOutput(summary, outDir,OutputType.DAMAGE, 0);
+		ArrayList<String> readsAndHeaders = new ArrayList<String>();
+		for(String header: reads.keySet()){
+			readsAndHeaders.add(header);
+			readsAndHeaders.add(reads.get(header));
+			}
 		writeOutput(editDistances, outDir,OutputType.EDITDISTANCE, 0);
 		writeOutput(percentIdentities, outDir,OutputType.PERCENTIDENTITY, 0);
+		writeOutput(readDistributions, outDir,OutputType.ALIGNMENTDISTRIBUTION, 0);
 		writeOutput(readLengthDistributions, outDir, OutputType.READLENGTH_STATISTICS, 0);
-		writeOutput(reads,outDir,OutputType.READS,0);
+		writeOutput(readsAndHeaders,outDir,OutputType.READS,taxID);
+		writeOutput(damageLines, outDir,OutputType.DAMAGE, 0);
 	}
 }
