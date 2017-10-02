@@ -1,6 +1,4 @@
 package RMAAlignment;
-
-import java.util.Comparator;
 /**
  * This class Represents an MatchBlock from Megan but has more Slots available and processes part of the alignment into statistics
  * @author huebler
