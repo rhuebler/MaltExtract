@@ -2,8 +2,7 @@ package strainMap;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
-
-import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
+import RMAAlignment.AlignmentStatistics;
 
 public class StrainMap {
 	/**
@@ -14,6 +13,7 @@ public class StrainMap {
 	private String name;
 	private StrainMisMatchContainer container;
 	private int numMatches=0;
+	private  AlignmentStatistics statistics;
 	
 	//constructor
 	public StrainMap(String s,StrainMisMatchContainer container, int n){
@@ -24,10 +24,29 @@ public class StrainMap {
 	}
 	//setters
 	//get edit edit distance and process edidistances
+	public void setStatistics(){
+		 AlignmentStatistics stats = container.getStatistics();
+		 this.statistics = stats;
+		
+	}
+	public String getCoverageHistogram(){
+		HashMap<Integer,Integer>histogram = statistics.getConverageHistogram();
+		String coveragHistograms =  name +"\t" + name;
+		for(int k : histogram.keySet())
+			coveragHistograms += "\t" + histogram.get(k);
+		return coveragHistograms;
+	}
+	public String getCoveragePositions(){
+		String coveragePostitions =  name +"\t" + name;
+		for(String cov :statistics.getCoveragePositions()){
+			coveragePostitions += "\t"+cov;
+		}
+		return coveragePostitions;
+	}
 	public String getReadDistribution(){
 		DecimalFormat df = new DecimalFormat("#.###");
 		String readDist = name +"\t" + name;
-		for(double d : container.getReadDistribution())
+		for(double d :statistics.getGenaralStatistics())
 			readDist += "\t" + df.format(d);
 		return readDist;
 	}
@@ -88,19 +107,26 @@ public class StrainMap {
 		}
 		return name.replace(" ", "_")+"\t"+histo.get(0)+"\t"+histo.get(1)+"\t"+histo.get(2)+"\t"+histo.get(3)+"\t"+histo.get(4);
 	}
+	private int round(double i, int v){
+	    return (int) (Math.round(i/v) * v);
+	}
 	// produce and get read distances
 	public String getReadLengthDistribution(){
 		ArrayList<Integer> lengths = container.getLengths();
 		if(lengths.size() != 0){
-			DescriptiveStatistics stats = new DescriptiveStatistics();
-			for(int i : lengths)
-				stats.addValue(i);
-			String line = name.replace(" ", "_");
-			line += "\t"+stats.getMean();
-			line += "\t"+stats.getGeometricMean();
-			line += "\t"+stats.getPercentile(50);
-			line += "\t"+stats.getStandardDeviation();
-			return line;
+			HashMap<Integer,Integer> intervals = new HashMap<Integer,Integer>();
+			for(int i = 25;i<=200;i+=5)
+				intervals.put(i, 0);
+				for(int i : lengths){// round to the closest number dividable by 5 to get the intervals
+					int value = intervals.get(round(i, 5));
+					value++;
+					intervals.replace(round(i, 5), value);
+				}
+				String rlDist = name;
+			for(int key:intervals.keySet()){
+					rlDist+="\t"+intervals.get(key);
+				}
+			return rlDist;
 		}else{
 			return name.replace(" ", "_")+"\t0\t0\t0\t0";
 		}

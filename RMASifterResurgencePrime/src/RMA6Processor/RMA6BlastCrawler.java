@@ -44,16 +44,19 @@ public class RMA6BlastCrawler {
 	private Logger warning;
 	private ArrayList<String> damageLines= new ArrayList<String>();
 	private NCBI_TreeReader treeReader;
+	private ArrayList<String> coverageHistograms = new ArrayList<String>();
+	private ArrayList<String> coveragePositions = new ArrayList<String>();
 	private ArrayList<String> editDistances = new ArrayList<String>();
 	private ArrayList<String> percentIdentities = new ArrayList<String>();
 	private ArrayList<String> readLengthDistributions = new ArrayList<String>();
 	private ArrayList<String> readDistributions = new ArrayList<String>();
+	private  boolean wantReads = false;
 	private Filter filter = Filter.CRAWL;
 	private HashMap<String,String> reads = new HashMap<String,String>();
 	//set values at construction
 	//TODO get Reads
 	public RMA6BlastCrawler(String dir, String name, String species, String out, NCBI_MapReader reader ,Logger warning,NCBI_TreeReader treeReader,
-			Filter filter){
+			Filter filter, boolean wantReads){
 		this.inDir = dir;
 		this.fileName = name;
 		this.speciesName = species;
@@ -62,6 +65,7 @@ public class RMA6BlastCrawler {
 		this.warning = warning;
 		this.treeReader = new NCBI_TreeReader(treeReader);
 		this.filter = filter;
+		this.wantReads = wantReads;
 	}
 	private void writeOutput(List<String> histo, String dir,OutputType type,int taxID){
 		try{
@@ -191,9 +195,11 @@ public class RMA6BlastCrawler {
 								if(blocks[i].getBitScore()/topScore < 1-0.01){
 									break;}
 								if(getName(blocks[i].getTaxonId()).contains(speciesName)){
-									if( !reads.containsKey(current.getReadHeader())){
-										reads.put(current.getReadHeader(),current.getReadSequence());
-									}
+									if(wantReads){
+										if( !reads.containsKey(current.getReadHeader())){
+											reads.put(current.getReadHeader(),current.getReadSequence());
+										}
+									}	
 									Alignment al = new Alignment();
 									al.setText(blocks[i].getText());
 									al.processText();
@@ -223,22 +229,32 @@ public class RMA6BlastCrawler {
 			}
 		}// for all IDs
 		for(int key :collection.keySet()){// write output here 
-		damageLines.add(collection.get(key).getDamageLine());
-		editDistances.add(collection.get(key).getEditDistanceHistogram());
-		percentIdentities.add(collection.get(key).getPercentIdentityHistogram());
-		readLengthDistributions.add(collection.get(key).getReadLengthDistribution());
-		readDistributions.add(collection.get(key).getReadDistribution());
+			StrainMap map = collection.get(key);
+			map.setStatistics();
+			coverageHistograms.add(map.getCoverageHistogram());
+			coveragePositions.add(map.getCoveragePositions());
+			damageLines.add(collection.get(key).getDamageLine());
+			editDistances.add(collection.get(key).getEditDistanceHistogram());
+			percentIdentities.add(collection.get(key).getPercentIdentityHistogram());
+			readLengthDistributions.add(collection.get(key).getReadLengthDistribution());
+			readDistributions.add(collection.get(key).getReadDistribution());
 		}
 		ArrayList<String> readsAndHeaders = new ArrayList<String>();
-		for(String header: reads.keySet()){
-			readsAndHeaders.add(header);
-			readsAndHeaders.add(reads.get(header));
-			}
+		if(wantReads){
+			for(String header: reads.keySet()){
+				readsAndHeaders.add(header);
+				readsAndHeaders.add(reads.get(header));
+				}
+		}	
+		writeOutput(coverageHistograms, outDir,OutputType.COVERAGEHISTOGRAM, 0);
+		writeOutput(coveragePositions, outDir,OutputType.POS_COVERED, 0);
 		writeOutput(editDistances, outDir,OutputType.EDITDISTANCE, 0);
 		writeOutput(percentIdentities, outDir,OutputType.PERCENTIDENTITY, 0);
 		writeOutput(readDistributions, outDir,OutputType.ALIGNMENTDISTRIBUTION, 0);
 		writeOutput(readLengthDistributions, outDir, OutputType.READLENGTH_STATISTICS, 0);
-		writeOutput(readsAndHeaders,outDir,OutputType.READS,taxID);
 		writeOutput(damageLines, outDir,OutputType.DAMAGE, 0);
+		if(wantReads){
+			writeOutput(readsAndHeaders,outDir,OutputType.READS,taxID);
+			}
 	}
 }

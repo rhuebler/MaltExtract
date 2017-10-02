@@ -16,8 +16,9 @@ public class ConcurrentRMA6Crawler implements Callable<RMA6BlastCrawler> {
 	private Logger warning;
 	private NCBI_TreeReader treeReader;
 	private Filter filter;
+	private boolean wantReads;
 	public ConcurrentRMA6Crawler(String dir, String name, String species, String out, 
-			NCBI_MapReader reader,Logger warning,NCBI_TreeReader treeReader, Filter f ){
+			NCBI_MapReader reader,Logger warning,NCBI_TreeReader treeReader, Filter f,boolean wantReads){
 		this.inDir = dir;
 		this.fileName = name;
 		this.speciesName = species;
@@ -26,11 +27,12 @@ public class ConcurrentRMA6Crawler implements Callable<RMA6BlastCrawler> {
 		this.warning = warning;
 		this.treeReader = treeReader;
 		this.filter = f;
+		this.wantReads = wantReads;
 	}
 	@Override
 	public RMA6BlastCrawler call() throws Exception {
 		RMA6BlastCrawler crawler = new RMA6BlastCrawler(inDir,fileName,speciesName,
-				 outDir,mapReader, warning ,treeReader, filter);
+				 outDir,mapReader, warning ,treeReader, filter, wantReads);
 		  crawler.process();
 		return crawler;
 	}

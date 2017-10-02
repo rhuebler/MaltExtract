@@ -130,7 +130,7 @@ public class RMAExtractor {
 				 for(int taxID:taxIDs){
 					 ConcurrentRMA6Crawler crawler = new ConcurrentRMA6Crawler(f.getParent()+"/",f.getName(),
 							  mapReader.getNcbiIdToNameMap().get(taxID),
-							  inProcessor.getOutDir(),mapReader, warning, treeReader, inProcessor.getFilter());
+							  inProcessor.getOutDir(),mapReader, warning, treeReader, inProcessor.getFilter(),inProcessor.wantReads());
 					  Future<RMA6BlastCrawler> future =  executor.submit(crawler);
 					  try {
 						future.get();

@@ -101,10 +101,10 @@ public class StrainMisMatchContainer{
 	public ArrayList<Double> getPercentIdentity(){
 		return this.pIdents;
 	}
-	public ArrayList<Double> getReadDistribution(){
+	public AlignmentStatistics getStatistics(){
 		AlignmentStatistics stats = new AlignmentStatistics(markDuplicates(alignments),false,false);
 		stats.calculateStatistics();
-		return stats.getGenaralStatistics();
+		return stats;
 	}
 public HashMap<Integer,Double> getDamage(){
 	return this.damage;
