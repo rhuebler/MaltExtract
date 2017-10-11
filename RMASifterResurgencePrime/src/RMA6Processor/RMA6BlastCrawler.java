@@ -77,7 +77,7 @@ public class RMA6BlastCrawler {
 									break;
 			case ALIGNMENTS:		outDir += getName(taxID)+".fasta";
 									break;
-			case ALIGNMENTDISTRIBUTION: header = "Taxon\tReference\tuniquePerReference\tnonStacked\tnonDuplicatesonReference\tTotalAlignmentsOnReference\tReferenceLength\tAverageCoverage";
+			case ALIGNMENTDISTRIBUTION: header = "Taxon\tReference\tuniquePerReference\tnonStacked\tnonDuplicatesonReference\tTotalAlignmentsOnReference\tReferenceLength";
 										outDir+= "readDist/"+fileName+"_alignmentDist"+".txt";
 									break;
 			case COVERAGEHISTOGRAM: header = "Taxon\tReference\t0\t1\t2\t3\t4\t5\t6\t7\t8\t9\t10\thigher";

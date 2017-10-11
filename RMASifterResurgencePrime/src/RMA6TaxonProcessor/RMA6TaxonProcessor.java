@@ -92,6 +92,7 @@ public RMA6TaxonProcessor(Integer id, double pID, NCBI_MapReader reader, boolean
 		s+="\t"+0;
 	}
 	setDamageLine(s);
+	
 	this.readDistribution = taxName+"\tNA\t0\t0\t0\t0\t0";
 	String rldist = taxName;
 	for(int i = 25;i<=200;i+=5)
