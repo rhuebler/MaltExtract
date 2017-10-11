@@ -11,7 +11,10 @@ import behaviour.Filter;
 import megan.data.IMatchBlock;
 import strainMap.StrainMap;
 /**
- * RMA6 processor that automatically removes PCR duplicated and stacked reads
+ * RMA6 processor that automatically removes PCR duplicated and stacked reads Essentially it gets the alignment block 
+ * from a read and than processes the best scoring percent of the alignment while sorting them by reference sequence
+ * essentially first duplicate and stacking reads are marked and discarded and then authenticity criteria calculated
+ * for the remaining reads
  * @author huebler
  *
  */

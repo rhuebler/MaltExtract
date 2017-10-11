@@ -78,8 +78,14 @@ public class AlignmentStatistics {
 			int zeros = refMap.getLength() - temp ;	
 			if(zeros<0)
 				zeros = 0;
-			coverageHistogram.put(0, zeros);	
+			coverageHistogram.put(0, zeros);
+			
 			int unique=coverageHistogram.get(1);
+			if(unique  == 0){
+				results.add(0.0);
+			}else{
+				results.add(unique/(refMap.getPossible()));
+			}
 			this.coverageHistogram = coverageHistogram;
 			results.add(unique/(refMap.getPossible()));
 			int nonDuplicates = input.size();

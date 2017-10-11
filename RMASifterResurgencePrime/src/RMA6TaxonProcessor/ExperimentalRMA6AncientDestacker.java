@@ -11,8 +11,11 @@ import behaviour.Filter;
 import megan.data.IMatchBlock;
 import strainMap.StrainMap;
 /**
- * RMA6 processor that automatically removes PCR duplicated and stacked reads and needs at least one C>T or G>A in the tailing bases
- * 
+ * RMA6 processor that automatically removes PCR duplicated and stacked reads Essentially it gets the alignment block 
+ * from a read and than processes the best scoring percent of the alignment while sorting them by reference sequence
+ * essentially first duplicate and stacking reads are marked and discarded and then authenticity criteria calculated
+ * for the remaining reads
+ * This filter will only process alignments that have at least one C>T or one G>A substitution at the tails of the read
  * @author huebler
  *
  */
@@ -46,8 +49,6 @@ public class ExperimentalRMA6AncientDestacker extends RMA6TaxonProcessor {
 				al.setText(blocks[i].getText());
 				al.processText();
 				al.setTaxID(blocks[i].getTaxonId());
-				System.out.println(blocks[i].getText());
-				System.out.println("Modified Percent Identity"+ blocks[i].getPercentIdentity());
 				al.setPIdent(blocks[i].getPercentIdentity());
 				al.setReadName(readName);
 				al.setReadLength(readLength);
