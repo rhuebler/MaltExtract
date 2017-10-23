@@ -8,7 +8,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -19,7 +18,6 @@ import java.util.logging.Logger;
 
 import NCBI_MapReader.NCBI_MapReader;
 import NCBI_MapReader.NCBI_TreeReader;
-import RMA6Processor.ConcurrentRMA6Crawler;
 import RMA6Processor.ConcurrentRMA6Scanner;
 import RMA6Processor.RMA6BlastCrawler;
 import RMA6Processor.RMA6Scanner;
@@ -123,24 +121,14 @@ public class RMAExtractor {
 			  log.log(Level.INFO, "Writing Scan Summary File");
 			  writer.write(inProcessor.getOutDir());
 	  }else if(inProcessor.getFilter() == Filter.CRAWL ){// run crawl filter
-		  executor=(ThreadPoolExecutor) Executors.newFixedThreadPool(inProcessor.getNumThreads());//intialize concurrent thread executor 
 		  for(String fileName : inProcessor.getFileNames()){
 			  File f = new File(fileName);
 			  log.log(Level.INFO, "Crawl for file " + fileName);
 				 for(int taxID:taxIDs){
-					 ConcurrentRMA6Crawler crawler = new ConcurrentRMA6Crawler(f.getParent()+"/",f.getName(),
+					 RMA6BlastCrawler crawler = new RMA6BlastCrawler(f.getParent()+"/",f.getName(),
 							  mapReader.getNcbiIdToNameMap().get(taxID),
-							  inProcessor.getOutDir(),mapReader, warning, treeReader, inProcessor.getFilter(),inProcessor.wantReads());
-					  Future<RMA6BlastCrawler> future =  executor.submit(crawler);
-					  try {
-						future.get();
-					} catch (InterruptedException e) {
-						e.printStackTrace();
-						System.exit(1);
-					} catch (ExecutionException e) {
-						e.printStackTrace();
-						System.exit(1);
-					}
+							  inProcessor.getOutDir(),mapReader, warning, treeReader, inProcessor.getFilter(),inProcessor.wantReads(), 
+							  inProcessor.getNumThreads());
 				}
 		  }	
 	  } 

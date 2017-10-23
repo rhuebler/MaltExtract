@@ -17,17 +17,17 @@ import megan.data.IMatchBlock;
  * @author huebler
  *
  */
-public class ExperimentalRMA6Destacker extends RMA6TaxonProcessor {
+public class MatchProcessorCrawler extends RMA6TaxonProcessor {
 	// initialize attributes
 	protected boolean wantReads = false;
 	protected boolean wantAlignments = false;
 	protected boolean turnOffDestacking = false;
 	protected boolean turnOffDeDuping = false;
 	//construvters and set values
-	public ExperimentalRMA6Destacker(Integer id, double pID, NCBI_MapReader reader, boolean v, Logger log, Logger warning,double tp,int mL, Filter behave) {
+	public MatchProcessorCrawler(Integer id, double pID, NCBI_MapReader reader, boolean v, Logger log, Logger warning,double tp,int mL, Filter behave) {
 		super(id, pID, reader, v, log, warning,tp,mL, behave);
 	}
-	public ExperimentalRMA6Destacker(int id ,double pID, NCBI_MapReader reader,
+	public MatchProcessorCrawler(int id ,double pID, NCBI_MapReader reader,
 			boolean v,Logger log, Logger warning, boolean reads,double tp,int mL,boolean wantAls,boolean turnOffDestacking,boolean turnOffDeDuping,Filter behave) {
 		super(id,pID, reader, v, log, warning,tp,mL, behave);
 		this.wantReads =reads;
@@ -35,25 +35,9 @@ public class ExperimentalRMA6Destacker extends RMA6TaxonProcessor {
 		this.turnOffDestacking = turnOffDestacking;
 		this.turnOffDeDuping = turnOffDeDuping;
 	}
-	//process each Marchblock
-	public void processMatchBlocks(IMatchBlock[] blocks, String readName, int readLength, String sequence){
-		originalNumberOfReads++;
-		float topScore = blocks[0].getBitScore();
-			for(int i = 0; i< blocks.length;i++){
-				if(blocks[i].getBitScore()/topScore < 1-topPercent){
-					break;}		
+	//process each Matchblock
+	public void processMatchBlock(Alignment al){
 			
-				Alignment al = new Alignment();
-				al.setText(blocks[i].getText());
-				al.setTaxID(blocks[i].getTaxonId());
-				al.processText();
-				al.setPIdent(blocks[i].getPercentIdentity());
-				al.setReadName(readName);
-				al.setReadLength(readLength);
-				al.setAcessionNumber(blocks[i].getTextFirstWord());
-			
-				al.setSequence(sequence);
-				originalNumberOfAlignments++;
 				if(minPIdent <= al.getPIdent()){ // check for minPercentIdentity
 								//get mismatches
 					if(!taxonMap.containsKey(al.getTaxID())){
@@ -77,8 +61,7 @@ public class ExperimentalRMA6Destacker extends RMA6TaxonProcessor {
 						taxonMap.replace(al.getTaxID(),list);
 					}
 				}
-			}
-	}		
+			}	
 	public void process(){ 
 		
 		//analyze collected data 
@@ -129,6 +112,7 @@ public class ExperimentalRMA6Destacker extends RMA6TaxonProcessor {
 				}
 			}	
 		}
+		
 		setOriginalNumberOfAlignments(originalNumberOfAlignments);
 		setOriginalNumberOfReads(originalNumberOfReads);
 		setDamageLine(container.getDamageLine());

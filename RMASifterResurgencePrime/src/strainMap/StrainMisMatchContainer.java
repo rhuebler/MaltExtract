@@ -19,92 +19,19 @@ public class StrainMisMatchContainer{
 	private HashMap<Integer,HashMap<String,Integer>> container = new HashMap<Integer,HashMap<String,Integer>>();
 	private HashMap<Integer,Double> damage; 
 	private HashMap<Integer,Double> noise;
-	
-	private ArrayList<Integer> distances;
-	private ArrayList<Double> pIdents;
-	private ArrayList<Integer> lengths;
-	private ArrayList<Alignment> alignments;
+	String name;
+
 
 	private int processed = 0;
-	private Filter filter;
 	// constructor
-	public  StrainMisMatchContainer(Filter filter) {
-		this.filter = filter;
-		if(filter == Filter.CRAWL){
-			distances = new ArrayList<Integer>();
-			pIdents = new ArrayList<Double>();
-			lengths = new ArrayList<Integer>();
-			alignments = new ArrayList<Alignment>();
-		}
+	public  StrainMisMatchContainer() {
 	}
-	private ArrayList<Alignment> markDuplicates(ArrayList<Alignment>list){ // that seems to be correct may be the ordering works better and therefore more stacking reads can be found
-		AlignmentComparator comp = new AlignmentComparator(); // should theoretically sort my alignments according to start positions
-			ArrayList<Alignment> inList = list;
-			inList.sort(comp);
-			int i =0;
-			HashMap<String, Integer> timesViewed =  new HashMap<String, Integer>();
-			while(i < inList.size() - 1){// array size is 47 last 46
-				
-				Alignment current = inList.get(i);
-				if(timesViewed.containsKey(current.getQuery())){
-					int k=timesViewed.get(current.getQuery());
-					timesViewed.replace(current.getQuery(),k );
-				}else{
-					timesViewed.put(current.getQuery(), 1);
-				}
-				
-				Alignment next = inList.get(i+1);
-				int cStart = 0;
-				int cEnd = 0;
-				int nStart = 0;
-				int nEnd = 0;
-				if(!current.isReversed() == !next.isReversed()){
-					cStart = current.getStart();
-					cEnd = current.getEnd();
-					nStart = next.getStart();
-					nEnd = next.getEnd();
-				}else if(current.isReversed() == !next.isReversed()){
-					cStart = current.getEnd();
-					cEnd = current.getStart();
-					nStart = next.getStart();
-					nEnd = next.getEnd();
-				}else if(!current.isReversed() == next.isReversed()){
-					cStart = current.getStart();
-					cEnd = current.getEnd();
-					nStart = next.getEnd();
-					nEnd = next.getStart();
-				}else{
-					cStart = current.getEnd();
-					cEnd = current.getStart();
-					nStart = next.getEnd();
-					nEnd = next.getStart();
-				}
-				if( cStart == nStart && cEnd == nEnd && current.getReferenceLength() == next.getReferenceLength()){
-					if(timesViewed.containsKey(next.getQuery())||current.getQuery().equals(next.getQuery())){
-					inList.get(i+1).setDuplicate(true);
-					}
-				}
-					i++;
-			}
-		return inList;
+	public void setName(String name){
+		this.name =  name;
 	}
 //getters
 	public int getProcessed(){
 		return this.processed;
-	}
-	public ArrayList<Integer> getEditDistances(){
-		return this.distances;
-	}
-	public ArrayList<Integer> getLengths(){
-		return this.lengths;
-	}
-	public ArrayList<Double> getPercentIdentity(){
-		return this.pIdents;
-	}
-	public AlignmentStatistics getStatistics(){
-		AlignmentStatistics stats = new AlignmentStatistics(markDuplicates(alignments),false,false);
-		stats.calculateStatistics();
-		return stats;
 	}
 public HashMap<Integer,Double> getDamage(){
 	return this.damage;
@@ -115,13 +42,6 @@ public HashMap<Integer,Double> getNoise(){
 //retrieve information from alignment
 public void processAlignment(Alignment al){
 	if(al.getMlength() >= 20){
-		if(filter == Filter.CRAWL){
-		distances.add(al.getEditDistance());
-		pIdents.add(al.getPIdent());
-		lengths.add(al.getMlength());
-		alignments.add(al);
-		}
-		
 		processed+=1;
 		String q = al.getQuery();
 		String r = al.getReference();
@@ -245,5 +165,39 @@ public void processMisMatches(){
 	}
 	this.damage = damage;
 	this.noise = noise;
+}
+public String getDamageLine(){ // process Map Into Damage Output Line 
+	if(getProcessed()!=0){
+		processMisMatches();
+		int numMatches = getProcessed();
+		HashMap<Integer,Double> damage = getDamage(); 
+		HashMap<Integer,Double> noise = getNoise();
+
+		String part1 = name.replace(" ", "_");
+		String part2 = "";
+		for(int i = 0;i < 20; i++){
+			if(damage.containsKey(i)){
+				part1 += "\t" + damage.get(i);
+			}else{	
+				part1 += "\t" + 0;	
+			}
+			if(noise.containsKey(i)){
+				part2 += "\t" + noise.get(i);
+			}else{
+				part2 += "\t" + 0;
+			}	
+		}
+		if(numMatches!=0)
+			part1 += part2 + "\t" + numMatches;
+		else
+			part1 += part2 + "\t" + 0;
+		return part1;
+}else{
+	String part1 = name.replace(" ", "_");
+	for(int i = 0;i<=40;i++){
+		part1+="\t"+0;
+	}
+	return part1;
+}
 }
 }

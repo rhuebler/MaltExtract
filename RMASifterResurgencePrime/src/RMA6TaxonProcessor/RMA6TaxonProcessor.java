@@ -53,7 +53,7 @@ protected ArrayList<Integer> distances = new ArrayList<Integer>();
 protected ArrayList<Double> pIdents = new ArrayList<Double>();
 protected HashMap<Integer,HashMap<String, ArrayList<Alignment>>> taxonMap = new HashMap<Integer,HashMap<String, ArrayList<Alignment>>>();
 protected Filter filter = Filter.NON;
-protected StrainMisMatchContainer container = new StrainMisMatchContainer(filter);
+protected StrainMisMatchContainer container = new StrainMisMatchContainer();
 protected String readLengthDistribution;
 protected String readLengthStatistics;
 protected int refLength = 0;
@@ -99,6 +99,7 @@ public RMA6TaxonProcessor(Integer id, double pID, NCBI_MapReader reader, boolean
 		rldist+="\t0";
 	this.readLengthDistribution = rldist;
 	readLengthStatistics =taxName+"\t0\t0\t0\t0";
+	container.setName(taxName);
 }
 //setters
 protected void setOriginalNumberOfAlignments(int num){

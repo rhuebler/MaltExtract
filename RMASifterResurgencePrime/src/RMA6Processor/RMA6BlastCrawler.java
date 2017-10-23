@@ -10,12 +10,13 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import NCBI_MapReader.NCBI_MapReader;
 import NCBI_MapReader.NCBI_TreeReader;
-import RMAAlignment.Alignment;
+import RMA6TaxonProcessor.MatchProcessorCrawler;
 import behaviour.Filter;
 import behaviour.OutputType;
 import jloda.util.ListOfLongs;
@@ -26,8 +27,6 @@ import megan.data.ReadBlockIterator;
 import megan.rma6.ClassificationBlockRMA6;
 import megan.rma6.RMA6File;
 import megan.rma6.ReadBlockGetterRMA6;
-import strainMap.StrainMap;
-import strainMap.StrainMisMatchContainer;
 
 public class RMA6BlastCrawler {
 	/**
@@ -50,13 +49,14 @@ public class RMA6BlastCrawler {
 	private ArrayList<String> percentIdentities = new ArrayList<String>();
 	private ArrayList<String> readLengthDistributions = new ArrayList<String>();
 	private ArrayList<String> readDistributions = new ArrayList<String>();
+	private ConcurrentHashMap<String, MatchProcessorCrawler> concurrentMap = new ConcurrentHashMap<String, MatchProcessorCrawler>();
 	private  boolean wantReads = false;
 	private Filter filter = Filter.CRAWL;
 	private HashMap<String,String> reads = new HashMap<String,String>();
 	//set values at construction
 	//TODO get Reads
 	public RMA6BlastCrawler(String dir, String name, String species, String out, NCBI_MapReader reader ,Logger warning,NCBI_TreeReader treeReader,
-			Filter filter, boolean wantReads){
+			Filter filter, boolean wantReads, int numberOfthreads){
 		this.inDir = dir;
 		this.fileName = name;
 		this.speciesName = species;
@@ -166,7 +166,6 @@ public class RMA6BlastCrawler {
 	// Process RMA6 file by crawling 
 	public void process(){
 		// retrieve IDs from file and intilaize StrainMap
-		HashMap<Integer, StrainMap> collection = new HashMap<Integer, StrainMap>();
 		HashSet<Integer> idsToProcess = new HashSet<Integer>();
 		int taxID = mapReader.getNcbiNameToIdMap().get(speciesName);
 		idsToProcess.add(taxID);
@@ -189,38 +188,14 @@ public class RMA6BlastCrawler {
 				// iterate through all nodes and store information in strain Map to process and retrieve at later use
 				while(classIt.hasNext()){
 					IReadBlock current = classIt.next();
-							IMatchBlock[] blocks = current.getMatchBlocks();
-							float topScore = current.getMatchBlock(0).getBitScore();
-							for(int i = 0; i< blocks.length;i++){
-								if(blocks[i].getBitScore()/topScore < 1-0.01){
-									break;}
-								if(getName(blocks[i].getTaxonId()).contains(speciesName)){
-									if(wantReads){
-										if( !reads.containsKey(current.getReadHeader())){
-											reads.put(current.getReadHeader(),current.getReadSequence());
-										}
-									}	
-									Alignment al = new Alignment();
-									al.setText(blocks[i].getText());
-									al.processText();
-									al.setPIdent(blocks[i].getPercentIdentity());
-									if(collection.containsKey(blocks[i].getTaxonId())){
-										StrainMap strain = collection.get(blocks[i].getTaxonId());
-										StrainMisMatchContainer container =	strain.getStrainMisMatchContainer();
-										container.processAlignment(al);
-										strain.setStrainMisMatchContainer(container);
-										strain.setNumberOfMatches(strain.getNumberOfMatches()+1);
-										collection.replace(blocks[i].getTaxonId(), strain);
-							
-									}else{
-										StrainMisMatchContainer container = new StrainMisMatchContainer(filter);
-										container.processAlignment(al);
-										StrainMap strain = new StrainMap(getName(blocks[i].getTaxonId()),
-										container,1);
-										collection.put(blocks[i].getTaxonId(), strain);
-											}//else
-										}//if
-						}// other for 	//matches
+					IMatchBlock[] blocks = current.getMatchBlocks();
+//					if(getName(blocks[1].getTaxonId()).contains(speciesName)){
+//						if(wantReads){
+//							if( !reads.containsKey(current.getReadHeader())){
+//								reads.put(current.getReadHeader(),current.getReadSequence());
+//							}
+//						}	
+//					}	
 				}	
 				classIt.close();
 				rma6File.close();
@@ -228,16 +203,17 @@ public class RMA6BlastCrawler {
 				warning.log(Level.SEVERE,"Can not locate or read File" ,io);
 			}
 		}// for all IDs
-		for(int key :collection.keySet()){// write output here 
-			StrainMap map = collection.get(key);
-			map.setStatistics();
-			coverageHistograms.add(map.getCoverageHistogram());
-			coveragePositions.add(map.getCoveragePositions());
-			damageLines.add(collection.get(key).getDamageLine());
-			editDistances.add(collection.get(key).getEditDistanceHistogram());
-			percentIdentities.add(collection.get(key).getPercentIdentityHistogram());
-			readLengthDistributions.add(collection.get(key).getReadLengthDistribution());
-			readDistributions.add(collection.get(key).getReadDistribution());
+//		for(int key :collection.keySet())
+		{// write output here 
+//			StrainMap map = collection.get(key);
+			
+//			coverageHistograms.add(map.getCoverageHistogram());
+//			coveragePositions.add(map.getCoveragePositions());
+//			damageLines.add(collection.get(key).getDamageLine());
+//			editDistances.add(collection.get(key).getEditDistanceHistogram());
+//			percentIdentities.add(collection.get(key).getPercentIdentityHistogram());
+//			readLengthDistributions.add(collection.get(key).getReadLengthDistribution());
+//			readDistributions.add(collection.get(key).getReadDistribution());
 		}
 		ArrayList<String> readsAndHeaders = new ArrayList<String>();
 		if(wantReads){
