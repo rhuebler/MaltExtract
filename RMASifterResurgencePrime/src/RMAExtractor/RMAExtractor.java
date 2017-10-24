@@ -126,7 +126,7 @@ public class RMAExtractor {
 				 for(int taxID:taxIDs){
 					 RMA6BlastCrawler crawler = new RMA6BlastCrawler(f.getParent()+"/",f.getName(),
 							  mapReader.getNcbiIdToNameMap().get(taxID),
-							  inProcessor.getOutDir(),mapReader,log, warning, treeReader, inProcessor.getFilter(),inProcessor.wantReads(), 
+							  inProcessor.getOutDir(),mapReader,log, warning, treeReader,inProcessor.wantReads(), 
 							  inProcessor.getNumThreads());
 					 crawler.process();
 				}

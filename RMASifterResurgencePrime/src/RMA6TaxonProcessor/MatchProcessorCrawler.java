@@ -8,7 +8,6 @@ import NCBI_MapReader.NCBI_MapReader;
 import RMAAlignment.Alignment;
 import RMAAlignment.CompositionMap;
 import behaviour.Filter;
-import megan.data.IMatchBlock;
 /**
  * RMA6 processor that automatically removes PCR duplicated and stacked reads Essentially it gets the alignment block 
  * from a read and than processes the best scoring percent of the alignment while sorting them by reference sequence

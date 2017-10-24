@@ -6,7 +6,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -19,16 +18,9 @@ import java.util.logging.Logger;
 import NCBI_MapReader.NCBI_MapReader;
 import NCBI_MapReader.NCBI_TreeReader;
 import RMA6TaxonProcessor.MatchProcessorCrawler;
-import behaviour.Filter;
 import behaviour.OutputType;
-import jloda.util.ListOfLongs;
-import megan.data.IMatchBlock;
-import megan.data.IReadBlock;
-import megan.data.IReadBlockIterator;
-import megan.data.ReadBlockIterator;
 import megan.rma6.ClassificationBlockRMA6;
 import megan.rma6.RMA6File;
-import megan.rma6.ReadBlockGetterRMA6;
 import utility.ConcurrentNodeMatchSorter;
 
 public class RMA6BlastCrawler {
@@ -60,12 +52,12 @@ public class RMA6BlastCrawler {
 		executor.shutdown();
 	}
 	private  boolean wantReads = false;
-	private Filter filter = Filter.CRAWL;
+	
 	private ArrayList<String> reads = new ArrayList<String>();
 	//set values at construction
 	//TODO get Reads
 	public RMA6BlastCrawler(String dir, String name, String species, String out, NCBI_MapReader reader ,Logger log, Logger warning,NCBI_TreeReader treeReader,
-			Filter filter, boolean wantReads, int numberOfThreads){
+			boolean wantReads, int numberOfThreads){
 		this.inDir = dir;
 		this.fileName = name;
 		this.speciesName = species;
@@ -73,7 +65,6 @@ public class RMA6BlastCrawler {
 		this.outDir = out+"/crawlResults/";
 		this.warning = warning;
 		this.treeReader = new NCBI_TreeReader(treeReader);
-		this.filter = filter;
 		this.wantReads = wantReads;
 		this.numThreads = numberOfThreads;
 	}

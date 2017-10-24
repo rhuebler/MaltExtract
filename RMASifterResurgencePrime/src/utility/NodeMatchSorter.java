@@ -8,7 +8,6 @@ import java.util.logging.Logger;
 import NCBI_MapReader.NCBI_MapReader;
 import RMA6TaxonProcessor.MatchProcessorCrawler;
 import RMAAlignment.Alignment;
-import behaviour.Filter;
 import jloda.util.ListOfLongs;
 import megan.data.IMatchBlock;
 import megan.data.IReadBlock;
@@ -41,14 +40,6 @@ public class NodeMatchSorter {
 		this.wantReads =wantReads;
 	}
 	//process a whole Node to resort the matches to different strains
-	private String getName(int taxId){
-		String name;
-		if(mapReader.getNcbiIdToNameMap().get(taxId) != null)
-			name = mapReader.getNcbiIdToNameMap().get(taxId);
-		else
-			name = "unassignedName";
-		return name;
-	}
 	public void processNode(){
 		boolean useFirstMatch = false;
 		try(RMA6File rma6File = new RMA6File(filePath, "r")){
