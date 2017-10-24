@@ -47,7 +47,6 @@ public class RMAExtractor {
 	private static final Logger log = Logger.getLogger(RMAExtractor.class.getName());
 	private static final Logger warning = Logger.getLogger("Error");
 	private static ThreadPoolExecutor executor;
-	// check how to produce Megan File from RMAExtractor 
 	private static void destroy(){
 		executor.shutdown();
 	}
@@ -127,8 +126,9 @@ public class RMAExtractor {
 				 for(int taxID:taxIDs){
 					 RMA6BlastCrawler crawler = new RMA6BlastCrawler(f.getParent()+"/",f.getName(),
 							  mapReader.getNcbiIdToNameMap().get(taxID),
-							  inProcessor.getOutDir(),mapReader, warning, treeReader, inProcessor.getFilter(),inProcessor.wantReads(), 
+							  inProcessor.getOutDir(),mapReader,log, warning, treeReader, inProcessor.getFilter(),inProcessor.wantReads(), 
 							  inProcessor.getNumThreads());
+					 crawler.process();
 				}
 		  }	
 	  } 

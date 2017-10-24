@@ -11,6 +11,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadPoolExecutor;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -27,6 +29,7 @@ import megan.data.ReadBlockIterator;
 import megan.rma6.ClassificationBlockRMA6;
 import megan.rma6.RMA6File;
 import megan.rma6.ReadBlockGetterRMA6;
+import utility.ConcurrentNodeMatchSorter;
 
 public class RMA6BlastCrawler {
 	/**
@@ -40,6 +43,7 @@ public class RMA6BlastCrawler {
 	private String speciesName;
 	private NCBI_MapReader mapReader;
 	private String outDir;
+	private Logger log;
 	private Logger warning;
 	private ArrayList<String> damageLines= new ArrayList<String>();
 	private NCBI_TreeReader treeReader;
@@ -49,14 +53,19 @@ public class RMA6BlastCrawler {
 	private ArrayList<String> percentIdentities = new ArrayList<String>();
 	private ArrayList<String> readLengthDistributions = new ArrayList<String>();
 	private ArrayList<String> readDistributions = new ArrayList<String>();
-	private ConcurrentHashMap<String, MatchProcessorCrawler> concurrentMap = new ConcurrentHashMap<String, MatchProcessorCrawler>();
+	private ConcurrentHashMap<Integer, MatchProcessorCrawler> concurrentMap = new ConcurrentHashMap<Integer, MatchProcessorCrawler>();
+	private int numThreads;
+	private ThreadPoolExecutor executor;
+	private void destroy(){
+		executor.shutdown();
+	}
 	private  boolean wantReads = false;
 	private Filter filter = Filter.CRAWL;
-	private HashMap<String,String> reads = new HashMap<String,String>();
+	private ArrayList<String> reads = new ArrayList<String>();
 	//set values at construction
 	//TODO get Reads
-	public RMA6BlastCrawler(String dir, String name, String species, String out, NCBI_MapReader reader ,Logger warning,NCBI_TreeReader treeReader,
-			Filter filter, boolean wantReads, int numberOfthreads){
+	public RMA6BlastCrawler(String dir, String name, String species, String out, NCBI_MapReader reader ,Logger log, Logger warning,NCBI_TreeReader treeReader,
+			Filter filter, boolean wantReads, int numberOfThreads){
 		this.inDir = dir;
 		this.fileName = name;
 		this.speciesName = species;
@@ -66,6 +75,7 @@ public class RMA6BlastCrawler {
 		this.treeReader = new NCBI_TreeReader(treeReader);
 		this.filter = filter;
 		this.wantReads = wantReads;
+		this.numThreads = numberOfThreads;
 	}
 	private void writeOutput(List<String> histo, String dir,OutputType type,int taxID){
 		try{
@@ -172,56 +182,27 @@ public class RMA6BlastCrawler {
 		for(Integer id : treeReader.getAllStrains(taxID, getAllKeys(inDir+fileName)))
 				idsToProcess.add(id);
 		idsToProcess.addAll(treeReader.getParents(taxID));
+		  executor=(ThreadPoolExecutor) Executors.newFixedThreadPool(numThreads);
 		for(Integer id : idsToProcess){
-			try(RMA6File rma6File = new RMA6File(inDir+fileName, "r")){
-				ListOfLongs list = new ListOfLongs();
-				Long location = rma6File.getFooterSectionRMA6().getStartClassification("Taxonomy");
-				if (location != null) {
-				   ClassificationBlockRMA6 classificationBlockRMA6 = new ClassificationBlockRMA6("Taxonomy");
-				   classificationBlockRMA6.read(location, rma6File.getReader());
-				   if (classificationBlockRMA6.getSum(id) > 0) {
-					   classificationBlockRMA6.readLocations(location, rma6File.getReader(), id, list);
-				   }
-				 }
-				IReadBlockIterator classIt  = new ReadBlockIterator(list, new ReadBlockGetterRMA6(rma6File, true, true, (float) 1.0,(float) 100.00,false,true));
-				
-				// iterate through all nodes and store information in strain Map to process and retrieve at later use
-				while(classIt.hasNext()){
-					IReadBlock current = classIt.next();
-					IMatchBlock[] blocks = current.getMatchBlocks();
-//					if(getName(blocks[1].getTaxonId()).contains(speciesName)){
-//						if(wantReads){
-//							if( !reads.containsKey(current.getReadHeader())){
-//								reads.put(current.getReadHeader(),current.getReadSequence());
-//							}
-//						}	
-//					}	
-				}	
-				classIt.close();
-				rma6File.close();
-			}catch(IOException io){
-				warning.log(Level.SEVERE,"Can not locate or read File" ,io);
-			}
+			ConcurrentNodeMatchSorter cocurrentNMS = new ConcurrentNodeMatchSorter(concurrentMap,inDir+fileName, id, log, warning, wantReads, speciesName, mapReader);
+			executor.submit(cocurrentNMS);
 		}// for all IDs
-//		for(int key :collection.keySet())
+		destroy();
+		for(int key :concurrentMap.keySet())
 		{// write output here 
-//			StrainMap map = collection.get(key);
-			
-//			coverageHistograms.add(map.getCoverageHistogram());
-//			coveragePositions.add(map.getCoveragePositions());
-//			damageLines.add(collection.get(key).getDamageLine());
-//			editDistances.add(collection.get(key).getEditDistanceHistogram());
-//			percentIdentities.add(collection.get(key).getPercentIdentityHistogram());
-//			readLengthDistributions.add(collection.get(key).getReadLengthDistribution());
-//			readDistributions.add(collection.get(key).getReadDistribution());
+			MatchProcessorCrawler matchPC= concurrentMap.get(key);
+			matchPC.process();
+			coverageHistograms.add(matchPC.getCoverageLine());
+			coveragePositions.add(matchPC.getCoveragePositions());
+			damageLines.add(matchPC.getDamageLine());
+			editDistances.add(matchPC.getEditDistanceHistogram());
+			percentIdentities.add(matchPC.getPercentIdentityHistogram());
+			readLengthDistributions.add(matchPC.getReadLengthDistribution());
+			readDistributions.add(matchPC.getReadDistribution());
+			reads.addAll(matchPC.getReads());
+			matchPC.clear();
 		}
-		ArrayList<String> readsAndHeaders = new ArrayList<String>();
-		if(wantReads){
-			for(String header: reads.keySet()){
-				readsAndHeaders.add(header);
-				readsAndHeaders.add(reads.get(header));
-				}
-		}	
+		
 		writeOutput(coverageHistograms, outDir,OutputType.COVERAGEHISTOGRAM, 0);
 		writeOutput(coveragePositions, outDir,OutputType.POS_COVERED, 0);
 		writeOutput(editDistances, outDir,OutputType.EDITDISTANCE, 0);
@@ -230,7 +211,7 @@ public class RMA6BlastCrawler {
 		writeOutput(readLengthDistributions, outDir, OutputType.READLENGTH_STATISTICS, 0);
 		writeOutput(damageLines, outDir,OutputType.DAMAGE, 0);
 		if(wantReads){
-			writeOutput(readsAndHeaders,outDir,OutputType.READS,taxID);
+			writeOutput(reads,outDir,OutputType.READS,taxID);
 			}
 	}
 }

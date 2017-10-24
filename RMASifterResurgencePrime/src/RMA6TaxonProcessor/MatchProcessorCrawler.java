@@ -23,7 +23,7 @@ public class MatchProcessorCrawler extends RMA6TaxonProcessor {
 	protected boolean wantAlignments = false;
 	protected boolean turnOffDestacking = false;
 	protected boolean turnOffDeDuping = false;
-	//construvters and set values
+	//constructors and set values
 	public MatchProcessorCrawler(Integer id, double pID, NCBI_MapReader reader, boolean v, Logger log, Logger warning,double tp,int mL, Filter behave) {
 		super(id, pID, reader, v, log, warning,tp,mL, behave);
 	}

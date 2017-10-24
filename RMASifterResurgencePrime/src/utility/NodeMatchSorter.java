@@ -1,13 +1,14 @@
 package utility;
 
 import java.io.IOException;
-import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import NCBI_MapReader.NCBI_MapReader;
 import RMA6TaxonProcessor.MatchProcessorCrawler;
 import RMAAlignment.Alignment;
+import behaviour.Filter;
 import jloda.util.ListOfLongs;
 import megan.data.IMatchBlock;
 import megan.data.IReadBlock;
@@ -18,22 +19,38 @@ import megan.rma6.RMA6File;
 import megan.rma6.ReadBlockGetterRMA6;
 
 public class NodeMatchSorter {
-	private ConcurrentHashMap<String, MatchProcessorCrawler> concurrentMap;
+	private ConcurrentHashMap<Integer, MatchProcessorCrawler> concurrentMap;
 	private String filePath="";
 	int id =0;
+	Logger log;
 	Logger warning;
 	boolean wantReads;
 	double topPercent;
 	String speciesName;
-	public NodeMatchSorter(ConcurrentHashMap<String, MatchProcessorCrawler> concurrentMap,String filePath, int id, Logger warning,boolean wantReads,
-			String speciesName){
+	NCBI_MapReader mapReader;
+	//Constructor
+	public NodeMatchSorter(ConcurrentHashMap<Integer, MatchProcessorCrawler> concurrentMap,String filePath, int id,Logger log, Logger warning,boolean wantReads,
+			String speciesName,NCBI_MapReader mapReader){
 		this.concurrentMap = concurrentMap;
 		this.filePath = filePath;
 		this.id = id;
 		this.warning = warning;
 		this.speciesName = speciesName;
+		this.mapReader=mapReader;
+		this.log = log;
+		this.wantReads =wantReads;
+	}
+	//process a whole Node to resort the matches to different strains
+	private String getName(int taxId){
+		String name;
+		if(mapReader.getNcbiIdToNameMap().get(taxId) != null)
+			name = mapReader.getNcbiIdToNameMap().get(taxId);
+		else
+			name = "unassignedName";
+		return name;
 	}
 	public void processNode(){
+		boolean useFirstMatch = false;
 		try(RMA6File rma6File = new RMA6File(filePath, "r")){
 			ListOfLongs list = new ListOfLongs();
 			Long location = rma6File.getFooterSectionRMA6().getStartClassification("Taxonomy");
@@ -44,6 +61,9 @@ public class NodeMatchSorter {
 				   classificationBlockRMA6.readLocations(location, rma6File.getReader(), id, list);
 			   }
 			 }
+			if(list.size()>=10000){
+				useFirstMatch=true;
+			}
 			IReadBlockIterator classIt  = new ReadBlockIterator(list, new ReadBlockGetterRMA6(rma6File, true, true, (float) 1.0,(float) 100.00,false,true));
 			
 			// iterate through all nodes and store information in strain Map to process and retrieve at later use
@@ -56,7 +76,9 @@ public class NodeMatchSorter {
 				float topScore = blocks[0].getBitScore();
 				for(int i = 0; i< blocks.length;i++){
 					if(blocks[i].getBitScore()/topScore < 1-topPercent){
-						break;}		
+						break;}	
+					if(useFirstMatch)//or just break here
+						i=blocks.length;
 					Alignment al = new Alignment();
 					al.setText(blocks[i].getText());
 					al.processText();
@@ -66,7 +88,19 @@ public class NodeMatchSorter {
 					al.setReadLength(readLength);
 					al.setAcessionNumber(blocks[i].getTextFirstWord());	
 					al.setSequence(readSequence);
-					
+					if(mapReader.getNcbiIdToNameMap().get(al.getTaxID()).contains(speciesName)){
+						if(concurrentMap.contains(al.getTaxID())){
+							MatchProcessorCrawler mpc = concurrentMap.get(al.getTaxID());
+							mpc.processMatchBlock(al);
+							concurrentMap.replace(al.getTaxID(), mpc);
+						}
+						else{
+							
+							MatchProcessorCrawler mpc = new MatchProcessorCrawler(id,topPercent,mapReader,false,log,warning,wantReads,0.01,0,false,true,false,behaviour.Filter.CRAWL);
+							mpc.processMatchBlock(al);
+							concurrentMap.put(al.getTaxID(), mpc);
+						}
+					}
 				}
 			}	
 			classIt.close();
