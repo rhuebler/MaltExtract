@@ -179,6 +179,7 @@ public class RMA6BlastCrawler {
 			executor.submit(cocurrentNMS);
 		}// for all IDs
 		destroy();
+		System.out.println(concurrentMap.keySet().size());
 		for(int key :concurrentMap.keySet())
 		{// write output here 
 			MatchProcessorCrawler matchPC= concurrentMap.get(key);
