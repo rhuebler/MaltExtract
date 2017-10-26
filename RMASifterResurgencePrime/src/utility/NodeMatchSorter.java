@@ -39,6 +39,14 @@ public class NodeMatchSorter {
 		this.log = log;
 		this.wantReads =wantReads;
 	}
+	private String getName(int taxId){
+		String name;
+		if(mapReader.getNcbiIdToNameMap().get(taxId) != null)
+			name = mapReader.getNcbiIdToNameMap().get(taxId);
+		else
+			name = "unassignedName";
+		return name;
+	}
 	//process a whole Node to resort the matches to different strains
 	public void processNode(){
 		boolean useFirstMatch = false;
@@ -79,7 +87,7 @@ public class NodeMatchSorter {
 					al.setReadLength(readLength);
 					al.setAcessionNumber(blocks[i].getTextFirstWord());	
 					al.setSequence(readSequence);
-					if(mapReader.getNcbiIdToNameMap().get(al.getTaxID()).contains(speciesName)){
+					if(getName(al.getTaxID()).contains(speciesName)){
 						if(concurrentMap.contains(al.getTaxID())){
 							MatchProcessorCrawler mpc = concurrentMap.get(al.getTaxID());
 							mpc.processMatchBlock(al);

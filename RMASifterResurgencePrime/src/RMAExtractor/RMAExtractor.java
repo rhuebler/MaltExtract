@@ -133,7 +133,6 @@ public class RMAExtractor {
 		  }	
 	  } 
 		  log.log(Level.INFO, "Crawling Done");
-		  destroy();
 	  }// get runtime 
 		long endTime = System.nanoTime();
 		log.log(Level.INFO,"Runtime: "+ (endTime - startTime)/1000000000 +" Seconds");
