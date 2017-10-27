@@ -23,7 +23,7 @@ public class CompositionMap {
 	// initialize values
 private HashMap<Integer, HashMap<String, ArrayList<Alignment>>> compositionMap;// hashMap of ReferenceID to List of start positions
 private HashMap<String,Alignment> resultsMap = new HashMap<String,Alignment>();// hashMap of ReferenceID to List of start positions
-private int maxID;
+private int maxID=0;
 private String maxReference;
 private ArrayList<Double> generalStatistics;
 private HashMap<Integer,Integer> coverageHistogram;
