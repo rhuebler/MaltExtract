@@ -7,6 +7,7 @@ import java.util.logging.Logger;
 import NCBI_MapReader.NCBI_MapReader;
 import RMAAlignment.Alignment;
 import RMAAlignment.CompositionMap;
+import Read.Read;
 import behaviour.Filter;
 import megan.data.IMatchBlock;
 
@@ -25,7 +26,7 @@ public class ExperimentalRMA6AncientDestacker extends RMA6TaxonProcessor {
 	protected boolean wantAlignments = false;
 	protected boolean turnOffDestacking = false;
 	protected boolean turnOffDeDuping = false;
-	
+	protected ArrayList<Read> reads = new ArrayList<Read>();
 	public ExperimentalRMA6AncientDestacker(Integer id, double pID, NCBI_MapReader reader, boolean v, Logger log, Logger warning,double tp,int mL, Filter behave) {
 		super(id, pID, reader, v, log, warning,tp,mL, behave);
 	}
@@ -39,7 +40,7 @@ public class ExperimentalRMA6AncientDestacker extends RMA6TaxonProcessor {
 		this.turnOffDeDuping = turnOffDeDuping;
 	}
 	// process matchblocks
-	public void processMatchBlocks(IMatchBlock[] blocks, String readName, int readLength, String sequence){
+	public void processMatchBlocks(IMatchBlock[] blocks, String name, int length, String sequence){
 		originalNumberOfReads++;
 		float topScore = blocks[0].getBitScore();
 			for(int i = 0; i< blocks.length;i++){
@@ -50,10 +51,13 @@ public class ExperimentalRMA6AncientDestacker extends RMA6TaxonProcessor {
 				al.processText();
 				al.setTaxID(blocks[i].getTaxonId());
 				al.setPIdent(blocks[i].getPercentIdentity());
-				al.setReadName(readName);
-				al.setReadLength(readLength);
 				al.setAcessionNumber(blocks[i].getTextFirstWord());	
 				al.setSequence(sequence);
+				al.setReadLength(length);
+				al.setReadName(name);
+				if(i==0){
+					al.setTopAlignment(true);
+				}
 				if(al.getFivePrimeDamage()&&minPIdent <= al.getPIdent()){ // check for minPercentIdentity
 					originalNumberOfAlignments++;
 								//get mismatches
@@ -85,48 +89,40 @@ public class ExperimentalRMA6AncientDestacker extends RMA6TaxonProcessor {
 		CompositionMap map = new CompositionMap(taxonMap,turnOffDestacking,turnOffDeDuping);
 		map.process();
 		map.getNonStacked();
-		HashMap<String,ArrayList<Alignment>> list = map.getResultsMap();
+		map.setMapReader(mapReader);
+		HashMap<String,Alignment> list = map.getResultsMap();
 		for(String key : list.keySet()){
-			int k = 0;
-			double pIdent = 0;
-			int editDistance = 0;
+			Alignment al = list.get(key);
 			String sequence = "";
-			for(Alignment al : list.get(key)){
-				numMatches++;	
-				pIdent+= al.getPIdent();
-				editDistance += al.getEditDistance();
-				container.processAlignment(al);
-				if(wantAlignments)
-					alignments.add(al.getText());
-				if(k==0){
-					lengths.add(al.getReadLength());
-					if(wantReads)
-						sequence=al.getSequence();
-				}	
-				k++;
+			numMatches++;	
+			container.processAlignment(al);
+			if(wantAlignments){
+				alignments.add(al.getReadName());
+				alignments.add(al.getText());
 			}
-			if(k!=0){
-				pIdents.add(pIdent/k);
-				distances.add(editDistance/k);
-				if(wantReads){
-					String readName =key;
-					String name = "";
-					if (!readName.startsWith(">"))
-						name = ">"+readName;
-					else
-						name = readName;
-					lines.add(name);
-					if (!name.endsWith("\n"))
-						name += "\n";
-					String readData = sequence;
-					if (readData != null) {
-						if (!readData.endsWith("\n"))
-							readData+=("\n");
-						lines.add(readData);    
-					}
-				}    
+	
+			lengths.add(al.getReadLength());
+			pIdents.add(al.getPIdent());
+			distances.add(al.getEditDistance());
+			if(wantReads){
+				String name = "";
+				String readName = key;
+				sequence = al.getSequence();
+				if (!readName.startsWith(">"))
+					name = ">"+readName;
+				else
+					name = readName;
+				lines.add(name);
+				if (!name.endsWith("\n"))
+					name += "\n";
+				String readData = sequence;
+				if (readData != null) {
+					if (!readData.endsWith("\n"))
+						readData+=("\n");
+					lines.add(readData);    
+				}
 			}
-		}
+		}	
 		setOriginalNumberOfAlignments(originalNumberOfAlignments);
 		setOriginalNumberOfReads(originalNumberOfReads);
 		setDamageLine(container.getDamageLine());
@@ -141,9 +137,4 @@ public class ExperimentalRMA6AncientDestacker extends RMA6TaxonProcessor {
 		calculateReadLengthDistribution();
 		map = null;
 	}//process
-	public void clear(){
-		container = null;
-		pIdents.clear();
-		distances.clear();
-	}
 }

@@ -135,20 +135,7 @@ protected void processCompositionMap(CompositionMap map){
 		for(int k : histogram.keySet())
 			line += "\t" + histogram.get(k);
 		this.coverageLine = line;
-		HashMap<Double,ArrayList<Integer>> list = map.getAllTopReferences();
-		String addEntries = taxName;
-		if(list.size()>0){
-			for(double x = 1.0;x>=0.0;x-=0.1){
-				ArrayList<Integer> margin = list.get(x);
-				addEntries+="\t";
-				for(int reference : margin){
-					addEntries+=getName(reference)+";";
-				}
-			}
-		}else{
-			addEntries = addEntries+="\t"+"none";
-		}
-		this.additionalEntries = addEntries;
+		this.additionalEntries =  map.getTopTenReferences();
 		//get coveragePositions
 		String covPosLine=taxName+"\t" + maxReference;
 		for(String cov :map.getCoveragePositions()){
@@ -342,13 +329,15 @@ public String getAdditionalEntries(){
 private int round(double i, int v){
     return (int) (Math.round(i/v) * v);
 }
-public void processMatchBlocks(IMatchBlock[] blocks, String readName, int lenght, String readSequence){ 
+public void processMatchBlocks(IMatchBlock[] blocks, String name, int length, String sequence){ 
 
 	}// void 
 public void process(){ 
 
 }// void 
 public void clear(){
-	
+	container = null;
+	pIdents.clear();
+	distances.clear();
 }
 }// class 

@@ -7,6 +7,7 @@ package RMAAlignment;
 
 public class Alignment {
 	// slots
+	private boolean topAlignment;
 	private String readName;
 	private double pIdent;
 	private String query;
@@ -31,6 +32,9 @@ public class Alignment {
 	private boolean stacked = false;
 	private int taxID = 0;
 // getter
+public boolean isTopAlignment(){
+	return this.topAlignment;
+}	
 public int getTaxID(){
 	return this.taxID;
 }	
@@ -101,6 +105,9 @@ public String getQuery(){
 	 return this.referenceLength;}
  
  // setters
+ public void setTopAlignment(boolean b){
+	 this.topAlignment = b;
+ }
  public void setTaxID(int ID){
 	this.taxID = ID;
  }

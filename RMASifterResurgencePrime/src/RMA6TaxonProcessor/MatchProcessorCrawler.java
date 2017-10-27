@@ -64,54 +64,45 @@ public class MatchProcessorCrawler extends RMA6TaxonProcessor {
 	public void process(){ 
 		
 		//analyze collected data 
+		 
+		//analyze collected data 
 		CompositionMap map = new CompositionMap(taxonMap,turnOffDestacking,turnOffDeDuping);
 		map.process();
 		map.getNonStacked();
-		HashMap<String,ArrayList<Alignment>> list =map.getResultsMap();
+		map.setMapReader(mapReader);
+		HashMap<String,Alignment> list = map.getResultsMap();
 		for(String key : list.keySet()){
-			int k = 0;
-			double pIdent = 0;
-			int editDistance = 0;
+			Alignment al = list.get(key);
 			String sequence = "";
-			
-			for(Alignment al : list.get(key)){	
-				numMatches++;	
-				pIdent+= al.getPIdent();
-				editDistance += al.getEditDistance();
-				container.processAlignment(al);
-				if(wantAlignments){
-					alignments.add(al.getReadName());
-					alignments.add(al.getText());}
-				if(k==0){
-					lengths.add(al.getReadLength());
-					if(wantReads)
-						sequence=al.getSequence();
-				}	
-				k++;
+			numMatches++;	
+			container.processAlignment(al);
+			if(wantAlignments){
+				alignments.add(al.getReadName());
+				alignments.add(al.getText());
 			}
-			if(k!=0){
-				pIdents.add(pIdent/k);
-				distances.add(Math.round(editDistance/k));
-				if(wantReads){
-					String readName =key;
-					String name = "";
-					if (!readName.startsWith(">"))
-	                    name = ">"+readName;
-					else
-						name = readName;
-					lines.add(name+"\t"+Math.round(editDistance/k));
-	                if (!name.endsWith("\n"))
-	                    name += "\n";
-	                String readData = sequence;
-	                if (readData != null) {
-	                    if (!readData.endsWith("\n"))
-	                    	readData+=("\n");
-	                lines.add(readData);    
-	                }
+	
+			lengths.add(al.getReadLength());
+			pIdents.add(al.getPIdent());
+			distances.add(al.getEditDistance());
+			if(wantReads){
+				String name = "";
+				String readName = key;
+				sequence = al.getSequence();
+				if (!readName.startsWith(">"))
+					name = ">"+readName;
+				else
+					name = readName;
+				lines.add(name);
+				if (!name.endsWith("\n"))
+					name += "\n";
+				String readData = sequence;
+				if (readData != null) {
+					if (!readData.endsWith("\n"))
+						readData+=("\n");
+					lines.add(readData);    
 				}
-			}	
-		}
-		
+			}
+		}	
 		setOriginalNumberOfAlignments(originalNumberOfAlignments);
 		setOriginalNumberOfReads(originalNumberOfReads);
 		setDamageLine(container.getDamageLine());
@@ -124,12 +115,6 @@ public class MatchProcessorCrawler extends RMA6TaxonProcessor {
 		setAlignments(alignments);
 		setTurnedOn(map.wasTurnedOn());
 		calculateReadLengthDistribution();
-		
 		map = null;
-	}//process
-	public void clear(){
-		container = null;
-		pIdents.clear();
-		distances.clear();
 	}
 }

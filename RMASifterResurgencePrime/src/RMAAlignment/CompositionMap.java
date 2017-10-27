@@ -1,6 +1,8 @@
 package RMAAlignment;
 import java.util.ArrayList;
 import java.util.HashMap;
+
+import NCBI_MapReader.NCBI_MapReader;
 /**
  * Save for a Megan Node all Blast hits stored as Alignment Objects these are kept as hashmap
  *  of the ID of the matching species and a List of the Hits 
@@ -20,14 +22,16 @@ public class CompositionMap {
 	}
 	// initialize values
 private HashMap<Integer, HashMap<String, ArrayList<Alignment>>> compositionMap;// hashMap of ReferenceID to List of start positions
-private HashMap<String,ArrayList<Alignment>> resultsMap = new HashMap<String,ArrayList<Alignment>>();// hashMap of ReferenceID to List of start positions
+private HashMap<String,Alignment> resultsMap = new HashMap<String,Alignment>();// hashMap of ReferenceID to List of start positions
 private int maxID;
 private String maxReference;
 private ArrayList<Double> generalStatistics;
 private HashMap<Integer,Integer> coverageHistogram;
 private ArrayList<String> coveragePositions;
+private ArrayList<NOAOR> stackedSizes = new ArrayList<NOAOR>();
 private int refLength = 0;
 private boolean turnedOn = true;
+private NCBI_MapReader mapReader;
 //getter
 public ArrayList<String> getCoveragePositions(){
 	return this.coveragePositions;
@@ -35,7 +39,7 @@ public ArrayList<String> getCoveragePositions(){
 public boolean wasTurnedOn(){
 	return this.turnedOn;
 }
-public HashMap<String,ArrayList<Alignment>> getResultsMap(){
+public HashMap<String,Alignment> getResultsMap(){
 	return this.resultsMap;
 }
 public int getReferenceLength(){
@@ -53,6 +57,9 @@ public HashMap<Integer,Integer> getConverageHistogram(){
 	return this.coverageHistogram;
 }
 //setters
+public void setMapReader(NCBI_MapReader mapReader){
+	this.mapReader = mapReader;
+}
 private void setCompositionMap(HashMap<Integer, HashMap<String, ArrayList<Alignment>>> taxonMap){// technically not required
 	this.compositionMap = taxonMap;}
 
@@ -139,36 +146,28 @@ public void calculateStatistics(){
 public void getNonStacked(){
 	//get nonstacked Reads
 	for(int key : compositionMap.keySet()){
+		HashMap<String,Integer> nonStackedOnReference = new HashMap<String,Integer>();
 		HashMap<String,ArrayList<Alignment>> rMap = compositionMap.get(key);
 		for(String reference : rMap.keySet()){
 			if(turnOffDestacking){
-				for(Alignment al : rMap.get(reference)){
-					String name = al.getReadName();
-					if(resultsMap.containsKey(name)){
-						ArrayList<Alignment> list = resultsMap.get(name);
-						list.add(al);
-						resultsMap.replace(name, list);
-					}else{
-						ArrayList<Alignment> list = new ArrayList<Alignment>();
-						list.add(al);
-						resultsMap.put(name, list);
-						}
+				ArrayList<Alignment>list=rMap.get(reference);
+				stackedSizes.add(new NOAOR(list.size(),reference,key));
+				nonStackedOnReference.putIfAbsent(reference, list.size());
+				for(Alignment al : list){
+					if(al.isTopAlignment()){
+						resultsMap.putIfAbsent(al.getReadName(), al);
 					}
-		}else{
-			GetStackedReads reads = new GetStackedReads(rMap.get(reference));
-			reads.calculateStatistics();
-			if(!reads.wasTurnedOn())
-				turnedOn = false;
-			for(Alignment al : reads.getNonStacked()){
-				String name = al.getReadName();
-				if(resultsMap.containsKey(name)){
-					ArrayList<Alignment> list = resultsMap.get(name);
-					list.add(al);
-					resultsMap.replace(name, list);
-				}else{
-					ArrayList<Alignment> list = new ArrayList<Alignment>();
-					list.add(al);
-					resultsMap.put(name, list);
+				}
+			}else{
+				GetStackedReads reads = new GetStackedReads(rMap.get(reference));
+				reads.calculateStatistics();
+				if(!reads.wasTurnedOn())
+					turnedOn = false;
+				ArrayList<Alignment> list =  reads.getNonStacked();
+				stackedSizes.add(new NOAOR(list.size(),reference,key));
+				for(Alignment al : list){
+					if(al.isTopAlignment()){
+						resultsMap.putIfAbsent(al.getReadName(), al);
 					}
 				}
 			}
@@ -200,26 +199,43 @@ public void process(){
   }
 
 //calculate and get all top references
-public HashMap<Double,ArrayList<Integer>> getAllTopReferences(){
-	HashMap<Double,ArrayList<Integer>> additional = new HashMap<Double,ArrayList<Integer>>();
-	HashMap<Integer,HashMap<String,ArrayList<Alignment>>> map = compositionMap;
-	if(map.size()>=1){
-		int maxSize = map.get(maxID).get(maxReference).size();
-		for(double x = 1.0;x>=0.0;x-=0.1){
-			ArrayList<Integer> margin = new ArrayList<Integer>();
-			for(int key : map.keySet()){
-				int size = 0;
-				for(String ref : map.get(key).keySet()){
-					size += map.get(key).get(ref).size();
-				}		
-				if(size > (maxSize*x) && size <= maxSize*(x+0.1)){
-				margin.add(key);
+public String getTopTenReferences(){
+	stackedSizes.sort(new NOAORComparator());
+	String line = getName(maxID)+";_TOPREFPERCREADS100";
+	if(stackedSizes.size()>=1){
+		int i=1;
+		int maxSize = compositionMap.get(maxID).get(maxReference).size();
+		for(NOAOR n : stackedSizes){
+			if(n.getTaxID()!=maxID && n.getReference() != maxReference){
+				int percentage = n.getSize()/maxSize;
+				System.out.println(percentage);
+				if(percentage<100){
+					line += "\t"+getName(n.getTaxID())+";_TOPREFPERCREADS0"+percentage;
+				}else{
+					line += "\t"+getName(n.getTaxID())+";_TOPREFPERCREADS100";
 				}	
+				i++;
 			}
-			additional.put(x, margin);
-		}	
+			if(i == 10)
+				break;
+		}
+		if(i<10){
+			while(i<=10){
+				line += "\tnon";
+				i++;
+			}
+		}
 	}
-	return additional;
+	return line;
 }
-
+String getName(int taxId){
+	String name;
+	if(mapReader.getNcbiIdToNameMap().get(taxId) != null)
+		name = mapReader.getNcbiIdToNameMap().get(taxId).replace(' ', '_');
+	else if(taxId == 0)
+		name="NA";
+	else
+		name = "unassignedName";
+	return name;
+}
 }//class
