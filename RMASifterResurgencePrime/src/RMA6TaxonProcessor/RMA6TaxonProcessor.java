@@ -319,7 +319,9 @@ public String getReadLengthStatistics(){
 public int getNumberOfReads(){
 	return this.numOfReads;
 }
-
+public HashMap<Integer, HashMap<String, ArrayList<Alignment>>> getTaxonMap(){
+	return this.taxonMap;
+}
 public String getReadDistribution(){
 	return this.readDistribution;
 }
@@ -335,6 +337,26 @@ public void processMatchBlocks(IMatchBlock[] blocks, String name, int length, St
 public void process(){ 
 
 }// void 
+public void merge(RMA6TaxonProcessor t1){
+	HashMap<Integer, HashMap<String, ArrayList<Alignment>>>merger =  t1.getTaxonMap();
+	for(int taxID:merger.keySet()){
+		if(!taxonMap.containsKey(taxID)){;
+			taxonMap.put(taxID, merger.get(taxID));
+		}else{
+			HashMap<String,ArrayList<Alignment>> list =  taxonMap.get(taxID);
+			HashMap<String,ArrayList<Alignment>> mergedList = merger.get(taxID);
+			for(String key: mergedList.keySet()){
+				if(!list.containsKey(key)){
+					list.put(key, mergedList.get(key));
+				}else{
+					ArrayList<Alignment> entry = list.get(key);
+					entry.addAll(mergedList.get(key));
+					list.replace(key,entry);
+				}
+			}
+		}
+	}	
+}
 public void clear(){
 	container = null;
 	pIdents.clear();

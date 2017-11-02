@@ -10,18 +10,23 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executors;
+import java.util.concurrent.FutureTask;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import java.util.concurrent.Future;
 import NCBI_MapReader.NCBI_MapReader;
 import NCBI_MapReader.NCBI_TreeReader;
+import RMA6TaxonProcessor.ConcurrentMatchProcessorCrawler;
 import RMA6TaxonProcessor.MatchProcessorCrawler;
 import behaviour.OutputType;
 import megan.rma6.ClassificationBlockRMA6;
 import megan.rma6.RMA6File;
 import utility.ConcurrentNodeMatchSorter;
+import utility.NodeMatchSorter;
 
 public class RMA6BlastCrawler {
 	/**
@@ -73,7 +78,7 @@ public class RMA6BlastCrawler {
 			String  header ="Taxon";
 			String outDir = dir;
 			switch (type) {
-			case ADDIDTIONALENTRIES: header = "TargetNode\t1.0\t0.9\t0.8\t0.7\t0.6\t0.5\t0.4\t0.3\t0.2\t0.1";
+			case ADDIDTIONALENTRIES: header = "TargetNode\t01\t02\t03\t04\t05\t06\t07\t08\t09\t10";
 									outDir += "readDist/"+fileName+"_additionalNodeEntries"+".txt";
 									break;
 			case ALIGNMENTS:		outDir += getName(taxID)+".fasta";
@@ -98,7 +103,7 @@ public class RMA6BlastCrawler {
 						 	header+=header_part2+"\tconsidered_Matches";
 						 	outDir += "damageMismatch/"+fileName+"_damageMismatch"+".txt";
 						 			break;
-			case EDITDISTANCE: header="Taxon\tReference\t0\t1\t2\t3\t4\t5\t6\t7\t8\t9\t10\thigher";
+			case EDITDISTANCE: header="Taxon\t0\t1\t2\t3\t4\t5\t6\t7\t8\t9\t10\thigher";
 								outDir += "editDistance/"+fileName+"_editDistance"+".txt";
 									break;
 			case FILTER: header= "Node\tNumberOfUnfilteredReads\tNumberOfFilteredReads\tNumberOfUnfilteredAlignments\tnumberOfAlignments\tturnedOn?";
@@ -174,15 +179,50 @@ public class RMA6BlastCrawler {
 				idsToProcess.add(id);
 		idsToProcess.addAll(treeReader.getParents(taxID));
 		  executor=(ThreadPoolExecutor) Executors.newFixedThreadPool(numThreads);
+		  ArrayList<Future<NodeMatchSorter>> futureList = new  ArrayList<Future<NodeMatchSorter>>(idsToProcess.size());
 		for(Integer id : idsToProcess){
-			ConcurrentNodeMatchSorter cocurrentNMS = new ConcurrentNodeMatchSorter(concurrentMap,inDir+fileName, id, log, warning, wantReads, speciesName, mapReader);
-			executor.submit(cocurrentNMS);
+			ConcurrentNodeMatchSorter cocurrentNMS = new ConcurrentNodeMatchSorter(inDir+fileName, id, log, warning, wantReads, speciesName, mapReader);
+			Future<NodeMatchSorter> future = executor.submit(cocurrentNMS);
+			futureList.add(future);
 		}// for all IDs
 		destroy();
-		System.out.println(concurrentMap.keySet().size());
-		for(int key :concurrentMap.keySet())
+		for(Future<NodeMatchSorter> futureNMS:futureList){
+			NodeMatchSorter nms = null;
+			try {
+				nms = futureNMS.get();
+			} catch (InterruptedException | ExecutionException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			ConcurrentHashMap<Integer, MatchProcessorCrawler> cHM= nms.returnCHashMap();
+			for(int id:cHM.keySet()){
+				if(concurrentMap.contains(id)){
+					MatchProcessorCrawler mpc = concurrentMap.get(id);
+					mpc.merge(cHM.get(id));
+					 concurrentMap.replace(id,mpc);
+				}else{
+					 concurrentMap.put(id, cHM.get(id));
+				}
+			}
+		}
+		futureList.clear();
+		executor=(ThreadPoolExecutor) Executors.newFixedThreadPool(numThreads);
+		ArrayList<Future<MatchProcessorCrawler>> futureMPCList = new ArrayList<Future<MatchProcessorCrawler>>(concurrentMap.keySet().size());
+		for(int key :concurrentMap.keySet()){
+			ConcurrentMatchProcessorCrawler cmpc = new ConcurrentMatchProcessorCrawler(concurrentMap.get(key));
+			Future<MatchProcessorCrawler> future = executor.submit(cmpc);
+			futureMPCList.add(future);
+		}
+		destroy();
+		for(Future<MatchProcessorCrawler> future :futureMPCList)
 		{// write output here 
-			MatchProcessorCrawler matchPC= concurrentMap.get(key);
+			MatchProcessorCrawler matchPC=null;
+			try {
+				matchPC = future.get();
+			} catch (InterruptedException | ExecutionException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 			matchPC.process();
 			coverageHistograms.add(matchPC.getCoverageLine());
 			coveragePositions.add(matchPC.getCoveragePositions());

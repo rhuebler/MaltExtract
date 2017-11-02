@@ -18,7 +18,7 @@ import megan.rma6.RMA6File;
 import megan.rma6.ReadBlockGetterRMA6;
 
 public class NodeMatchSorter {
-	private ConcurrentHashMap<Integer, MatchProcessorCrawler> concurrentMap;
+	private ConcurrentHashMap<Integer, MatchProcessorCrawler> concurrentMap= new ConcurrentHashMap<Integer, MatchProcessorCrawler>();
 	private String filePath="";
 	int id =0;
 	Logger log;
@@ -28,9 +28,11 @@ public class NodeMatchSorter {
 	String speciesName;
 	NCBI_MapReader mapReader;
 	//Constructor
-	public NodeMatchSorter(ConcurrentHashMap<Integer, MatchProcessorCrawler> concurrentMap,String filePath, int id,Logger log, Logger warning,boolean wantReads,
+	public ConcurrentHashMap<Integer, MatchProcessorCrawler> returnCHashMap(){
+		return concurrentMap;
+	}
+	public NodeMatchSorter(String filePath, int id,Logger log, Logger warning,boolean wantReads,
 			String speciesName,NCBI_MapReader mapReader){
-		this.concurrentMap = concurrentMap;
 		this.filePath = filePath;
 		this.id = id;
 		this.warning = warning;

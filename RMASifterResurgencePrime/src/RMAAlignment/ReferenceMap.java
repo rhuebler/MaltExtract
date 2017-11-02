@@ -121,23 +121,23 @@ public class ReferenceMap {
 		for(int k: coverageContainer.keySet()){
 			double coverage = coverageContainer.get(k);
 			averageCoverage+=coverage;
-			if(coverage>1){
+			if(coverage>=1){
 				Double count = coverageMap.get(0);
 				count++;
 				coverageMap.replace(0, count);
-			}if(coverage>2){
+			}if(coverage>=2){
 				Double count = coverageMap.get(1);
 				count++;
 				coverageMap.replace(1, count);
-			}if(coverage>3){
+			}if(coverage>=3){
 				Double count = coverageMap.get(2);
 				count++;
 				coverageMap.replace(2, count);
-			}if(coverage>4){
+			}if(coverage>=4){
 				Double count = coverageMap.get(3);
 				count++;
 				coverageMap.replace(3, count);
-			}if(coverage>5){
+			}if(coverage>=5){
 				Double count = coverageMap.get(4);
 				count++;
 				coverageMap.replace(4, count);

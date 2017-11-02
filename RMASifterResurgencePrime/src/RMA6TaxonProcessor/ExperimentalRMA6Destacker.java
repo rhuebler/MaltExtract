@@ -75,7 +75,6 @@ public class ExperimentalRMA6Destacker extends RMA6TaxonProcessor {
 						}else{
 							ArrayList<Alignment> entry = list.get(al.getAccessionNumber());
 							entry.add(al);
-							entry.add(al);
 							list.replace(al.getAccessionNumber(),entry);
 						}
 						

@@ -90,7 +90,7 @@ public class RMA6OutputProcessor {
 			String  header ="Taxon";
 			String outDir = dir;
 			switch (type) {
-			case ADDIDTIONALENTRIES: header = "TargetNode\t1.0\t0.9\t0.8\t0.7\t0.6\t0.5\t0.4\t0.3\t0.2\t0.1";
+			case ADDIDTIONALENTRIES: header = "TargetNode\t01\t02\t03\t04\t05\t06\t07\t08\t09\t10";
 									outDir += "readDist/"+fileName+"_additionalNodeEntries"+".txt";
 									break;
 			case ALIGNMENTS:		outDir += getName(taxID)+".fasta";
@@ -115,7 +115,7 @@ public class RMA6OutputProcessor {
 						 	header+=header_part2+"\tconsidered_Matches";
 						 	outDir += "damageMismatch/"+fileName+"_damageMismatch"+".txt";
 						 			break;
-			case EDITDISTANCE: header="Taxon\tReference\t0\t1\t2\t3\t4\t5\t6\t7\t8\t9\t10\thigher";
+			case EDITDISTANCE: header="Taxon\t0\t1\t2\t3\t4\t5\t6\t7\t8\t9\t10\thigher";
 								outDir += "editDistance/"+fileName+"_editDistance"+".txt";
 									break;
 			case FILTER: header= "Node\tNumberOfUnfilteredReads\tNumberOfFilteredReads\tNumberOfUnfilteredAlignments\tnumberOfAlignments\tturnedOn?";

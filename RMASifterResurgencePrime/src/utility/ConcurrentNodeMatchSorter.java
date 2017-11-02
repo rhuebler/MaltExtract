@@ -1,13 +1,11 @@
 package utility;
 
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.Callable;
 import java.util.logging.Logger;
-
 import NCBI_MapReader.NCBI_MapReader;
-import RMA6TaxonProcessor.MatchProcessorCrawler;
 
-public class ConcurrentNodeMatchSorter implements Runnable {
-	private ConcurrentHashMap<Integer, MatchProcessorCrawler> concurrentMap;
+
+public class ConcurrentNodeMatchSorter implements Callable<NodeMatchSorter> {
 	private String filePath="";
 	int id =0;
 	Logger log;
@@ -16,9 +14,8 @@ public class ConcurrentNodeMatchSorter implements Runnable {
 	double topPercent;
 	String speciesName;
 	NCBI_MapReader mapReader;
-	public ConcurrentNodeMatchSorter(ConcurrentHashMap<Integer, MatchProcessorCrawler> concurrentMap,String filePath, int id,Logger log, Logger warning,boolean wantReads,
+	public ConcurrentNodeMatchSorter(String filePath, int id,Logger log, Logger warning,boolean wantReads,
 	String speciesName,NCBI_MapReader mapReader){
-		this.concurrentMap = concurrentMap;
 		this.filePath = filePath;
 		this.id = id;
 		this.warning = warning;
@@ -28,14 +25,14 @@ public class ConcurrentNodeMatchSorter implements Runnable {
 		this.wantReads =wantReads;
 	}
 	
-	@Override
-	public void run() {
+	public NodeMatchSorter call() {
+		NodeMatchSorter nodeMatchSorter = new NodeMatchSorter(filePath, id, log, warning, wantReads, speciesName, mapReader);
 		try{
-			NodeMatchSorter nodeMatchSorter = new NodeMatchSorter(concurrentMap, filePath, id, log, warning, wantReads, speciesName, mapReader);
 			nodeMatchSorter.processNode();
+			
 		}catch(Exception e){
 			e.printStackTrace();
 		}
-		
+		return nodeMatchSorter;
 	}
 }

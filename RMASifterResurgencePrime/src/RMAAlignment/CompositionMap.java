@@ -207,9 +207,10 @@ public String getTopTenReferences(){
 		int maxSize = compositionMap.get(maxID).get(maxReference).size();
 		for(NOAOR n : stackedSizes){
 			if(n.getTaxID()!=maxID && n.getReference() != maxReference){
-				int percentage = n.getSize()/maxSize;
-				System.out.println(percentage);
-				if(percentage<100){
+				int  percentage =(int) ((double) n.getSize()/(double) maxSize*100);
+				if(percentage<10){
+					line += "\t"+getName(n.getTaxID())+";_TOPREFPERCREADS00"+percentage;
+				}else if(percentage<100){
 					line += "\t"+getName(n.getTaxID())+";_TOPREFPERCREADS0"+percentage;
 				}else{
 					line += "\t"+getName(n.getTaxID())+";_TOPREFPERCREADS100";
