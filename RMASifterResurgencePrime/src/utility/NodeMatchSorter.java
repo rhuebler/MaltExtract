@@ -78,8 +78,9 @@ public class NodeMatchSorter {
 				for(int i = 0; i< blocks.length;i++){
 					if(blocks[i].getBitScore()/topScore < 1-topPercent){
 						break;}	
-					if(useFirstMatch)//or just break here
-						i=blocks.length;
+					if(useFirstMatch){//or just break here
+						i=blocks.length-1;
+					}	
 					Alignment al = new Alignment();
 					al.setText(blocks[i].getText());
 					al.processText();

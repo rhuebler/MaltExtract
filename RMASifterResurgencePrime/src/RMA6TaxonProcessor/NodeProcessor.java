@@ -117,17 +117,10 @@ public class NodeProcessor{
 				   }
 				 }
 				// Downsample list if necessary and write log 
-				if(list.size()>100000){
+				if(list.size()>10000){
 					warning.log(Level.WARNING,"For " + taxName + " in file "+fileName+ " downsampling was turned on");
-//					ArrayList<Long> longList = new ArrayList<Long>();
-//					for(int i = 0; i<list.size(); i++)
-//						longList.add(list.get(i));
-//					Collections.shuffle(longList);
-//					list.clear();
-//					for(long l : longList.subList(0, 100000))
-//						list.add(l);
 					ListOfLongs temp = new ListOfLongs();//TODO remove shuffeling to speed up
-					for(int i = 0; i<=50000;i++){
+					for(int i = 0; i<=10000;i++){
 						temp.add(list.get(i));
 					}
 					list= temp;

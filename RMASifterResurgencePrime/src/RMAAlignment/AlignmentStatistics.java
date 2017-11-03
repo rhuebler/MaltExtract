@@ -87,14 +87,10 @@ public class AlignmentStatistics {
 				results.add(unique/(refMap.getPossible()));
 			}
 			this.coverageHistogram = coverageHistogram;
-			results.add(unique/(refMap.getPossible()));
-			int nonDuplicates = input.size();
-		
 			results.add((double) input.size()-refMap.getStackedReads());
-			results.add((double) nonDuplicates);
+			results.add((double)  input.size());
 			results.add((double) currentList.size());
 			results.add((double) refMap.getLength());
-
 
 			DecimalFormat df = new DecimalFormat("#.###");
 			coverage.add(df.format(refMap.getAverageCoverage()));

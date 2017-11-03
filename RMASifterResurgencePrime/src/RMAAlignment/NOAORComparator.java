@@ -6,7 +6,7 @@ public class NOAORComparator implements Comparator<NOAOR> // comparator for alig
 {															// if the Read is on the reverse Strand //TODO double check
 	  @Override public int compare(NOAOR n1, NOAOR n2 )
 	  {
-		  return n1.getSize()-n2.getSize();
+		  return n2.getSize()-n1.getSize();
 	  }
 
 }
