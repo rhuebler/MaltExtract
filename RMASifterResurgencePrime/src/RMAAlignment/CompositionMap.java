@@ -203,7 +203,7 @@ public String getTopTenReferences(){
 	stackedSizes.sort(new NOAORComparator());
 	String line = getName(maxID)+";_TOPREFPERCREADS100";
 	if(stackedSizes.size()>=1){
-		int i=1;
+		int i=0;
 		int maxSize = compositionMap.get(maxID).get(maxReference).size();
 		for(NOAOR n : stackedSizes){
 			if(n.getTaxID()!=maxID && n.getReference() != maxReference){
