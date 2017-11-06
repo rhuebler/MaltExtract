@@ -1,12 +1,9 @@
 package strainMap;
-import java.util.ArrayList;
+
 // Store all Combinations for the first 10 and last 10 Positions of each Blast hit
 import java.util.HashMap;
-
 import RMAAlignment.Alignment;
-import RMAAlignment.AlignmentComparator;
-import RMAAlignment.AlignmentStatistics;
-import behaviour.Filter;
+
 /**
  * Functions that collects all misMatches and processes them 
  * also serves as a container for alignmets

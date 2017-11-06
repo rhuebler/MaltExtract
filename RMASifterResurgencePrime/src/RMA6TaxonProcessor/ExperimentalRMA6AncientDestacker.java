@@ -43,9 +43,10 @@ public class ExperimentalRMA6AncientDestacker extends RMA6TaxonProcessor {
 	public void processMatchBlocks(IMatchBlock[] blocks, String name, int length, String sequence){
 		originalNumberOfReads++;
 		float topScore = blocks[0].getBitScore();
-			for(int i = 0; i< blocks.length;i++){
-				if(blocks[i].getBitScore()/topScore < 1-topPercent){
-					break;}		
+			for(int i = 0; i<blocks.length;i++){
+				if((blocks[i].getBitScore()/topScore) < 1-topPercent || i==10){
+					break;
+				}		
 				Alignment al = new Alignment();
 				al.setText(blocks[i].getText());
 				al.processText();

@@ -20,6 +20,7 @@ public class AlignmentStatistics {
 	private boolean turnOffDestacking = false;
 	private boolean turnOffDeDupping = false;
 	private ArrayList<String> coverage = new ArrayList<String>();
+	private ArrayList<Alignment> destackedList;
 	//constructor and set values
 	public AlignmentStatistics(ArrayList<Alignment> list, boolean turnOffDestacking, boolean turnOffDeDupping){
 		this.currentList = list;
@@ -27,6 +28,9 @@ public class AlignmentStatistics {
 		this.turnOffDeDupping = turnOffDeDupping;
 	}
 	//getters
+	public ArrayList<Alignment> getDestackedList(){
+		return destackedList;
+	}
 	public ArrayList<String> getCoveragePositions(){
 		return this.coverage;
 	}
@@ -87,6 +91,7 @@ public class AlignmentStatistics {
 				results.add(unique/(refMap.getPossible()));
 			}
 			this.coverageHistogram = coverageHistogram;
+			this.destackedList = refMap.getNonStacked();
 			results.add((double) input.size()-refMap.getStackedReads());
 			results.add((double)  input.size());
 			results.add((double) currentList.size());

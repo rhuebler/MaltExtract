@@ -298,6 +298,13 @@ public class InputParameterProcessor {
     	        {
     	        	log.log(Level.INFO,"Top Percent value set to: "+commandLine.getOptionValue("top"));
     	            this.topPercent = Double.parseDouble(commandLine.getOptionValue("top"));
+    	            if(topPercent>1){
+    	            	warning.log(Level.SEVERE, "Top percent values higher >1 not accepted please use 0.01 to use the highest scoring percent of alingments");
+    	            	System.exit(1);
+    	            }
+    	            if(topPercent==1){
+    	            	log.log(Level.WARNING, "Using top percent of 1 will use all alignmets per read please consider se 0.01 to use the highest scoring percent of alingments");
+    	            }
     	        }
     	        
     	        if (commandLine.hasOption("maxReadLength"))

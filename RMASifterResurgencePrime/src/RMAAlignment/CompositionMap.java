@@ -1,7 +1,6 @@
 package RMAAlignment;
 import java.util.ArrayList;
 import java.util.HashMap;
-
 import NCBI_MapReader.NCBI_MapReader;
 /**
  * Save for a Megan Node all Blast hits stored as Alignment Objects these are kept as hashmap
@@ -32,6 +31,7 @@ private ArrayList<NOAOR> stackedSizes = new ArrayList<NOAOR>();
 private int refLength = 0;
 private boolean turnedOn = true;
 private NCBI_MapReader mapReader;
+private int maxSize;
 //getter
 public ArrayList<String> getCoveragePositions(){
 	return this.coveragePositions;
@@ -140,6 +140,7 @@ public void calculateStatistics(){
 	this.generalStatistics = stats.getGenaralStatistics();
 	this.refLength = stats.getLength();
 	this.coveragePositions = stats.getCoveragePositions();
+	this.maxSize = stats.getDestackedList().size();
 }
 
 // process composition and find taxon with maximum number of start positions
@@ -204,7 +205,6 @@ public String getTopTenReferences(){
 	String line = getName(maxID)+";_TOPREFPERCREADS100";
 	if(stackedSizes.size()>=1){
 		int i=0;
-		int maxSize = compositionMap.get(maxID).get(maxReference).size();
 		for(NOAOR n : stackedSizes){
 			if(n.getTaxID()!=maxID && n.getReference() != maxReference){
 				int  percentage =(int) (((double) n.getSize()/(double) maxSize)*100);
