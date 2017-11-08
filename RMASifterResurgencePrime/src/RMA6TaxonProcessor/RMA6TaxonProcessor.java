@@ -100,6 +100,7 @@ public RMA6TaxonProcessor(Integer id, double pID, NCBI_MapReader reader, boolean
 	this.readLengthDistribution = rldist;
 	readLengthStatistics =taxName+"\t0\t0\t0\t0";
 	container.setName(taxName);
+	this.additionalEntries =taxName+"\tNA\tNA\tNA\tNA\tNA\tNA\tNA\tNA\tNA\tNA";
 }
 //setters
 protected void setOriginalNumberOfAlignments(int num){
@@ -135,7 +136,7 @@ protected void processCompositionMap(CompositionMap map){
 		for(int k : histogram.keySet())
 			line += "\t" + histogram.get(k);
 		this.coverageLine = line;
-		this.additionalEntries =  map.getTopTenReferences();
+		this.additionalEntries = taxName+"\t"+map.getTopTenReferences();
 		//get coveragePositions
 		String covPosLine=taxName+"\t" + maxReference;
 		for(String cov :map.getCoveragePositions()){

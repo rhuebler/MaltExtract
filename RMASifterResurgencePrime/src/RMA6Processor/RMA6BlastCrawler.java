@@ -6,6 +6,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -193,7 +194,7 @@ public class RMA6BlastCrawler {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-			ConcurrentHashMap<Integer, MatchProcessorCrawler> cHM= nms.returnCHashMap();
+			HashMap<Integer, MatchProcessorCrawler> cHM= nms.returnCHashMap();
 			for(int id:cHM.keySet()){
 				if(concurrentMap.contains(id)){
 					MatchProcessorCrawler mpc = concurrentMap.get(id);

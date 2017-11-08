@@ -119,7 +119,7 @@ public class RMA6OutputProcessor {
 								outDir += "editDistance/"+fileName+"_editDistance"+".txt";
 									break;
 			case FILTER: header= "Node\tNumberOfUnfilteredReads\tNumberOfFilteredReads\tNumberOfUnfilteredAlignments\tnumberOfAlignments\tturnedOn?";
-						 outDir += "FilterInformation/"+fileName+"_filterTable"+".txt";			
+						 outDir += "filterInformation/"+fileName+"_filterTable"+".txt";			
 									break;
 			case READS:	outDir += getName(taxID)+".fasta";
 						break;

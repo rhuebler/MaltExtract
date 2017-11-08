@@ -36,7 +36,7 @@ public class MatchProcessorCrawler extends RMA6TaxonProcessor {
 	}
 	//process each Matchblock
 	public void processMatchBlock(Alignment al){
-			
+			//System.out.println("Here");
 				if(minPIdent <= al.getPIdent()){ // check for minPercentIdentity
 								//get mismatches
 					if(!taxonMap.containsKey(al.getTaxID())){

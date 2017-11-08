@@ -77,14 +77,14 @@ public class DirectoryCreator {
 			new File(outDir+"/ancient/"+"/editDistance/").mkdirs();
 			new File(outDir+"/ancient/"+"/percentIdentity/").mkdirs();
 			new File(outDir+"/ancient/"+"/damageMismatch/").mkdirs();
-			new File(outDir+"/ancient/"+"/FilterInformation/").mkdirs();
+			new File(outDir+"/ancient/"+"/filterInformation/").mkdirs();
 			new File(outDir+"/ancient/"+"/coverage/").mkdirs();
 			
 			new File(outDir+"/default/"+"/readDist/").mkdirs(); 
 			new File(outDir+"/default/"+"/editDistance/").mkdirs();
 			new File(outDir+"/default/"+"/percentIdentity/").mkdirs();
 			new File(outDir+"/default/"+"/damageMismatch/").mkdirs();
-			new File(outDir+"/default/"+"/FilterInformation/").mkdirs();
+			new File(outDir+"/default/"+"/filterInformation/").mkdirs();
 			new File(outDir+"/default/"+"/coverage/").mkdirs();
 			if(hits){
 				new File(outDir+"/default/"+"/alignments/").mkdirs();
