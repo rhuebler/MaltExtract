@@ -220,8 +220,8 @@ public String getTopTenReferences(){
 			if(i == 9)
 				break;
 		}
-		if(i<10){
-			while(i<=9){
+		if(i<9){
+			while(i<9){
 				line += "\tNA";
 				i++;
 			}

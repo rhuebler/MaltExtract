@@ -85,12 +85,10 @@ public class NodeMatchSorter {
 						al.setReadLength(readLength);
 						al.setAcessionNumber(blocks[i].getTextFirstWord());	
 						al.setSequence(readSequence);
-						System.out.println(al.getTaxID());
 						if(concurrentMap.containsKey(al.getTaxID())){
 							MatchProcessorCrawler mpc = concurrentMap.get(al.getTaxID());
 							mpc.processMatchBlock(al);
 							concurrentMap.replace(al.getTaxID(), mpc);
-							System.out.println("Here");
 						}
 						else{
 							MatchProcessorCrawler mpc = new MatchProcessorCrawler(id,topPercent,mapReader,false,log,warning,wantReads,0.01,0,false,true,false,behaviour.Filter.CRAWL);
