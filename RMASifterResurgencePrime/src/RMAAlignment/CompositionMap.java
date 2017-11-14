@@ -202,18 +202,18 @@ public void process(){
 //calculate and get all top references
 public String getTopTenReferences(){
 	stackedSizes.sort(new NOAORComparator());
-	String line =getName(maxID)+";_TOPREFPERCREADS100";
+	String line =getName(maxID)+";_"+maxReference+";_TOPREFPERCREADS100";
 	if(stackedSizes.size()>=1){
 		int i=0;
 		for(NOAOR n : stackedSizes){
 			if(n.getTaxID()!=maxID && n.getReference() != maxReference){
 				int  percentage =(int) (((double) n.getSize()/(double) maxSize)*100);
-				if(percentage<9){
-					line += "\t"+getName(n.getTaxID())+";_TOPREFPERCREADS00"+percentage;
+				if(percentage <=9){
+					line += "\t"+getName(n.getTaxID())+";_"+n.getReference()+";_TOPREFPERCREADS00"+percentage;
 				}else if(percentage<100){
-					line += "\t"+getName(n.getTaxID())+";_TOPREFPERCREADS0"+percentage;
+					line += "\t"+getName(n.getTaxID())+";_"+n.getReference()+";_TOPREFPERCREADS0"+percentage;
 				}else{
-					line += "\t"+getName(n.getTaxID())+";_TOPREFPERCREADS100";
+					line += "\t"+getName(n.getTaxID())+";_"+n.getReference()+";_TOPREFPERCREADS100";
 				}	
 				i++;
 			}

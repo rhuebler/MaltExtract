@@ -180,7 +180,6 @@ public class RMA6BlastCrawler {
 		idsToProcess.addAll(treeReader.getParents(taxID));
 		  executor=(ThreadPoolExecutor) Executors.newFixedThreadPool(numThreads);
 		  ArrayList<Future<NodeMatchSorter>> futureList = new  ArrayList<Future<NodeMatchSorter>>(idsToProcess.size());
-		System.out.println(numThreads);
 		for(Integer id : idsToProcess){
 			ConcurrentNodeMatchSorter cocurrentNMS = new ConcurrentNodeMatchSorter(inDir+fileName, id, log, warning, wantReads, speciesName, mapReader);
 			Future<NodeMatchSorter> future = executor.submit(cocurrentNMS);
