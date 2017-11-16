@@ -339,6 +339,7 @@ public void process(){
 
 }// void 
 public void merge(RMA6TaxonProcessor t1){
+	lines.addAll(t1.getReads());
 	HashMap<Integer, HashMap<String, ArrayList<Alignment>>>merger =  t1.getTaxonMap();
 	for(int taxID:merger.keySet()){
 		if(!taxonMap.containsKey(taxID)){;

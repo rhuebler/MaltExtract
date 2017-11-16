@@ -50,7 +50,7 @@ public class RMA6BlastCrawler {
 	private ArrayList<String> percentIdentities = new ArrayList<String>();
 	private ArrayList<String> readLengthDistributions = new ArrayList<String>();
 	private ArrayList<String> readDistributions = new ArrayList<String>();
-	private ConcurrentHashMap<Integer, MatchProcessorCrawler> concurrentMap = new ConcurrentHashMap<Integer, MatchProcessorCrawler>();
+	private ConcurrentHashMap<String, MatchProcessorCrawler> concurrentMap = new ConcurrentHashMap<String, MatchProcessorCrawler>();
 	private int numThreads;
 	private ThreadPoolExecutor executor;
 	private void destroy(){
@@ -194,8 +194,9 @@ public class RMA6BlastCrawler {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-			HashMap<Integer, MatchProcessorCrawler> cHM= nms.returnCHashMap();
-			for(int id:cHM.keySet()){
+			HashMap<String, MatchProcessorCrawler> cHM= nms.returnCHashMap();
+			for(String id:cHM.keySet()){
+				System.out.println(id);
 				if(concurrentMap.contains(id)){
 					MatchProcessorCrawler mpc = concurrentMap.get(id);
 					mpc.merge(cHM.get(id));
@@ -208,7 +209,7 @@ public class RMA6BlastCrawler {
 		futureList.clear();
 		executor=(ThreadPoolExecutor) Executors.newFixedThreadPool(numThreads);
 		ArrayList<Future<MatchProcessorCrawler>> futureMPCList = new ArrayList<Future<MatchProcessorCrawler>>(concurrentMap.keySet().size());
-		for(int key :concurrentMap.keySet()){
+		for(String key :concurrentMap.keySet()){
 			ConcurrentMatchProcessorCrawler cmpc = new ConcurrentMatchProcessorCrawler(concurrentMap.get(key));
 			Future<MatchProcessorCrawler> future = executor.submit(cmpc);
 			futureMPCList.add(future);
@@ -223,7 +224,6 @@ public class RMA6BlastCrawler {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-			matchPC.process();
 			coverageHistograms.add(matchPC.getCoverageLine());
 			coveragePositions.add(matchPC.getCoveragePositions());
 			damageLines.add(matchPC.getDamageLine());

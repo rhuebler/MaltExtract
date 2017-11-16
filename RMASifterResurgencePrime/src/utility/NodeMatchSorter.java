@@ -18,7 +18,7 @@ import megan.rma6.RMA6File;
 import megan.rma6.ReadBlockGetterRMA6;
 
 public class NodeMatchSorter {
-	private HashMap<Integer, MatchProcessorCrawler> concurrentMap= new HashMap<Integer, MatchProcessorCrawler>();
+	private HashMap<String, MatchProcessorCrawler> concurrentMap= new HashMap<String, MatchProcessorCrawler>();
 	private String filePath="";
 	int id =0;
 	Logger log;
@@ -28,7 +28,7 @@ public class NodeMatchSorter {
 	String speciesName;
 	NCBI_MapReader mapReader;
 	//Constructor
-	public HashMap<Integer, MatchProcessorCrawler> returnCHashMap(){
+	public HashMap<String, MatchProcessorCrawler> returnCHashMap(){
 		return concurrentMap;
 	}
 	public NodeMatchSorter(String filePath, int id,Logger log, Logger warning,boolean wantReads,
@@ -75,7 +75,8 @@ public class NodeMatchSorter {
 				for(int i = 0; i< blocks.length;i++){
 					if((blocks[i].getBitScore()/topScore) < 1-topPercent){
 						break;}	
-					if(getName(blocks[i].getTaxonId()).contains(speciesName)){
+					String name = getName(blocks[i].getTaxonId());
+					if(name.contains(speciesName)){
 						Alignment al = new Alignment();
 						al.setText(blocks[i].getText());
 						al.processText();
@@ -85,15 +86,16 @@ public class NodeMatchSorter {
 						al.setReadLength(readLength);
 						al.setAcessionNumber(blocks[i].getTextFirstWord());	
 						al.setSequence(readSequence);
-						if(concurrentMap.containsKey(al.getTaxID())){
-							MatchProcessorCrawler mpc = concurrentMap.get(al.getTaxID());
+						al.setTopAlignment(true);
+						if(concurrentMap.containsKey(name)){
+							MatchProcessorCrawler mpc = concurrentMap.get(name);
 							mpc.processMatchBlock(al);
-							concurrentMap.replace(al.getTaxID(), mpc);
+							concurrentMap.replace(name, mpc);
 						}
 						else{
 							MatchProcessorCrawler mpc = new MatchProcessorCrawler(id,topPercent,mapReader,false,log,warning,wantReads,0.01,0,false,true,false,behaviour.Filter.CRAWL);
 							mpc.processMatchBlock(al);
-							concurrentMap.put(al.getTaxID(), mpc);
+							concurrentMap.put(name, mpc);
 						}
 						break;
 					}

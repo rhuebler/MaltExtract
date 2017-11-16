@@ -38,7 +38,25 @@ public class MatchProcessorCrawler extends RMA6TaxonProcessor {
 	public void processMatchBlock(Alignment al){
 			//System.out.println("Here");
 				if(minPIdent <= al.getPIdent()){ // check for minPercentIdentity
-								//get mismatches
+					if(wantReads){//add Read
+						String sequence = "";
+						String name = "";
+						String readName =al.getReadName();
+						sequence = al.getSequence();
+						if (!readName.startsWith(">"))
+							name = ">"+readName;
+						else
+							name = readName;
+						lines.add(name);
+						if (!name.endsWith("\n"))
+							name += "\n";
+						String readData = sequence;
+						if (readData != null) {
+							if (!readData.endsWith("\n"))
+								readData+=("\n");
+							lines.add(readData);    
+						}
+					}
 					if(!taxonMap.containsKey(al.getTaxID())){
 						HashMap<String,ArrayList<Alignment>> list = new HashMap<String,ArrayList<Alignment>>();
 						ArrayList<Alignment> entry =new ArrayList<Alignment>();
@@ -62,18 +80,15 @@ public class MatchProcessorCrawler extends RMA6TaxonProcessor {
 				}
 			}	
 	public void process(){ 
-		
-		//analyze collected data 
-		 
 		//analyze collected data 
 		CompositionMap map = new CompositionMap(taxonMap,turnOffDestacking,turnOffDeDuping);
+		map.setMapReader(mapReader);
 		map.process();
 		map.getNonStacked();
-		map.setMapReader(mapReader);
+		
 		HashMap<String,Alignment> list = map.getResultsMap();
 		for(String key : list.keySet()){
 			Alignment al = list.get(key);
-			String sequence = "";
 			numMatches++;	
 			container.processAlignment(al);
 			if(wantAlignments){
@@ -84,24 +99,7 @@ public class MatchProcessorCrawler extends RMA6TaxonProcessor {
 			lengths.add(al.getReadLength());
 			pIdents.add(al.getPIdent());
 			distances.add(al.getEditDistance());
-			if(wantReads){
-				String name = "";
-				String readName = key;
-				sequence = al.getSequence();
-				if (!readName.startsWith(">"))
-					name = ">"+readName;
-				else
-					name = readName;
-				lines.add(name);
-				if (!name.endsWith("\n"))
-					name += "\n";
-				String readData = sequence;
-				if (readData != null) {
-					if (!readData.endsWith("\n"))
-						readData+=("\n");
-					lines.add(readData);    
-				}
-			}
+			
 		}	
 		setOriginalNumberOfAlignments(originalNumberOfAlignments);
 		setOriginalNumberOfReads(originalNumberOfReads);
