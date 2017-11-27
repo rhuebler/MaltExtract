@@ -59,8 +59,8 @@ protected String readLengthStatistics;
 protected int refLength = 0;
 protected ArrayList<Integer> lengths = new ArrayList<Integer>();
 protected boolean turnedOn = true;
-protected String additionalEntries = "none";
-protected String covPositions = "none";
+protected String additionalEntries;
+protected String covPositions;
 //constructor
 public RMA6TaxonProcessor(Integer id, double pID, NCBI_MapReader reader, boolean v, Logger log, Logger warning, double topPercent, int maxLength, Filter f){
 	// set input values
@@ -101,6 +101,7 @@ public RMA6TaxonProcessor(Integer id, double pID, NCBI_MapReader reader, boolean
 	readLengthStatistics =taxName+"\t0\t0\t0\t0";
 	container.setName(taxName);
 	this.additionalEntries =taxName+"\tNA\tNA\tNA\tNA\tNA\tNA\tNA\tNA\tNA\tNA";
+	this.covPositions = taxName+"\tNA\t0\t0\t0\t0\t0\t0\t0";
 }
 //setters
 protected void setOriginalNumberOfAlignments(int num){
@@ -132,23 +133,23 @@ protected void processCompositionMap(CompositionMap map){
 		
 		//set coverage Line
 		HashMap<Integer,Integer> histogram = map.getConverageHistogram();
-		String line = taxName+"\t" + maxReference;
+		String line = taxName + "\t" + maxReference;
 		for(int k : histogram.keySet())
 			line += "\t" + histogram.get(k);
 		this.coverageLine = line;
 		this.additionalEntries = taxName+"\t"+map.getTopTenReferences();
 		//get coveragePositions
-		String covPosLine=taxName+"\t" + maxReference;
-		for(String cov :map.getCoveragePositions()){
-			covPosLine+="\t"+cov;
+		String covPosLine = taxName+"\t" + maxReference;
+		for(String cov : map.getCoveragePositions()){
+			covPosLine += "\t"+cov;
 		}
 		this.covPositions = covPosLine;
 		
 		map=null; // unassign Map at the end 
 	}else{
-		this.readDistribution = taxName+"\tNA\t0\t0\t0\t0";
+		this.readDistribution = taxName+"\tNA\t0\t0\t0\t0\t0";
 		this.coverageLine = taxName+"\tNA\t0\t0\t0\t0\t0\t0\t0\t0\t0\t0\t0\t0";
-		this.covPositions=taxName+"\tNA\t0\t0\t0\t0\t0\t0\t0";
+		this.covPositions = taxName+"\tNA\t0\t0\t0\t0\t0\t0\t0";
 	}
 }
 

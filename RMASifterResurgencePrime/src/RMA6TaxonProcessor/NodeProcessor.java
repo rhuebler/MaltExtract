@@ -38,6 +38,7 @@ public class NodeProcessor{
 		private boolean turnOffDestacking = false;
 		private boolean turnOffDeDuping = false;
 		private String fileName ="";
+		private boolean turnOnDownsample = false;
 		//constructors
 		public NodeProcessor(int id, double minPIdent, NCBI_MapReader reader, boolean v, Logger log, Logger warning,
 				boolean reads, Filter behave, double minCompl,boolean alignment,boolean turnOffDestacking, boolean turnOffDeDuping) {
@@ -117,13 +118,8 @@ public class NodeProcessor{
 				   }
 				 }
 				// Downsample list if necessary and write log 
-				if(list.size()>10000){
+				if(list.size()>10000&&turnOnDownsample){
 					warning.log(Level.WARNING,"For " + taxName + " in file "+fileName+ " downsampling was turned on");
-					ListOfLongs temp = new ListOfLongs();//TODO remove shuffeling to speed up
-					for(int i = 0; i<=10000;i++){
-						temp.add(list.get(i));
-					}
-					list= temp;
 				}
 				IReadBlockIterator classIt  = new ReadBlockIterator(list, new ReadBlockGetterRMA6(rma6File, true, true, (float) 1.0,(float) 100.00,false,true));
 				if(!classIt.hasNext()){ // check if reads are assigned to TaxID if not print to console and skip and set all values to default
@@ -132,6 +128,7 @@ public class NodeProcessor{
 				}else{
 					if(verbose)
 						log.log(Level.INFO,"Processing Taxon "+taxName+" in File " +fileName);
+					int i = 0;
 					while(classIt.hasNext()){// get Alignments and pass to filters
 						IReadBlock current = classIt.next();
 						if(current.getReadLength() <= maxLength || maxLength == 0){
@@ -145,6 +142,10 @@ public class NodeProcessor{
 								}
 							}
 						}// if  
+						i++;
+						if(i==10000&&turnOnDownsample){
+							break;
+						}
 					}// while
 				classIt.close();
 				rma6File.close();
