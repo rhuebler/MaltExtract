@@ -38,10 +38,11 @@ public class NodeProcessor{
 		private boolean turnOffDestacking = false;
 		private boolean turnOffDeDuping = false;
 		private String fileName ="";
-		private boolean turnOnDownsample = false;
+		private boolean downsample = true;
 		//constructors
 		public NodeProcessor(int id, double minPIdent, NCBI_MapReader reader, boolean v, Logger log, Logger warning,
-				boolean reads, Filter behave, double minCompl,boolean alignment,boolean turnOffDestacking, boolean turnOffDeDuping) {
+				boolean reads, Filter behave, double minCompl,boolean alignment,boolean turnOffDestacking, 
+				boolean turnOffDeDuping, boolean downsample) {
 			this.taxID = id;
 			this.minPIdent = minPIdent;
 			this.mapReader = reader;
@@ -54,6 +55,7 @@ public class NodeProcessor{
 			this.alignment = alignment;
 			this.turnOffDestacking = turnOffDestacking;
 			this.turnOffDeDuping = turnOffDeDuping;
+			this.downsample = downsample;
 		}
 		//getters
 		
@@ -118,7 +120,7 @@ public class NodeProcessor{
 				   }
 				 }
 				// Downsample list if necessary and write log 
-				if(list.size()>10000&&turnOnDownsample){
+				if(list.size()>10000 && downsample){
 					warning.log(Level.WARNING,"For " + taxName + " in file "+fileName+ " downsampling was turned on");
 				}
 				IReadBlockIterator classIt  = new ReadBlockIterator(list, new ReadBlockGetterRMA6(rma6File, true, true, (float) 1.0,(float) 100.00,false,true));
@@ -143,7 +145,7 @@ public class NodeProcessor{
 							}
 						}// if  
 						i++;
-						if(i==10000&&turnOnDownsample){
+						if(i==10000 && downsample){
 							break;
 						}
 					}// while

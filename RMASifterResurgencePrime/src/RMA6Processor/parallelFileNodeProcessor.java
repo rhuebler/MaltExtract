@@ -67,6 +67,7 @@ public class parallelFileNodeProcessor {
 	private boolean turnOffDeDuping;
 	private List<Integer>taxIDs; 
 	private double topPercent;
+	private boolean downsample;
 	private HashMap<String,HashMap<Integer,Future<NodeProcessor>>> sortedNodes = new HashMap<String,HashMap<Integer,Future<NodeProcessor>>>();
 	// constructor and intilaize attributes
 	public parallelFileNodeProcessor(InputParameterProcessor inputParameterProcessor, ArrayList<Integer> taxIDs, NCBI_MapReader mapReader,NCBI_TreeReader treeReader,
@@ -91,6 +92,7 @@ public class parallelFileNodeProcessor {
 		this.threads = inputParameterProcessor.getNumThreads();
 		this.taxIDs = taxIDs;
 		this.topPercent = inputParameterProcessor.getTopPercent();
+		this.downsample =  inputParameterProcessor.downsampling();
 	}
 	
 
@@ -142,7 +144,7 @@ public void process() {// processing through file
 		containedIDs.addAll(idsToProcess);// write down contained IDs
 		HashMap<Integer,Future<NodeProcessor>> map = new HashMap<Integer,Future<NodeProcessor>>();
 		for(Integer id : idsToProcess){
-			NodeProcessor nodeProcessor = new NodeProcessor(id, minPIdent, mapReader, verbose,log, warning,reads,behave, minComplexity,alignments,turnOffDestacking,turnOffDeDuping);
+			NodeProcessor nodeProcessor = new NodeProcessor(id, minPIdent, mapReader, verbose,log, warning,reads,behave, minComplexity,alignments,turnOffDestacking,turnOffDeDuping,downsample);
 			ConcurrentNodeProcessor task = new ConcurrentNodeProcessor(nodeProcessor,inDir, fileName, topPercent, maxLength);
 			Future<NodeProcessor> future = executor.submit(task);
 				map.put(id,future);

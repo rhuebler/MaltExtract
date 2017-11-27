@@ -55,6 +55,7 @@ public class InputParameterProcessor {
 	private boolean wantMeganSummaries = false;
 	private boolean destackOff = false;
 	private boolean deDupOff=false;
+	private boolean downsampling = true;
 	// constructor
 
 	public InputParameterProcessor(String[] params ,Logger log, Logger warning){
@@ -63,6 +64,9 @@ public class InputParameterProcessor {
 		process(params);	
 	}
 	// getters for parameters
+	public boolean downsampling(){
+		return downsampling;
+	}
 	public boolean turnDestackingOff(){
 		return this.destackOff;
 	}
@@ -162,6 +166,7 @@ public class InputParameterProcessor {
     	    Option option_MeganSummaries = Option.builder().longOpt("meganSummary").hasArg().argName("meganSummary").optionalArg(true).desc("Return Megan Summary Files").build();
     	    Option option_DeStackOff = Option.builder().longOpt("destackingOff").hasArg().argName("turn off destacking").optionalArg(true).desc("Turn Off automated stacked Read Removal only useful in >1 coverage data").build();
     	    Option option_DeDupOff = Option.builder().longOpt("dupRemOff").hasArg().argName("turn off duplicate removal").optionalArg(true).desc("Turn Off automated pcr duplicate removal useful in >1 coverage data").build();
+    	    Option option_Downsampling = Option.builder().longOpt("downSampOff").hasArg().argName("turn off downsampling").optionalArg(true).desc("Turn Off automatic downsampling on nodes with more than 10.000 assigned reads").build();
     	    Options options = new Options();
     	    
     	    // add all parameters to the parser
@@ -188,6 +193,7 @@ public class InputParameterProcessor {
     	    options.addOption(option_MeganSummaries);
     	    options.addOption(option_DeStackOff);
     	    options.addOption(option_DeDupOff);
+    	    options.addOption(option_Downsampling);
 
     	    try //evaluate commandline
     	    {
@@ -373,6 +379,9 @@ public class InputParameterProcessor {
     	        }
     	        if(commandLine.hasOption("dupRemOff")){
     	        	this.deDupOff = true;
+    	        }
+    	        if(commandLine.hasOption("downSampOff")){
+    	        	this.downsampling = false;
     	        }
     	        if(commandLine.hasOption("h")){////help
     	        	String header = "RMAExtractor beta 1.1";
