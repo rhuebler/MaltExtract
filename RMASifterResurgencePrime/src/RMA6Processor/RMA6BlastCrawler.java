@@ -26,6 +26,7 @@ import behaviour.OutputType;
 import megan.rma6.ClassificationBlockRMA6;
 import megan.rma6.RMA6File;
 import utility.ConcurrentNodeMatchSorter;
+import utility.InputParameterProcessor;
 import utility.NodeMatchSorter;
 
 public class RMA6BlastCrawler {
@@ -61,17 +62,16 @@ public class RMA6BlastCrawler {
 	private ArrayList<String> reads = new ArrayList<String>();
 	//set values at construction
 	//TODO get Reads
-	public RMA6BlastCrawler(String dir, String name, String species, String out, NCBI_MapReader reader ,Logger log, Logger warning,NCBI_TreeReader treeReader,
-			boolean wantReads, int numberOfThreads){
+	public RMA6BlastCrawler(String dir, String name, String species,InputParameterProcessor inProcessor, NCBI_MapReader reader ,Logger log, Logger warning,NCBI_TreeReader treeReader){
 		this.inDir = dir;
 		this.fileName = name;
 		this.speciesName = species;
 		this.mapReader = reader;
-		this.outDir = out+"/crawlResults/";
+		this.outDir = inProcessor.getOutDir()+"/crawlResults/";
 		this.warning = warning;
 		this.treeReader = new NCBI_TreeReader(treeReader);
-		this.wantReads = wantReads;
-		this.numThreads = numberOfThreads;
+		this.wantReads = inProcessor.wantReads();
+		this.numThreads =inProcessor.getNumThreads();
 	}
 	private void writeOutput(List<String> histo, String dir,OutputType type,int taxID){
 		try{

@@ -120,8 +120,8 @@ public class parallelFileNodeProcessor {
 		return keys;
 	}
 public void process() {// processing through file 
-	executor=(ThreadPoolExecutor) Executors.newFixedThreadPool(threads);
 	
+	executor=(ThreadPoolExecutor) Executors.newFixedThreadPool(threads);
 	for(String file: inFiles){
 		 File f = new File(file);
 		 String inDir = f.getParent() +"/";
