@@ -158,7 +158,7 @@ public void process() {// processing through file
 	public void calculateRunOutput(HashMap<String,HashMap<Integer,Future<NodeProcessor>>> sortedNodes){
 		for(String fileName:sortedNodes.keySet()){
 			RMA6OutputProcessor outProcessor = new RMA6OutputProcessor(fileName, outDir,mapReader,warning, behave,alignments, reads);// initilaize output processor here 
-			outProcessor.process(sortedNodes.get(fileName));
+			//outProcessor.process(sortedNodes.get(fileName));
 				if(behave == Filter.NON_ANCIENT){
 					overallSum.put(fileName, outProcessor.getSumLine());
 					ancientSum.put(fileName, outProcessor.getAncientLine());

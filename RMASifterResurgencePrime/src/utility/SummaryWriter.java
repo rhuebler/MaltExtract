@@ -16,7 +16,7 @@ import NCBI_MapReader.NCBI_MapReader;
 
 import behaviour.Filter;
 /**
- * Write overall Summy file from processed RMA6Files
+ * Write overall Summary file from processed RMA6Files
  * @author huebler
  *
  */

@@ -18,16 +18,18 @@ import java.util.logging.Logger;
 
 import NCBI_MapReader.NCBI_MapReader;
 import NCBI_MapReader.NCBI_TreeReader;
+import RMA6Processor.ConcurrentRMA6Processor;
 import RMA6Processor.ConcurrentRMA6Scanner;
 import RMA6Processor.RMA6BlastCrawler;
+import RMA6Processor.RMA6Processor;
 import RMA6Processor.RMA6Scanner;
-import RMA6Processor.parallelFileNodeProcessor;
 import behaviour.Filter;
 import behaviour.Taxas;
 import jloda.util.PeakMemoryUsageMonitor;
 import utility.DirectoryCreator;
 import utility.InputParameterProcessor;
 import utility.ScanSummaryWriter;
+import utility.SummaryWriter2;
 /**
  * Essentially the Main Class of RMA Extractor is a concurrent Program
  * At start up passes all command line arguments into InputProcessor
@@ -77,8 +79,8 @@ public class RMAExtractor {
 		NCBI_MapReader mapReader = new NCBI_MapReader(inProcessor.getTreePath());
 		DirectoryCreator dCreator = new DirectoryCreator();
 		dCreator.process(inProcessor.getFilter(),inProcessor.getOutDir(),inProcessor.getBlastHits(),inProcessor.wantReads(), inProcessor.wantMeganSummaries());
-		List<Integer> taxIDs= new  ArrayList<Integer>();
-		
+		ArrayList<Integer> taxIDs= new  ArrayList<Integer>();
+		log.log(Level.INFO, "Setting up Phylogenetic Tree");
 		NCBI_TreeReader treeReader = new NCBI_TreeReader(inProcessor.getTreePath());
 		
 		//read in taxa list and convert to numbers
@@ -96,16 +98,29 @@ public class RMAExtractor {
 		
 		//intialize  thread pool executor
 		
-		log.log(Level.INFO, "Setting up Phylogenetic Tree");
+		
 		
 		// run normal mode if neither crawl nor scan are used
+
 		if(inProcessor.getFilter() != Filter.SCAN  && inProcessor.getFilter() != Filter.CRAWL ){
-    		parallelFileNodeProcessor fileProcessor = new parallelFileNodeProcessor(inProcessor,(ArrayList<Integer>) taxIDs,mapReader,treeReader, log, warning);
-    		fileProcessor.process();
+			executor=(ThreadPoolExecutor) Executors.newFixedThreadPool(inProcessor.getNumThreads());//intialize concurrent thread executor 
+			log.log(Level.INFO, "Using "+executor.getCorePoolSize()+"cores");
+			List<Future<RMA6Processor>> processedFiles = new ArrayList<>();
+    		for(String fileName : inProcessor.getFileNames()){
+    			File f = new File(fileName);
+					ConcurrentRMA6Processor task = new ConcurrentRMA6Processor(inProcessor,f.getParent() + "/",f.getName(), taxIDs, mapReader, treeReader, log, warning);
+						Future<RMA6Processor> future=executor.submit(task);
+						processedFiles.add(future);
+    		}//fileNames;
+	    // wait for all threads to finish here currently no concurrency errors or deadlocks but this would be the place where it would fall apart 
+    	destroy();
+	    SummaryWriter2 sumWriter = new SummaryWriter2(processedFiles,mapReader,inProcessor.getOutDir(), warning,inProcessor.getFilter()); 
+	    sumWriter.process();
 	    log.log(Level.INFO, "Writing Summary File");
 	  }else{ 
 			  if(inProcessor.getFilter() == Filter.SCAN && inProcessor.getFilter() != Filter.CRAWL){// run scan if crawl is not set
 			  executor=(ThreadPoolExecutor) Executors.newFixedThreadPool(inProcessor.getNumThreads());//intialize concurrent thread executor 
+			  log.log(Level.INFO, "Using ",executor.getCorePoolSize());
 			  List<Future<RMA6Scanner>> scannerList = new ArrayList<Future<RMA6Scanner>>();
 			  // every tree has its own copy of this now to avoid concurrency issues
 			  for(String fileName : inProcessor.getFileNames()){

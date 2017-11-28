@@ -223,6 +223,9 @@ public void setTurnedOn(boolean b){
 }
 
 //getters
+public int getTaxID(){
+	return taxID;
+}
 public String getCoveragePositions(){
 	return this.covPositions;
 }
