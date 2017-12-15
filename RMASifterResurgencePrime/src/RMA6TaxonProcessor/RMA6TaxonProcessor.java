@@ -3,7 +3,7 @@ package RMA6TaxonProcessor;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
-
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
@@ -291,12 +291,16 @@ protected void calculateReadLengthDistribution(){
 	HashMap<Integer,Integer> intervals = new HashMap<Integer,Integer>();
 	for(int i = 25;i<=200;i+=5)
 		intervals.put(i, 0);
-	if(lengths.size() > 0){
+	if(lengths.size() > 0 && lengths!=null){
 		for(int i : lengths){// round to the closest number dividable by 5 to get the intervals
-			stats.addValue(i);
-			int value = intervals.get(round(i, 5));
-			value++;
-			intervals.replace(round(i, 5), value);
+			if(i>=25&&i<=200){//check that lenghts are in interval
+				stats.addValue(i);
+				int value = intervals.get(round(i, 5));
+				value++;
+				intervals.replace(round(i, 5), value);
+			}else{
+				warning.log(Level.WARNING, taxName+"has reads that fall outisde 25-200 target range");
+			}
 		}
 		String rlStat = taxName;
 		

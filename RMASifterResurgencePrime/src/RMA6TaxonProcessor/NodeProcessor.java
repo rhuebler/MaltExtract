@@ -125,8 +125,9 @@ public class NodeProcessor{
 				}
 				IReadBlockIterator classIt  = new ReadBlockIterator(list, new ReadBlockGetterRMA6(rma6File, true, true, (float) 1.0,(float) 100.00,false,true));
 				if(!classIt.hasNext()){ // check if reads are assigned to TaxID if not print to console and skip and set all values to default
-					if(verbose)
-						warning.log(Level.WARNING,"TaxID: " + taxID +  " not assigned in File " + fileName+"\n");
+					if(verbose){
+						warning.log(Level.WARNING,"TaxID: " + taxName +  " not assigned in File " + fileName+"\n");
+					}
 				}else{
 					if(verbose)
 						log.log(Level.INFO,"Processing Taxon "+taxName+" in File " +fileName);
