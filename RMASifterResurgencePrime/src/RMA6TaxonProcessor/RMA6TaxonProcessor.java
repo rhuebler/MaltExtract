@@ -291,9 +291,12 @@ protected void calculateReadLengthDistribution(){
 	HashMap<Integer,Integer> intervals = new HashMap<Integer,Integer>();
 	for(int i = 25;i<=200;i+=5)
 		intervals.put(i, 0);
-	if(lengths.size() > 0 && lengths!=null){
+	if(lengths.size() == 0 && lengths == null){
+		warning.log(Level.WARNING, taxName+"no read lenghts");
+	}
+	else{//check that lengths are set and filled
 		for(int i : lengths){// round to the closest number dividable by 5 to get the intervals
-			if(i>=25&&i<=200){//check that lenghts are in interval
+			if(i>=25 && i<=200){//check that lenghts are in interval
 				stats.addValue(i);
 				int value = intervals.get(round(i, 5));
 				value++;
