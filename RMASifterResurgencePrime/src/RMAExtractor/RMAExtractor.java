@@ -15,6 +15,7 @@ import java.util.logging.FileHandler;
 import java.util.logging.Handler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.logging.SimpleFormatter;
 
 import NCBI_MapReader.NCBI_MapReader;
 import NCBI_MapReader.NCBI_TreeReader;
@@ -47,7 +48,7 @@ public class RMAExtractor {
 	 * @throws none thrown all caught
 	 */
 	private static final Logger log = Logger.getLogger(RMAExtractor.class.getName());
-	private static final Logger warning = Logger.getLogger("Error");
+	private static final Logger warning = Logger.getLogger(RMAExtractor.class.getName());
 	private static ThreadPoolExecutor executor;
 	private static void destroy(){
 		executor.shutdown();
@@ -58,22 +59,25 @@ public class RMAExtractor {
 		InputParameterProcessor inProcessor = new InputParameterProcessor(args ,log, warning);
 		new File(inProcessor.getOutDir()).mkdirs();// make outdir before log handlers
 		Handler handler = null;
+		SimpleFormatter sf = new SimpleFormatter();
+		
+		
 		//Initialize Output Handler and Error Handler
 		try {
 			handler = new FileHandler(inProcessor.getOutDir()+"log.txt");
+			handler.setFormatter(sf);
 		} catch (SecurityException | IOException e) {
 			e.printStackTrace();
 		}
 		log.addHandler(handler);
-		
 		Handler error = null;
 		try {
 			error = new FileHandler(inProcessor.getOutDir()+"error.txt");
+			error.setFormatter(sf);
 		} catch (SecurityException | IOException e) {
 			 warning.log(Level.SEVERE,"Interuption",e);
 		}
 		warning.addHandler(error);
-		
 		//Set taxon and ID maps
 		log.log(Level.INFO, "Setting up Taxon Name and Taxon ID maps");
 		NCBI_MapReader mapReader = new NCBI_MapReader(inProcessor.getTreePath());
