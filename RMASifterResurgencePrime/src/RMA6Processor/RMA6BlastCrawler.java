@@ -6,28 +6,27 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
 import java.util.concurrent.Future;
 import NCBI_MapReader.NCBI_MapReader;
 import NCBI_MapReader.NCBI_TreeReader;
 import RMA6TaxonProcessor.ConcurrentMatchProcessorCrawler;
 import RMA6TaxonProcessor.MatchProcessorCrawler;
+import RMAAlignment.Alignment;
 import behaviour.OutputType;
 import megan.rma6.ClassificationBlockRMA6;
 import megan.rma6.RMA6File;
 import utility.ConcurrentNodeMatchSorter;
 import utility.InputParameterProcessor;
-import utility.NodeMatchSorter;
 
 public class RMA6BlastCrawler {
 	/**
@@ -51,7 +50,7 @@ public class RMA6BlastCrawler {
 	private ArrayList<String> percentIdentities = new ArrayList<String>();
 	private ArrayList<String> readLengthDistributions = new ArrayList<String>();
 	private ArrayList<String> readDistributions = new ArrayList<String>();
-	private ConcurrentHashMap<String, MatchProcessorCrawler> concurrentMap = new ConcurrentHashMap<String, MatchProcessorCrawler>();
+	private  ConcurrentHashMap<Integer,ConcurrentLinkedDeque<Alignment>> concurrentMap  = new ConcurrentHashMap<Integer,ConcurrentLinkedDeque<Alignment>>();
 	private int numThreads;
 	private ThreadPoolExecutor executor;
 	private void destroy(){
@@ -179,38 +178,17 @@ public class RMA6BlastCrawler {
 				idsToProcess.add(id);
 		idsToProcess.addAll(treeReader.getParents(taxID));
 		  executor=(ThreadPoolExecutor) Executors.newFixedThreadPool(numThreads);
-		  ArrayList<Future<NodeMatchSorter>> futureList = new  ArrayList<Future<NodeMatchSorter>>(idsToProcess.size());
+		 
 		for(Integer id : idsToProcess){
-			ConcurrentNodeMatchSorter cocurrentNMS = new ConcurrentNodeMatchSorter(inDir+fileName, id, log, warning, wantReads, speciesName, mapReader);
-			Future<NodeMatchSorter> future = executor.submit(cocurrentNMS);
-			futureList.add(future);
+			ConcurrentNodeMatchSorter cocurrentNMS = new ConcurrentNodeMatchSorter(inDir+fileName, id, log, warning, wantReads, speciesName, mapReader, concurrentMap);
+			executor.submit(cocurrentNMS);
 		}// for all IDs
 		destroy();
-		for(Future<NodeMatchSorter> futureNMS:futureList){
-			NodeMatchSorter nms = null;
-			try {
-				nms = futureNMS.get();
-			} catch (InterruptedException | ExecutionException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-			HashMap<String, MatchProcessorCrawler> cHM= nms.returnCHashMap();
-			for(String id:cHM.keySet()){
-				System.out.println(id);
-				if(concurrentMap.contains(id)){
-					MatchProcessorCrawler mpc = concurrentMap.get(id);
-					mpc.merge(cHM.get(id));
-					 concurrentMap.replace(id,mpc);
-				}else{
-					 concurrentMap.put(id, cHM.get(id));
-				}
-			}
-		}
-		futureList.clear();
+		
 		executor=(ThreadPoolExecutor) Executors.newFixedThreadPool(numThreads);
 		ArrayList<Future<MatchProcessorCrawler>> futureMPCList = new ArrayList<Future<MatchProcessorCrawler>>(concurrentMap.keySet().size());
-		for(String key :concurrentMap.keySet()){
-			ConcurrentMatchProcessorCrawler cmpc = new ConcurrentMatchProcessorCrawler(concurrentMap.get(key));
+		for(int key :concurrentMap.keySet()){
+			ConcurrentMatchProcessorCrawler cmpc = new ConcurrentMatchProcessorCrawler(concurrentMap.get(key), key, log, warning, wantReads, mapReader);
 			Future<MatchProcessorCrawler> future = executor.submit(cmpc);
 			futureMPCList.add(future);
 		}

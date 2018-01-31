@@ -1,11 +1,27 @@
 package utility;
 
-import java.util.concurrent.Callable;
+import java.io.IOException;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentLinkedDeque;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import NCBI_MapReader.NCBI_MapReader;
+import RMAAlignment.Alignment;
+import jloda.util.ListOfLongs;
+import megan.data.IMatchBlock;
+import megan.data.IReadBlock;
+import megan.data.IReadBlockIterator;
+import megan.data.ReadBlockIterator;
+import megan.rma6.ClassificationBlockRMA6;
+import megan.rma6.RMA6File;
+import megan.rma6.ReadBlockGetterRMA6;
 
-
-public class ConcurrentNodeMatchSorter implements Callable<NodeMatchSorter> {
+/**
+ * is desinged to fill a hashmap with all alignments that fit a given species name
+ * @author huebler
+ *
+ */
+public class ConcurrentNodeMatchSorter implements Runnable {
 	private String filePath="";
 	int id =0;
 	Logger log;
@@ -14,8 +30,9 @@ public class ConcurrentNodeMatchSorter implements Callable<NodeMatchSorter> {
 	double topPercent;
 	String speciesName;
 	NCBI_MapReader mapReader;
+	 ConcurrentHashMap<Integer,ConcurrentLinkedDeque<Alignment>> concurrentMap;
 	public ConcurrentNodeMatchSorter(String filePath, int id,Logger log, Logger warning,boolean wantReads,
-	String speciesName,NCBI_MapReader mapReader){
+	String speciesName,NCBI_MapReader mapReader, ConcurrentHashMap<Integer,ConcurrentLinkedDeque<Alignment>> map){
 		this.filePath = filePath;
 		this.id = id;
 		this.warning = warning;
@@ -23,16 +40,67 @@ public class ConcurrentNodeMatchSorter implements Callable<NodeMatchSorter> {
 		this.mapReader=mapReader;
 		this.log = log;
 		this.wantReads =wantReads;
+		concurrentMap = map;
 	}
 	
-	public NodeMatchSorter call() {
-		NodeMatchSorter nodeMatchSorter = new NodeMatchSorter(filePath, id, log, warning, wantReads, speciesName, mapReader);
-		try{
-			nodeMatchSorter.processNode();
+	
+	private String getName(int taxId){
+		String name;
+		if(mapReader.getNcbiIdToNameMap().get(taxId) != null)
+			name = mapReader.getNcbiIdToNameMap().get(taxId);
+		else
+			name = "unassignedName";
+		return name;
+	}
+	@Override
+	public void run() {
+		try(RMA6File rma6File = new RMA6File(filePath, "r")){
+			ListOfLongs list = new ListOfLongs();
+			Long location = rma6File.getFooterSectionRMA6().getStartClassification("Taxonomy");
+			if (location != null) {
+			   ClassificationBlockRMA6 classificationBlockRMA6 = new ClassificationBlockRMA6("Taxonomy");
+			   classificationBlockRMA6.read(location, rma6File.getReader());
+			   if (classificationBlockRMA6.getSum(id) > 0) {
+				   classificationBlockRMA6.readLocations(location, rma6File.getReader(), id, list);
+			   }
+			 }
 			
-		}catch(Exception e){
-			e.printStackTrace();
+			IReadBlockIterator classIt  = new ReadBlockIterator(list, new ReadBlockGetterRMA6(rma6File, true, true, (float) 1.0,(float) 100.00,false,true));
+			
+			// iterate through all nodes and store information in strain Map to process and retrieve at later use
+			while(classIt.hasNext()){
+				IReadBlock current = classIt.next();
+				IMatchBlock[] blocks = current.getMatchBlocks();
+				String readName = current.getReadName();
+				String readSequence = current.getReadSequence();
+				int readLength = current.getReadLength();
+				float topScore = blocks[0].getBitScore();
+				for(int i = 0; i< blocks.length;i++){
+					if((blocks[i].getBitScore()/topScore) < 1-topPercent){
+						break;}	
+					String name = getName(blocks[i].getTaxonId());
+					int cid= blocks[i].getTaxonId();
+					if(name.contains(speciesName)){
+						Alignment al = new Alignment();
+						al.setText(blocks[i].getText());
+						al.processText();
+						al.setTaxID(blocks[i].getTaxonId());
+						al.setPIdent(blocks[i].getPercentIdentity());
+						al.setReadName(readName);
+						al.setReadLength(readLength);
+						al.setAcessionNumber(blocks[i].getTextFirstWord());	
+						al.setSequence(readSequence);
+						al.setTopAlignment(true);
+						ConcurrentLinkedDeque<Alignment> cld=concurrentMap.computeIfAbsent(cid,key->new ConcurrentLinkedDeque<>());
+						cld.add(al);
+						break;
+					}
+				}
+			}	
+			classIt.close();
+			rma6File.close();
+		}catch(IOException io){
+			warning.log(Level.SEVERE,"Can not locate or read File" ,io);
 		}
-		return nodeMatchSorter;
 	}
 }

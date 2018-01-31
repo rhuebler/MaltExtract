@@ -2,6 +2,7 @@ package RMA6TaxonProcessor;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.logging.Logger;
 
 import NCBI_MapReader.NCBI_MapReader;
@@ -12,7 +13,7 @@ import behaviour.Filter;
  * RMA6 processor that automatically removes PCR duplicated and stacked reads Essentially it gets the alignment block 
  * from a read and than processes the best scoring percent of the alignment while sorting them by reference sequence
  * essentially first duplicate and stacking reads are marked and discarded and then authenticity criteria calculated
- * for the remaining reads
+ * for the remaining reads this verion is specific to the crawl function and can process a list of alignments
  * @author huebler
  *
  */
@@ -23,9 +24,7 @@ public class MatchProcessorCrawler extends RMA6TaxonProcessor {
 	protected boolean turnOffDestacking = false;
 	protected boolean turnOffDeDuping = false;
 	//constructors and set values
-	public MatchProcessorCrawler(Integer id, double pID, NCBI_MapReader reader, boolean v, Logger log, Logger warning,double tp,int mL, Filter behave) {
-		super(id, pID, reader, v, log, warning,tp,mL, behave);
-	}
+
 	public MatchProcessorCrawler(int id ,double pID, NCBI_MapReader reader,
 			boolean v,Logger log, Logger warning, boolean reads,double tp,int mL,boolean wantAls,boolean turnOffDestacking,boolean turnOffDeDuping,Filter behave) {
 		super(id,pID, reader, v, log, warning,tp,mL, behave);
@@ -35,6 +34,11 @@ public class MatchProcessorCrawler extends RMA6TaxonProcessor {
 		this.turnOffDeDuping = turnOffDeDuping;
 	}
 	//process each Matchblock
+	public void processDLQlist(ConcurrentLinkedDeque<Alignment> concurrentLinkedDeque) {
+		for(Alignment al: concurrentLinkedDeque) {
+			processMatchBlock(al);
+		}
+	}
 	public void processMatchBlock(Alignment al){
 			//System.out.println("Here");
 				if(minPIdent <= al.getPIdent()){ // check for minPercentIdentity
