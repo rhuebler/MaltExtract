@@ -79,7 +79,6 @@ public class ConcurrentNodeMatchSorter implements Runnable {
 						break;}	
 					String name = getName(blocks[i].getTaxonId());
 					int cid= blocks[i].getTaxonId();
-					System.out.println(name);
 					if(name.contains(speciesName)){
 						Alignment al = new Alignment();
 						al.setText(blocks[i].getText());
@@ -93,8 +92,7 @@ public class ConcurrentNodeMatchSorter implements Runnable {
 						al.setTopAlignment(true);
 						ConcurrentLinkedDeque<Alignment> cld=concurrentMap.computeIfAbsent(cid,key->new ConcurrentLinkedDeque<>());
 						cld.add(al);
-						System.out.println("FOUND Match");
-						break;
+						i=blocks.length;
 					}
 				}
 			}	
