@@ -160,9 +160,9 @@ public class InputParameterProcessor {
     	    Option option_Verbose = Option.builder("v").longOpt("verbose").optionalArg(true).desc("How much output to print to screen").build();
     	    Option option_Alignment = Option.builder().longOpt("matches").optionalArg(true).desc("Retrieve Alignments").build();
     	    Option option_Reads = Option.builder().longOpt("reads").optionalArg(true).desc("Retrieve Reads").build();
-    	    Option option_Crawl = Option.builder().longOpt("crawl").optionalArg(true).desc("Use all alignments for damage and edit distance").build();
+    	   // Option option_Crawl = Option.builder().longOpt("crawl").optionalArg(true).desc("Use all alignments for damage and edit distance").build();
     	    Option option_minComplexity = Option.builder().longOpt("minComp").hasArg().argName("minComplexity").optionalArg(true).desc("Use minimum complexity").build();
-    	    Option option_List = Option.builder().longOpt("list").hasArg().argName("list").optionalArg(true).desc("Decide on which build in list to use (not enabled yet)").build();
+    	   // Option option_List = Option.builder().longOpt("list").hasArg().argName("list").optionalArg(true).desc("Decide on which build in list to use (not enabled yet)").build();
     	    Option option_MeganSummaries = Option.builder().longOpt("meganSummary").hasArg().argName("meganSummary").optionalArg(true).desc("Return Megan Summary Files").build();
     	    Option option_DeStackOff = Option.builder().longOpt("destackingOff").hasArg().argName("turn off destacking").optionalArg(true).desc("Turn Off automated stacked Read Removal only useful in >1 coverage data").build();
     	    Option option_DeDupOff = Option.builder().longOpt("dupRemOff").hasArg().argName("turn off duplicate removal").optionalArg(true).desc("Turn Off automated pcr duplicate removal useful in >1 coverage data").build();
@@ -188,8 +188,8 @@ public class InputParameterProcessor {
     	    options.addOption(option_Path);
     	    options.addOption(option_Verbose);
     	    options.addOption(option_Reads);
-    	    options.addOption(option_Crawl);
-    	    options.addOption(option_List);
+    	    //options.addOption(option_Crawl);
+    	    //options.addOption(option_List);
     	    options.addOption(option_MeganSummaries);
     	    options.addOption(option_DeStackOff);
     	    options.addOption(option_DeDupOff);

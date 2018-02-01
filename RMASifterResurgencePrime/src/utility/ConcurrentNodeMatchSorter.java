@@ -66,7 +66,6 @@ public class ConcurrentNodeMatchSorter implements Runnable {
 			 }
 			
 			IReadBlockIterator classIt  = new ReadBlockIterator(list, new ReadBlockGetterRMA6(rma6File, true, true, (float) 1.0,(float) 100.00,false,true));
-			
 			// iterate through all nodes and store information in strain Map to process and retrieve at later use
 			while(classIt.hasNext()){
 				IReadBlock current = classIt.next();
@@ -80,6 +79,7 @@ public class ConcurrentNodeMatchSorter implements Runnable {
 						break;}	
 					String name = getName(blocks[i].getTaxonId());
 					int cid= blocks[i].getTaxonId();
+					System.out.println(name);
 					if(name.contains(speciesName)){
 						Alignment al = new Alignment();
 						al.setText(blocks[i].getText());
@@ -93,6 +93,7 @@ public class ConcurrentNodeMatchSorter implements Runnable {
 						al.setTopAlignment(true);
 						ConcurrentLinkedDeque<Alignment> cld=concurrentMap.computeIfAbsent(cid,key->new ConcurrentLinkedDeque<>());
 						cld.add(al);
+						System.out.println("FOUND Match");
 						break;
 					}
 				}

@@ -23,9 +23,14 @@ import RMA6TaxonProcessor.ConcurrentMatchProcessorCrawler;
 import RMA6TaxonProcessor.MatchProcessorCrawler;
 import RMAAlignment.Alignment;
 import behaviour.OutputType;
+import jloda.util.ListOfLongs;
+import megan.data.IMatchBlock;
+import megan.data.IReadBlock;
+import megan.data.IReadBlockIterator;
+import megan.data.ReadBlockIterator;
 import megan.rma6.ClassificationBlockRMA6;
 import megan.rma6.RMA6File;
-import utility.ConcurrentNodeMatchSorter;
+import megan.rma6.ReadBlockGetterRMA6;
 import utility.InputParameterProcessor;
 
 public class RMA6BlastCrawler {
@@ -177,14 +182,63 @@ public class RMA6BlastCrawler {
 		for(Integer id : treeReader.getAllStrains(taxID, getAllKeys(inDir+fileName)))
 				idsToProcess.add(id);
 		idsToProcess.addAll(treeReader.getParents(taxID));
-		  executor=(ThreadPoolExecutor) Executors.newFixedThreadPool(numThreads);
-		 
+		executor=(ThreadPoolExecutor) Executors.newFixedThreadPool(numThreads);
+		
 		for(Integer id : idsToProcess){
-			ConcurrentNodeMatchSorter cocurrentNMS = new ConcurrentNodeMatchSorter(inDir+fileName, id, log, warning, wantReads, speciesName, mapReader, concurrentMap);
-			executor.submit(cocurrentNMS);
+			try(RMA6File rma6File = new RMA6File(inDir+fileName, "r")){
+				ListOfLongs list = new ListOfLongs();
+				Long location = rma6File.getFooterSectionRMA6().getStartClassification("Taxonomy");
+				if (location != null) {
+				   ClassificationBlockRMA6 classificationBlockRMA6 = new ClassificationBlockRMA6("Taxonomy");
+				   classificationBlockRMA6.read(location, rma6File.getReader());
+				   if (classificationBlockRMA6.getSum(id) > 0) {
+					   classificationBlockRMA6.readLocations(location, rma6File.getReader(), id, list);
+				   }
+				 }
+				
+				IReadBlockIterator classIt  = new ReadBlockIterator(list, new ReadBlockGetterRMA6(rma6File, true, true, (float) 1.0,(float) 100.00,false,true));
+				// iterate through all nodes and store information in strain Map to process and retrieve at later use
+				while(classIt.hasNext()){
+					IReadBlock current = classIt.next();
+					IMatchBlock[] blocks = current.getMatchBlocks();
+					String readName = current.getReadName();
+					String readSequence = current.getReadSequence();
+					int readLength = current.getReadLength();
+					float topScore = blocks[0].getBitScore();
+					for(int i = 0; i< blocks.length;i++){
+						if((blocks[i].getBitScore()/topScore) < 1-0.01){
+							break;}	
+						String name = getName(blocks[i].getTaxonId());
+						int cid= blocks[i].getTaxonId();
+						if(name.contains(speciesName)){
+							Alignment al = new Alignment();
+							al.setText(blocks[i].getText());
+							al.processText();
+							al.setTaxID(blocks[i].getTaxonId());
+							al.setPIdent(blocks[i].getPercentIdentity());
+							al.setReadName(readName);
+							al.setReadLength(readLength);
+							al.setAcessionNumber(blocks[i].getTextFirstWord());	
+							al.setSequence(readSequence);
+							al.setTopAlignment(true);
+							ConcurrentLinkedDeque<Alignment> cld=concurrentMap.computeIfAbsent(cid,key->new ConcurrentLinkedDeque<>());
+							cld.add(al);
+							break;
+						}
+					}
+				}	
+				classIt.close();
+				rma6File.close();
+			}catch(IOException io){
+				warning.log(Level.SEVERE,"Can not locate or read File" ,io);
+			}
+//			try {
+//				executor.submit(new ConcurrentNodeMatchSorter(inDir+fileName, id, log, warning, wantReads, speciesName, mapReader, concurrentMap));
+//			}catch(Exception e) {
+//				e.p;
+//			}
 		}// for all IDs
 		destroy();
-		
 		executor=(ThreadPoolExecutor) Executors.newFixedThreadPool(numThreads);
 		ArrayList<Future<MatchProcessorCrawler>> futureMPCList = new ArrayList<Future<MatchProcessorCrawler>>(concurrentMap.keySet().size());
 		for(int key :concurrentMap.keySet()){
@@ -193,6 +247,7 @@ public class RMA6BlastCrawler {
 			futureMPCList.add(future);
 		}
 		destroy();
+		
 		for(Future<MatchProcessorCrawler> future :futureMPCList)
 		{// write output here 
 			MatchProcessorCrawler matchPC=null;
@@ -222,6 +277,6 @@ public class RMA6BlastCrawler {
 		writeOutput(damageLines, outDir,OutputType.DAMAGE, 0);
 		if(wantReads){
 			writeOutput(reads,outDir,OutputType.READS,taxID);
-			}
+		}
 	}
 }
