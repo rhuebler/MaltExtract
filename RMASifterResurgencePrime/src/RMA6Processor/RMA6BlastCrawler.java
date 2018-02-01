@@ -255,7 +255,7 @@ public class RMA6BlastCrawler {
 				matchPC = future.get();
 			} catch (InterruptedException | ExecutionException e) {
 				// TODO Auto-generated catch block
-				e.printStackTrace();
+				warning.log(Level.SEVERE, "Interuppted Exception", e);
 			}
 			coverageHistograms.add(matchPC.getCoverageLine());
 			coveragePositions.add(matchPC.getCoveragePositions());
