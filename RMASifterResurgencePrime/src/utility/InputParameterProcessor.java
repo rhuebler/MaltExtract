@@ -384,7 +384,7 @@ public class InputParameterProcessor {
     	        	this.downsampling = false;
     	        }
     	        if(commandLine.hasOption("h")){////help
-    	        	String header = "RMAExtractor beta 1.1";
+    	        	String header = "RMAExtractor beta 1.3";
     	    	    String footer = "In case you encounter an error drop an email to huebler@shh.mpg.de with a useful description";
     	    	    HelpFormatter formatter = new HelpFormatter();
     	    	    formatter.setWidth(500);

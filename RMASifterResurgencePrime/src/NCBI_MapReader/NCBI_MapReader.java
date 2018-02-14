@@ -15,6 +15,10 @@ import java.util.Scanner;
 import utility.ResourceFinder;
 public class NCBI_MapReader {
 	/**
+	 * Is used to read the NCBI map fie and generate two hashmaps that 
+	 * map the taxonomy ID to the taxonomy name and the name to the taxonomy ID
+	 * which is necessary to interface human understandable species names to the 
+	 * taxonomy IDs used internally to exit RMA6 files
 	 * @param String directory/to/file
 	 * @throws none thrown all caught
 	 * @return return two hashmaps with IDs to name and Name to ID

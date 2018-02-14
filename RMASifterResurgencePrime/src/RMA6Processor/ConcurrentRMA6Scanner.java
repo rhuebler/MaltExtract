@@ -8,6 +8,8 @@ import NCBI_MapReader.NCBI_TreeReader;
 import behaviour.Taxas;
 /**
  * Concurrent version of RMA6Scanner that allows for one to run on each thread
+ * While this speeds up the RMA6Scanner the Scanner itself is already very fast,
+ * this basically exits for consistencies sake
  * @author huebler
  *
  */

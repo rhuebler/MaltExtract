@@ -7,7 +7,6 @@ import java.util.logging.Logger;
 import NCBI_MapReader.NCBI_MapReader;
 import RMAAlignment.Alignment;
 import RMAAlignment.CompositionMap;
-import Read.Read;
 import behaviour.Filter;
 import megan.data.IMatchBlock;
 /**
@@ -24,7 +23,6 @@ public class ExperimentalRMA6Destacker extends RMA6TaxonProcessor {
 	protected boolean wantAlignments = false;
 	protected boolean turnOffDestacking = false;
 	protected boolean turnOffDeDuping = false;
-	protected ArrayList<Read> reads = new ArrayList<Read>();
 	//construvters and set values
 	public ExperimentalRMA6Destacker(Integer id, double pID, NCBI_MapReader reader, boolean v, Logger log, Logger warning,double tp,int mL, Filter behave) {
 		super(id, pID, reader, v, log, warning,tp,mL, behave);

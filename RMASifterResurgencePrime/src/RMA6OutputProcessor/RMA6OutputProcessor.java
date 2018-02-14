@@ -21,6 +21,7 @@ import behaviour.OutputType;
  * This class is used to retrieve all outputs from RMA6TaxonProcessors
  * Writes RMA6Distributions. Coverage Histograms, damage mismatch Histograms 
  * Edit Histograms and Percent Identity Histograms and potentially Reads
+ * The Enum OutputType is used to channel the correct output into the correct files
  * @author huebler
  *
  */

@@ -1,5 +1,9 @@
 package behaviour;
-
+/**
+ * Enum that is used to control the output the RMA6 Output processor
+ * @author huebler
+ *
+ */
 public enum OutputType {
 	POS_COVERED, READLENGTH_DIST, READLENGTH_STATISTICS, READS, FILTER, ALIGNMENTS, PERCENTIDENTITY, 
 	COVERAGE, EDITDISTANCE, ADDIDTIONALENTRIES, ALIGNMENTDISTRIBUTION, COVERAGEHISTOGRAM, DAMAGE;

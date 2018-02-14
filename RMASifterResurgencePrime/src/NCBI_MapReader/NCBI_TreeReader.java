@@ -15,9 +15,9 @@ import utility.ResourceFinder;
  * Process NCBI tre File with archeoptrix.jar
  * Process tree find child nodes to input taxID
  * only keep child IDs that are assigned in current RMA6 file 
- * Unfortunately does Malt only store taxIds of nodes that have at least one assigned 
+ * Unfortunately Malt does only store taxIds of nodes that have at least one assigned 
  * read therefore the number of nodes cannot be reduced at every level for the risk of losing 
- * a branch. Instead a more crawling like approach is currently needed that allows to skip one taxonomic evel or two 
+ * a branch. Instead a more crawling like approach is currently needed that allows to skip one taxonomic Level or two 
  * @author huebler
  *
  */

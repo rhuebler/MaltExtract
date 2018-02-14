@@ -8,7 +8,10 @@ import NCBI_MapReader.NCBI_TreeReader;
 import utility.InputParameterProcessor;
 
 /**
- * Concurrent class of RMA6 Processor that allows for one RMA6Processor per thread
+ * Concurrent class of RMA6 Processor that allows one RMA6Processor to run per thread
+ * which speeds up the process of analyzing multiple files. This seems to be the best strategy for
+ * parallelization. Trying to multi-thread the process of analyzing a node severly slows down Maltextract
+ * So up to date this is the fasteest way to do it
  * @author huebler
  *
  */

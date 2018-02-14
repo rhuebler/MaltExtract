@@ -28,7 +28,7 @@ import utility.SummaryWriter;
 /**
  * take care of extracting all the information for one RMA6 file and a List of taxons
  * contains functions to write its own output for supplementary information
- * uses several taxons processors to process RMAFiles in different ways to reflect 
+ * uses several taxon processors to process RMAFiles in different ways to reflect 
  * the user filter choice and make adding new filters more accessible 
  * @author huebler
  *

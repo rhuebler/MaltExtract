@@ -1,6 +1,6 @@
 package behaviour;
 /**
- * Enum that is used to control behaviour
+ * Enum that is sets a behaviour for MaltExtract
  * @author huebler
  *
  */
