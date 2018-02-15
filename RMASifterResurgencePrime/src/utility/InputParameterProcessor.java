@@ -145,28 +145,28 @@ public class InputParameterProcessor {
 	private void process(String[] parameters){	
     	 CommandLine commandLine;
     	 	// Short Flags Are necessary parameters that are necessary for any run
-    	    Option option_Input = Option.builder("i").longOpt("input").argName("Path/to/inDir or RMA6Files").hasArgs().desc("Specify input directory or files").build();
-    	    Option option_Output = Option.builder("o").longOpt("output").argName("Path/to/outDir").hasArg().desc("Specify out directory").build();
-    	    Option option_Taxons = Option.builder("t").longOpt("taxa").argName("Path/to/taxFile or Taxon in \"\"").hasArgs().desc("Target species or list of targets").build();
+    	    Option option_Input = Option.builder("i").longOpt("input").argName("Input").hasArgs().desc("Specify input directory or RMA6 files").build();
+    	    Option option_Output = Option.builder("o").longOpt("output").argName("Outdir").hasArg().desc("Specify out directory").build();
+    	    Option option_Taxons = Option.builder("t").longOpt("taxa").argName("Taxons").hasArgs().desc("Target species or List of targets").build();
     	    
     	    // long flags
-    	    Option option_Threads = Option.builder("p").longOpt("threads").argName("1..maxNumberOfCores").hasArg().optionalArg(true).desc("How many cores to use?").build();		
-    	    Option option_TopPercent = Option.builder("a").longOpt("top").argName("0.0-0.99").hasArg().optionalArg(true).desc("Use top 0.XX percent").build();
-    	    Option option_Filter = Option.builder("f").longOpt("filter").argName("default, ancient, def_anc, scan").optionalArg(true).hasArg().desc("Use chosen filter").build();
-    	    Option option_MaxLength = Option.builder().longOpt("maxReadLength").argName("maxReadLength").hasArg().optionalArg(true).desc("Set maximum read length").build();
-    	    Option option_minPercentIdent = Option.builder().longOpt("minPI").argName("minPI").hasArg().optionalArg(true).desc("Set minimum percent identity to XX.X").build(); 
+    	    Option option_Threads = Option.builder("p").longOpt("threads").argName("Integer").hasArg().optionalArg(true).desc("How many cores to use?").build();		
+    	    Option option_TopPercent = Option.builder("a").longOpt("top").argName("Double").hasArg().optionalArg(true).desc("Use top scoring 0.XX of alignments by defualt 0.01").build();
+    	    Option option_Filter = Option.builder("f").longOpt("filter").argName("String").optionalArg(true).hasArg().desc("Use chosen filter complete, ancient, crawl, scan").build();
+    	    Option option_MaxLength = Option.builder().longOpt("maxReadLength").argName("Integer").hasArg().optionalArg(true).desc("Set maximum read length").build();
+    	    Option option_minPercentIdent = Option.builder().longOpt("minPI").argName("Double").hasArg().optionalArg(true).desc("Set minimum percent identity to XX.X").build(); 
     	    Option option_Help = Option.builder("h").longOpt("help").optionalArg(true).desc("Print Help").build();
-    	    Option option_Path = Option.builder("r").longOpt("resources").hasArg().argName("path").optionalArg(true).desc("Set path to required ncbi files").build();
+    	    Option option_Path = Option.builder("r").longOpt("resources").hasArg().argName("String").optionalArg(true).desc("Set path to required ncbi files").build();
     	    Option option_Verbose = Option.builder("v").longOpt("verbose").optionalArg(true).desc("How much output to print to screen").build();
     	    Option option_Alignment = Option.builder().longOpt("matches").optionalArg(true).desc("Retrieve Alignments").build();
     	    Option option_Reads = Option.builder().longOpt("reads").optionalArg(true).desc("Retrieve Reads").build();
     	   // Option option_Crawl = Option.builder().longOpt("crawl").optionalArg(true).desc("Use all alignments for damage and edit distance").build();
-    	    Option option_minComplexity = Option.builder().longOpt("minComp").hasArg().argName("minComplexity").optionalArg(true).desc("Use minimum complexity").build();
+    	    Option option_minComplexity = Option.builder().longOpt("minComp").hasArg().argName("Double").optionalArg(true).desc("Use minimum complexity").build();
     	   // Option option_List = Option.builder().longOpt("list").hasArg().argName("list").optionalArg(true).desc("Decide on which build in list to use (not enabled yet)").build();
-    	    Option option_MeganSummaries = Option.builder().longOpt("meganSummary").hasArg().argName("meganSummary").optionalArg(true).desc("Return Megan Summary Files").build();
-    	    Option option_DeStackOff = Option.builder().longOpt("destackingOff").hasArg().argName("turn off destacking").optionalArg(true).desc("Turn Off automated stacked Read Removal only useful in >1 coverage data").build();
-    	    Option option_DeDupOff = Option.builder().longOpt("dupRemOff").hasArg().argName("turn off duplicate removal").optionalArg(true).desc("Turn Off automated pcr duplicate removal useful in >1 coverage data").build();
-    	    Option option_Downsampling = Option.builder().longOpt("downSampOff").hasArg().argName("turn off downsampling").optionalArg(true).desc("Turn Off automatic downsampling on nodes with more than 10.000 assigned reads").build();
+    	    Option option_MeganSummaries = Option.builder().longOpt("meganSummary").optionalArg(true).desc("Return Megan Summary Files").build();
+    	    Option option_DeStackOff = Option.builder().longOpt("destackingOff").optionalArg(true).desc("Turn Off automated stacked Read Removal only useful in >1 coverage data").build();
+    	    Option option_DeDupOff = Option.builder().longOpt("dupRemOff").optionalArg(true).desc("Turn Off automated pcr duplicate removal useful in >1 coverage data").build();
+    	    Option option_Downsampling = Option.builder().longOpt("downSampOff").optionalArg(true).desc("Turn Off automatic downsampling on nodes with more than 10.000 assigned reads").build();
     	    Options options = new Options();
     	    
     	    // add all parameters to the parser
@@ -384,7 +384,7 @@ public class InputParameterProcessor {
     	        	this.downsampling = false;
     	        }
     	        if(commandLine.hasOption("h")){////help
-    	        	String header = "RMAExtractor beta 1.3";
+    	        	String header = "MaltExtract beta version 1.3";
     	    	    String footer = "In case you encounter an error drop an email to huebler@shh.mpg.de with a useful description";
     	    	    HelpFormatter formatter = new HelpFormatter();
     	    	    formatter.setWidth(500);
