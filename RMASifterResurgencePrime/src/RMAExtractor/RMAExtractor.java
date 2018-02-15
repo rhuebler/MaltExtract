@@ -30,7 +30,7 @@ import jloda.util.PeakMemoryUsageMonitor;
 import utility.DirectoryCreator;
 import utility.InputParameterProcessor;
 import utility.ScanSummaryWriter;
-import utility.SummaryWriter2;
+import utility.SummaryWriter;
 /**
  * Essentially the Main Class of RMA Extractor is a concurrent Program
  * At start up passes all command line arguments into InputProcessor
@@ -118,7 +118,7 @@ public class RMAExtractor {
     		}//fileNames;
 	    // wait for all threads to finish here currently no concurrency errors or deadlocks but this would be the place where it would fall apart 
     	destroy();
-	    SummaryWriter2 sumWriter = new SummaryWriter2(processedFiles,mapReader,inProcessor.getOutDir(), warning,inProcessor.getFilter()); 
+	    SummaryWriter sumWriter = new SummaryWriter(processedFiles,mapReader,inProcessor.getOutDir(), warning,inProcessor.getFilter()); 
 	    sumWriter.process();
 	    log.log(Level.INFO, "Writing Summary File");
 	  }else{ 

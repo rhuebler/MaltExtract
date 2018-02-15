@@ -19,10 +19,11 @@ import RMA6Processor.RMA6Processor;
 import behaviour.Filter;
 /**
  * Write overall Summary file from processed RMA6Files for MaltExtract run.
+ * Outputs into a table for every node in every file how many reads are still assigned after filtering
  * @author huebler
  *
  */
-public class SummaryWriter2 {
+public class SummaryWriter {
 	/**
 	 * @param List<Future<RMA6Processor>> processedFiles, NCBI_MapReader mapReader, Set<Integer> processedIDs,
 	 * String outDir Logger,Warning
@@ -34,7 +35,7 @@ public class SummaryWriter2 {
 	private String outDir;
 	private Logger warning;
 	private Filter behave;
-	public SummaryWriter2(List<Future<RMA6Processor>> pFiles, NCBI_MapReader mReader, String oDir, Logger warning, Filter behave){
+	public SummaryWriter(List<Future<RMA6Processor>> pFiles, NCBI_MapReader mReader, String oDir, Logger warning, Filter behave){
 		this.processedFiles = pFiles;
 		this.mapReader = mReader;
 		this.outDir = oDir;
