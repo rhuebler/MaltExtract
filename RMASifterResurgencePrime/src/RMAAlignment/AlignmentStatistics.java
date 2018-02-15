@@ -9,7 +9,7 @@ import java.util.HashSet;
  * This class is used to compute some Statistics from a List of Alignments. Alignments should come from CompositionMap and must have their duplicates marked
  * Usually duplicates will be removed unless the off switch is turned on. And stacking reads is removed also retrieve information whether filter was turned off or not
  * @author huebler
- *
+ * @params ArrayList<Alignment> list, boolean turnOffDestacking, boolean turnOffDeDupping
  */
 public class AlignmentStatistics {
 	// initialize attributes

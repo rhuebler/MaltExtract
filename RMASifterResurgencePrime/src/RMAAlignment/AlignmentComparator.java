@@ -1,5 +1,8 @@
 package RMAAlignment;
-
+/**
+ * Comparator for RMA6 Alignmet objects necessary for sorting to allow PCR duplicate removal
+ * @author huebler
+ */
 import java.util.Comparator;
 
 public class AlignmentComparator implements Comparator<Alignment> // comparator for alignment class that takes into consideration if the read

@@ -18,6 +18,11 @@ import megan.core.SyncArchiveAndDataTable;
 import megan.data.IConnector;
 /**
  *  This class gets the Megan summary files from the RMA6Files
+ *  This usefull if RMA6 are removed at the end of an analysis. 
+ *  The Megan summary file retains the information how many reads 
+ *  were assigned to each taxonomic node but gets rid of the alignments,
+ *  greatly reducing the memeory footprint
+ *  
  * @author huebler
  *
  */

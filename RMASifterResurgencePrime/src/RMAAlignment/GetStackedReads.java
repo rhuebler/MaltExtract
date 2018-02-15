@@ -6,7 +6,8 @@ import java.util.HashMap;
 import java.util.HashSet;
 /**
  * This class is used to mark and remove stacked reads from alignments. Alignments should come from CompositionMap and must have their duplicates marked. 
- * Return list with removed stakced reads and coverage distribution. Is an version of alignment statistics 
+ * Return list with removed stacked reads and coverage distribution. Is an version of alignment statistics that does not retrieve statistics but instead 
+ * just removed overlapping reads
  * @author huebler
  *
  */

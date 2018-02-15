@@ -4,7 +4,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 /**
- * This class is used to get the coverage Histogram and to mark and remove stacked reads based oninut parameters
+ * This class is used to get the coverage Histogram and to mark and remove stacked reads based on input parameters
+ * Essenitally this is used to "map" reads and get the coverage and find out which reads overlap
  * @author huebler
  *
  */

@@ -18,7 +18,7 @@ import NCBI_MapReader.NCBI_MapReader;
 import RMA6Processor.RMA6Processor;
 import behaviour.Filter;
 /**
- * Write overall Summary file from processed RMA6Files
+ * Write overall Summary file from processed RMA6Files for MaltExtract run.
  * @author huebler
  *
  */

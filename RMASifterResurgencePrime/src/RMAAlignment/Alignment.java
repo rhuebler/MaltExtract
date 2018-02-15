@@ -1,6 +1,8 @@
 package RMAAlignment;
 /**
- * This class Represents an MatchBlock from Megan but has more Slots available and processes part of the alignment into statistics
+ * This class Represents an MatchBlock from MeEGAN 
+ * but has more Slots available and processes part of the alignment into statistics
+ * Is essentialy the MaltExtractVersion of of an RMA6 MatchObject
  * @author huebler
  *
  */

@@ -13,7 +13,8 @@ import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
 /**
- * Tjis class is used to locate the NCBI Map and NCBI tre
+ * Tjis class is used to locate the NCBI Map and NCBI tree but it is way faster 
+ * to provide the file Location to MaltExtract
  * @author huebler
  *
  */

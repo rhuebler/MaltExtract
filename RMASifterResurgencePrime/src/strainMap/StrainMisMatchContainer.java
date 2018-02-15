@@ -1,12 +1,11 @@
 package strainMap;
 
-// Store all Combinations for the first 10 and last 10 Positions of each Blast hit
 import java.util.HashMap;
 import RMAAlignment.Alignment;
 
 /**
- * Functions that collects all misMatches and processes them 
- * also serves as a container for alignmets
+ * Class that collects information on mismatch for the first and last 10 Positions of RMA6 ALignment Objects
+ * both collects information on "genuine" damage and noise
  * @author huebler
  *
  */

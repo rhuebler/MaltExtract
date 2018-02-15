@@ -3,9 +3,10 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import NCBI_MapReader.NCBI_MapReader;
 /**
- * Save for a Megan Node all Blast hits stored as Alignment Objects these are kept as hashmap
- *  of the ID of the matching species and a List of the Hits 
- *  Mainly serves as a Storage to identify the reference to calculate Read distribution and to mark duplicates 
+ * Composition Map is used to process a Hashmap that maps the ALignment objects to their 
+ * specific references so that statistics concerning read alignments can be calculated correctly
+ * It can also mark PCR duplicates
+ * @author huebler
  */
 // set Composition Map
 public class CompositionMap {
