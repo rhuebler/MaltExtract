@@ -37,7 +37,10 @@ public class RMA6BlastCrawler {
 	/**
 	 * Go through whole file and find blast hits that that match the strains of the target species
 	 * one line per strain currently only works with Strains that contain species name and won't
-	 * work for anything for that is higher than species level
+	 * work for anything for that is higher than species level as the name matching will probably fail.
+	 * This class is parallelized to some extent to make it a viable option for deeper sequenced data,
+	 * however this will still be relatively slow as any read for any alignment on the taxonomic path 
+	 * (all strains of that species and all higher nodes up to the root)
 	 */
 	//Initilaize attributes
 	private String inDir;

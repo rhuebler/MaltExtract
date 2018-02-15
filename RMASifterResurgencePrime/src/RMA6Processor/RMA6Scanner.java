@@ -17,9 +17,9 @@ import utility.DataSummaryWriter;
 
 /**
  * Class returns the keyset of a RMA6File
- * which means it returns the names of all Nodes that have an assigned Read
- * it returns the everything as a hash map with the taxId serving as a key 
- * and the number of assigned Reads as result
+ * which means it returns the names of all Nodes that have at least one assigned Read
+ * it returns everything as a hash map with the taxId serving as a key 
+ * and the number of assigned Reads as a stored value
  * @author huebler
  *
  */

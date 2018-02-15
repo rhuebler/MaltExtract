@@ -1,8 +1,9 @@
 package RMA6TaxonProcessor;
 /**
  * The purpose of this class is to serve as mediator between the rma6File and the filters
- * it has different slots for each filters and passes the match blocks into the filters to be processed 
- * and keep some statistics 
+ * it has different slots for each filters and retrieves the RMA6 match blocks from the file and than passes 
+ * them into the filters to be processed and 
+ * extract and keep some filters. This allows to run two or more filters in parallel.
  * @author huebler
  */
 

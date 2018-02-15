@@ -10,12 +10,10 @@ import RMAAlignment.Alignment;
 import RMAAlignment.CompositionMap;
 import behaviour.Filter;
 /**
- * RMA6 processor that automatically removes PCR duplicated and stacked reads Essentially it gets the alignment block 
- * from a read and than processes the best scoring percent of the alignment while sorting them by reference sequence
- * essentially first duplicate and stacking reads are marked and discarded and then authenticity criteria calculated
- * for the remaining reads this verion is specific to the crawl function and can process a list of alignments
- * @author huebler
- *
+ * RMA6 child of RMA6TaxonProcessor used for RMA6Crawler. Has an extra function that allows to go through
+ * a list RMA6 Alignmet projects and retrieve statistics for them all
+ * @params int id ,double pID, NCBI_MapReader reader, boolean v,Logger log, Logger warning, boolean reads, 
+ * double tp,int mL,boolean wantAls,boolean turnOffDestacking,boolean turnOffDeDuping,Filter behave
  */
 public class MatchProcessorCrawler extends RMA6TaxonProcessor {
 	// initialize attributes

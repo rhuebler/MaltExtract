@@ -17,7 +17,8 @@ import strainMap.StrainMisMatchContainer;
 
 /**
  * Extract all information from one Taxon and save the information in the specified slots to be retrieved
- * in RMA6Processor is parent class for all filtering Taxonprocessors now mainly serves as a makeshift interface
+ * in RMA6Processor is parent class for all filtering Taxonprocessors now mainly serves as parent class for ]
+ * all Filters so that all of them have access to the same basic functions and can be used somewhat interchangeably
  * @author huebler
  *
  */

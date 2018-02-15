@@ -17,7 +17,8 @@ import megan.data.IMatchBlock;
  * for the remaining reads
  * This filter will only process alignments that have at least one C>T or one G>A substitution at the tails of the read
  * @author huebler
- *
+ * @params int id ,double pID, NCBI_MapReader reader, boolean v,Logger log, Logger warning, boolean reads, 
+ * double tp,int mL,boolean wantAls, boolean turnOffDestacking,boolean turnOffDeDuping, Filter behave
  */
 public class ExperimentalRMA6AncientDestacker extends RMA6TaxonProcessor {
 	//attributes

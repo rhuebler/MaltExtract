@@ -15,7 +15,8 @@ import megan.data.IMatchBlock;
  * essentially first duplicate and stacking reads are marked and discarded and then authenticity criteria calculated
  * for the remaining reads
  * @author huebler
- *
+ * @params int id ,double pID, NCBI_MapReader reader, boolean v,Logger log, Logger warning, boolean reads,
+ * double tp,int mL,boolean wantAls,boolean turnOffDestacking,boolean turnOffDeDuping,Filter behave
  */
 public class ExperimentalRMA6Destacker extends RMA6TaxonProcessor {
 	// initialize attributes
