@@ -280,23 +280,25 @@ public class InputParameterProcessor {
 
     	        if (commandLine.hasOption("filter"))// set filters to trigger specific behaviour 
     	        {
-//    	            if(Pattern.compile(Pattern.quote("default"), Pattern.CASE_INSENSITIVE).matcher(commandLine.getOptionValue("filter")).find()){
-//    	            	this.behave = Filter.NON;
-//    	            	log.log(Level.INFO,"Custom Behaviour set to: "+commandLine.getOptionValue("filter"));
-//    	            }
-    	             if(Pattern.compile(Pattern.quote("ancient"), Pattern.CASE_INSENSITIVE).matcher(commandLine.getOptionValue("filter")).find()){
-    	            	this.behave = Filter.ANCIENT;
-    	            	log.log(Level.INFO,"Custom Behaviour set to: "+commandLine.getOptionValue("filter"));}
-    	        	else if(Pattern.compile(Pattern.quote("scan"), Pattern.CASE_INSENSITIVE).matcher(commandLine.getOptionValue("filter")).find()){
-    	            	this.behave = Filter.SCAN;
-    	            	log.log(Level.INFO,"Custom Behaviour set to: "+commandLine.getOptionValue("filter"));
+    	            if(Pattern.compile(Pattern.quote("default"), Pattern.CASE_INSENSITIVE).matcher(commandLine.getOptionValue("filter")).find()){
+	    	            	this.behave = Filter.NON;
+	    	            	log.log(Level.INFO,"Custom Behaviour set to: "+commandLine.getOptionValue("filter"));
+    	            }
+    	            else if(Pattern.compile(Pattern.quote("ancient"), Pattern.CASE_INSENSITIVE).matcher(commandLine.getOptionValue("filter")).find()){
+    	            		this.behave = Filter.ANCIENT;
+    	            		log.log(Level.INFO,"Custom Behaviour set to: "+commandLine.getOptionValue("filter"));
+    	            	}else if(Pattern.compile(Pattern.quote("scan"), Pattern.CASE_INSENSITIVE).matcher(commandLine.getOptionValue("filter")).find()){
+	    	            	this.behave = Filter.SCAN;
+	    	            	log.log(Level.INFO,"Custom Behaviour set to: "+commandLine.getOptionValue("filter"));
     	            }else if(Pattern.compile(Pattern.quote("crawl"), Pattern.CASE_INSENSITIVE).matcher(commandLine.getOptionValue("filter")).find()){
-        	        	this.behave = Filter.CRAWL;
-        	        	log.log(Level.INFO,"Custom Behaviour set to: "+commandLine.getOptionValue("filter"));
-        	        }
-    	            else if(Pattern.compile(Pattern.quote("def_anc"), Pattern.CASE_INSENSITIVE).matcher(commandLine.getOptionValue("filter")).find()){
-    	            	this.behave = Filter.NON_ANCIENT;
-    	            	log.log(Level.INFO,"Custom Behaviour set to: "+commandLine.getOptionValue("filter"));
+	        	        	this.behave = Filter.CRAWL;
+	        	        	log.log(Level.INFO,"Custom Behaviour set to: "+commandLine.getOptionValue("filter"));
+        	        }else if(Pattern.compile(Pattern.quote("def_anc"), Pattern.CASE_INSENSITIVE).matcher(commandLine.getOptionValue("filter")).find()){
+	    	            	this.behave = Filter.NON_ANCIENT;
+	    	            	log.log(Level.INFO,"Custom Behaviour set to: "+commandLine.getOptionValue("filter"));
+    	            }else if(Pattern.compile(Pattern.quote("complete"), Pattern.CASE_INSENSITIVE).matcher(commandLine.getOptionValue("filter")).find()){//TODO remove in future
+	    	            	this.behave = Filter.NON_ANCIENT;
+	    	            	log.log(Level.INFO,"Custom Behaviour set to: "+commandLine.getOptionValue("filter"));
     	            }
     	        }
 
@@ -385,7 +387,7 @@ public class InputParameterProcessor {
     	        }
     	        if(commandLine.hasOption("h")){////help
     	        	String header = "MaltExtract beta version 1.3";
-    	    	    String footer = "In case you encounter an error drop an email to huebler@shh.mpg.de with a useful description";
+    	    	    String footer = "In case you encounter an error drop an email with a useful description to huebler@shh.mpg.de ";
     	    	    HelpFormatter formatter = new HelpFormatter();
     	    	    formatter.setWidth(500);
     	    	    formatter.printHelp("RMAExtractor", header, options, footer, true);   
