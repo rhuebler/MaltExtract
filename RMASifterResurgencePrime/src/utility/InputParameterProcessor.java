@@ -387,7 +387,7 @@ public class InputParameterProcessor {
     	        }
     	        if(commandLine.hasOption("h")){////help
     	        	String header = "MaltExtract beta version 1.3";
-    	    	    String footer = "In case you encounter an error drop an email with a useful description to huebler@shh.mpg.de ";
+    	    	    String footer = "In case you encounter an error drop an email with an useful description to huebler@shh.mpg.de ";
     	    	    HelpFormatter formatter = new HelpFormatter();
     	    	    formatter.setWidth(500);
     	    	    formatter.printHelp("RMAExtractor", header, options, footer, true);   

@@ -45,6 +45,8 @@ public class NCBI_TreeReader {
 	    }
 	}
 	public NCBI_TreeReader(String path){
+		if(!path.endsWith("/"))
+			path+="/";
 		this.treName = path + "ncbi.tre";// if path is provided use path
 		try{
 			Scanner in = new Scanner(new File(treName));

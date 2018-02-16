@@ -32,6 +32,8 @@ public class NCBI_MapReader {
 		processNcbiMap(mapName);
 	}
 	public NCBI_MapReader(String path){// use provided path
+		if(!path.endsWith("/"))
+			path+="/";
 		this.mapName = path + "ncbi.map";
 		processNcbiMap(mapName);
 	}
