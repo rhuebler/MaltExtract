@@ -152,7 +152,7 @@ public class InputParameterProcessor {
     	    // long flags
     	    Option option_Threads = Option.builder("p").longOpt("threads").argName("Integer").hasArg().optionalArg(true).desc("How many cores to use?").build();		
     	    Option option_TopPercent = Option.builder("a").longOpt("top").argName("Double").hasArg().optionalArg(true).desc("Use top scoring 0.XX of alignments by defualt 0.01").build();
-    	    Option option_Filter = Option.builder("f").longOpt("filter").argName("String").hasArg().desc("Use chosen filter complete, ancient, crawl, scan").build();
+    	    Option option_Filter = Option.builder("f").longOpt("filter").argName("String").optionalArg(true).hasArg().desc("Use chosen filter complete, ancient, crawl, scan").build();
     	    Option option_MaxLength = Option.builder().longOpt("maxReadLength").argName("Integer").hasArg().optionalArg(true).desc("Set maximum read length").build();
     	    Option option_minPercentIdent = Option.builder().longOpt("minPI").argName("Double").hasArg().optionalArg(true).desc("Set minimum percent identity to XX.X").build(); 
     	    Option option_Help = Option.builder("h").longOpt("help").optionalArg(true).desc("Print Help").build();
@@ -278,7 +278,7 @@ public class InputParameterProcessor {
     	    		log.log(Level.INFO,"Using " + numThreads +" threads");
     	        }
 
-    	        if (commandLine.hasOption("f"))// set filters to trigger specific behaviour 
+    	        if (commandLine.hasOption("filter"))// set filters to trigger specific behaviour 
     	        {
     	            if(Pattern.compile(Pattern.quote("default"), Pattern.CASE_INSENSITIVE).matcher(commandLine.getOptionValue("filter")).find()){
 	    	            	this.behave = Filter.NON;
@@ -299,9 +299,6 @@ public class InputParameterProcessor {
     	            }else if(Pattern.compile(Pattern.quote("complete"), Pattern.CASE_INSENSITIVE).matcher(commandLine.getOptionValue("filter")).find()){//TODO remove in future
 	    	            	this.behave = Filter.NON_ANCIENT;
 	    	            	log.log(Level.INFO,"Custom Behaviour set to: "+commandLine.getOptionValue("filter"));
-    	            }else {
-    	             	log.log(Level.INFO,"Behaviour "+commandLine.getOptionValue("filter")+" unknown! "
-    	             			+ "/nSwitching to Behaviour scan!");
     	            }
     	        }
 
