@@ -82,7 +82,7 @@ public class RMA6Processor {
 		this.topPercent = inputParameterProcessor.getTopPercent();
 		this.alignments = inputParameterProcessor.getBlastHits();
 		this.turnOffDestacking =  inputParameterProcessor.turnDestackingOff();
-		this.turnOffDeDuping = inputParameterProcessor.turnDestackingOff();
+		this.turnOffDeDuping = inputParameterProcessor.getDeDupOff();
 		this.downsample = inputParameterProcessor.downsampling();
 	}
 	
