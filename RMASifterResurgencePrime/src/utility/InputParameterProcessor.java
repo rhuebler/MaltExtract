@@ -59,66 +59,103 @@ public class InputParameterProcessor {
 	// constructor
 
 	public InputParameterProcessor(String[] params ,Logger log, Logger warning){
-		this.log = log;
-		this.warning =  warning;
+		 this.log = log;
+		 this.warning =  warning;
 		process(params);	
+	}
+	public String GetParameters() {
+		String input ="";
+		for(String name : fileNames)
+			input+=name+"\\b";
+		String tax ="";
+		for(String name : taxNames)
+			tax+=name+"\\b";
+			String line="--input "+input+"\n"
+				+"--taxa "+tax+"\n"
+				+"--output "+outDir+"\n"
+				+"--filter "+behave+"\n"
+				+"--top "+topPercent+"\n"
+				+"--numThreads "+numThreads+"\n"
+				+"--maxLength "+maxLength+"\n"
+				+"--minPI "+minPIdent+"\n"
+				+"--resources "+tree_Path+"\n"
+				+ "--threads "+numThreads+"\n";
+				if(verbose)
+					line+="--verbose\n";
+				if(alignment)
+					line+="--matches\n";
+				if(reads)
+					line+="--reads\n";
+				if(maxLength>0)
+					line+="--maxReadLength "+maxLength+"\n";
+				if(minComplexity>0)
+					line+="--minComp "+minComplexity+"\n";
+				if(wantMeganSummaries)
+					line+="--wantMeganSummaries "+"\n";
+				if(destackOff)
+					line+="--destackingOff "+"\n";
+				if(deDupOff)
+					line+="--dupRemOff "+"\n";
+				if(!downsampling)
+					line+="--downSampOff "+"\n";
+				return line;
 	}
 	// getters for parameters
 	public boolean downsampling(){
 		return downsampling;
 	}
 	public boolean turnDestackingOff(){
-		return this.destackOff;
+		return destackOff;
 	}
 	public double getMinComplexity(){
-		return this.minComplexity;
+		return minComplexity;
 	}
 	public boolean wantMeganSummaries(){
-		return this.wantMeganSummaries;
+		return  wantMeganSummaries;
 	}
 	public boolean getBlastHits(){
-		return this.alignment;
+		return  alignment;
 	}
 	public double getMinPIdent(){
-		return this.minPIdent;
+		return  minPIdent;
 	}
 	public List<String> getTaxNames(){
-		return this.taxNames;
+		return  taxNames;
 	}
 	
 	public List<String> getFileNames(){
-		return this.fileNames;
+		return  fileNames;
 	}
 	public double getTopPercent(){
-		return this.topPercent;
+		return  topPercent;
 	}
 	public String getOutDir(){
-		return this.outDir;
+		return  outDir;
 	}
 	public Filter getFilter(){
-		return this.behave;
+		return  behave;
 	}
 	public Taxas getTaxas(){
-		return this.taxas;
+		return  taxas;
 	}
 	public int getNumThreads(){
-		return this.numThreads;
+		return  numThreads;
 	}
 	public int getMaxLength(){
-		return this.maxLength;
+		return  maxLength;
 	}
 	public String getTreePath(){
-		return this.tree_Path;
+		return  tree_Path;
 	}
 	public boolean isVerbose(){
-		return this.verbose;
+		return  verbose;
 	}
 
 	public boolean wantReads(){
-		return this.reads;
+		return  reads;
 	}
 	public boolean getDeDupOff(){
-		return this.deDupOff;
+		return  deDupOff;
 	}
 	private void readTaxList(File f) throws IOException{
 		try {
@@ -214,7 +251,7 @@ public class InputParameterProcessor {
     	            			 log.info(arg);
     	            			for(String name : inFile.list())//if file ends with RMA6 or is as a soft link at to files
     	            				if(name.endsWith("rma6")|| Files.isSymbolicLink(new File(inFile.getPath()+"/" + name).toPath()))
-    	            				this.fileNames.add(inFile.getPath()+"/" + name);
+    	            				 fileNames.add(inFile.getPath()+"/" + name);
     	            		}else if(inFile.isFile()){// is File
     	            			if(arg.endsWith("rma6")||Files.isSymbolicLink(new File(inFile.getPath()).toPath())){ // test if file can be read as if text file that contains names
     	            				log.info(inFile.getPath());
@@ -239,14 +276,14 @@ public class InputParameterProcessor {
     	        		}
     	        		File f = new File(path);
     	        		f.isDirectory();
-    	        		this.outDir = f.getCanonicalPath()+"/";
+    	        		 outDir = f.getCanonicalPath()+"/";
     	        		}catch(IOException io){
     	        			warning.log(Level.SEVERE,"no valid outdir", io);
     	        		}
     	        }
     	        
     	        if (commandLine.hasOption("taxa"))//evaluate node list
-    	        {	this.taxas = Taxas.USER;
+    	        {	 taxas = Taxas.USER;
     	            for(String tax : commandLine.getOptionValues("taxa")){
     	            	log.info("Taxon File: ");
     	            	log.info(tax);
@@ -270,9 +307,9 @@ public class InputParameterProcessor {
     	        if (commandLine.hasOption("threads"))//set set number of threads
     	        {	
     	        	log.info("Trying to use "+commandLine.getOptionValue("threads")+" threads");
-    	            this.numThreads=Integer.parseInt(commandLine.getOptionValue("threads"));
-    	            if(this.numThreads > Runtime.getRuntime().availableProcessors()){
-    	    			this.numThreads = Runtime.getRuntime().availableProcessors(); // enforce that not more processors than available to jvm should be used 
+    	             numThreads=Integer.parseInt(commandLine.getOptionValue("threads"));
+    	            if( numThreads > Runtime.getRuntime().availableProcessors()){
+    	    			 numThreads = Runtime.getRuntime().availableProcessors(); // enforce that not more processors than available to jvm should be used 
     	    			log.warning("The Number of Threads higher than than Number available to System");
     	            }
     	    		log.log(Level.INFO,"Using " + numThreads +" threads");
@@ -281,23 +318,23 @@ public class InputParameterProcessor {
     	        if (commandLine.hasOption("filter"))// set filters to trigger specific behaviour 
     	        {
     	            if(Pattern.compile(Pattern.quote("default"), Pattern.CASE_INSENSITIVE).matcher(commandLine.getOptionValue("filter")).find()){
-	    	            	this.behave = Filter.NON;
+	    	            	 behave = Filter.NON;
 	    	            	log.log(Level.INFO,"Custom Behaviour set to: "+commandLine.getOptionValue("filter"));
     	            }
     	            else if(Pattern.compile(Pattern.quote("ancient"), Pattern.CASE_INSENSITIVE).matcher(commandLine.getOptionValue("filter")).find()){
-    	            		this.behave = Filter.ANCIENT;
+    	            		 behave = Filter.ANCIENT;
     	            		log.log(Level.INFO,"Custom Behaviour set to: "+commandLine.getOptionValue("filter"));
     	            	}else if(Pattern.compile(Pattern.quote("scan"), Pattern.CASE_INSENSITIVE).matcher(commandLine.getOptionValue("filter")).find()){
-	    	            	this.behave = Filter.SCAN;
+	    	            	 behave = Filter.SCAN;
 	    	            	log.log(Level.INFO,"Custom Behaviour set to: "+commandLine.getOptionValue("filter"));
     	            }else if(Pattern.compile(Pattern.quote("crawl"), Pattern.CASE_INSENSITIVE).matcher(commandLine.getOptionValue("filter")).find()){
-	        	        	this.behave = Filter.CRAWL;
+	        	        	 behave = Filter.CRAWL;
 	        	        	log.log(Level.INFO,"Custom Behaviour set to: "+commandLine.getOptionValue("filter"));
         	        }else if(Pattern.compile(Pattern.quote("def_anc"), Pattern.CASE_INSENSITIVE).matcher(commandLine.getOptionValue("filter")).find()){
-	    	            	this.behave = Filter.NON_ANCIENT;
+	    	            	 behave = Filter.NON_ANCIENT;
 	    	            	log.log(Level.INFO,"Custom Behaviour set to: "+commandLine.getOptionValue("filter"));
     	            }else if(Pattern.compile(Pattern.quote("complete"), Pattern.CASE_INSENSITIVE).matcher(commandLine.getOptionValue("filter")).find()){//TODO remove in future
-	    	            	this.behave = Filter.NON_ANCIENT;
+	    	            	 behave = Filter.NON_ANCIENT;
 	    	            	log.log(Level.INFO,"Custom Behaviour set to: "+commandLine.getOptionValue("filter"));
     	            }
     	        }
@@ -305,7 +342,7 @@ public class InputParameterProcessor {
     	        if (commandLine.hasOption("top"))
     	        {
     	        	log.log(Level.INFO,"Top Percent value set to: "+commandLine.getOptionValue("top"));
-    	            this.topPercent = Double.parseDouble(commandLine.getOptionValue("top"));
+    	             topPercent = Double.parseDouble(commandLine.getOptionValue("top"));
     	            if(topPercent>1){
     	            	warning.log(Level.SEVERE, "Top percent values higher >1 not accepted please use 0.01 to use the highest scoring percent of alingments");
     	            	System.exit(1);
@@ -318,7 +355,7 @@ public class InputParameterProcessor {
     	        if (commandLine.hasOption("maxReadLength"))
     	        {
     	        	log.log(Level.INFO,"maximum Read Length set to: " + commandLine.getOptionValue("maxReadLength"));
-    	            this.maxLength = Integer.parseInt(commandLine.getOptionValue("maxReadLength"));
+    	             maxLength = Integer.parseInt(commandLine.getOptionValue("maxReadLength"));
     	        }
     	        
     	        if(commandLine.hasOption("minPI")){
@@ -327,9 +364,9 @@ public class InputParameterProcessor {
     	        		log.log(Level.WARNING, "Minimum pIdent "+ minP+" smaller than 1.0");
     	        		minP *= 100;
     	        		log.log(Level.WARNING, "Set Minimum pIdent "+ minP);
-    	        		this.minPIdent = minP;
+    	        		 minPIdent = minP;
     	        	}else{
-    	        		this.minPIdent = minP;
+    	        		 minPIdent = minP;
     	        		log.log(Level.INFO, "Minimum pIdent set to "+ minPIdent);
     	        	}
     	        }
@@ -337,21 +374,21 @@ public class InputParameterProcessor {
     	        if(commandLine.hasOption("resources")){
     	        	File f = new File(commandLine.getOptionValue("resources"));
     	        	if(f.isDirectory()){
-    	        		this.tree_Path = commandLine.getOptionValue("resources");
+    	        		 tree_Path = commandLine.getOptionValue("resources");
     	        	}
     	        }
     	        if(commandLine.hasOption("minComp")){
-    	        	this.minComplexity = Double.parseDouble(commandLine.getOptionValue("minComp"));
+    	        	 minComplexity = Double.parseDouble(commandLine.getOptionValue("minComp"));
     	        	log.log(Level.INFO, "Minimum Complexity set to " + minComplexity);
     	        }
     	        if(commandLine.hasOption('v')){
     	        	log.log(Level.INFO, "Verbose");
-    	        	this.verbose = true;
+    	        	 verbose = true;
     	        }
     	        
     	        if((commandLine.hasOption("reads") && behave != Filter.SCAN)){
-    	        	log.log(Level.INFO, "Rerieve filtered Reads");
-    	        	this.reads = true;
+    	        	log.log(Level.INFO, "Retrieve filtered Reads");
+    	        	 reads = true;
     	        }
     	        if(commandLine.hasOption("list")){
     	        	String list = commandLine.getOptionValue("list");
@@ -377,13 +414,13 @@ public class InputParameterProcessor {
     	        	wantMeganSummaries = true;
     	        }
     	        if(commandLine.hasOption("destackingOff")){
-    	        	this.destackOff = true;
+    	        	 destackOff = true;
     	        }
     	        if(commandLine.hasOption("dupRemOff")){
-    	        	this.deDupOff = true;
+    	        	 deDupOff = true;
     	        }
     	        if(commandLine.hasOption("downSampOff")){
-    	        	this.downsampling = false;
+    	        	 downsampling = false;
     	        }
     	        if(commandLine.hasOption("h")){////help
     	        	String header = "MaltExtract beta version 1.3";

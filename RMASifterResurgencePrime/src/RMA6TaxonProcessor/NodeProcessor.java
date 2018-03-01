@@ -110,6 +110,8 @@ public class NodeProcessor{
 			this.taxName = getName(taxID);
 			// use ReadsIterator to get all Reads assigned to MegantaxID and print top percent to file
 			this.fileName =fileName;
+			//--downSampOff --destackingOff --dupRemOff
+			
 			try(RMA6File rma6File = new RMA6File(inDir+fileName, "r")){
 				ListOfLongs list = new ListOfLongs();
 				Long location = rma6File.getFooterSectionRMA6().getStartClassification("Taxonomy");

@@ -79,6 +79,8 @@ public class RMAExtractor {
 		}
 		warning.addHandler(error);
 		//Set taxon and ID maps
+		log.log(Level.INFO,inProcessor.GetParameters());
+		
 		log.log(Level.INFO, "Setting up Taxon Name and Taxon ID maps");
 		NCBI_MapReader mapReader = new NCBI_MapReader(inProcessor.getTreePath());
 		DirectoryCreator dCreator = new DirectoryCreator();

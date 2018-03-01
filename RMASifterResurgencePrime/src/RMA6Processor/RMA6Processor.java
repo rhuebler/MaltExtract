@@ -81,6 +81,9 @@ public class RMA6Processor {
 		this.wantMeganSummaries = inputParameterProcessor.wantMeganSummaries();
 		this.topPercent = inputParameterProcessor.getTopPercent();
 		this.alignments = inputParameterProcessor.getBlastHits();
+		this.turnOffDestacking =  inputParameterProcessor.turnDestackingOff();
+		this.turnOffDeDuping = inputParameterProcessor.turnDestackingOff();
+		this.downsample = inputParameterProcessor.downsampling();
 	}
 	
 
@@ -131,6 +134,9 @@ public class RMA6Processor {
 	}
 
 public void process() {// processing 
+	System.out.println("DownSampling? "+downsample+"\n"+
+			"Destacking? "+turnOffDestacking+"\n"+
+			"Dedupping? "+turnOffDeDuping);
 	log.log(Level.INFO,"Reading File: " +inDir+fileName);
 	if(wantMeganSummaries){
 		DataSummaryWriter dsWriter = new DataSummaryWriter(warning);
