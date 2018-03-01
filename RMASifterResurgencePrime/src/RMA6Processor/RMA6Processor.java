@@ -134,9 +134,6 @@ public class RMA6Processor {
 	}
 
 public void process() {// processing 
-	System.out.println("DownSampling? "+downsample+"\n"+
-			"Destacking? "+turnOffDestacking+"\n"+
-			"Dedupping? "+turnOffDeDuping);
 	log.log(Level.INFO,"Reading File: " +inDir+fileName);
 	if(wantMeganSummaries){
 		DataSummaryWriter dsWriter = new DataSummaryWriter(warning);
