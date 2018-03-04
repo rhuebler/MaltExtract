@@ -294,7 +294,7 @@ protected void calculateReadLengthDistribution(){
 	for(int i = 25;i<=200;i+=5)
 		intervals.put(i, 0);
 	if(lengths.size() == 0 && lengths == null){
-		warning.log(Level.WARNING, taxName+"no read lenghts");
+		warning.log(Level.WARNING, taxName+" Read Lengths empty");
 	}
 	else{//check that lengths are set and filled
 		boolean warn = false;
