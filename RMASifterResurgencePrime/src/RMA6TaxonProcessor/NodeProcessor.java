@@ -96,14 +96,14 @@ public class NodeProcessor{
 		//processing through node initialize taxon processors based on input parameters
 		public void process(String inDir, String fileName, double topPercent, int maxLength){ 
 				if(behave == Filter.ANCIENT){
-					ancientProcessor =  new ExperimentalRMA6AncientDestacker(taxID, minPIdent, mapReader, verbose, log, log, wantReads, topPercent, maxLength,alignment,turnOffDestacking,turnOffDeDuping, behave);
+					ancientProcessor =  new ExperimentalRMA6AncientDestacker(taxID, minPIdent, mapReader, verbose, log, warning, wantReads, topPercent, maxLength,alignment,turnOffDestacking,turnOffDeDuping, behave);
 				}else if(behave == Filter.NON){
-					defaultProcessor = new ExperimentalRMA6Destacker(taxID, minPIdent, mapReader, verbose, log, log, wantReads, topPercent, maxLength,alignment,turnOffDestacking,turnOffDeDuping, behave);
+					defaultProcessor = new ExperimentalRMA6Destacker(taxID, minPIdent, mapReader, verbose, log, warning, wantReads, topPercent, maxLength,alignment,turnOffDestacking,turnOffDeDuping, behave);
 				}else if(behave == Filter.ALL){
 					System.err.println("Filter no longer supported");
 				}else if(behave == Filter.NON_ANCIENT){
-					ancientProcessor = new ExperimentalRMA6AncientDestacker(taxID, minPIdent, mapReader, verbose, log, log, wantReads, topPercent, maxLength,alignment,turnOffDestacking,turnOffDeDuping,  behave);
-					defaultProcessor = new ExperimentalRMA6Destacker(taxID, minPIdent, mapReader, verbose, log, log, wantReads, topPercent, maxLength,alignment,turnOffDestacking,turnOffDeDuping,  behave);
+					ancientProcessor = new ExperimentalRMA6AncientDestacker(taxID, minPIdent, mapReader, verbose, log, warning, wantReads, topPercent, maxLength,alignment,turnOffDestacking,turnOffDeDuping,  behave);
+					defaultProcessor = new ExperimentalRMA6Destacker(taxID, minPIdent, mapReader, verbose, log, warning, wantReads, topPercent, maxLength,alignment,turnOffDestacking,turnOffDeDuping,  behave);
 				}else if(behave == Filter.NONDUPLICATES ){
 					System.err.println("Filter no longer supported");
 				}		//TODO depreciated

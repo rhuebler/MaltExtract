@@ -297,6 +297,7 @@ protected void calculateReadLengthDistribution(){
 		warning.log(Level.WARNING, taxName+"no read lenghts");
 	}
 	else{//check that lengths are set and filled
+		boolean warn = false;
 		for(int i : lengths){// round to the closest number dividable by 5 to get the intervals
 			if(i>=25 && i<=200){//check that lenghts are in interval
 				stats.addValue(i);
@@ -304,8 +305,11 @@ protected void calculateReadLengthDistribution(){
 				value++;
 				intervals.replace(round(i, 5), value);
 			}else{
-				warning.log(Level.WARNING, taxName+"has reads that fall outisde 25-200 target range");
+				warn = true;
 			}
+		}
+		if(warn) {
+			warning.log(Level.WARNING, taxName+"has reads that fall outside the 25-200 target range");
 		}
 		String rlStat = taxName;
 		
