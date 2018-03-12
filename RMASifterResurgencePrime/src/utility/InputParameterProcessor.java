@@ -66,16 +66,15 @@ public class InputParameterProcessor {
 	public String GetParameters() {
 		String input ="";
 		for(String name : fileNames)
-			input+=name+"\\b";
+			input+=name+"\b";
 		String tax ="";
 		for(String name : taxNames)
-			tax+=name+"\\b";
+			tax+=name+"\b";
 			String line="--input "+input+"\n"
 				+"--taxa "+tax+"\n"
 				+"--output "+outDir+"\n"
 				+"--filter "+behave+"\n"
 				+"--top "+topPercent+"\n"
-				+"--numThreads "+numThreads+"\n"
 				+"--maxLength "+maxLength+"\n"
 				+"--minPI "+minPIdent+"\n"
 				+"--resources "+tree_Path+"\n"

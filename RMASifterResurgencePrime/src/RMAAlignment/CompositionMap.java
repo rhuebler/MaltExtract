@@ -152,12 +152,13 @@ public void getNonStacked(){
 		HashMap<String,ArrayList<Alignment>> rMap = compositionMap.get(key);
 		for(String reference : rMap.keySet()){
 			if(turnOffDestacking){
+				
 				ArrayList<Alignment>list=rMap.get(reference);
 				stackedSizes.add(new NOAOR(list.size(),reference,key));
 				nonStackedOnReference.putIfAbsent(reference, list.size());
 				for(Alignment al : list){
-					if(al.isTopAlignment()){
-						resultsMap.putIfAbsent(al.getReadName(), al);
+					if(al.isTopAlignment()) {
+						resultsMap.putIfAbsent(al.getReadName()+al.getSequence(), al);
 					}
 				}
 			}else{
@@ -169,7 +170,7 @@ public void getNonStacked(){
 				stackedSizes.add(new NOAOR(list.size(),reference,key));
 				for(Alignment al : list){
 					if(al.isTopAlignment()){
-						resultsMap.putIfAbsent(al.getReadName(), al);
+						resultsMap.putIfAbsent(al.getReadName()+al.getSequence(), al);
 					}
 				}
 			}

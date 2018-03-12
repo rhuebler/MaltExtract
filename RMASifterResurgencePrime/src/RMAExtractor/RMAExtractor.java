@@ -59,12 +59,10 @@ public class RMAExtractor {
 		InputParameterProcessor inProcessor = new InputParameterProcessor(args ,log, warning);
 		new File(inProcessor.getOutDir()).mkdirs();// make outdir before log handlers
 		Handler handler = null;
-		SimpleFormatter sf = new SimpleFormatter();
-		
-		
 		//Initialize Output Handler and Error Handler
 		try {
 			handler = new FileHandler(inProcessor.getOutDir()+"log.txt");
+			SimpleFormatter sf = new SimpleFormatter();
 			handler.setFormatter(sf);
 		} catch (SecurityException | IOException e) {
 			e.printStackTrace();
@@ -73,6 +71,7 @@ public class RMAExtractor {
 		Handler error = null;
 		try {
 			error = new FileHandler(inProcessor.getOutDir()+"error.txt");
+			SimpleFormatter sf = new SimpleFormatter();
 			error.setFormatter(sf);
 		} catch (SecurityException | IOException e) {
 			 warning.log(Level.SEVERE,"Interuption",e);

@@ -131,7 +131,8 @@ public class NodeProcessor{
 					}
 				}else{
 					if(verbose)
-						log.log(Level.INFO,"Processing Taxon "+taxName+" in File " +fileName);
+						log.log(Level.INFO,"Processing Taxon "+taxName+" in File " +fileName+"\n"
+								+ " Number of Reads "+ list.size());
 					int i = 0;
 					while(classIt.hasNext()){// get Alignments and pass to filters
 						IReadBlock current = classIt.next();
