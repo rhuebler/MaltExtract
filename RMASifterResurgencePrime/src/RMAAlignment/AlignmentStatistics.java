@@ -94,7 +94,7 @@ public class AlignmentStatistics {
 			if(unique  == 0){
 				results.add(0.0);
 			}else{
-				results.add(unique/(refMap.getPossible()));
+				results.add((Double.parseDouble(df.format(unique/(refMap.getPossible())))));
 			}
 			this.coverageHistogram = coverageHistogram;
 			destackedList = refMap.getNonStacked();

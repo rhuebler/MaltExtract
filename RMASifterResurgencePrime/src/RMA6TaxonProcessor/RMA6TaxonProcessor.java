@@ -134,10 +134,10 @@ protected void processCompositionMap(CompositionMap map){
 		//setReadDist
 		String maxReference = getName(map.getMaxID());
 		String s = taxName +"\t" + maxReference;;
-		for(double d : map.getGenaralStatistics())
+		for(double d : map.getGenaralStatistics()) {
 			s += "\t" + df.format(d);
+		}	
 		this.readDistribution=s;
-		
 		//set coverage Line
 		HashMap<Integer,Integer> histogram = map.getConverageHistogram();
 		String line = taxName + "\t" + maxReference;
