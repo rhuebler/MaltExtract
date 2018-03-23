@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 import java.util.logging.FileHandler;
 import java.util.logging.Handler;
 import java.util.logging.Level;
@@ -153,7 +154,7 @@ public class RMAExtractor {
 		  log.log(Level.INFO, "Crawling Done");
 	  }// get runtime 
 		long endTime = System.nanoTime();
-		log.log(Level.INFO,"Runtime: "+ (endTime - startTime)/1000000000 +" Seconds");
+		log.log(Level.INFO,"Runtime: "+ TimeUnit.NANOSECONDS.toMinutes(endTime - startTime) +" Minutes");
 		log.log(Level.INFO,"Peak memory: " + PeakMemoryUsageMonitor.getPeakUsageString());
 		log.log(Level.INFO,"Shutdown");
 		System.exit(0);// shutdown
