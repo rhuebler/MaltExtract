@@ -48,7 +48,7 @@ public class RMAExtractor {
 	 * @throws none thrown all caught
 	 */
 	private static final Logger log = Logger.getLogger(RMAExtractor.class.getName());
-	private static final Logger warning = Logger.getLogger(RMAExtractor.class.getName());
+	private static final Logger warning = Logger.getLogger("Error");
 	private static ThreadPoolExecutor executor;
 	private static void destroy(){
 		executor.shutdown();

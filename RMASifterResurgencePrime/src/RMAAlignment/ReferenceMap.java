@@ -157,10 +157,10 @@ public class ReferenceMap {
 		this.coverageDeviation = temp;
 		if(averageCoverage>=10 && !turnOffDestacking)
 			turnedOn = false;
-		i=0;
-		while(i<alignments.size()){
+		int l =0;
+		while(l<alignments.size()){
 		//calculate unique positions per read plus average distance between current and next read
-			Alignment current = alignments.get(i);
+			Alignment current = alignments.get(l);
 			int cStart = 0;
 			int cEnd = 0;
 			if(current.isReversed()){
@@ -185,7 +185,7 @@ public class ReferenceMap {
 					
 				}
 			}
-			i++;
+			l++;
 		}
 		stackedReads+=stacked.size();
 		nonStacked.removeAll(stacked);

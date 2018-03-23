@@ -2,6 +2,7 @@ package RMAAlignment;
 
 
 import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -82,8 +83,14 @@ public class AlignmentStatistics {
 			int zeros = refMap.getLength() - temp ;	
 			if(zeros<0)
 				zeros = 0;
+			
+			DecimalFormatSymbols otherSymbols = new DecimalFormatSymbols();
+			otherSymbols.setDecimalSeparator('.');
+			otherSymbols.setGroupingSeparator(','); 
+			DecimalFormat df = new DecimalFormat("#.###",otherSymbols);
 			coverageHistogram.put(0, zeros);
 			int unique=coverageHistogram.get(1);
+			
 			if(unique  == 0){
 				results.add(0.0);
 			}else{
@@ -96,7 +103,7 @@ public class AlignmentStatistics {
 			results.add((double) currentList.size());
 			results.add((double) refMap.getLength());
 
-			DecimalFormat df = new DecimalFormat("#.###");
+			
 			coverage.add(df.format(refMap.getAverageCoverage()));
 			coverage.add(df.format(refMap.getCoverageDeviation()));
 			for(int key:refMap.getCoveragePositions().keySet()){

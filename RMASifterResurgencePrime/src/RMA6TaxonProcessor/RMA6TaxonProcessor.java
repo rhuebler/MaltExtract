@@ -1,6 +1,7 @@
 package RMA6TaxonProcessor;
 
 import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.logging.Level;
@@ -63,6 +64,7 @@ protected ArrayList<Integer> lengths = new ArrayList<Integer>();
 protected boolean turnedOn = true;
 protected String additionalEntries;
 protected String covPositions;
+protected DecimalFormat df;
 //constructor
 public RMA6TaxonProcessor(Integer id, double pID, NCBI_MapReader reader, boolean v, Logger log, Logger warning, double topPercent, int maxLength, Filter f){
 	// set input values
@@ -104,6 +106,10 @@ public RMA6TaxonProcessor(Integer id, double pID, NCBI_MapReader reader, boolean
 	container.setName(taxName);
 	this.additionalEntries =taxName+"\tNA\tNA\tNA\tNA\tNA\tNA\tNA\tNA\tNA\tNA";
 	this.covPositions = taxName+"\tNA\t0\t0\t0\t0\t0\t0\t0";
+	DecimalFormatSymbols otherSymbols = new DecimalFormatSymbols();
+	otherSymbols.setDecimalSeparator('.');
+	otherSymbols.setGroupingSeparator(','); 
+	df =new DecimalFormat("#.###",otherSymbols);
 }
 //setters
 protected void setOriginalNumberOfAlignments(int num){
@@ -123,7 +129,6 @@ protected void setDamageLine(String s){
 }
 // setter for compostion map that retrieves information on read distribution and node composition
 protected void processCompositionMap(CompositionMap map){
-	DecimalFormat df = new DecimalFormat("#.###");
 	if(map.getCompositionMap().keySet().size() >0){//check if some alignments are even left after filtering
 		map.calculateStatistics();
 		//setReadDist
