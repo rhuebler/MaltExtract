@@ -109,8 +109,6 @@ public class ExperimentalRMA6Destacker extends RMA6TaxonProcessor {
 					readName = ">"+readName;
 				lines.add(readName);
 				if (sequence != null) {
-					if (!sequence.endsWith("\n"))
-						sequence+=("\n");
 					lines.add(sequence);    
 				}
 			}

@@ -61,9 +61,8 @@ public class RMAExtractor {
 		Handler handler = null;
 		//Initialize Output Handler and Error Handler
 		try {
-			handler = new FileHandler(inProcessor.getOutDir()+"log.txt");
-			SimpleFormatter sf = new SimpleFormatter();
-			handler.setFormatter(sf);
+			handler = new FileHandler(inProcessor.getOutDir()+"log.txt"); 
+			handler.setFormatter(new SimpleFormatter());
 		} catch (SecurityException | IOException e) {
 			e.printStackTrace();
 		}
@@ -71,8 +70,7 @@ public class RMAExtractor {
 		Handler error = null;
 		try {
 			error = new FileHandler(inProcessor.getOutDir()+"error.txt");
-			SimpleFormatter sf = new SimpleFormatter();
-			error.setFormatter(sf);
+			error.setFormatter(new SimpleFormatter());
 		} catch (SecurityException | IOException e) {
 			 warning.log(Level.SEVERE,"Interuption",e);
 		}
