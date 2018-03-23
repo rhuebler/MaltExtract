@@ -83,7 +83,6 @@ public class AlignmentStatistics {
 			if(zeros<0)
 				zeros = 0;
 			coverageHistogram.put(0, zeros);
-			
 			int unique=coverageHistogram.get(1);
 			if(unique  == 0){
 				results.add(0.0);
@@ -91,7 +90,7 @@ public class AlignmentStatistics {
 				results.add(unique/(refMap.getPossible()));
 			}
 			this.coverageHistogram = coverageHistogram;
-			this.destackedList = refMap.getNonStacked();
+			destackedList = refMap.getNonStacked();
 			results.add((double) input.size()-refMap.getStackedReads());
 			results.add((double)  input.size());
 			results.add((double) currentList.size());

@@ -214,9 +214,9 @@ public class RMA6OutputProcessor {
 					readLengthStatistics.add(taxProcessor.getReadLengthStatistics());	
 					if(alignment )
 						writeOutput(taxProcessor.getAlignments(),dir+"/alignments/"+fileName+"/",OutputType.ALIGNMENTS, id);
-					if(reads)
+					if(reads) {
 						writeOutput(taxProcessor.getReads(),dir+"/reads/"+fileName+"/",OutputType.READS, id);
-			
+					}
 		}
 			
 			//write output

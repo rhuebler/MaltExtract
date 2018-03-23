@@ -105,21 +105,15 @@ public class ExperimentalRMA6AncientDestacker extends RMA6TaxonProcessor {
 			pIdents.add(al.getPIdent());
 			distances.add(al.getEditDistance());
 			if(wantReads){
-				String name = "";
-				String readName = key;
+				String readName = al.getReadName();
 				sequence = al.getSequence();
 				if (!readName.startsWith(">"))
-					name = ">"+readName;
-				else
-					name = readName;
-				lines.add(name);
-				if (!name.endsWith("\n"))
-					name += "\n";
-				String readData = sequence;
-				if (readData != null) {
-					if (!readData.endsWith("\n"))
-						readData+=("\n");
-					lines.add(readData);    
+					readName = ">"+readName;
+				lines.add(readName);
+				if (sequence != null) {
+					if (!sequence.endsWith("\n"))
+						sequence+=("\n");
+					lines.add(sequence);    
 				}
 			}
 		}	

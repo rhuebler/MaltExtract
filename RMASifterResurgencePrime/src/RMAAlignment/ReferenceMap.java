@@ -157,7 +157,7 @@ public class ReferenceMap {
 		this.coverageDeviation = temp;
 		if(averageCoverage>=10 && !turnOffDestacking)
 			turnedOn = false;
-		
+		i=0;
 		while(i<alignments.size()){
 		//calculate unique positions per read plus average distance between current and next read
 			Alignment current = alignments.get(i);
@@ -171,7 +171,6 @@ public class ReferenceMap {
 				cEnd = current.getEnd();		
 			}
 			possible += (cEnd - cStart)+1;
-			
 			
 			for(int k = cStart; k<= cEnd; k++){
 				int coverage = coverageContainer.get(k);

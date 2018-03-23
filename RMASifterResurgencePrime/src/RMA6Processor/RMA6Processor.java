@@ -159,7 +159,7 @@ public void process() {// processing
 			results.put(id, nodeProcessor);
 	  }//TaxIDs	
 
-	RMA6OutputProcessor outProcessor = new RMA6OutputProcessor(fileName, outDir,mapReader,warning, behave, reads, alignments);
+	RMA6OutputProcessor outProcessor = new RMA6OutputProcessor(fileName, outDir,mapReader,warning, behave, alignments, reads);
 	outProcessor.process(results);
 	if(behave==Filter.NON_ANCIENT || behave==Filter.NON){
 		setSumLine(outProcessor.getSumLine());
