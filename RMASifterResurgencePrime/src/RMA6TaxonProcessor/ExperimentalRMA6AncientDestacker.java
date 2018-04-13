@@ -97,7 +97,7 @@ public class ExperimentalRMA6AncientDestacker extends RMA6TaxonProcessor {
 			numMatches++;	
 			container.processAlignment(al);
 			if(wantAlignments){
-				alignments.add(al.getReadName());
+				alignments.add(al.getReadName()+"	"+ al.getTaxID());
 				alignments.add(al.getText());
 			}
 	
