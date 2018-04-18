@@ -127,7 +127,7 @@ public class SummaryWriter {
 		   summary.add(0,header);
 		   ArrayList<String> counts = new ArrayList<String>();
 		   counts.add(header);
-		   counts.add(0,reads);
+		   counts.add(reads);
 		   
 		   if(switcher==Filter.NON){
 			   writeSummary(summary,outDir+"/default/"+"RunSummary"+".txt");
