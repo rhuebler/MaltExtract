@@ -1,6 +1,7 @@
 package utility;
 import java.io.IOException;
-import java.nio.charset.Charset;
+
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -13,6 +14,8 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+
 
 import NCBI_MapReader.NCBI_MapReader;
 import RMA6Processor.RMA6Processor;
@@ -142,7 +145,7 @@ public class SummaryWriter {
 	private void writeSummary(List<String> summary,String outDir) {
 		try{
 		Path file = Paths.get(outDir);
-		Files.write(file, summary, Charset.forName("UTF-8"));
+		Files.write(file, summary, StandardCharsets.UTF_8);
 		}catch(IOException io){
 			warning.log(Level.SEVERE, "Error", io);
 		}
