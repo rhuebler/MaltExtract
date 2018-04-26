@@ -74,6 +74,7 @@ public class NCBI_TreeReader {
 		return assigned;
 	} 
 	public ArrayList<Integer> getAllStrains(int target, Set<Integer> keys){// get all strains of a node
+		positionsToKeep.clear();
 		PhylogenyNode query = ph.getNode(String.valueOf(target));
 	    for(PhylogenyNode leaf : query.getAllExternalDescendants()){
 	    	HashSet<Integer> children = new HashSet<Integer>();
@@ -87,7 +88,29 @@ public class NCBI_TreeReader {
 	      }
 	      positionsToKeep.addAll(getAssigned(children,keys));
 	    }	
-	   
+	    ArrayList<Integer> results = new ArrayList<Integer>();
+		results.addAll(positionsToKeep);
+		return results;
+	}   
+	    public ArrayList<Integer> getLowestContainedIds(Set<Integer> keys){// get all strains of a node
+	    	positionsToKeep.clear();
+			PhylogenyNode query = ph.getNode(0);
+		    for(PhylogenyNode leaf : query.getAllExternalDescendants()){
+		    	if(keys.contains(Integer.parseInt(leaf.getName()))) {
+		    		positionsToKeep.add(Integer.parseInt(leaf.getName()));
+		    	}else {
+		    		 for(int i = 0;i< (leaf.calculateDepth()-query.calculateDepth());i++){
+		    		    	leaf = leaf.getParent();
+		    		    	int id = Integer.parseInt(leaf.getName());
+		    		    	if(keys.contains(id)){
+		    		    		positionsToKeep.add(id);
+		    		    		break;
+		    		    	}
+		    		      }
+		    	}	
+
+		     
+		    }	
 	   ArrayList<Integer> results = new ArrayList<Integer>();
 			   results.addAll(positionsToKeep);
 	   

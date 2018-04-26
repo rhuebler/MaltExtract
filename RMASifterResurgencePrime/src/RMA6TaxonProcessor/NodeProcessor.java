@@ -79,14 +79,7 @@ public class NodeProcessor{
 			return  this.defaultProcessor;
 			
 		}
-		public RMA6TaxonProcessor getNonDuplicate(){
-			return this.nonDuplicateProcessor;
-			
-		}
-		public RMA6TaxonProcessor getAncientNonDuplicate(){
-			return  this.ancientNonDuplicateProcessor;
-			
-		}
+		
 		public int getTaxId(){
 			return this.taxID;
 		}
@@ -161,10 +154,6 @@ public class NodeProcessor{
 				}else if(behave == Filter.NON ){
 					defaultProcessor.process();
 					defaultProcessor.clear();
-				}else if(behave == Filter.ALL){
-					ancientNonDuplicateProcessor.process();
-				}else if(behave == Filter.NONDUPLICATES){
-					nonDuplicateProcessor.process();
 				}else if(behave == Filter.NON_ANCIENT) {
 					ancientProcessor.process();
 					defaultProcessor.process();
@@ -176,6 +165,4 @@ public class NodeProcessor{
 			warning.log(Level.SEVERE,mapReader.getNcbiIdToNameMap().get(taxID), e);	
 		}
 	}// void
-		
 }
-

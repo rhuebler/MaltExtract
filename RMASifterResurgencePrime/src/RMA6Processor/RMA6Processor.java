@@ -134,38 +134,37 @@ public class RMA6Processor {
 	}
 
 public void process() {// processing 
-	log.log(Level.INFO,"Reading File: " +inDir+fileName);
-	if(wantMeganSummaries){
-		DataSummaryWriter dsWriter = new DataSummaryWriter(warning);
-		dsWriter.writeSummary(inDir, fileName, outDir);
-	}
-	Set<Integer> keys = getAllKeys();
-	Set<Integer> idsToProcess = new HashSet<Integer>();
-   // treeReader here to avoid synchronization issues 
-	if(taxas == Taxas.USER){
-		for(Integer taxID : taxIDs){
-			idsToProcess.add(taxID);
-			idsToProcess.addAll(treeReader.getAllStrains(taxID, keys));
+		log.log(Level.INFO,"Reading File: " +inDir+fileName);
+		if(wantMeganSummaries){
+			DataSummaryWriter dsWriter = new DataSummaryWriter(warning);
+			dsWriter.writeSummary(inDir, fileName, outDir);
 		}
-	}
-	else if(taxas == Taxas.ALL){
-		idsToProcess.addAll(keys);
-	}
-	setContainedIDs(idsToProcess);
-	HashMap<Integer,NodeProcessor> results =  new HashMap<Integer,NodeProcessor>();
-		for(Integer id : idsToProcess){
-			NodeProcessor nodeProcessor = new NodeProcessor(id, minPIdent, mapReader, verbose,log, warning,reads,behave, minComplexity,alignments,turnOffDestacking,turnOffDeDuping,downsample);
-			nodeProcessor.process(inDir, fileName, topPercent, maxLength);
-			results.put(id, nodeProcessor);
-	  }//TaxIDs	
-
-	RMA6OutputProcessor outProcessor = new RMA6OutputProcessor(fileName, outDir,mapReader,warning, behave, alignments, reads);
-	outProcessor.process(results);
-	if(behave==Filter.NON_ANCIENT || behave==Filter.NON){
-		setSumLine(outProcessor.getSumLine());
-	}
-	if(behave==Filter.NON_ANCIENT || behave==Filter.ANCIENT){
-		ancientSum = outProcessor.getAncientLine();
-	}
+		Set<Integer> keys = getAllKeys();
+		Set<Integer> idsToProcess = new HashSet<Integer>();
+	   // treeReader here to avoid synchronization issues 
+		if(taxas == Taxas.USER){
+			for(Integer taxID : taxIDs){
+				idsToProcess.add(taxID);
+				idsToProcess.addAll(treeReader.getAllStrains(taxID, keys));
+			}
+		}
+		else if(taxas == Taxas.ALL){
+			idsToProcess.addAll(keys);
+		}
+		setContainedIDs(idsToProcess);
+		HashMap<Integer,NodeProcessor> results =  new HashMap<Integer,NodeProcessor>();
+			for(Integer id : idsToProcess){
+				NodeProcessor nodeProcessor = new NodeProcessor(id, minPIdent, mapReader, verbose,log, warning,reads,behave, minComplexity,alignments,turnOffDestacking,turnOffDeDuping,downsample);
+				nodeProcessor.process(inDir, fileName, topPercent, maxLength);
+				results.put(id, nodeProcessor);
+		  }//TaxIDs	
+		RMA6OutputProcessor outProcessor = new RMA6OutputProcessor(fileName, outDir,mapReader,warning, behave, alignments, reads);
+		outProcessor.process(results);
+		if(behave==Filter.NON_ANCIENT || behave==Filter.NON){
+			setSumLine(outProcessor.getSumLine());
+		}
+		if(behave==Filter.NON_ANCIENT || behave==Filter.ANCIENT){
+			ancientSum = outProcessor.getAncientLine();
+		}
     }
  }
