@@ -9,6 +9,10 @@ package RMA6TaxonProcessor;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+
+import Analysis_16S_Data.RMA6_16S_AncientNodeProcessor;
+import Analysis_16S_Data.RMA6_16S_NodeProcessor;
 import NCBI_MapReader.NCBI_MapReader;
 import behaviour.Filter;
 import jloda.util.DNAComplexityMeasure;
@@ -23,8 +27,6 @@ import megan.rma6.ReadBlockGetterRMA6;
 public class NodeProcessor{
 		private RMA6TaxonProcessor ancientProcessor;
 		private RMA6TaxonProcessor defaultProcessor;
-		private RMA6TaxonProcessor nonDuplicateProcessor;
-		private RMA6TaxonProcessor ancientNonDuplicateProcessor;
 		private String taxName;	
 		private boolean wantReads = false;
 		private NCBI_MapReader mapReader;
@@ -99,7 +101,10 @@ public class NodeProcessor{
 					defaultProcessor = new ExperimentalRMA6Destacker(taxID, minPIdent, mapReader, verbose, log, warning, wantReads, topPercent, maxLength,alignment,turnOffDestacking,turnOffDeDuping,  behave);
 				}else if(behave == Filter.NONDUPLICATES ){
 					System.err.println("Filter no longer supported");
-				}		//TODO depreciated
+				}else if(behave == Filter.SRNA) {
+					ancientProcessor = new RMA6_16S_AncientNodeProcessor(taxID, minPIdent, mapReader, verbose, log, warning, wantReads, topPercent, maxLength,alignment,turnOffDestacking,turnOffDeDuping, behave);
+					defaultProcessor = new RMA6_16S_NodeProcessor(taxID, minPIdent, mapReader, verbose, log, warning, wantReads, topPercent, maxLength,alignment,turnOffDestacking,turnOffDeDuping,  behave);
+				}
 			this.taxName = getName(taxID);
 			// use ReadsIterator to get all Reads assigned to MegantaxID and print top percent to file
 			this.fileName =fileName;
@@ -155,6 +160,11 @@ public class NodeProcessor{
 					defaultProcessor.process();
 					defaultProcessor.clear();
 				}else if(behave == Filter.NON_ANCIENT) {
+					ancientProcessor.process();
+					defaultProcessor.process();
+					ancientProcessor.clear();
+					defaultProcessor.clear();
+				}else if(behave==Filter.SRNA) {
 					ancientProcessor.process();
 					defaultProcessor.process();
 					ancientProcessor.clear();

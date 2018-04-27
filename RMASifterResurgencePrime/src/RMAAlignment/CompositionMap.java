@@ -2,6 +2,7 @@ package RMAAlignment;
 import java.util.ArrayList;
 import java.util.HashMap;
 import NCBI_MapReader.NCBI_MapReader;
+import behaviour.Filter;
 /**
  * Composition Map is used to process a Hashmap that maps the ALignment objects to their 
  * specific references so that statistics concerning read alignments can be calculated correctly
@@ -12,6 +13,7 @@ import NCBI_MapReader.NCBI_MapReader;
 public class CompositionMap {
 	private boolean turnOffDestacking= false;
 	private boolean turnOffDeDupping = false;
+	private Filter behave = Filter.NON_ANCIENT;
 //	public CompositionMap(HashMap<Integer,ArrayList<Alignment>> map){
 //		setCompositionMap(map);
 //	}
@@ -19,6 +21,12 @@ public class CompositionMap {
 		setCompositionMap(taxonMap);
 		this.turnOffDestacking = turnOffDestacking;
 		this.turnOffDeDupping = turnOffDeDupping;
+	}
+	public CompositionMap(HashMap<Integer, HashMap<String, ArrayList<Alignment>>> taxonMap,boolean turnOffDestacking, boolean turnOffDeDupping,Filter behave){
+		setCompositionMap(taxonMap);
+		this.turnOffDestacking = turnOffDestacking;
+		this.turnOffDeDupping = turnOffDeDupping;
+		this.behave=behave;
 	}
 	// initialize values
 private HashMap<Integer, HashMap<String, ArrayList<Alignment>>> compositionMap;// hashMap of ReferenceID to List of start positions
@@ -134,7 +142,8 @@ public void markAllDuplicates(){
 	}
 }
 public void calculateStatistics(){
-	AlignmentStatistics stats = new AlignmentStatistics(compositionMap.get(getMaxID()).get(maxReference),turnOffDestacking, turnOffDeDupping);
+	
+	AlignmentStatistics stats = new AlignmentStatistics(compositionMap.get(getMaxID()).get(maxReference),turnOffDestacking, turnOffDeDupping, behave);
 	stats.calculateStatistics();
 	this.coverageHistogram = stats.getConverageHistogram();
 	this.generalStatistics = stats.getGenaralStatistics();
@@ -151,7 +160,6 @@ public void getNonStacked(){
 		HashMap<String,ArrayList<Alignment>> rMap = compositionMap.get(key);
 		for(String reference : rMap.keySet()){
 			if(turnOffDestacking){
-				
 				ArrayList<Alignment>list=rMap.get(reference);
 				stackedSizes.add(new NOAOR(list.size(),reference,key));
 				nonStackedOnReference.putIfAbsent(reference, list.size());
@@ -197,7 +205,13 @@ public void process(){
 	//System.out.println(maxKey);
 	setMaxID(maxKey);
 	setMaxReference(maxReference);
-	markAllDuplicates();
+	if(behave!=Filter.SRNA) {
+		if(!turnOffDeDupping) {
+			markAllDuplicates();
+		}
+	 }	else {
+		 turnOffDestacking=true;
+	 }	
   }
 
 //calculate and get all top references

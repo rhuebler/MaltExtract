@@ -6,6 +6,9 @@ import java.text.DecimalFormatSymbols;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+
+import Analysis_16S_Data.ReferenceMap16S;
+import behaviour.Filter;
 /**
  * This class is used to compute some Statistics from a List of Alignments. Alignments should come from CompositionMap and must have their duplicates marked
  * Usually duplicates will be removed unless the off switch is turned on. And stacking reads is removed also retrieve information whether filter was turned off or not
@@ -22,8 +25,14 @@ public class AlignmentStatistics {
 	private boolean turnOffDeDupping = false;
 	private ArrayList<String> coverage = new ArrayList<String>();
 	private ArrayList<Alignment> destackedList;
+	private Filter behave = Filter.NON_ANCIENT;
 	//constructor and set values
 	public AlignmentStatistics(ArrayList<Alignment> list, boolean turnOffDestacking, boolean turnOffDeDupping){
+		this.currentList = list;
+		this.turnOffDestacking = turnOffDestacking;
+		this.turnOffDeDupping = turnOffDeDupping;
+	}
+	public AlignmentStatistics(ArrayList<Alignment> list, boolean turnOffDestacking, boolean turnOffDeDupping, Filter behave){
 		this.currentList = list;
 		this.turnOffDestacking = turnOffDestacking;
 		this.turnOffDeDupping = turnOffDeDupping;
@@ -65,61 +74,110 @@ public class AlignmentStatistics {
 	
 	// process best list of start positions
 	public void calculateStatistics(){
-		
-		ArrayList<Alignment> input = new ArrayList<Alignment>();
-		if(!turnOffDeDupping)
-			input =removeDuplicates(currentList);
-		else
-			input = currentList;
-		if(input != null && input.size()>0){
-			ArrayList<Double> results = new ArrayList<Double>();
-			// initialize reference map
-			ReferenceMap refMap = new ReferenceMap(input,turnOffDestacking);
-			refMap.process();
-			HashMap<Integer,Integer> coverageHistogram = refMap.getCoverageHistogram();
-			int temp = 0;
-			for(int key : coverageHistogram.keySet())
-				temp += coverageHistogram.get(key);
-			int zeros = refMap.getLength() - temp ;	
-			if(zeros<0)
-				zeros = 0;
-			
-			DecimalFormatSymbols otherSymbols = new DecimalFormatSymbols();
-			otherSymbols.setDecimalSeparator('.');
-			otherSymbols.setGroupingSeparator(','); 
-			DecimalFormat df = new DecimalFormat("#.###",otherSymbols);
-			coverageHistogram.put(0, zeros);
-			int unique=coverageHistogram.get(1);
-			
-			if(unique  == 0){
-				results.add(0.0);
+		if(behave!=Filter.SRNA) {// Here we process Read distribution as per usual
+			ArrayList<Alignment> input = new ArrayList<Alignment>();
+			if(!turnOffDeDupping)
+				input =removeDuplicates(currentList);
+			else
+				input = currentList;
+			if(input != null && input.size()>0){
+				ArrayList<Double> results = new ArrayList<Double>();
+				// initialize reference map
+				ReferenceMap refMap = new ReferenceMap(input,turnOffDestacking);
+				refMap.process();
+				HashMap<Integer,Integer> coverageHistogram = refMap.getCoverageHistogram();
+				int temp = 0;
+				for(int key : coverageHistogram.keySet())
+					temp += coverageHistogram.get(key);
+				int zeros = refMap.getLength() - temp ;	
+				if(zeros<0)
+					zeros = 0;
+				
+				DecimalFormatSymbols otherSymbols = new DecimalFormatSymbols();
+				otherSymbols.setDecimalSeparator('.');
+				otherSymbols.setGroupingSeparator(','); 
+				DecimalFormat df = new DecimalFormat("#.###",otherSymbols);
+				coverageHistogram.put(0, zeros);
+				int unique=coverageHistogram.get(1);
+				
+				if(unique  == 0){
+					results.add(0.0);
+				}else{
+					results.add((Double.parseDouble(df.format(unique/(refMap.getPossible())))));
+				}
+				this.coverageHistogram = coverageHistogram;
+				destackedList = refMap.getNonStacked();
+				results.add((double) input.size()-refMap.getStackedReads());
+				results.add((double)  input.size());
+				results.add((double) currentList.size());
+				results.add((double) refMap.getLength());
+	
+				
+				coverage.add(df.format(refMap.getAverageCoverage()));
+				coverage.add(df.format(refMap.getCoverageDeviation()));
+				for(int key:refMap.getCoveragePositions().keySet()){
+					coverage.add(df.format(refMap.getCoveragePositions().get(key)/refMap.getLength()));
+				}
+				this.generalStatistics = results;
 			}else{
-				results.add((Double.parseDouble(df.format(unique/(refMap.getPossible())))));
+				HashMap<Integer,Integer> coverageHistogram = new HashMap<Integer,Integer>();
+				for(int l = 0; l<=11; l++)
+					coverageHistogram.put(l, 0);	
+				this.coverageHistogram = coverageHistogram;
+				ArrayList<Double> results =	new ArrayList<Double>();
+				for(int i = 0; i<5;  i++)
+					results.add(0.0);
+				this.generalStatistics = results;
 			}
-			this.coverageHistogram = coverageHistogram;
-			destackedList = refMap.getNonStacked();
-			results.add((double) input.size()-refMap.getStackedReads());
-			results.add((double)  input.size());
-			results.add((double) currentList.size());
-			results.add((double) refMap.getLength());
-
 			
-			coverage.add(df.format(refMap.getAverageCoverage()));
-			coverage.add(df.format(refMap.getCoverageDeviation()));
-			for(int key:refMap.getCoveragePositions().keySet()){
-				coverage.add(df.format(refMap.getCoveragePositions().get(key)/refMap.getLength()));
-			}
-			this.generalStatistics = results;
-		}else{
-			HashMap<Integer,Integer> coverageHistogram = new HashMap<Integer,Integer>();
-			for(int l = 0; l<=11; l++)
-				coverageHistogram.put(l, 0);	
-			this.coverageHistogram = coverageHistogram;
-			ArrayList<Double> results =	new ArrayList<Double>();
-			for(int i = 0; i<5;  i++)
+		}else {//In !6S data our red distibution estimation is probably flawed as spikes in coverage are to be expected
+			ArrayList<Alignment> input = new ArrayList<Alignment>();
+			if(!turnOffDeDupping)
+				input =removeDuplicates(currentList);
+			else
+				input = currentList;
+			if(input != null && input.size()>0){
+				ArrayList<Double> results = new ArrayList<Double>();
+				// initialize reference map
+				ReferenceMap16S refMap = new ReferenceMap16S(input);
+				refMap.process();
+				HashMap<Integer,Integer> coverageHistogram = refMap.getCoverageHistogram();
+				int temp = 0;
+				for(int key : coverageHistogram.keySet())
+					temp += coverageHistogram.get(key);
+				int zeros = refMap.getLength() - temp ;	
+				if(zeros<0)
+					zeros = 0;
+				
+				DecimalFormatSymbols otherSymbols = new DecimalFormatSymbols();
+				otherSymbols.setDecimalSeparator('.');
+				otherSymbols.setGroupingSeparator(','); 
+				DecimalFormat df = new DecimalFormat("#.###",otherSymbols);
+				coverageHistogram.put(0, zeros);
+				this.coverageHistogram = coverageHistogram;
+				
 				results.add(0.0);
-			this.generalStatistics = results;
-		}
-		
+				results.add((double) 0);
+				results.add((double)  0);
+				results.add((double) currentList.size());
+				results.add((double) refMap.getLength());
+	
+				coverage.add(df.format(refMap.getAverageCoverage()));
+				coverage.add(df.format(refMap.getCoverageDeviation()));
+				for(int key:refMap.getCoveragePositions().keySet()){
+					coverage.add(df.format(refMap.getCoveragePositions().get(key)/refMap.getLength()));
+				}
+				this.generalStatistics = results;
+			}else{
+				HashMap<Integer,Integer> coverageHistogram = new HashMap<Integer,Integer>();
+				for(int l = 0; l<=11; l++)
+					coverageHistogram.put(l, 0);	
+				this.coverageHistogram = coverageHistogram;
+				ArrayList<Double> results =	new ArrayList<Double>();
+				for(int i = 0; i<5;  i++)
+					results.add(0.0);
+				this.generalStatistics = results;
+			}
+		}	
 	}
 }

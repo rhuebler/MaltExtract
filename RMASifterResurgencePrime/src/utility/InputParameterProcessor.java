@@ -335,6 +335,9 @@ public class InputParameterProcessor {
     	            }else if(Pattern.compile(Pattern.quote("full"), Pattern.CASE_INSENSITIVE).matcher(commandLine.getOptionValue("filter")).find()){//TODO remove in future
 	    	            	 behave = Filter.NON_ANCIENT;
 	    	            	log.log(Level.INFO,"Custom Behaviour set to: "+commandLine.getOptionValue("filter"));
+    	            }else if(Pattern.compile(Pattern.quote("sRNA"), Pattern.CASE_INSENSITIVE).matcher(commandLine.getOptionValue("filter")).find()){//TODO remove in future
+	    	            	 behave = Filter.SRNA;
+	    	            	log.log(Level.INFO,"Custom Behaviour set to: "+commandLine.getOptionValue("filter"));
     	            }
     	        }
 
