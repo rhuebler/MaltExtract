@@ -78,7 +78,7 @@ public class InputParameterProcessor {
 				+"--maxLength "+maxLength+"\n"
 				+"--minPI "+minPIdent+"\n"
 				+"--resources "+tree_Path+"\n"
-				+ "--threads "+numThreads+"\n";
+				+"--threads "+numThreads+"\n";
 				if(verbose)
 					line+="--verbose\n";
 				if(alignment)
@@ -188,7 +188,7 @@ public class InputParameterProcessor {
     	    // long flags
     	    Option option_Threads = Option.builder("p").longOpt("threads").argName("Integer").hasArg().optionalArg(true).desc("How many cores to use?").build();		
     	    Option option_TopPercent = Option.builder("a").longOpt("top").argName("Double").hasArg().optionalArg(true).desc("Use top scoring 0.XX of alignments by defualt 0.01").build();
-    	    Option option_Filter = Option.builder("f").longOpt("filter").argName("String").optionalArg(true).hasArg().desc("Use chosen filter full (def_anc), ancient, default crawl, scan").build();
+    	    Option option_Filter = Option.builder("f").longOpt("filter").argName("String").optionalArg(true).hasArg().desc("Use chosen filter full (def_anc), ancient, default, crawl, scan, srna").build();
     	    Option option_MaxLength = Option.builder().longOpt("maxReadLength").argName("Integer").hasArg().optionalArg(true).desc("Set maximum read length").build();
     	    Option option_minPercentIdent = Option.builder().longOpt("minPI").argName("Double").hasArg().optionalArg(true).desc("Set minimum percent identity to XX.X").build(); 
     	    Option option_Help = Option.builder("h").longOpt("help").optionalArg(true).desc("Print Help").build();
@@ -335,7 +335,7 @@ public class InputParameterProcessor {
     	            }else if(Pattern.compile(Pattern.quote("full"), Pattern.CASE_INSENSITIVE).matcher(commandLine.getOptionValue("filter")).find()){//TODO remove in future
 	    	            	 behave = Filter.NON_ANCIENT;
 	    	            	log.log(Level.INFO,"Custom Behaviour set to: "+commandLine.getOptionValue("filter"));
-    	            }else if(Pattern.compile(Pattern.quote("sRNA"), Pattern.CASE_INSENSITIVE).matcher(commandLine.getOptionValue("filter")).find()){//TODO remove in future
+    	            }else if(Pattern.compile(Pattern.quote("srna"), Pattern.CASE_INSENSITIVE).matcher(commandLine.getOptionValue("filter")).find()){//TODO remove in future
 	    	            	 behave = Filter.SRNA;
 	    	            	log.log(Level.INFO,"Custom Behaviour set to: "+commandLine.getOptionValue("filter"));
     	            }

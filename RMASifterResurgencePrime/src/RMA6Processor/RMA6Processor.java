@@ -142,13 +142,14 @@ public void process() {// processing
 		Set<Integer> keys = getAllKeys();
 		Set<Integer> idsToProcess = new HashSet<Integer>();
 	   // treeReader here to avoid synchronization issues 
-		if(taxas == Taxas.USER){
+		if(taxas == Taxas.USER && behave!= Filter.SRNA){
 			for(Integer taxID : taxIDs){
 				idsToProcess.add(taxID);
 				idsToProcess.addAll(treeReader.getAllStrains(taxID, keys));
 			}
-		}
-		else if(taxas == Taxas.ALL){
+		}else if(taxas == Taxas.USER && behave== Filter.SRNA) {
+			idsToProcess.addAll(treeReader.getLowestContainedIds(keys));
+		}else if(taxas == Taxas.ALL){
 			idsToProcess.addAll(keys);
 		}
 		setContainedIDs(idsToProcess);
