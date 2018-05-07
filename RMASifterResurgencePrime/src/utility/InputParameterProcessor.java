@@ -273,7 +273,7 @@ public class InputParameterProcessor {
     	        			warning.log(Level.SEVERE,"Illegal character used in path for out dir");
     	        			System.exit(1);
     	        		}
-    	        		File f = new File(path);
+    	        		File f = new File(path.trim());
     	        		f.isDirectory();
     	        		 outDir = f.getCanonicalPath()+"/";
     	        		}catch(IOException io){
@@ -291,6 +291,7 @@ public class InputParameterProcessor {
     	     				if(f.getCanonicalFile().exists()){
     	     					readTaxList(f);
     	     				}else{
+    	     					log.info("No Input file specified!!! Add taxons to analyis");
 							   log.info("Added Taxon: ");
 							   log.info(tax +" to analysis");
 							   //taxNames.add(tax.replace('_', ' ')); 

@@ -95,7 +95,7 @@ public class RMAExtractor {
 					if(inProcessor.isVerbose())
 						log.log(Level.INFO, mapReader.getNcbiNameToIdMap().get(name)+" added to analysis");
 				}else{
-					warning.log(Level.SEVERE, name + " has no assigned taxID and cannot be processed!");
+					warning.log(Level.SEVERE, name + " has no assigned taxID and cannot be processed! Consider checking for a error in filepath if you provided a taxon file as input");
 				}
 			}
     	}
