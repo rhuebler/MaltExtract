@@ -293,7 +293,8 @@ public class InputParameterProcessor {
     	     				}else{
 							   log.info("Added Taxon: ");
 							   log.info(tax +" to analysis");
-							   taxNames.add(tax.replace('_', ' ')); 
+							   //taxNames.add(tax.replace('_', ' ')); 
+							   taxNames.add(tax);
     	     				}
     	            	} catch (IOException e) {
     	            	System.exit(1);
@@ -392,22 +393,22 @@ public class InputParameterProcessor {
     	        	log.log(Level.INFO, "Retrieve filtered Reads");
     	        	 reads = true;
     	        }
-    	        if(commandLine.hasOption("list")){
-    	        	String list = commandLine.getOptionValue("list");
-    	        	String line = "";
-    	        	if(Pattern.compile(Pattern.quote("default"), Pattern.CASE_INSENSITIVE).matcher(list).find()){
-    	        		log.log(Level.INFO, "use default list" + minComplexity);
-    	        		line = "myPointer";
-    	        	}// use other lists here
-    	        	try{
-	            		File f = new File(line);
-	     				if(f.getCanonicalFile().exists()){
-	     					readTaxList(f);
-	     				}
-    	        	} catch(IOException io)	{
-    	        		warning.log(Level.WARNING, line+" not exist", io);
-    	        	}
-    	        }
+//    	        if(commandLine.hasOption("list")){
+//    	        	String list = commandLine.getOptionValue("list");
+//    	        	String line = "";
+//    	        	if(Pattern.compile(Pattern.quote("default"), Pattern.CASE_INSENSITIVE).matcher(list).find()){
+//    	        		log.log(Level.INFO, "use default list" + minComplexity);
+//    	        		line = "myPointer";
+//    	        	}// use other lists here
+//    	        	try{
+//	            		File f = new File(line);
+//	     				if(f.getCanonicalFile().exists()){
+//	     					readTaxList(f);
+//	     				}
+//    	        	} catch(IOException io)	{
+//    	        		warning.log(Level.WARNING, line+" not exist", io);
+//    	        	}
+//    	        }
     	        if(commandLine.hasOption("matches")&& behave != Filter.SCAN){
     	        	log.log(Level.INFO, "retrieve Alignments");
     	        	alignment = true;

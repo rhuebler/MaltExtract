@@ -71,7 +71,7 @@ public class DirectoryCreator {
 				new File(outDir+"/ancientNonDuplicates/"+"/alignments/").mkdirs();
 			if(reads)
 				new File(outDir+"/ancientNonDuplicates/"+"/reads/").mkdirs();
-		}else if(behave == Filter.NON_ANCIENT){
+		}else if(behave == Filter.NON_ANCIENT ){
 			new File(outDir+"/default/").mkdirs();
 			new File(outDir+"/ancient/"+"/readDist/").mkdirs(); 
 			new File(outDir+"/ancient/"+"/editDistance/").mkdirs();
@@ -94,7 +94,30 @@ public class DirectoryCreator {
 				new File(outDir+"/default/"+"/reads/").mkdirs();
 				new File(outDir+"/ancient/"+"/reads/").mkdirs();
 			}
+		}else if(behave == Filter.SRNA ){
+			new File(outDir+"/default/").mkdirs();
+			new File(outDir+"/ancient/"+"/readDist/").mkdirs(); 
+			new File(outDir+"/ancient/"+"/editDistance/").mkdirs();
+			new File(outDir+"/ancient/"+"/percentIdentity/").mkdirs();
+			new File(outDir+"/ancient/"+"/damageMismatch/").mkdirs();
+			new File(outDir+"/ancient/"+"/filterInformation/").mkdirs();
+			new File(outDir+"/ancient/"+"/coverage/").mkdirs();
+			
+			new File(outDir+"/default/"+"/readDist/").mkdirs(); 
+			new File(outDir+"/default/"+"/editDistance/").mkdirs();
+			new File(outDir+"/default/"+"/percentIdentity/").mkdirs();
+			new File(outDir+"/default/"+"/damageMismatch/").mkdirs();
+			new File(outDir+"/default/"+"/filterInformation/").mkdirs();
+			new File(outDir+"/default/"+"/coverage/").mkdirs();
+			if(hits){
+				new File(outDir+"/default/"+"/alignments/").mkdirs();
+				new File(outDir+"/ancient/"+"/alignments/").mkdirs();
 			}
+			if(reads){
+				new File(outDir+"/default/"+"/reads/").mkdirs();
+				new File(outDir+"/ancient/"+"/reads/").mkdirs();
+			}
+		}
 	}
 
 }

@@ -262,11 +262,24 @@ public class RMA6OutputProcessor {
 						new File(outDir+"/default/"+"/reads/"+fileName).mkdirs();
 						new File(outDir+"/ancient/"+"/reads/"+fileName).mkdirs();
 				}
-			prepareOutput(processedMap,Filter.NON);
-			prepareOutput(processedMap,Filter.ANCIENT);
-			
-			processedMap.clear();
-			break;
+				prepareOutput(processedMap,Filter.NON);
+				prepareOutput(processedMap,Filter.ANCIENT);
+				processedMap.clear();
+				break;
+			}
+			case SRNA:{
+				if(alignment){
+					new File(outDir+"/ancient/"+"/alignments/"+fileName).mkdirs();
+					new File(outDir+"/default/"+"/alignments/"+fileName).mkdirs();
+				}	
+				if(reads){
+						new File(outDir+"/default/"+"/reads/"+fileName).mkdirs();
+						new File(outDir+"/ancient/"+"/reads/"+fileName).mkdirs();
+				}
+				prepareOutput(processedMap,Filter.NON);
+				prepareOutput(processedMap,Filter.ANCIENT);
+				processedMap.clear();
+				break;
 			}
 		default:	
 			warning.log(Level.SEVERE, "Filter no longer supported");
