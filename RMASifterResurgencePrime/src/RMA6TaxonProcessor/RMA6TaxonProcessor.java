@@ -141,7 +141,7 @@ protected void processCompositionMap(CompositionMap map){
 		//set coverage Line
 		HashMap<Integer,Integer> histogram = map.getConverageHistogram();
 		String line = taxName + "\t" + maxReference;
-		for(int k : histogram.keySet())
+		for(int k =0;k<=11;k++)
 			line += "\t" + histogram.get(k);
 		this.coverageLine = line;
 		this.additionalEntries = taxName+"\t"+map.getTopTenReferences();
@@ -306,9 +306,10 @@ protected void calculateReadLengthDistribution(){
 		for(int i : lengths){// round to the closest number dividable by 5 to get the intervals
 			if(i>=25 && i<=200){//check that lenghts are in interval
 				stats.addValue(i);
-				int value = intervals.get(round(i, 5));
+				int x = round(i, 5);
+				int value = intervals.get(x);
 				value++;
-				intervals.replace(round(i, 5), value);
+				intervals.replace(x, value);
 			}else{
 				warn = true;
 			}
@@ -325,8 +326,8 @@ protected void calculateReadLengthDistribution(){
 		
 		this.readLengthStatistics = rlStat;
 		String rlDist = taxName;
-		for(int key:intervals.keySet()){
-			rlDist+="\t"+intervals.get(key);
+		for(int i = 25;i<=200;i+=5){
+			rlDist+="\t"+intervals.get(i);
 		}
 		this.readLengthDistribution = rlDist;
 		stats=null;
@@ -352,7 +353,7 @@ public String getAdditionalEntries(){
 	return this.additionalEntries;
 }
 private int round(double i, int v){
-    return (int) (Math.round(i/v) * v);
+    return (int) (Math.round((double)i/(double)v) * (double)v);
 }
 public void processMatchBlocks(IMatchBlock[] blocks, String name, int length, String sequence){ 
 
