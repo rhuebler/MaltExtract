@@ -90,21 +90,26 @@ public class NodeProcessor{
 		}
 		//processing through node initialize taxon processors based on input parameters
 		public void process(String inDir, String fileName, double topPercent, int maxLength){ 
-				if(behave == Filter.ANCIENT){
+			switch(behave) {
+				case ANCIENT:
 					ancientProcessor =  new ExperimentalRMA6AncientDestacker(taxID, minPIdent, mapReader, verbose, log, warning, wantReads, topPercent, maxLength,alignment,turnOffDestacking,turnOffDeDuping, behave);
-				}else if(behave == Filter.NON){
+					break;
+				case NON:
 					defaultProcessor = new ExperimentalRMA6Destacker(taxID, minPIdent, mapReader, verbose, log, warning, wantReads, topPercent, maxLength,alignment,turnOffDestacking,turnOffDeDuping, behave);
-				}else if(behave == Filter.ALL){
-					System.err.println("Filter no longer supported");
-				}else if(behave == Filter.NON_ANCIENT){
+					break;
+				case NON_ANCIENT:
 					ancientProcessor = new ExperimentalRMA6AncientDestacker(taxID, minPIdent, mapReader, verbose, log, warning, wantReads, topPercent, maxLength,alignment,turnOffDestacking,turnOffDeDuping,  behave);
 					defaultProcessor = new ExperimentalRMA6Destacker(taxID, minPIdent, mapReader, verbose, log, warning, wantReads, topPercent, maxLength,alignment,turnOffDestacking,turnOffDeDuping,  behave);
-				}else if(behave == Filter.NONDUPLICATES ){
-					System.err.println("Filter no longer supported");
-				}else if(behave == Filter.SRNA) {
+					break;
+				case SRNA:
 					ancientProcessor = new RMA6_16S_AncientNodeProcessor(taxID, minPIdent, mapReader, verbose, log, warning, wantReads, topPercent, maxLength,alignment,turnOffDestacking,turnOffDeDuping, behave);
 					defaultProcessor = new RMA6_16S_NodeProcessor(taxID, minPIdent, mapReader, verbose, log, warning, wantReads, topPercent, maxLength,alignment,turnOffDestacking,turnOffDeDuping,  behave);
-				}
+					break;
+				default:
+					System.err.println("Filter no longer supported");
+					break;
+					
+			}
 			this.taxName = getName(taxID);
 			// use ReadsIterator to get all Reads assigned to MegantaxID and print top percent to file
 			this.fileName =fileName;
@@ -137,11 +142,17 @@ public class NodeProcessor{
 						if(current.getReadLength() <= maxLength || maxLength == 0){
 							if(minComplexity<=getComplexity(current.getReadSequence())){
 								IMatchBlock[] blocks = current.getMatchBlocks();
-								if(behave == Filter.NON_ANCIENT || behave == Filter.ANCIENT ){
-									ancientProcessor.processMatchBlocks(blocks, current.getReadName(), current.getReadLength(), current.getReadSequence());
-								} 
-								if(behave == Filter.NON_ANCIENT || behave == Filter.NON ){
+								switch(behave) {
+								default:
 									defaultProcessor.processMatchBlocks(blocks,current.getReadName(), current.getReadLength(), current.getReadSequence());
+									ancientProcessor.processMatchBlocks(blocks, current.getReadName(), current.getReadLength(), current.getReadSequence());
+									break;
+								case ANCIENT:
+									ancientProcessor.processMatchBlocks(blocks, current.getReadName(), current.getReadLength(), current.getReadSequence());
+									break;
+								case NON:
+									defaultProcessor.processMatchBlocks(blocks,current.getReadName(), current.getReadLength(), current.getReadSequence());
+									break;
 								}
 							}
 						}// if  
@@ -153,23 +164,23 @@ public class NodeProcessor{
 				classIt.close();
 				rma6File.close();
 				// process taxonprocessors
-				if(behave == Filter.ANCIENT ){
-					ancientProcessor.process();
-					ancientProcessor.clear();
-				}else if(behave == Filter.NON ){
-					defaultProcessor.process();
-					defaultProcessor.clear();
-				}else if(behave == Filter.NON_ANCIENT) {
-					ancientProcessor.process();
-					defaultProcessor.process();
-					ancientProcessor.clear();
-					defaultProcessor.clear();
-				}else if(behave==Filter.SRNA) {
-					ancientProcessor.process();
-					defaultProcessor.process();
-					ancientProcessor.clear();
-					defaultProcessor.clear();
-				}	
+				switch(behave){
+					default:
+						ancientProcessor.process();
+						defaultProcessor.process();
+						ancientProcessor.clear();
+						defaultProcessor.clear();
+						break;
+					case ANCIENT:	
+						ancientProcessor.process();
+						ancientProcessor.clear();
+						break;
+					case NON:
+						defaultProcessor.process();
+						defaultProcessor.clear();
+						break;
+						
+				}
 			}
 		}catch(Exception e){
 			warning.log(Level.SEVERE,mapReader.getNcbiIdToNameMap().get(taxID), e);	

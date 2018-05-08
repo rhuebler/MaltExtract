@@ -160,7 +160,8 @@ public class InputParameterProcessor {
 		try {
 			 Scanner	in = new Scanner(f.getCanonicalFile());
 			 while(in.hasNext()){
-				 taxNames.add(in.nextLine().trim().replace('_', ' '));
+				// taxNames.add(in.nextLine().trim().replace('_', ' '));
+				 taxNames.add(in.nextLine().trim());
 			 }
 			 in.close();
 		 	}catch (FileNotFoundException e) {
@@ -291,7 +292,7 @@ public class InputParameterProcessor {
     	     				if(f.getCanonicalFile().exists()){
     	     					readTaxList(f);
     	     				}else{
-    	     					log.info("No Input file specified!!! Add taxons to analyis");
+    	     					log.info("No Taxin file specified!!! Using cli as taxon");
 							   log.info("Added Taxon: ");
 							   log.info(tax +" to analysis");
 							   //taxNames.add(tax.replace('_', ' ')); 

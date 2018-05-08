@@ -161,11 +161,17 @@ public void process() {// processing
 		  }//TaxIDs	
 		RMA6OutputProcessor outProcessor = new RMA6OutputProcessor(fileName, outDir,mapReader,warning, behave, alignments, reads);
 		outProcessor.process(results);
-		if(behave==Filter.NON_ANCIENT || behave==Filter.NON){
-			setSumLine(outProcessor.getSumLine());
-		}
-		if(behave==Filter.NON_ANCIENT || behave==Filter.ANCIENT){
-			ancientSum = outProcessor.getAncientLine();
+		switch(behave) {
+			default:
+				setSumLine(outProcessor.getSumLine());
+				ancientSum = outProcessor.getAncientLine();
+				break;
+			case NON:
+				setSumLine(outProcessor.getSumLine());
+				break;
+			case ANCIENT:
+				ancientSum = outProcessor.getAncientLine();
+				break;
 		}
     }
  }

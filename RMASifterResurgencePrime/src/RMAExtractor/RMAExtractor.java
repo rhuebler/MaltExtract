@@ -25,7 +25,6 @@ import RMA6Processor.ConcurrentRMA6Scanner;
 import RMA6Processor.RMA6BlastCrawler;
 import RMA6Processor.RMA6Processor;
 import RMA6Processor.RMA6Scanner;
-import behaviour.Filter;
 import behaviour.Taxas;
 import jloda.util.PeakMemoryUsageMonitor;
 import utility.DirectoryCreator;
@@ -106,7 +105,8 @@ public class RMAExtractor {
 		
 		// run normal mode if neither crawl nor scan are used
 
-		if(inProcessor.getFilter() != Filter.SCAN  && inProcessor.getFilter() != Filter.CRAWL ){
+		switch(inProcessor.getFilter()){
+		default:
 			executor=(ThreadPoolExecutor) Executors.newFixedThreadPool(inProcessor.getNumThreads());//intialize concurrent thread executor 
 			log.log(Level.INFO, "Using "+executor.getCorePoolSize()+"cores");
 			List<Future<RMA6Processor>> processedFiles = new ArrayList<>();
@@ -116,13 +116,14 @@ public class RMAExtractor {
 						Future<RMA6Processor> future=executor.submit(task);
 						processedFiles.add(future);
     		}//fileNames;
-	    // wait for all threads to finish here currently no concurrency errors or deadlocks but this would be the place where it would fall apart 
-    	destroy();
-	    SummaryWriter sumWriter = new SummaryWriter(processedFiles,mapReader,inProcessor.getOutDir(), warning,inProcessor.getFilter()); 
-	    sumWriter.process();
-	    log.log(Level.INFO, "Writing Summary File");
-	  }else{ 
-			  if(inProcessor.getFilter() == Filter.SCAN && inProcessor.getFilter() != Filter.CRAWL){// run scan if crawl is not set
+    		// wait for all threads to finish here currently no concurrency errors or deadlocks but this would be the place where it would fall apart 
+    		destroy();
+    		SummaryWriter sumWriter = new SummaryWriter(processedFiles,mapReader,inProcessor.getOutDir(), warning,inProcessor.getFilter()); 
+    		sumWriter.process();
+	    	log.log(Level.INFO, "Writing Summary File");
+	    	break;
+	 
+	case SCAN:	 
 			  executor=(ThreadPoolExecutor) Executors.newFixedThreadPool(inProcessor.getNumThreads());//intialize concurrent thread executor 
 			  log.log(Level.INFO, "Using ",executor.getCorePoolSize());
 			  List<Future<RMA6Scanner>> scannerList = new ArrayList<Future<RMA6Scanner>>();
@@ -138,7 +139,9 @@ public class RMAExtractor {
 			  ScanSummaryWriter writer = new ScanSummaryWriter(scannerList, mapReader, warning);
 			  log.log(Level.INFO, "Writing Scan Summary File");
 			  writer.write(inProcessor.getOutDir());
-	  }else if(inProcessor.getFilter() == Filter.CRAWL ){// run crawl filter
+			  break;
+			  
+	case CRAWL:
 		  for(String fileName : inProcessor.getFileNames()){
 			  File f = new File(fileName);
 			  log.log(Level.INFO, "Crawl for file " + fileName);
@@ -150,8 +153,9 @@ public class RMAExtractor {
 					 crawler.process();
 				}
 		  }	
-	  } 
-		  log.log(Level.INFO, "Crawling Done");
+		 log.log(Level.INFO, "Crawling Done");
+		 break;
+		  
 	  }// get runtime 
 		long endTime = System.nanoTime();
 		log.log(Level.INFO,"Runtime: "+ TimeUnit.NANOSECONDS.toMinutes(endTime - startTime) +" Minutes");
