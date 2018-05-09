@@ -272,8 +272,10 @@ public ArrayList<String> getReads(){
 }
 public String getEditDistanceHistogram(){
 	HashMap<Integer,Integer> histo = this.editHistogram;
-	return taxName+"\t"+ histo.get(0)+"\t"+histo.get(1)+"\t"+histo.get(2)+"\t"+histo.get(3)+"\t"+histo.get(4)+"\t"+histo.get(5)+"\t"
-			+histo.get(6)+"\t"+histo.get(7)+"\t"+histo.get(8)+"\t"+histo.get(9)+"\t"+histo.get(10)+"\t"+histo.get(11);
+	String line = taxName;
+	for(int i=0;i<=11;i++)
+		line+="\t"+histo.get(i);
+	return line;
 }
 public String getPercentIdentityHistogram(){
 	HashMap<Integer,Integer> histo = this.pIdentHistogram;
