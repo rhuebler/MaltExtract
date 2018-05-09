@@ -25,11 +25,7 @@ public class MatchProcessorCrawler extends RMA6TaxonProcessor {
 
 	public MatchProcessorCrawler(int id ,double pID, NCBI_MapReader reader,
 			boolean v,Logger log, Logger warning, boolean reads,double tp,int mL,boolean wantAls,boolean turnOffDestacking,boolean turnOffDeDuping,Filter behave) {
-		super(id,pID, reader, v, log, warning,tp,mL, behave);
-		this.wantReads =reads;
-		this.wantAlignments = wantAls;
-		this.turnOffDestacking = turnOffDestacking;
-		this.turnOffDeDuping = turnOffDeDuping;
+		super(id ,pID, reader, v, log, warning, reads, tp, mL, wantAls, turnOffDestacking, turnOffDeDuping, behave);
 	}
 	//process each Matchblock
 	public void processDLQlist(ConcurrentLinkedDeque<Alignment> concurrentLinkedDeque) {

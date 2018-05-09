@@ -65,13 +65,19 @@ protected boolean turnedOn = true;
 protected String additionalEntries;
 protected String covPositions;
 protected DecimalFormat df;
+protected boolean wantReads = false;
+protected boolean wantAlignments = false;
+protected boolean turnOffDestacking = false;
+protected boolean turnOffDeDuping = false;
 //constructor
-public RMA6TaxonProcessor(Integer id, double pID, NCBI_MapReader reader, boolean v, Logger log, Logger warning, double topPercent, int maxLength, Filter f){
+
+public RMA6TaxonProcessor(Integer id, double pID, NCBI_MapReader reader, boolean verbose, Logger log, Logger warning,boolean wantReads, double topPercent, int maxLength, 
+		boolean wantAls, boolean turnOffDestacking, boolean turnOffDeDuping, Filter f){
 	// set input values
 	this.mapReader = reader;
 	this.minPIdent = pID;
 	this.taxID = id;
-	this.verbose = v;
+	this.verbose = verbose;
 	this.log = log;
 	this.warning = warning;
 	this.topPercent = topPercent;
@@ -110,6 +116,11 @@ public RMA6TaxonProcessor(Integer id, double pID, NCBI_MapReader reader, boolean
 	otherSymbols.setDecimalSeparator('.');
 	otherSymbols.setGroupingSeparator(','); 
 	df =new DecimalFormat("#.###",otherSymbols);
+	this.wantReads = wantReads;
+	this.wantAlignments = wantAls;
+	this.turnOffDestacking = turnOffDestacking;
+	this.turnOffDeDuping = turnOffDeDuping;
+	
 }
 //setters
 protected void setOriginalNumberOfAlignments(int num){

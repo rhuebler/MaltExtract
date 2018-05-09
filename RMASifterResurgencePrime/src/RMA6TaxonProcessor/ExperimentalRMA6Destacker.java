@@ -25,16 +25,9 @@ public class ExperimentalRMA6Destacker extends RMA6TaxonProcessor {
 	protected boolean turnOffDestacking = false;
 	protected boolean turnOffDeDuping = false;
 	//construvters and set values
-	public ExperimentalRMA6Destacker(Integer id, double pID, NCBI_MapReader reader, boolean v, Logger log, Logger warning,double tp,int mL, Filter behave) {
-		super(id, pID, reader, v, log, warning,tp,mL, behave);
-	}
 	public ExperimentalRMA6Destacker(int id ,double pID, NCBI_MapReader reader,
 			boolean v,Logger log, Logger warning, boolean reads,double tp,int mL,boolean wantAls,boolean turnOffDestacking,boolean turnOffDeDuping,Filter behave) {
-		super(id,pID, reader, v, log, warning,tp,mL, behave);
-		this.wantReads =reads;
-		this.wantAlignments = wantAls;
-		this.turnOffDestacking = turnOffDestacking;
-		this.turnOffDeDuping = turnOffDeDuping;
+		super(id ,pID, reader, v, log, warning, reads, tp, mL, wantAls, turnOffDestacking, turnOffDeDuping, behave);
 	}
 	//process each Matchblock
 	public void processMatchBlocks(IMatchBlock[] blocks, String name, int length, String sequence){
