@@ -140,6 +140,7 @@ protected void setDamageLine(String s){
 }
 // setter for compostion map that retrieves information on read distribution and node composition
 protected void processCompositionMap(CompositionMap map){
+	setTurnedOn(map.wasTurnedOn());
 	if(map.getCompositionMap().keySet().size() >0){//check if some alignments are even left after filtering
 		map.calculateStatistics();
 		//setReadDist

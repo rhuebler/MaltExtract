@@ -105,7 +105,6 @@ import megan.data.IMatchBlock;
 				setPercentIdentityHistogram(pIdents);
 				setReads(lines);
 				setAlignments(alignments);
-				setTurnedOn(map.wasTurnedOn());
 				calculateReadLengthDistribution();
 				map = null;
 			}//process

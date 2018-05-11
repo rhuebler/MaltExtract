@@ -160,6 +160,7 @@ public void getNonStacked(){
 		HashMap<String,ArrayList<Alignment>> rMap = compositionMap.get(key);
 		for(String reference : rMap.keySet()){
 			if(turnOffDestacking){
+				turnedOn = false;
 				ArrayList<Alignment>list=rMap.get(reference);
 				stackedSizes.add(new NOAOR(list.size(),reference,key));
 				nonStackedOnReference.putIfAbsent(reference, list.size());

@@ -109,7 +109,6 @@ public class RMA6_16S_NodeProcessor extends RMA6TaxonProcessor{
 		setPercentIdentityHistogram(pIdents);
 		setReads(lines);
 		setAlignments(alignments);
-		setTurnedOn(map.wasTurnedOn());
 		calculateReadLengthDistribution();
 		map = null;
 	}//process

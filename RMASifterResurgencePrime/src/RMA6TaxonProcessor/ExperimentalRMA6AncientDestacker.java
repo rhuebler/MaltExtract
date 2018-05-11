@@ -118,7 +118,6 @@ public class ExperimentalRMA6AncientDestacker extends RMA6TaxonProcessor {
 		setPercentIdentityHistogram(pIdents);
 		setReads(lines);
 		setAlignments(alignments);
-		setTurnedOn(map.wasTurnedOn());
 		calculateReadLengthDistribution();
 		map = null;
 	}//process
