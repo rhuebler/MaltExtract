@@ -144,6 +144,7 @@ public class NodeProcessor{
 								IMatchBlock[] blocks = current.getMatchBlocks();
 								switch(behave) {
 								default:
+									System.out.println("Processing Reads");
 									defaultProcessor.processMatchBlocks(blocks,current.getReadName(), current.getReadLength(), current.getReadSequence());
 									ancientProcessor.processMatchBlocks(blocks, current.getReadName(), current.getReadLength(), current.getReadSequence());
 									break;
@@ -166,6 +167,7 @@ public class NodeProcessor{
 				// process taxonprocessors
 				switch(behave){
 					default:
+						System.out.println("Processing Parameters");
 						ancientProcessor.process();
 						defaultProcessor.process();
 						ancientProcessor.clear();

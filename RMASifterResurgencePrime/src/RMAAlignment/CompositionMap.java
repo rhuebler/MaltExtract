@@ -142,7 +142,6 @@ public void markAllDuplicates(){
 	}
 }
 public void calculateStatistics(){
-	
 	AlignmentStatistics stats = new AlignmentStatistics(compositionMap.get(getMaxID()).get(maxReference),turnOffDestacking, turnOffDeDupping, behave);
 	stats.calculateStatistics();
 	this.coverageHistogram = stats.getConverageHistogram();
@@ -210,7 +209,7 @@ public void process(){
 		if(!turnOffDeDupping) {
 			markAllDuplicates();
 		}
-	 }	else {
+	 }else {//if Filter.SNRNA we can stop destacking
 		 turnOffDestacking=true;
 	 }	
   }

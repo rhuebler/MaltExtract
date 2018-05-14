@@ -48,15 +48,19 @@ public class SummaryWriter {
 	}
 	public void process(){
 		setProcessedIds();
-		if(behave == Filter.NON){
+		switch(behave) {
+		default:
 			prepareOutput(behave);
-		}else if(behave == Filter.ANCIENT){
-			prepareOutput(behave);
-		}else if(behave == Filter.NON_ANCIENT){
+			break;
+		case NON_ANCIENT:
 			prepareOutput(Filter.NON);
 			prepareOutput(Filter.ANCIENT);
+			break;
+		case SRNA:
+			prepareOutput(Filter.NON);
+			prepareOutput(Filter.ANCIENT);
+			break;
 		}
-		
 	}
 	private void setProcessedIds(){
 		Set<Integer> pIDs = new HashSet<>();
