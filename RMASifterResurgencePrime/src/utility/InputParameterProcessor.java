@@ -70,7 +70,8 @@ public class InputParameterProcessor {
 		String tax ="";
 		for(String name : taxNames)
 			tax+=name+"\b";
-			String line="--input "+input+"\n"
+			String line="MaltTExtract 1.4"
+					+ "--input "+input+"\n"
 				+"--taxa "+tax+"\n"
 				+"--output "+outDir+"\n"
 				+"--filter "+behave+"\n"

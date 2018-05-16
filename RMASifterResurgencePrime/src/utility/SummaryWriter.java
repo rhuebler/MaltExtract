@@ -131,7 +131,7 @@ public class SummaryWriter {
 		   for(int id: summary.keySet())
 				output.add(summary.get(id));
 		   output.sort(null);
-		   output.add(header);
+		   output.add(0,header);
 		  
 		   ArrayList<String> counts = new ArrayList<String>();
 		   counts.add(header);

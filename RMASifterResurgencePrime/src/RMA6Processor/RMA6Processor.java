@@ -39,7 +39,7 @@ public class RMA6Processor {
 	private String inDir;
 	private NCBI_MapReader mapReader;
 	private NCBI_TreeReader treeReader;
-	private Set<Integer> containedIDs;
+	private Set<Integer> containedIDs = new HashSet<Integer>();
 	private Filter behave;
 	private int maxLength;
 	private double minPIdent;
