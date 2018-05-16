@@ -22,10 +22,6 @@ import megan.data.IMatchBlock;
  */
 public class ExperimentalRMA6AncientDestacker extends RMA6TaxonProcessor {
 	//attributes
-	protected boolean wantReads = false;
-	protected boolean wantAlignments = false;
-	protected boolean turnOffDestacking = false;
-	protected boolean turnOffDeDuping = false;
 	public ExperimentalRMA6AncientDestacker(int id ,double pID, NCBI_MapReader reader,
 			boolean v,Logger log, Logger warning, boolean reads,double tp,int mL,boolean wantAls, boolean turnOffDestacking,boolean turnOffDeDuping, Filter behave) {
 		//intialize Nodeanalyzer

@@ -20,10 +20,6 @@ import megan.data.IMatchBlock;
  */
 public class ExperimentalRMA6Destacker extends RMA6TaxonProcessor {
 	// initialize attributes
-	protected boolean wantReads = false;
-	protected boolean wantAlignments = false;
-	protected boolean turnOffDestacking = false;
-	protected boolean turnOffDeDuping = false;
 	//construvters and set values
 	public ExperimentalRMA6Destacker(int id ,double pID, NCBI_MapReader reader,
 			boolean v,Logger log, Logger warning, boolean reads,double tp,int mL,boolean wantAls,boolean turnOffDestacking,boolean turnOffDeDuping,Filter behave) {
@@ -31,6 +27,7 @@ public class ExperimentalRMA6Destacker extends RMA6TaxonProcessor {
 	}
 	//process each Matchblock
 	public void processMatchBlocks(IMatchBlock[] blocks, String name, int length, String sequence){
+
 		originalNumberOfReads++;
 		float topScore = blocks[0].getBitScore();
 			for(int i = 0; i< blocks.length;i++){

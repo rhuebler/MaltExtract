@@ -269,7 +269,7 @@ public String getDamageLine(){
 protected String getName(int taxId){
 	String name;
 	if(mapReader.getNcbiIdToNameMap().get(taxId) != null)
-		name = mapReader.getNcbiIdToNameMap().get(taxId).replace(' ', '_');
+		name = mapReader.getNcbiIdToNameMap().get(taxId).replace(' ', '_').replace('\'', '_').replace('#', '_');
 	else if(taxId == 0)
 		name="NA";
 	else

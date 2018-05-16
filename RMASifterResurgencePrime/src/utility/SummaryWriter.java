@@ -75,7 +75,7 @@ public class SummaryWriter {
 		}
 	}
 	private void prepareOutput(Filter switcher) {
-		   List<String> summary = new ArrayList<String>();
+		 HashMap<Integer,String> summary = new  HashMap<Integer,String>();
 		   String header ="Node"; // could and should be its own function 
 		   String reads = "Total_Count";
 		   boolean first = true;	   
@@ -100,26 +100,23 @@ public class SummaryWriter {
 							}
 						   if(fileResults.containsKey(id)){
 							   line+= "\t"+fileResults.get(id);
-							   summary.add(line);
+							  
 						   }else{
 							   line+= "\t"+0;
-							   summary.add(line);
 						   }
+						   summary.put(id,line);
 					   first = false;
 					   }//for
 				   	}else{
-					   int i = 0;
 					   for(int id : processedIDs){ 
-						   String line = summary.get(i);
+						   String line = summary.get(id);
 						   if(fileResults.containsKey(id)){
 							   line+= "\t"+fileResults.get(id);
-							   summary.set(i,line);
+							  
 						   }else{
 							   line+= "\t"+0;
-							   summary.set(i,line);
 						   }
-					  
-						   i++;
+						   summary.replace(id, line);
 					   }
 				   	}
 				  
@@ -130,17 +127,21 @@ public class SummaryWriter {
 			}
 			   
 		   }//for
-		   summary.sort(null);
-		   summary.add(0,header);
+		   ArrayList<String> output = new ArrayList<String>();
+		   for(int id: summary.keySet())
+				output.add(summary.get(id));
+		   output.sort(null);
+		   output.add(header);
+		  
 		   ArrayList<String> counts = new ArrayList<String>();
 		   counts.add(header);
 		   counts.add(reads);
 		   
 		   if(switcher==Filter.NON){
-			   writeSummary(summary,outDir+"/default/"+"RunSummary"+".txt");
+			   writeSummary(output,outDir+"/default/"+"RunSummary"+".txt");
 			   writeSummary(counts,outDir+"/default/"+"TotalCount"+".txt");
 		   }else if(switcher==Filter.ANCIENT){
-			   writeSummary(summary,outDir+"/ancient/"+"RunSummary"+".txt");
+			   writeSummary(output,outDir+"/ancient/"+"RunSummary"+".txt");
 			   writeSummary(counts,outDir+"/ancient/"+"TotalCount"+".txt");
 		   }
 		   

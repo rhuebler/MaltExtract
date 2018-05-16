@@ -12,10 +12,7 @@ import behaviour.Filter;
 import megan.data.IMatchBlock;
 
 public class RMA6_16S_NodeProcessor extends RMA6TaxonProcessor{
-	protected boolean wantReads = false;
-	protected boolean wantAlignments = false;
-	protected boolean turnOffDestacking = false;
-	protected boolean turnOffDeDuping = false;
+
 	//constructers and set values
 	public RMA6_16S_NodeProcessor(int id ,double pID, NCBI_MapReader reader,
 			boolean verbose,Logger log, Logger warning, boolean wantReads,double tp,int mL,boolean wantAls,boolean turnOffDestacking,boolean turnOffDeDuping,Filter behave) {

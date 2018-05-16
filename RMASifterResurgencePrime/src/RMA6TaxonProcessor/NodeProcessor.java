@@ -123,7 +123,7 @@ public class NodeProcessor{
 					   classificationBlockRMA6.readLocations(location, rma6File.getReader(), taxID, list);
 				   }
 				 }
-				// Downsample list if necessary and write log 
+					// Downsample list if necessary and write log 
 				if(list.size()>10000 && downsample){
 					warning.log(Level.WARNING,"For " + taxName + " in file "+fileName+ " downsampling was turned on");
 				}
@@ -144,7 +144,6 @@ public class NodeProcessor{
 								IMatchBlock[] blocks = current.getMatchBlocks();
 								switch(behave) {
 								default:
-									System.out.println("Processing Reads");
 									defaultProcessor.processMatchBlocks(blocks,current.getReadName(), current.getReadLength(), current.getReadSequence());
 									ancientProcessor.processMatchBlocks(blocks, current.getReadName(), current.getReadLength(), current.getReadSequence());
 									break;
@@ -167,7 +166,6 @@ public class NodeProcessor{
 				// process taxonprocessors
 				switch(behave){
 					default:
-						System.out.println("Processing Parameters");
 						ancientProcessor.process();
 						defaultProcessor.process();
 						ancientProcessor.clear();

@@ -167,6 +167,7 @@ public void getNonStacked(){
 					if(al.isTopAlignment()) {
 						resultsMap.putIfAbsent(al.getReadName()+al.getSequence(), al);
 					}
+					
 				}
 			}else{
 				GetStackedReads reads = new GetStackedReads(rMap.get(reference));

@@ -76,10 +76,11 @@ public class AlignmentStatistics {
 	public void calculateStatistics(){
 		if(behave!=Filter.SRNA) {// Here we process Read distribution as per usual
 			ArrayList<Alignment> input = new ArrayList<Alignment>();
-			if(!turnOffDeDupping)
-				input =removeDuplicates(currentList);
-			else
+			if(turnOffDeDupping) {
 				input = currentList;
+			}else {
+				input =removeDuplicates(currentList);
+			}	
 			if(input != null && input.size()>0){
 				ArrayList<Double> results = new ArrayList<Double>();
 				// initialize reference map
