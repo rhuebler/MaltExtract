@@ -69,10 +69,11 @@ protected boolean wantReads = false;
 protected boolean wantAlignments = false;
 protected boolean turnOffDestacking = false;
 protected boolean turnOffDeDuping = false;
+protected boolean useAllAlignments = false;
 //constructor
 
 public RMA6TaxonProcessor(Integer id, double pID, NCBI_MapReader reader, boolean verbose, Logger log, Logger warning,boolean wantReads, double topPercent, int maxLength, 
-		boolean wantAls, boolean turnOffDestacking, boolean turnOffDeDuping, Filter f){
+		boolean wantAls, boolean turnOffDestacking, boolean turnOffDeDuping, Filter f, boolean useAllAlignments){
 	// set input values
 	this.mapReader = reader;
 	this.minPIdent = pID;
@@ -120,6 +121,7 @@ public RMA6TaxonProcessor(Integer id, double pID, NCBI_MapReader reader, boolean
 	this.wantAlignments = wantAls;
 	this.turnOffDestacking = turnOffDestacking;
 	this.turnOffDeDuping = turnOffDeDuping;
+	this.useAllAlignments = useAllAlignments;
 	
 }
 //setters

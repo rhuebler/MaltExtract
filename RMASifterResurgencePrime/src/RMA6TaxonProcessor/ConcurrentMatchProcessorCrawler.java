@@ -36,7 +36,7 @@ public class ConcurrentMatchProcessorCrawler implements Callable<MatchProcessorC
 	}
 	@Override
 	public MatchProcessorCrawler call() throws Exception {
-		MatchProcessorCrawler matchProcessorCrawler = new MatchProcessorCrawler(taxID,top,mapReader,false,log,warning,wantReads,0.01,0,false,true,false,behaviour.Filter.CRAWL);
+		MatchProcessorCrawler matchProcessorCrawler = new MatchProcessorCrawler(taxID,top,mapReader,false,log,warning,wantReads,0.01,0,false,true,false,behaviour.Filter.CRAWL,false);
 		matchProcessorCrawler.processDLQlist(clD);
 		matchProcessorCrawler.process();
 		return matchProcessorCrawler;

@@ -50,16 +50,14 @@ public class RMA6Processor {
 	private Logger warning;
 	private boolean reads;
 	private double minComplexity;
-	
-
 	private boolean alignments;
-
 	private boolean wantMeganSummaries;
 	private boolean turnOffDestacking;
 	private boolean turnOffDeDuping;
 	private List<Integer>taxIDs; 
 	private double topPercent;
 	private boolean downsample;
+	private boolean useAllAlignments;
 	// constructor
 	public RMA6Processor(InputParameterProcessor inputParameterProcessor, String inDir, String fileName, ArrayList<Integer> taxIDs, NCBI_MapReader mapReader,NCBI_TreeReader treeReader,
 			Logger log, Logger warning) {
@@ -84,6 +82,7 @@ public class RMA6Processor {
 		this.turnOffDestacking =  inputParameterProcessor.turnDestackingOff();
 		this.turnOffDeDuping = inputParameterProcessor.getDeDupOff();
 		this.downsample = inputParameterProcessor.downsampling();
+		this.useAllAlignments = inputParameterProcessor.useAllAlignments();
 	}
 	
 
@@ -155,7 +154,7 @@ public void process() {// processing
 		setContainedIDs(idsToProcess);
 		HashMap<Integer,NodeProcessor> results =  new HashMap<Integer,NodeProcessor>();
 			for(Integer id : idsToProcess){
-				NodeProcessor nodeProcessor = new NodeProcessor(id, minPIdent, mapReader, verbose,log, warning,reads,behave, minComplexity,alignments,turnOffDestacking,turnOffDeDuping,downsample);
+				NodeProcessor nodeProcessor = new NodeProcessor(id, minPIdent, mapReader, verbose,log, warning,reads,behave, minComplexity,alignments,turnOffDestacking,turnOffDeDuping,downsample, useAllAlignments);
 				nodeProcessor.process(inDir, fileName, topPercent, maxLength);
 				results.put(id, nodeProcessor);
 		  }//TaxIDs	

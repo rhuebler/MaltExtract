@@ -11,26 +11,29 @@ import behaviour.Filter;
  */
 // set Composition Map
 public class CompositionMap {
+	private boolean useAllAlignments = false;
 	private boolean turnOffDestacking= false;
 	private boolean turnOffDeDupping = false;
 	private Filter behave = Filter.NON_ANCIENT;
 //	public CompositionMap(HashMap<Integer,ArrayList<Alignment>> map){
 //		setCompositionMap(map);
 //	}
-	public CompositionMap(HashMap<Integer, HashMap<String, ArrayList<Alignment>>> taxonMap,boolean turnOffDestacking, boolean turnOffDeDupping){
+	public CompositionMap(HashMap<Integer, HashMap<String, ArrayList<Alignment>>> taxonMap,boolean turnOffDestacking, boolean turnOffDeDupping, boolean useAllAlignments){
 		setCompositionMap(taxonMap);
 		this.turnOffDestacking = turnOffDestacking;
 		this.turnOffDeDupping = turnOffDeDupping;
+		this.useAllAlignments = useAllAlignments;
 	}
-	public CompositionMap(HashMap<Integer, HashMap<String, ArrayList<Alignment>>> taxonMap,boolean turnOffDestacking, boolean turnOffDeDupping,Filter behave){
+	public CompositionMap(HashMap<Integer, HashMap<String, ArrayList<Alignment>>> taxonMap,boolean turnOffDestacking, boolean turnOffDeDupping, boolean useAllAlignments,Filter behave){
 		setCompositionMap(taxonMap);
 		this.turnOffDestacking = turnOffDestacking;
 		this.turnOffDeDupping = turnOffDeDupping;
 		this.behave=behave;
+		this.useAllAlignments = useAllAlignments;
 	}
 	// initialize values
 private HashMap<Integer, HashMap<String, ArrayList<Alignment>>> compositionMap;// hashMap of ReferenceID to List of start positions
-private HashMap<String,Alignment> resultsMap = new HashMap<String,Alignment>();// hashMap of ReferenceID to List of start positions
+private HashMap<String,ArrayList<Alignment>> resultsMap = new HashMap<String,ArrayList<Alignment>>();// hashMap of ReferenceID to List of start positions
 private int maxID=0;
 private String maxReference;
 private ArrayList<Double> generalStatistics;
@@ -48,7 +51,7 @@ public ArrayList<String> getCoveragePositions(){
 public boolean wasTurnedOn(){
 	return this.turnedOn;
 }
-public HashMap<String,Alignment> getResultsMap(){
+public HashMap<String,ArrayList<Alignment>> getResultsMap(){
 	return this.resultsMap;
 }
 public int getReferenceLength(){
@@ -164,8 +167,22 @@ public void getNonStacked(){
 				stackedSizes.add(new NOAOR(list.size(),reference,key));
 				nonStackedOnReference.putIfAbsent(reference, list.size());
 				for(Alignment al : list){
+					if(useAllAlignments) {
+						String name = al.getReadName()+al.getSequence();
+						if(resultsMap.containsKey(name)){
+							ArrayList<Alignment> als = resultsMap.get(name);
+							als.add(al);
+							resultsMap.replace(name, als);
+						}else{
+							ArrayList<Alignment> als = new ArrayList<Alignment>();
+							list.add(al);
+							resultsMap.put(name, als);
+						}
+					}
 					if(al.isTopAlignment()) {
-						resultsMap.putIfAbsent(al.getReadName()+al.getSequence(), al);
+						ArrayList<Alignment> als = new ArrayList<Alignment>();
+						als.add(al);
+						resultsMap.putIfAbsent(al.getReadName()+al.getSequence(), als);
 					}
 					
 				}
@@ -177,8 +194,23 @@ public void getNonStacked(){
 				ArrayList<Alignment> list =  reads.getNonStacked();
 				stackedSizes.add(new NOAOR(list.size(),reference,key));
 				for(Alignment al : list){
-					if(al.isTopAlignment()){
-						resultsMap.putIfAbsent(al.getReadName()+al.getSequence(), al);
+					if(useAllAlignments) {
+						String name = al.getReadName()+al.getSequence();
+						if(resultsMap.containsKey(name)){
+							ArrayList<Alignment> als = resultsMap.get(name);
+							als.add(al);
+							resultsMap.replace(name, als);
+						}else{
+							ArrayList<Alignment> als = new ArrayList<Alignment>();
+							list.add(al);
+							resultsMap.put(name, als);
+						}
+					}else {
+						if(al.isTopAlignment()){
+							ArrayList<Alignment> als = new ArrayList<Alignment>();
+							als.add(al);
+							resultsMap.putIfAbsent(al.getReadName()+al.getSequence(), als);
+						}
 					}
 				}
 			}

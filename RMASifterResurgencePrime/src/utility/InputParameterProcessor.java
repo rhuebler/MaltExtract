@@ -56,6 +56,7 @@ public class InputParameterProcessor {
 	private boolean destackOff = false;
 	private boolean deDupOff=false;
 	private boolean downsampling = true;
+	private boolean useAllAlignments = true;
 	// constructor
 
 	public InputParameterProcessor(String[] params ,Logger log, Logger warning){
@@ -98,9 +99,14 @@ public class InputParameterProcessor {
 					line+="--dupRemOff "+"\n";
 				if(!downsampling)
 					line+="--downSampOff "+"\n";
+				if(!useAllAlignments)
+					line+="--useTopAlignment "+"\n";
 				return line;
 	}
 	// getters for parameters
+	public boolean useAllAlignments() {
+		return this.useAllAlignments;
+	}
 	public boolean downsampling(){
 		return downsampling;
 	}
@@ -205,6 +211,7 @@ public class InputParameterProcessor {
     	    Option option_DeStackOff = Option.builder().longOpt("destackingOff").optionalArg(true).desc("Turn Off automated stacked Read Removal only useful in >1 coverage data").build();
     	    Option option_DeDupOff = Option.builder().longOpt("dupRemOff").optionalArg(true).desc("Turn Off automated pcr duplicate removal useful in >1 coverage data").build();
     	    Option option_Downsampling = Option.builder().longOpt("downSampOff").optionalArg(true).desc("Turn Off automatic downsampling on nodes with more than 10.000 assigned reads").build();
+    	    Option option_UseTopAlignment = Option.builder().longOpt("useTopAlignment").optionalArg(true).desc("Use only the top Alignment per read after filtering").build();
     	    Options options = new Options();
     	    
     	    // add all parameters to the parser
@@ -232,7 +239,7 @@ public class InputParameterProcessor {
     	    options.addOption(option_DeStackOff);
     	    options.addOption(option_DeDupOff);
     	    options.addOption(option_Downsampling);
-
+    	    options.addOption(option_UseTopAlignment);
     	    try //evaluate commandline
     	    {
     	        commandLine = parser.parse(options, parameters);
@@ -376,7 +383,10 @@ public class InputParameterProcessor {
     	        		log.log(Level.INFO, "Minimum pIdent set to "+ minPIdent);
     	        	}
     	        }
-    	        
+    	        if(commandLine.hasOption("useTopAlignment")) {
+    	        	useAllAlignments = false;
+    	        	log.log(Level.INFO, "Use only top ALignment");
+    	        }
     	        if(commandLine.hasOption("resources")){
     	        	File f = new File(commandLine.getOptionValue("resources"));
     	        	if(f.isDirectory()){

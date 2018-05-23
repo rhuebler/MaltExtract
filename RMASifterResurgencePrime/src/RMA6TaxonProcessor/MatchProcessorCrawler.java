@@ -23,9 +23,9 @@ public class MatchProcessorCrawler extends RMA6TaxonProcessor {
 	protected boolean turnOffDeDuping = false;
 	//constructors and set values
 
-	public MatchProcessorCrawler(int id ,double pID, NCBI_MapReader reader,
-			boolean v,Logger log, Logger warning, boolean reads,double tp,int mL,boolean wantAls,boolean turnOffDestacking,boolean turnOffDeDuping,Filter behave) {
-		super(id ,pID, reader, v, log, warning, reads, tp, mL, wantAls, turnOffDestacking, turnOffDeDuping, behave);
+	public MatchProcessorCrawler(int id ,double pID, NCBI_MapReader reader,boolean v,Logger log, Logger warning, boolean reads,double tp,int mL,boolean wantAls, boolean turnOffDestacking,boolean turnOffDeDuping, Filter behave, boolean useAllAlignments) {
+		//intialize Nodeanalyzer
+		super(id ,pID, reader, v, log, warning, reads, tp, mL, wantAls, turnOffDestacking, turnOffDeDuping, behave, useAllAlignments);
 	}
 	//process each Matchblock
 	public void processDLQlist(ConcurrentLinkedDeque<Alignment> concurrentLinkedDeque) {
@@ -79,24 +79,46 @@ public class MatchProcessorCrawler extends RMA6TaxonProcessor {
 			}	
 	public void process(){ 
 		//analyze collected data 
-		CompositionMap map = new CompositionMap(taxonMap,turnOffDestacking,turnOffDeDuping);
+		CompositionMap map = new CompositionMap(taxonMap,turnOffDestacking,turnOffDeDuping,useAllAlignments,filter);
 		map.setMapReader(mapReader);
 		map.process();
 		map.getNonStacked();
 		
-		HashMap<String,Alignment> list = map.getResultsMap();
+		HashMap<String,ArrayList<Alignment>> list = map.getResultsMap();
 		for(String key : list.keySet()){
-			Alignment al = list.get(key);
-			numMatches++;	
-			container.processAlignment(al);
-			if(wantAlignments){
-				alignments.add(al.getReadName());
-				alignments.add(al.getText());
+			ArrayList<Alignment> als = list.get(key);
+			String sequence = "";
+			int count = 0;
+			double length=0;
+			double pIdent=0;
+			double edit = 0;
+			for(Alignment al : als) {
+				numMatches++;	
+				container.processAlignment(al);
+				if(wantAlignments){
+					alignments.add(al.getReadName());
+					alignments.add(al.getText());
+				}
+				length += al.getReadLength();
+				pIdent +=al.getPIdent();
+				edit += al.getEditDistance();
+				if( count == 0) {
+					if(wantReads){
+						String readName = al.getReadName();
+						sequence = al.getSequence();
+						if (!readName.startsWith(">"))
+							readName = ">"+readName;
+							lines.add(readName);
+						if (sequence != null) {
+								lines.add(sequence);    
+						}
+					}
+				}
+				count++;
 			}
-	
-			lengths.add(al.getReadLength());
-			pIdents.add(al.getPIdent());
-			distances.add(al.getEditDistance());
+			lengths.add((int)(length/=count));
+			pIdents.add((pIdent/=count));
+			distances.add((int)(edit/=count));
 			
 		}	
 		setOriginalNumberOfAlignments(originalNumberOfAlignments);
