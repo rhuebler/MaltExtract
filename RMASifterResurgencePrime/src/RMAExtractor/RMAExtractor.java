@@ -125,7 +125,7 @@ public class RMAExtractor {
 	 
 	case SCAN:	 
 			  executor=(ThreadPoolExecutor) Executors.newFixedThreadPool(inProcessor.getNumThreads());//intialize concurrent thread executor 
-			  log.log(Level.INFO, "Using ",executor.getCorePoolSize());
+			  log.log(Level.INFO, "Using "+executor.getCorePoolSize() +" cores");
 			  List<Future<RMA6Scanner>> scannerList = new ArrayList<Future<RMA6Scanner>>();
 			  // every tree has its own copy of this now to avoid concurrency issues
 			  for(String fileName : inProcessor.getFileNames()){
