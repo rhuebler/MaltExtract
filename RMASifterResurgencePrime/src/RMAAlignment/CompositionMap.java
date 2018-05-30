@@ -157,6 +157,7 @@ public void calculateStatistics(){
 // process composition and find taxon with maximum number of start positions
 public void getNonStacked(){
 	//get nonstacked Reads
+	HashMap<String,ArrayList<Alignment>> map = new HashMap<String,ArrayList<Alignment>>();
 	for(int key : compositionMap.keySet()){
 		HashMap<String,Integer> nonStackedOnReference = new HashMap<String,Integer>();
 		HashMap<String,ArrayList<Alignment>> rMap = compositionMap.get(key);
@@ -167,26 +168,27 @@ public void getNonStacked(){
 				stackedSizes.add(new NOAOR(list.size(),reference,key));
 				nonStackedOnReference.putIfAbsent(reference, list.size());
 				for(Alignment al : list){
+					String name = al.getReadName()+al.getSequence();
 					if(useAllAlignments) {
-						String name = al.getReadName()+al.getSequence();
-						if(resultsMap.containsKey(name)){
-							ArrayList<Alignment> als = resultsMap.get(name);
+						if(map.containsKey(name)){
+							ArrayList<Alignment> als = map.get(name);
 							als.add(al);
-							resultsMap.replace(name, als);
+							map.replace(name, als);
 						}else{
 							ArrayList<Alignment> als = new ArrayList<Alignment>();
-							list.add(al);
-							resultsMap.put(name, als);
+							als.add(al);
+							map.put(al.getReadName()+al.getSequence(), als);
+						}
+					}else {
+						if(al.isTopAlignment()) {
+							ArrayList<Alignment> als = new ArrayList<Alignment>();
+							als.add(al);
+							map.putIfAbsent(name, als);
 						}
 					}
-					if(al.isTopAlignment()) {
-						ArrayList<Alignment> als = new ArrayList<Alignment>();
-						als.add(al);
-						resultsMap.putIfAbsent(al.getReadName()+al.getSequence(), als);
-					}
-					
 				}
 			}else{
+				
 				GetStackedReads reads = new GetStackedReads(rMap.get(reference));
 				reads.calculateStatistics();
 				if(!reads.wasTurnedOn())
@@ -196,26 +198,27 @@ public void getNonStacked(){
 				for(Alignment al : list){
 					if(useAllAlignments) {
 						String name = al.getReadName()+al.getSequence();
-						if(resultsMap.containsKey(name)){
-							ArrayList<Alignment> als = resultsMap.get(name);
+						if(map.containsKey(name)){
+							ArrayList<Alignment> als = map.get(name);
 							als.add(al);
-							resultsMap.replace(name, als);
+							map.replace(name, als);
 						}else{
 							ArrayList<Alignment> als = new ArrayList<Alignment>();
 							list.add(al);
-							resultsMap.put(name, als);
+							map.put(name, als);
 						}
 					}else {
 						if(al.isTopAlignment()){
 							ArrayList<Alignment> als = new ArrayList<Alignment>();
 							als.add(al);
-							resultsMap.putIfAbsent(al.getReadName()+al.getSequence(), als);
+							map.putIfAbsent(al.getReadName()+al.getSequence(), als);
 						}
 					}
 				}
 			}
 		}
 	}
+	resultsMap=map;
 }
 
 
