@@ -373,7 +373,7 @@ public class InputParameterProcessor {
     	        
     	        if(commandLine.hasOption("minPI")){
     	        	double minP = Double.parseDouble(commandLine.getOptionValue("minPI"));
-    	        	if(minP < 1.0){
+    	        	if(minP <= 1.0){
     	        		log.log(Level.WARNING, "Minimum pIdent "+ minP+" smaller than 1.0");
     	        		minP *= 100;
     	        		log.log(Level.WARNING, "Set Minimum pIdent "+ minP);
