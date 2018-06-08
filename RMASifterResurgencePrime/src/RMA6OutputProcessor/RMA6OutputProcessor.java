@@ -92,7 +92,7 @@ public class RMA6OutputProcessor {
 			case ADDIDTIONALENTRIES: header = "TargetNode\t01\t02\t03\t04\t05\t06\t07\t08\t09\t10";
 									outDir += "readDist/"+fileName+"_additionalNodeEntries"+".txt";
 									break;
-			case ALIGNMENTS:		outDir += getName(taxID)+".fasta";
+			case ALIGNMENTS:		outDir += getName(taxID)+".blast";
 									break;
 			case ALIGNMENTDISTRIBUTION: header = "Taxon\tReference\tuniquePerReference\tnonStacked\tnonDuplicatesonReference\tTotalAlignmentsOnReference\tReferenceLength";
 										outDir+= "readDist/"+fileName+"_alignmentDist"+".txt";
