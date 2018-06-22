@@ -155,7 +155,7 @@ public class ReferenceMap {
 		temp+=(averageCoverage*(length-coverageContainer.size()));
 		temp/=length;
 		this.coverageDeviation = temp;
-		if(averageCoverage>=10 && !turnOffDestacking)
+		if(averageCoverage>=5 && !turnOffDestacking)
 			turnedOn = false;
 		int l =0;
 		while(l<alignments.size()){
