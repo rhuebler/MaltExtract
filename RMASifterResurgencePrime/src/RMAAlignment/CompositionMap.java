@@ -177,7 +177,7 @@ public void getNonStacked(){
 						}else{
 							ArrayList<Alignment> als = new ArrayList<Alignment>();
 							als.add(al);
-							map.put(al.getReadName()+al.getSequence(), als);
+							map.put(name, als);
 						}
 					}else {
 						if(al.isTopAlignment()) {
@@ -188,7 +188,6 @@ public void getNonStacked(){
 					}
 				}
 			}else{
-				
 				GetStackedReads reads = new GetStackedReads(rMap.get(reference));
 				reads.calculateStatistics();
 				if(!reads.wasTurnedOn())
@@ -196,22 +195,22 @@ public void getNonStacked(){
 				ArrayList<Alignment> list =  reads.getNonStacked();
 				stackedSizes.add(new NOAOR(list.size(),reference,key));
 				for(Alignment al : list){
+					String name = al.getReadName()+al.getSequence();
 					if(useAllAlignments) {
-						String name = al.getReadName()+al.getSequence();
 						if(map.containsKey(name)){
 							ArrayList<Alignment> als = map.get(name);
 							als.add(al);
 							map.replace(name, als);
 						}else{
 							ArrayList<Alignment> als = new ArrayList<Alignment>();
-							list.add(al);
+							als.add(al);
 							map.put(name, als);
 						}
 					}else {
 						if(al.isTopAlignment()){
 							ArrayList<Alignment> als = new ArrayList<Alignment>();
 							als.add(al);
-							map.putIfAbsent(al.getReadName()+al.getSequence(), als);
+							map.putIfAbsent(name, als);
 						}
 					}
 				}
