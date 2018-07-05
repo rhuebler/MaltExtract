@@ -79,6 +79,7 @@ public class SummaryWriter {
 		   String header ="Node"; // could and should be its own function 
 		   String reads = "Total_Count";
 		   boolean first = true;	   
+		   processedFiles.sort(null);
 		   for(Future<RMA6Processor> future : processedFiles){
 			   RMA6Processor current;
 			   try {
