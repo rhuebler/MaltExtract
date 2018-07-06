@@ -6,11 +6,9 @@ import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
 import NCBI_MapReader.NCBI_MapReader;
 import RMAAlignment.NOAOR;
 import RMAAlignment.NOAORComparator;
-import behaviour.Taxas;
 import megan.rma6.ClassificationBlockRMA6;
 import megan.rma6.RMA6File;
 
@@ -21,17 +19,16 @@ public class ReadDatabaseAnalyzer {
 	private Set<Integer> allKeys;
 	private Integer readCount;
 	private Map<Integer,Integer> assignmentMap;
-	private String outDir;
+	private String output;
 	private Logger log;
 	private Logger warning;
 	private NCBI_MapReader reader;
 
 	// constructor
 	public ReadDatabaseAnalyzer(String inDir, String name,
-			Logger log, Logger warning,String outDir, NCBI_MapReader reader){
+			Logger log, Logger warning, NCBI_MapReader reader){
 		this.inDir = inDir;
 		this.fileName =  name;
-		this.outDir = outDir;
 		this.log = log;
 		this.warning = warning;
 		this.reader = reader;
@@ -50,6 +47,9 @@ public class ReadDatabaseAnalyzer {
 	}
 	public String getFileName(){
 		return this.fileName;
+	}
+	public String getOutput() {
+		return output;
 	}
 	// process
 	private void process(){
@@ -87,6 +87,7 @@ public class ReadDatabaseAnalyzer {
 				}
 			}
 			System.out.println(output);
+			this.output = output;
 		}catch(IOException io){
 			warning.log(Level.SEVERE,"Cannot open File",io);
 		}
