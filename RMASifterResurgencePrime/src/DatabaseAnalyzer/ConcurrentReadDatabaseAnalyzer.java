@@ -1,14 +1,9 @@
 package DatabaseAnalyzer;
-
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.concurrent.Callable;
-import java.util.concurrent.Future;
 import java.util.logging.Logger;
-
 import NCBI_MapReader.NCBI_MapReader;
 
-public class ConcurrentReadDatabaseAnalyzer implements Callable {
+public class ConcurrentReadDatabaseAnalyzer implements Callable<ReadDatabaseAnalyzer> {
 	private String inDir;
 	private String fileName ;
 	private Logger log ;
@@ -24,7 +19,7 @@ public class ConcurrentReadDatabaseAnalyzer implements Callable {
 		
 	}
 	@Override
-	public Object call() throws Exception {
+	public ReadDatabaseAnalyzer call() throws Exception {
 		ReadDatabaseAnalyzer analyzer = new ReadDatabaseAnalyzer(inDir, fileName, log, warning, reader);
 		
 		// TODO Auto-generated method stub
