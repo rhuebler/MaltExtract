@@ -23,9 +23,9 @@ public class MatchProcessorCrawler extends RMA6TaxonProcessor {
 	protected boolean turnOffDeDuping = false;
 	//constructors and set values
 
-	public MatchProcessorCrawler(int id ,double pID, NCBI_MapReader reader,boolean v,Logger log, Logger warning, boolean reads,double tp,int mL,boolean wantAls, boolean turnOffDestacking,boolean turnOffDeDuping, Filter behave, boolean useAllAlignments) {
+	public MatchProcessorCrawler(int id ,double pID, NCBI_MapReader reader,boolean v,Logger log, Logger warning, boolean reads,double tp,int mL,boolean wantAls, boolean turnOffDestacking,boolean turnOffDeDuping, Filter behave, boolean useAllAlignments, boolean singleStranded) {
 		//intialize Nodeanalyzer
-		super(id ,pID, reader, v, log, warning, reads, tp, mL, wantAls, turnOffDestacking, turnOffDeDuping, behave, useAllAlignments);
+		super(id ,pID, reader, v, log, warning, reads, tp, mL, wantAls, turnOffDestacking, turnOffDeDuping, behave, useAllAlignments, singleStranded);
 	}
 	//process each Matchblock
 	public void processDLQlist(ConcurrentLinkedDeque<Alignment> concurrentLinkedDeque) {

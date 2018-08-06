@@ -61,6 +61,7 @@ public class RMA6BlastCrawler {
 	private  ConcurrentHashMap<Integer,ConcurrentLinkedDeque<Alignment>> concurrentMap  = new ConcurrentHashMap<Integer,ConcurrentLinkedDeque<Alignment>>();
 	private int numThreads;
 	private ThreadPoolExecutor executor;
+	private boolean singleStranded = false;
 	private void destroy(){
 		executor.shutdown();
 	}
@@ -245,7 +246,7 @@ public class RMA6BlastCrawler {
 		executor=(ThreadPoolExecutor) Executors.newFixedThreadPool(numThreads);
 		ArrayList<Future<MatchProcessorCrawler>> futureMPCList = new ArrayList<Future<MatchProcessorCrawler>>(concurrentMap.keySet().size());
 		for(int key :concurrentMap.keySet()){
-			ConcurrentMatchProcessorCrawler cmpc = new ConcurrentMatchProcessorCrawler(concurrentMap.get(key), key, log, warning, wantReads, mapReader);
+			ConcurrentMatchProcessorCrawler cmpc = new ConcurrentMatchProcessorCrawler(concurrentMap.get(key), key, log, warning, wantReads, mapReader,singleStranded);
 			Future<MatchProcessorCrawler> future = executor.submit(cmpc);
 			futureMPCList.add(future);
 		}

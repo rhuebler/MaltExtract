@@ -16,7 +16,7 @@ public class StrainMisMatchContainer{
 	private HashMap<Integer,Double> damage; 
 	private HashMap<Integer,Double> noise;
 	String name;
-
+	private boolean singleStranded = false; 
 
 	private int processed = 0;
 	// constructor
@@ -122,42 +122,78 @@ public void processMisMatches(){
 			divident /= 11;
 			noise.put(i, divident/divisor);
 		}else{
-			double damDivident = 0.0;
-			double damDivisor = 0.0;
-			if(positionContainer.containsKey("GA")){
-				damDivident=positionContainer.get("GA");
-				if(positionContainer.containsKey("GG")){
-					damDivisor = (damDivident+positionContainer.get("GG"));
-					double d = damDivident/damDivisor;
-					damage.put(i, d);
-				}else{
-					double d = 1.0;
-					damage.put(i, d);
+			if(singleStranded) {
+				double damDivident = 0.0;
+				double damDivisor = 0.0;
+				if(positionContainer.containsKey("CT")){
+					damDivident=positionContainer.get("CT");
+					if(positionContainer.containsKey("CC")){
+						damDivisor = (damDivident+positionContainer.get("CC"));
+						double d = damDivident/damDivisor;
+						damage.put(i, d);
+					}else{
+						double d = 1.0;
+						damage.put(i, d);
+					}
 				}
+				double divident = 0.0;
+				double divisor = 0.0;
+				for(String key : positionContainer.keySet()){
+					if(!key.equals("CT") || !key.contains("-"))
+						divisor+=positionContainer.get(key);
+				}
+				divident += divisor;
+				if(positionContainer.containsKey("CC")){
+					divident-=positionContainer.get("CC");
+				}
+				if(positionContainer.containsKey("AA")){
+					divident-=positionContainer.get("AA");
+				}
+				if(positionContainer.containsKey("TT")){
+					divident-=positionContainer.get("TT");
+				}
+				if(positionContainer.containsKey("GG")){
+					divident-=positionContainer.get("GG");
+				}
+				divident /= 11;
+				noise.put(i, divident/divisor);
+			}else {
+				double damDivident = 0.0;
+				double damDivisor = 0.0;
+				if(positionContainer.containsKey("GA")){
+					damDivident=positionContainer.get("GA");
+					if(positionContainer.containsKey("GG")){
+						damDivisor = (damDivident+positionContainer.get("GG"));
+						double d = damDivident/damDivisor;
+						damage.put(i, d);
+					}else{
+						double d = 1.0;
+						damage.put(i, d);
+					}
+				}
+				double divident = 0.0;
+				double divisor = 0.0;
+				for(String key : positionContainer.keySet()){
+					if(!key.equals("GA") || !key.contains("-"))
+						divisor+=positionContainer.get(key);
+				}
+				divident += divisor;
+				if(positionContainer.containsKey("CC")){
+					divident-=positionContainer.get("CC");
+				}
+				if(positionContainer.containsKey("AA")){
+					divident-=positionContainer.get("AA");
+				}
+				if(positionContainer.containsKey("TT")){
+					divident-=positionContainer.get("TT");
+				}
+				if(positionContainer.containsKey("GG")){
+					divident-=positionContainer.get("GG");
+				}
+				divident /= 11;
+				noise.put(i, divident/divisor);
 			}
-			double divident = 0.0;
-			double divisor = 0.0;
-			for(String key : positionContainer.keySet()){
-				if(!key.equals("GA") || !key.contains("-"))
-					divisor+=positionContainer.get(key);
-			}
-			divident += divisor;
-			if(positionContainer.containsKey("CC")){
-				divident-=positionContainer.get("CC");
-			}
-			if(positionContainer.containsKey("AA")){
-				divident-=positionContainer.get("AA");
-			}
-			if(positionContainer.containsKey("TT")){
-				divident-=positionContainer.get("TT");
-			}
-			if(positionContainer.containsKey("GG")){
-				divident-=positionContainer.get("GG");
-			}
-			divident /= 11;
-			noise.put(i, divident/divisor);
-			
-		}
+		}	
 	}
 	this.damage = damage;
 	this.noise = noise;

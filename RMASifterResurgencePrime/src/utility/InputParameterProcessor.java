@@ -57,6 +57,7 @@ public class InputParameterProcessor {
 	private boolean deDupOff=false;
 	private boolean downsampling = true;
 	private boolean useAllAlignments = true;
+	private boolean singleStranded = false;
 	// constructor
 
 	public InputParameterProcessor(String[] params ,Logger log, Logger warning){
@@ -101,9 +102,14 @@ public class InputParameterProcessor {
 					line+="--downSampOff "+"\n";
 				if(!useAllAlignments)
 					line+="--useTopAlignment "+"\n";
+				if(!singleStranded)
+					line+="--singleStranded "+"\n";
 				return line;
 	}
 	// getters for parameters
+	public boolean isSingleStranded() {
+		return singleStranded;
+	}
 	public boolean useAllAlignments() {
 		return this.useAllAlignments;
 	}
@@ -212,6 +218,7 @@ public class InputParameterProcessor {
     	    Option option_DeDupOff = Option.builder().longOpt("dupRemOff").optionalArg(true).desc("Turn Off automated pcr duplicate removal useful in >1 coverage data").build();
     	    Option option_Downsampling = Option.builder().longOpt("downSampOff").optionalArg(true).desc("Turn Off automatic downsampling on nodes with more than 10.000 assigned reads").build();
     	    Option option_UseTopAlignment = Option.builder().longOpt("useTopAlignment").optionalArg(true).desc("Use only the top Alignment per read after filtering").build();
+    	    Option option_Single_Stranded = Option.builder().longOpt("singleStranded").optionalArg(true).desc("Switch damage patterns to single stranded mode").build();
     	    Options options = new Options();
     	    
     	    // add all parameters to the parser
@@ -240,6 +247,7 @@ public class InputParameterProcessor {
     	    options.addOption(option_DeDupOff);
     	    options.addOption(option_Downsampling);
     	    options.addOption(option_UseTopAlignment);
+    	    options.addOption(option_Single_Stranded);
     	    try //evaluate commandline
     	    {
     	        commandLine = parser.parse(options, parameters);
@@ -425,6 +433,10 @@ public class InputParameterProcessor {
     	        if(commandLine.hasOption("matches")&& behave != Filter.SCAN){
     	        	log.log(Level.INFO, "retrieve Alignments");
     	        	alignment = true;
+    	        }
+    	        if(commandLine.hasOption("singleStranded")&& behave != Filter.SCAN){
+    	        	log.log(Level.INFO, "Switch damage patterns to single stranded");
+    	        	singleStranded = true;
     	        }
     	        if(commandLine.hasOption("meganSummary")){//request megan summary files
     	        	wantMeganSummaries = true;

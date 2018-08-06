@@ -23,20 +23,22 @@ public class ConcurrentMatchProcessorCrawler implements Callable<MatchProcessorC
 	private Logger warning;
 	private ConcurrentLinkedDeque<Alignment> clD; 
 	private boolean wantReads;
+	private boolean singleStranded;
 	
 	private NCBI_MapReader mapReader;
 	public ConcurrentMatchProcessorCrawler(ConcurrentLinkedDeque<Alignment> concurrentLinkedDeque,int id,Logger log, Logger warning,boolean wantReads,
-			NCBI_MapReader mapReader){
+			NCBI_MapReader mapReader, boolean singleStranded){
 		this.log = log;
 		this.warning= warning;
 		this.wantReads = wantReads;
 		this.taxID = id;
 		this.mapReader = mapReader;
 		clD=concurrentLinkedDeque;
+		this.singleStranded = singleStranded;
 	}
 	@Override
 	public MatchProcessorCrawler call() throws Exception {
-		MatchProcessorCrawler matchProcessorCrawler = new MatchProcessorCrawler(taxID,top,mapReader,false,log,warning,wantReads,0.01,0,false,true,false,behaviour.Filter.CRAWL,false);
+		MatchProcessorCrawler matchProcessorCrawler = new MatchProcessorCrawler(taxID,top,mapReader,false,log,warning,wantReads,0.01,0,false,true,false,behaviour.Filter.CRAWL,false,singleStranded);
 		matchProcessorCrawler.processDLQlist(clD);
 		matchProcessorCrawler.process();
 		return matchProcessorCrawler;

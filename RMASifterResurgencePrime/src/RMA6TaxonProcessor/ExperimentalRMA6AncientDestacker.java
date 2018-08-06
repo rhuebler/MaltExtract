@@ -23,9 +23,9 @@ import megan.data.IMatchBlock;
 public class ExperimentalRMA6AncientDestacker extends RMA6TaxonProcessor {
 	//attributes
 	public ExperimentalRMA6AncientDestacker(int id ,double pID, NCBI_MapReader reader,
-			boolean v,Logger log, Logger warning, boolean reads,double tp,int mL,boolean wantAls, boolean turnOffDestacking,boolean turnOffDeDuping, Filter behave, boolean useAllAlignments) {
+			boolean v,Logger log, Logger warning, boolean reads,double tp,int mL,boolean wantAls, boolean turnOffDestacking,boolean turnOffDeDuping, Filter behave, boolean useAllAlignments, boolean singleStranded) {
 		//intialize Nodeanalyzer
-		super(id ,pID, reader, v, log, warning, reads, tp, mL, wantAls, turnOffDestacking, turnOffDeDuping, behave, useAllAlignments);
+		super(id ,pID, reader, v, log, warning, reads, tp, mL, wantAls, turnOffDestacking, turnOffDeDuping, behave, useAllAlignments, singleStranded);
 	}
 	// process matchblocks
 	public void processMatchBlocks(IMatchBlock[] blocks, String name, int length, String sequence){

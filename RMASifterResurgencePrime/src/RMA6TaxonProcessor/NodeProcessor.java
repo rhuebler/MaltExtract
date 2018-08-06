@@ -43,10 +43,11 @@ public class NodeProcessor{
 		private String fileName ="";
 		private boolean downsample = true;
 		private boolean useAllAlignments =  false;
+		private boolean singleStranded = false;
 		//constructors
 		public NodeProcessor(int id, double minPIdent, NCBI_MapReader reader, boolean v, Logger log, Logger warning,
 				boolean reads, Filter behave, double minCompl,boolean alignment,boolean turnOffDestacking, 
-				boolean turnOffDeDuping, boolean downsample, boolean useAllAlignments) {
+				boolean turnOffDeDuping, boolean downsample, boolean useAllAlignments, boolean singleStranded) {
 			this.taxID = id;
 			this.minPIdent = minPIdent;
 			this.mapReader = reader;
@@ -61,6 +62,7 @@ public class NodeProcessor{
 			this.turnOffDeDuping = turnOffDeDuping;
 			this.downsample = downsample;
 			this.useAllAlignments = useAllAlignments;
+			this.singleStranded = singleStranded;
 		}
 		//getters
 		
@@ -94,18 +96,19 @@ public class NodeProcessor{
 		public void process(String inDir, String fileName, double topPercent, int maxLength){ 
 			switch(behave) {
 				case ANCIENT:
-					ancientProcessor =  new ExperimentalRMA6AncientDestacker(taxID, minPIdent, mapReader, verbose, log, warning, wantReads, topPercent, maxLength,alignment,turnOffDestacking,turnOffDeDuping, behave, useAllAlignments);
+					
+					ancientProcessor =  new ExperimentalRMA6AncientDestacker(taxID, minPIdent, mapReader, verbose, log, warning, wantReads, topPercent, maxLength,alignment,turnOffDestacking,turnOffDeDuping, behave, useAllAlignments, singleStranded);
 					break;
 				case NON:
-					defaultProcessor = new ExperimentalRMA6Destacker(taxID, minPIdent, mapReader, verbose, log, warning, wantReads, topPercent, maxLength,alignment,turnOffDestacking,turnOffDeDuping, behave, useAllAlignments);
+					defaultProcessor = new ExperimentalRMA6Destacker(taxID, minPIdent, mapReader, verbose, log, warning, wantReads, topPercent, maxLength,alignment,turnOffDestacking,turnOffDeDuping, behave, useAllAlignments, singleStranded);
 					break;
 				case NON_ANCIENT:
-					ancientProcessor = new ExperimentalRMA6AncientDestacker(taxID, minPIdent, mapReader, verbose, log, warning, wantReads, topPercent, maxLength,alignment,turnOffDestacking,turnOffDeDuping,  behave, useAllAlignments);
-					defaultProcessor = new ExperimentalRMA6Destacker(taxID, minPIdent, mapReader, verbose, log, warning, wantReads, topPercent, maxLength,alignment,turnOffDestacking,turnOffDeDuping,  behave, useAllAlignments);
+					ancientProcessor = new ExperimentalRMA6AncientDestacker(taxID, minPIdent, mapReader, verbose, log, warning, wantReads, topPercent, maxLength,alignment,turnOffDestacking,turnOffDeDuping,  behave, useAllAlignments,singleStranded);
+					defaultProcessor = new ExperimentalRMA6Destacker(taxID, minPIdent, mapReader, verbose, log, warning, wantReads, topPercent, maxLength,alignment,turnOffDestacking,turnOffDeDuping,  behave, useAllAlignments, singleStranded);
 					break;
 				case SRNA:
-					ancientProcessor = new RMA6_16S_AncientNodeProcessor(taxID, minPIdent, mapReader, verbose, log, warning, wantReads, topPercent, maxLength,alignment,turnOffDestacking,turnOffDeDuping, behave, useAllAlignments);
-					defaultProcessor = new RMA6_16S_NodeProcessor(taxID, minPIdent, mapReader, verbose, log, warning, wantReads, topPercent, maxLength,alignment,turnOffDestacking,turnOffDeDuping,  behave, useAllAlignments);
+					ancientProcessor = new RMA6_16S_AncientNodeProcessor(taxID, minPIdent, mapReader, verbose, log, warning, wantReads, topPercent, maxLength,alignment,turnOffDestacking,turnOffDeDuping, behave, useAllAlignments, singleStranded);
+					defaultProcessor = new RMA6_16S_NodeProcessor(taxID, minPIdent, mapReader, verbose, log, warning, wantReads, topPercent, maxLength,alignment,turnOffDestacking,turnOffDeDuping,  behave, useAllAlignments, singleStranded);
 					break;
 				default:
 					System.err.println("Filter no longer supported");

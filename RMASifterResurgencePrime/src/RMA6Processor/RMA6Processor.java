@@ -58,6 +58,7 @@ public class RMA6Processor {
 	private double topPercent;
 	private boolean downsample;
 	private boolean useAllAlignments;
+	private boolean singleStranded;
 	// constructor
 	public RMA6Processor(InputParameterProcessor inputParameterProcessor, String inDir, String fileName, ArrayList<Integer> taxIDs, NCBI_MapReader mapReader,NCBI_TreeReader treeReader,
 			Logger log, Logger warning) {
@@ -83,6 +84,7 @@ public class RMA6Processor {
 		this.turnOffDeDuping = inputParameterProcessor.getDeDupOff();
 		this.downsample = inputParameterProcessor.downsampling();
 		this.useAllAlignments = inputParameterProcessor.useAllAlignments();
+		this.singleStranded = inputParameterProcessor.isSingleStranded();
 	}
 	
 
@@ -154,7 +156,7 @@ public void process() {// processing
 		setContainedIDs(idsToProcess);
 		HashMap<Integer,NodeProcessor> results =  new HashMap<Integer,NodeProcessor>();
 			for(Integer id : idsToProcess){
-				NodeProcessor nodeProcessor = new NodeProcessor(id, minPIdent, mapReader, verbose,log, warning,reads,behave, minComplexity,alignments,turnOffDestacking,turnOffDeDuping,downsample, useAllAlignments);
+				NodeProcessor nodeProcessor = new NodeProcessor(id, minPIdent, mapReader, verbose,log, warning,reads,behave, minComplexity,alignments,turnOffDestacking,turnOffDeDuping,downsample, useAllAlignments, singleStranded);
 				nodeProcessor.process(inDir, fileName, topPercent, maxLength);
 				results.put(id, nodeProcessor);
 		  }//TaxIDs	

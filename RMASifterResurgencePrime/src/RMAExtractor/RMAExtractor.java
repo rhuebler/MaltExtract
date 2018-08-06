@@ -42,6 +42,7 @@ import utility.SummaryWriter;
  * @author huebler
  *
  */
+//TODO add switch to change damage patterns for  single straded dna
 public class RMAExtractor {
 	/**
 	 * @param String[] args all command line parameters
