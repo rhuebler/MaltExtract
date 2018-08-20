@@ -160,7 +160,7 @@ public void process() {// processing
 				nodeProcessor.process(inDir, fileName, topPercent, maxLength);
 				results.put(id, nodeProcessor);
 		  }//TaxIDs	
-		log.log(Level.INFO, "Finished File: "+fileName);
+	
 		RMA6OutputProcessor outProcessor = new RMA6OutputProcessor(fileName, outDir,mapReader,warning, behave, alignments, reads);
 		outProcessor.process(results);
 		switch(behave) {
@@ -175,5 +175,6 @@ public void process() {// processing
 				ancientSum = outProcessor.getAncientLine();
 				break;
 		}
+		log.log(Level.INFO, "Finished File: "+fileName);
     }
  }
