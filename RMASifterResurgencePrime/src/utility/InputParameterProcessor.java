@@ -102,7 +102,7 @@ public class InputParameterProcessor {
 					line+="--downSampOff "+"\n";
 				if(!useAllAlignments)
 					line+="--useTopAlignment "+"\n";
-				if(!singleStranded)
+				if(singleStranded)
 					line+="--singleStranded "+"\n";
 				return line;
 	}
@@ -174,6 +174,7 @@ public class InputParameterProcessor {
 			 Scanner	in = new Scanner(f.getCanonicalFile());
 			 while(in.hasNext()){
 				// taxNames.add(in.nextLine().trim().replace('_', ' '));
+				 
 				 taxNames.add(in.nextLine().trim());
 			 }
 			 in.close();
@@ -311,8 +312,10 @@ public class InputParameterProcessor {
     	     					log.info("No Taxin file specified!!! Using cli as taxon");
 							   log.info("Added Taxon: ");
 							   log.info(tax +" to analysis");
-							   //taxNames.add(tax.replace('_', ' ')); 
-							   taxNames.add(tax);
+							   if(tax.contains("_"))
+								   taxNames.add(tax.replace('_', ' ')); 
+							   else
+								   taxNames.add(tax);
     	     				}
     	            	} catch (IOException e) {
     	            	System.exit(1);

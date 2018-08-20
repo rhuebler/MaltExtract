@@ -17,10 +17,6 @@ import behaviour.Filter;
  */
 public class MatchProcessorCrawler extends RMA6TaxonProcessor {
 	// initialize attributes
-	protected boolean wantReads = false;
-	protected boolean wantAlignments = false;
-	protected boolean turnOffDestacking = false;
-	protected boolean turnOffDeDuping = false;
 	//constructors and set values
 
 	public MatchProcessorCrawler(int id ,double pID, NCBI_MapReader reader,boolean v,Logger log, Logger warning, boolean reads,double tp,int mL,boolean wantAls, boolean turnOffDestacking,boolean turnOffDeDuping, Filter behave, boolean useAllAlignments, boolean singleStranded) {
@@ -28,13 +24,13 @@ public class MatchProcessorCrawler extends RMA6TaxonProcessor {
 		super(id ,pID, reader, v, log, warning, reads, tp, mL, wantAls, turnOffDestacking, turnOffDeDuping, behave, useAllAlignments, singleStranded);
 	}
 	//process each Matchblock
-	public void processDLQlist(ConcurrentLinkedDeque<Alignment> concurrentLinkedDeque) {
+	public void processDLQlist(ArrayList<Alignment> concurrentLinkedDeque) {
+		System.out.println("Turn off destacking " + turnOffDestacking +" turnOffDeduping "+turnOffDeDuping );
 		for(Alignment al: concurrentLinkedDeque) {
 			processMatchBlock(al);
 		}
 	}
 	public void processMatchBlock(Alignment al){
-			//System.out.println("Here");
 				if(minPIdent <= al.getPIdent()){ // check for minPercentIdentity
 					if(wantReads){//add Read
 						String sequence = "";

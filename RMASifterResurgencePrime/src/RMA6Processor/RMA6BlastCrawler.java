@@ -6,6 +6,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -58,7 +59,7 @@ public class RMA6BlastCrawler {
 	private ArrayList<String> percentIdentities = new ArrayList<String>();
 	private ArrayList<String> readLengthDistributions = new ArrayList<String>();
 	private ArrayList<String> readDistributions = new ArrayList<String>();
-	private  ConcurrentHashMap<Integer,ConcurrentLinkedDeque<Alignment>> concurrentMap  = new ConcurrentHashMap<Integer,ConcurrentLinkedDeque<Alignment>>();
+	private  HashMap<Integer,ArrayList<Alignment>> concurrentMap  = new HashMap<Integer,ArrayList<Alignment>>();
 	private int numThreads;
 	private ThreadPoolExecutor executor;
 	private boolean singleStranded = false;
@@ -213,8 +214,10 @@ public class RMA6BlastCrawler {
 						if((blocks[i].getBitScore()/topScore) < 1-0.01){
 							break;}	
 						String name = getName(blocks[i].getTaxonId());
-						int cid= blocks[i].getTaxonId();
+						
 						if(name.contains(speciesName)){
+							int cid= blocks[i].getTaxonId();
+							//System.out.println("true");
 							Alignment al = new Alignment();
 							al.setText(blocks[i].getText());
 							al.processText();
@@ -225,8 +228,18 @@ public class RMA6BlastCrawler {
 							al.setAcessionNumber(blocks[i].getTextFirstWord());	
 							al.setSequence(readSequence);
 							al.setTopAlignment(true);
-							ConcurrentLinkedDeque<Alignment> cld=concurrentMap.computeIfAbsent(cid,key->new ConcurrentLinkedDeque<>());
-							cld.add(al);
+							
+							if(concurrentMap.containsKey(cid)) {
+								
+								ArrayList<Alignment> alist =	concurrentMap.get(cid);
+								alist.add(al);
+								concurrentMap.replace(cid, alist);
+							}else {
+								
+								ArrayList<Alignment> alist = new ArrayList<Alignment>();
+								alist.add(al);
+								concurrentMap.put(cid, alist);
+							}
 							break;
 						}
 					}
@@ -236,11 +249,6 @@ public class RMA6BlastCrawler {
 			}catch(IOException io){
 				warning.log(Level.SEVERE,"Can not locate or read File" ,io);
 			}
-//			try {
-//				executor.submit(new ConcurrentNodeMatchSorter(inDir+fileName, id, log, warning, wantReads, speciesName, mapReader, concurrentMap));
-//			}catch(Exception e) {
-//				e.p;
-//			}
 		}// for all IDs
 		destroy();
 		executor=(ThreadPoolExecutor) Executors.newFixedThreadPool(numThreads);

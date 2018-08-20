@@ -119,6 +119,7 @@ public class RMAExtractor {
     		}//fileNames;
     		// wait for all threads to finish here currently no concurrency errors or deadlocks but this would be the place where it would fall apart 
     		destroy();
+    		log.log(Level.INFO, "Finished Processing RMA6 files");
     		SummaryWriter sumWriter = new SummaryWriter(processedFiles,mapReader,inProcessor.getOutDir(), warning,inProcessor.getFilter()); 
     		sumWriter.process();
 	    	log.log(Level.INFO, "Writing Summary File");
