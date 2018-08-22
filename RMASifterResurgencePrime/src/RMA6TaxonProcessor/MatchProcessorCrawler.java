@@ -129,6 +129,7 @@ public class MatchProcessorCrawler extends RMA6TaxonProcessor {
 		setAlignments(alignments);
 		setTurnedOn(map.wasTurnedOn());
 		calculateReadLengthDistribution();
+		setFilterLine(false);
 		map = null;
 	}
 }

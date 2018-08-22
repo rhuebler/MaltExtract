@@ -73,7 +73,7 @@ public class ExperimentalRMA6AncientDestacker extends RMA6TaxonProcessor {
 				}
 			}
 	}		
-	public void process(){ 
+	public void process(boolean downsample){ 
 		//process collected information
 		CompositionMap map = new CompositionMap(taxonMap,turnOffDestacking,turnOffDeDuping, useAllAlignments, filter);
 		map.process();
@@ -127,6 +127,7 @@ public class ExperimentalRMA6AncientDestacker extends RMA6TaxonProcessor {
 		setReads(lines);
 		setAlignments(alignments);
 		calculateReadLengthDistribution();
+		setFilterLine(downsample);
 		map = null;
 	}//process
 }

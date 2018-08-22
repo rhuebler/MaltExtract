@@ -254,13 +254,20 @@ public String getCoveragePositions(){
 public boolean wasTurnedOn(){
 	return this.turnedOn;
 }
-public String getFilterLine(){
+public void setFilterLine(boolean downSamplingOn){
 	String s;
 	if(turnedOn)
 		s = taxName+"\t"+originalNumberOfReads + "\t" +numOfReads +"\t"+originalNumberOfAlignments+"\t" + numMatches+"\t"+"On";
 	else
 		s = taxName+"\t"+originalNumberOfReads + "\t" +numOfReads +"\t"+originalNumberOfAlignments+"\t" + numMatches+"\t"+"Off";
-	return s;
+	if(downSamplingOn)
+		s+="\tOn";
+	else	
+		s+="\tOff";
+	filterLine = s;
+}
+public String getFilterLine() {
+	return filterLine;
 }
 public String getCoverageLine(){
 	return this.coverageLine;
@@ -375,6 +382,9 @@ private int round(double i, int v){
 public void processMatchBlocks(IMatchBlock[] blocks, String name, int length, String sequence){ 
 
 	}// void 
+public void process(boolean downsample){ 
+
+}
 public void process(){ 
 
 }// void 
