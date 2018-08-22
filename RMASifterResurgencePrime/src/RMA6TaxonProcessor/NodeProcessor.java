@@ -96,7 +96,6 @@ public class NodeProcessor{
 		public void process(String inDir, String fileName, double topPercent, int maxLength){ 
 			switch(behave) {
 				case ANCIENT:
-					
 					ancientProcessor =  new ExperimentalRMA6AncientDestacker(taxID, minPIdent, mapReader, verbose, log, warning, wantReads, topPercent, maxLength,alignment,turnOffDestacking,turnOffDeDuping, behave, useAllAlignments, singleStranded);
 					break;
 				case NON:

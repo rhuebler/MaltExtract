@@ -105,9 +105,13 @@ public class RMAExtractor {
 		
 		
 		// run normal mode if neither crawl nor scan are used
-
+		if( inProcessor.getFileNames().size()==0) {
+			warning.log(Level.SEVERE, "No input files are prvided shutting down");
+			System.exit(1);
+		}
+			
 		switch(inProcessor.getFilter()){
-		default:
+		default:{
 			executor=(ThreadPoolExecutor) Executors.newFixedThreadPool(inProcessor.getNumThreads());//intialize concurrent thread executor 
 			log.log(Level.INFO, "Using "+executor.getCorePoolSize()+"cores");
 			List<Future<RMA6Processor>> processedFiles = new ArrayList<>();
@@ -124,8 +128,8 @@ public class RMAExtractor {
     		sumWriter.process();
 	    	log.log(Level.INFO, "Writing Summary File");
 	    	break;
-	 
-	case SCAN:	 
+		}
+	case SCAN:	{ 
 			  executor=(ThreadPoolExecutor) Executors.newFixedThreadPool(inProcessor.getNumThreads());//intialize concurrent thread executor 
 			  log.log(Level.INFO, "Using "+executor.getCorePoolSize() +" cores");
 			  List<Future<RMA6Scanner>> scannerList = new ArrayList<Future<RMA6Scanner>>();
@@ -142,8 +146,8 @@ public class RMAExtractor {
 			  log.log(Level.INFO, "Writing Scan Summary File");
 			  writer.write(inProcessor.getOutDir());
 			  break;
-			  
-	case CRAWL:
+		} 
+	case CRAWL:{
 		  for(String fileName : inProcessor.getFileNames()){
 			  File f = new File(fileName);
 			  log.log(Level.INFO, "Crawl for file " + fileName);
@@ -157,7 +161,7 @@ public class RMAExtractor {
 		  }	
 		 log.log(Level.INFO, "Crawling Done");
 		 break;
-		  
+		} 
 	  }// get runtime 
 		long endTime = System.nanoTime();
 		log.log(Level.INFO,"Runtime: "+ TimeUnit.NANOSECONDS.toMinutes(endTime - startTime) +" Minutes");
