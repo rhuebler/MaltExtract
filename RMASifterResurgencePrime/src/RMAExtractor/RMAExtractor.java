@@ -7,6 +7,7 @@ package RMAExtractor;
 import java.io.File; 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
@@ -18,6 +19,9 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.logging.SimpleFormatter;
 
+import DatabaseAnalyzer.ConcurrentReadDatabaseAnalyzer;
+import DatabaseAnalyzer.ReadDatabaseAnalyzer;
+import DatabaseAnalyzer.ReadDatabaseSummaryWriter;
 import NCBI_MapReader.NCBI_MapReader;
 import NCBI_MapReader.NCBI_TreeReader;
 import RMA6Processor.ConcurrentRMA6Processor;
@@ -162,6 +166,25 @@ public class RMAExtractor {
 		 log.log(Level.INFO, "Crawling Done");
 		 break;
 		} 
+	case ASSIGNMENT:{
+		 log.log(Level.INFO, "Analyze Nodes of Assignment");
+		 executor=(ThreadPoolExecutor) Executors.newFixedThreadPool(inProcessor.getNumThreads());//intialize concurrent thread executor 
+		  HashMap<String,Future<ReadDatabaseAnalyzer>> analyzerMap = new HashMap<String, Future<ReadDatabaseAnalyzer>>();
+		  // every tree has its own copy of this now to avoid concurrency issues
+		  for(String fileName : inProcessor.getFileNames()){
+			 File f = new File(fileName);
+			 ConcurrentReadDatabaseAnalyzer task = new ConcurrentReadDatabaseAnalyzer(f.getParent()+"/",
+					 f.getName(), log, warning, mapReader);
+			 Future<ReadDatabaseAnalyzer> future = executor.submit(task);
+			 analyzerMap.put(fileName,future);
+		  }
+		  destroy();
+		  ReadDatabaseSummaryWriter writer = new ReadDatabaseSummaryWriter(analyzerMap, mapReader, warning, (ArrayList<String>) inProcessor.getFileNames());
+		  
+		  log.log(Level.INFO, "Writing Scan Summary File");
+		  writer.write(inProcessor.getOutDir());
+		  break;
+	}
 	  }// get runtime 
 		long endTime = System.nanoTime();
 		log.log(Level.INFO,"Runtime: "+ TimeUnit.NANOSECONDS.toMinutes(endTime - startTime) +" Minutes");
