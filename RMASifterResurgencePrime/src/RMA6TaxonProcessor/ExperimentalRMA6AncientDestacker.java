@@ -37,6 +37,7 @@ public class ExperimentalRMA6AncientDestacker extends RMA6TaxonProcessor {
 				}		
 				Alignment al = new Alignment();
 				al.setText(blocks[i].getText());
+				al.setSingleStranded(singleStranded);
 				al.processText();
 				al.setTaxID(blocks[i].getTaxonId());
 				al.setPIdent(blocks[i].getPercentIdentity());

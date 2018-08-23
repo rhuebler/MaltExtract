@@ -29,6 +29,7 @@ import megan.data.IMatchBlock;
 						Alignment al = new Alignment();
 						al.setText(blocks[i].getText());
 						al.setTaxID(blocks[i].getTaxonId());
+						al.setSingleStranded(singleStranded);
 						al.processText();
 						al.setPIdent(blocks[i].getPercentIdentity());
 						al.setAcessionNumber(blocks[i].getTextFirstWord());

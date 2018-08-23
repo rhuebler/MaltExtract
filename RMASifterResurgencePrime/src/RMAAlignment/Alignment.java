@@ -33,6 +33,7 @@ public class Alignment {
 	private String text;
 	private boolean stacked = false;
 	private int taxID = 0;
+	private boolean singleStranded = false;
 // getter
 public boolean isTopAlignment(){
 	return this.topAlignment;
@@ -178,6 +179,9 @@ private void setReferenceLength(int k) {
 
  private void setNumGaps(int k){
 	 this.numGaps = k;}
+ public void setSingleStranded(boolean b) {
+	 this.singleStranded = b;
+ }
  //utility
  private boolean misMatchFivePrime(int i){
 	 if((reference.charAt(i) == 'C' && query.charAt(i) == 'T')||
@@ -282,12 +286,18 @@ private void setReferenceLength(int k) {
 			 setReversed(true);
 		 }
 		 for(int k = 0; k < 5; k++ ){ //test first and last 5 positions for g->c mismatch
-			 if(reference.length() > 1+k*2 && query.length() > 1+k*2 
-					 && reference.length() == query.length()){
-				 if(misMatchFivePrime(k) || misMatchThreePrime(query.length()-k-1)){ // set damage true if there is a C->T sub at eithter end
-					setFivePrimeDamage(true);
-					break;// break out of loop
-				}
+			 if(reference.length() > 1+k*2 && query.length() > 1+k*2  && reference.length() == query.length()){
+				 if(!singleStranded) {
+					 if(misMatchFivePrime(k) || misMatchThreePrime(query.length()-k-1)){ // set damage true if there is a C->T sub at eithter end
+						 setFivePrimeDamage(true);
+						 break;// break out of loop
+					 }
+			 	}else {
+			 		 if(misMatchFivePrime(k) || misMatchFivePrime(query.length()-k-1)){ // set damage true if there is a C->T sub at eithter end
+						 setFivePrimeDamage(true);
+						 break;// break out of loop
+					 }
+			 	}
 		 	}
 		 }
 		 calculateEditDistance(query, reference);
