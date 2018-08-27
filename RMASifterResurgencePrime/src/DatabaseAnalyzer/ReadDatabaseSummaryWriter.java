@@ -23,24 +23,24 @@ public class ReadDatabaseSummaryWriter {
 	 * @throws none thrown all caught
 	 */
 	private HashMap<String,Future<ReadDatabaseAnalyzer>> map;
-	private NCBI_MapReader reader;
-	private Set<Integer> keySet;
+
 	private List<String> summary;
 	private Logger warning;
 	private  ArrayList<String> fileNames;
-	public ReadDatabaseSummaryWriter(HashMap<String,Future<ReadDatabaseAnalyzer>> databaseMap, NCBI_MapReader reader,Logger warning, ArrayList<String> fileNames){
+	public ReadDatabaseSummaryWriter(HashMap<String,Future<ReadDatabaseAnalyzer>> databaseMap,Logger warning, ArrayList<String> fileNames){
 		this.map = databaseMap;
-		this.reader = reader;
 		this.warning = warning;
 		this.fileNames = fileNames;
 		prepareOutput();
 	}
 	private void prepareOutput(){
-		String header = "Node\t";
+		String header = "FileName\t";
 		ArrayList<String> output= new ArrayList<String>();
 		fileNames.sort(null);
+		for(int i =1; i<=10; i++) {
+			header+="\tNode_"+i;
+			}
 		for(String name : fileNames) {
-			header+=name+"\t";
 			if(map.containsKey(name)) {
 				try {
 					output.add(map.get(name).get().getOutput());
@@ -51,16 +51,19 @@ public class ReadDatabaseSummaryWriter {
 			}else {
 				int i=0;
 				String line = "name\t";
-				while(i<10)
-				line+="NA;NA\t";
+				while(i<10) {
+					line+="NA;NA\t";
+				}
 				output.add(line);
 			}
 		}
-		
+		output.sort(null);
+		output.add(0,header);
+		summary = output;
 	}
 		public void write(String outDir){
 			try{
-				Path file = Paths.get(outDir+"ScanSummary"+".txt");
+				Path file = Paths.get(outDir+"AssingedNodes"+".txt");
 				Files.write(file, summary, Charset.forName("UTF-8"));
 			}catch(IOException io){
 				warning.log(Level.SEVERE, "Error", io);

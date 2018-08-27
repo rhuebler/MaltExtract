@@ -72,8 +72,8 @@ public class InputParameterProcessor {
 		String tax ="";
 		for(String name : taxNames)
 			tax+=name+"\b";
-			String line="MaltTExtract 1.4"
-					+ "--input "+input+"\n"
+			String line="MaltTExtract 1.4\n"
+				+ "--input "+input+"\n"
 				+"--taxa "+tax+"\n"
 				+"--output "+outDir+"\n"
 				+"--filter "+behave+"\n"
@@ -360,7 +360,10 @@ public class InputParameterProcessor {
     	            }else if(Pattern.compile(Pattern.quote("srna"), Pattern.CASE_INSENSITIVE).matcher(commandLine.getOptionValue("filter")).find()){//TODO remove in future
 	    	            	 behave = Filter.SRNA;
 	    	            	log.log(Level.INFO,"Custom Behaviour set to: "+commandLine.getOptionValue("filter"));
-    	            }
+    	            }else if(Pattern.compile(Pattern.quote("assignment"), Pattern.CASE_INSENSITIVE).matcher(commandLine.getOptionValue("filter")).find()){//TODO remove in future
+   	            	 behave = Filter.ASSIGNMENT;
+   	            	log.log(Level.INFO,"Custom Behaviour set to: "+commandLine.getOptionValue("filter"));
+	            }
     	        }
 
     	        if (commandLine.hasOption("top"))

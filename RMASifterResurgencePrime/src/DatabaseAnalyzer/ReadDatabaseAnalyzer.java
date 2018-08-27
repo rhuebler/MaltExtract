@@ -22,7 +22,7 @@ public class ReadDatabaseAnalyzer {
 	private String output;
 	private Logger log;
 	private Logger warning;
-	private NCBI_MapReader reader;
+	private NCBI_MapReader mapReader;
 
 	// constructor
 	public ReadDatabaseAnalyzer(String inDir, String name,
@@ -31,7 +31,7 @@ public class ReadDatabaseAnalyzer {
 		this.fileName =  name;
 		this.log = log;
 		this.warning = warning;
-		this.reader = reader;
+		this.mapReader = reader;
 		process();
 		}
 	// getters
@@ -50,6 +50,16 @@ public class ReadDatabaseAnalyzer {
 	}
 	public String getOutput() {
 		return output;
+	}
+	protected String getName(int taxId){
+		String name;
+		if(mapReader.getNcbiIdToNameMap().get(taxId) != null)
+			name = mapReader.getNcbiIdToNameMap().get(taxId).replace(' ', '_').replace('\'', '_').replace('#', '_').replace('$', '_');
+		else if(taxId == 0)
+			name="NA";
+		else
+			name = "unassignedName";
+		return name;
 	}
 	// process
 	private void process(){
@@ -77,16 +87,14 @@ public class ReadDatabaseAnalyzer {
 			rma6File.close();
 			NOAORComparator comparator = new NOAORComparator();
 			noarList.sort(comparator);
-			String output = fileName;
+			String output = fileName+"\t";
 			for(int i =0; i< 10; i++) {
 				if(i<noarList.size()) {
-					System.out.println(reader.getNcbiIdToNameMap().get(noarList.get(i).getTaxID())+"\t"+noarList.get(i).getSize());
-					output += reader.getNcbiIdToNameMap().get(noarList.get(i).getTaxID())+";"+noarList.get(i).getSize()+"\t";
+					output += getName(noarList.get(i).getTaxID())+";"+noarList.get(i).getSize()+"\t";
 				}else{
 					output += "NA;NA\t";
 				}
 			}
-			System.out.println(output);
 			this.output = output;
 		}catch(IOException io){
 			warning.log(Level.SEVERE,"Cannot open File",io);

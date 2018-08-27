@@ -179,7 +179,7 @@ public class RMAExtractor {
 			 analyzerMap.put(fileName,future);
 		  }
 		  destroy();
-		  ReadDatabaseSummaryWriter writer = new ReadDatabaseSummaryWriter(analyzerMap, mapReader, warning, (ArrayList<String>) inProcessor.getFileNames());
+		  ReadDatabaseSummaryWriter writer = new ReadDatabaseSummaryWriter(analyzerMap, warning, (ArrayList<String>) inProcessor.getFileNames());
 		  
 		  log.log(Level.INFO, "Writing Scan Summary File");
 		  writer.write(inProcessor.getOutDir());

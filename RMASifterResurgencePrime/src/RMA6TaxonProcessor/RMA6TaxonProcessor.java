@@ -51,7 +51,7 @@ protected int numOfReads = 0;
 protected int numMatches = 0;
 protected int originalNumberOfReads = 0;
 protected int originalNumberOfAlignments = 0;
-protected String filterLine = "";
+protected String filterLine;
 protected ArrayList<Integer> distances = new ArrayList<Integer>();
 protected ArrayList<Double> pIdents = new ArrayList<Double>();
 protected HashMap<Integer,HashMap<String, ArrayList<Alignment>>> taxonMap = new HashMap<Integer,HashMap<String, ArrayList<Alignment>>>();
@@ -114,6 +114,7 @@ public RMA6TaxonProcessor(Integer id, double pID, NCBI_MapReader reader, boolean
 	container.setName(taxName);
 	this.additionalEntries =taxName+"\tNA\tNA\tNA\tNA\tNA\tNA\tNA\tNA\tNA\tNA";
 	this.covPositions = taxName+"\tNA\t0\t0\t0\t0\t0\t0\t0";
+	this.filterLine = taxName+"	0	0	0	0	na	na";
 	DecimalFormatSymbols otherSymbols = new DecimalFormatSymbols();
 	otherSymbols.setDecimalSeparator('.');
 	otherSymbols.setGroupingSeparator(','); 
@@ -264,10 +265,10 @@ public void setFilterLine(boolean downSamplingOn){
 		s+="\tOn";
 	else	
 		s+="\tOff";
-	filterLine = s;
+	this.filterLine = s;
 }
 public String getFilterLine() {
-	return filterLine;
+	return this.filterLine;
 }
 public String getCoverageLine(){
 	return this.coverageLine;
@@ -279,7 +280,7 @@ public String getDamageLine(){
 protected String getName(int taxId){
 	String name;
 	if(mapReader.getNcbiIdToNameMap().get(taxId) != null)
-		name = mapReader.getNcbiIdToNameMap().get(taxId).replace(' ', '_').replace('\'', '_').replace('#', '_');
+		name = mapReader.getNcbiIdToNameMap().get(taxId).replace(' ', '_').replace('\'', '_').replace('#', '_').replace('$', '_');
 	else if(taxId == 0)
 		name="NA";
 	else
