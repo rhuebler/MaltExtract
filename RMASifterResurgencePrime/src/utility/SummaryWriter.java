@@ -63,10 +63,11 @@ public class SummaryWriter {
 		}
 	}
 	private void setProcessedIds(){
-		Set<Integer> pIDs = new HashSet<>();
+		HashSet<Integer> pIDs = new HashSet<Integer>();
 		try{
 		for(Future<RMA6Processor> future : processedFiles)
-			pIDs.addAll(future.get().getContainedIDs());
+			if(future.get().getContainedIDs()!=null)
+				pIDs.addAll(future.get().getContainedIDs());
 		this.processedIDs = pIDs;
 		}catch(InterruptedException ie){
 			warning.log(Level.SEVERE, "Error", ie);
