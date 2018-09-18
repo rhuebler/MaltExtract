@@ -101,14 +101,19 @@ public class RMA6Processor {
 		    this.totalCount = (int) rma6File.getFooterSectionRMA6().getNumberOfReads();
 		    rma6File.close();
 		    }catch(IOException io){
-				io.printStackTrace();
+		    	warning.log(Level.SEVERE, "COuld not retrieve all keys for file: "+fileName, io);
+				
 			}
 		
 		return keys;
 	}
 	
 	private void setContainedIDs(Set<Integer> set){
-		this.containedIDs = set;
+		if(set!=null) {
+			containedIDs.addAll(set);
+		}else {
+			containedIDs.add(-1);
+		}
 	}
 	private void setSumLine(HashMap<Integer,Integer> list){	
 		this.overallSum = list;
