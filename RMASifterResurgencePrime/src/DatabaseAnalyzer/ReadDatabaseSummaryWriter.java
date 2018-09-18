@@ -8,13 +8,11 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import NCBI_MapReader.NCBI_MapReader;
 
 public class ReadDatabaseSummaryWriter {
 
