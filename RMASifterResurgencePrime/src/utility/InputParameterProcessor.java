@@ -257,6 +257,7 @@ public class InputParameterProcessor {
     	        {
     	        	log.log(Level.INFO,"Input Set to: ");
     	            for(String arg :commandLine.getOptionValues("input")){
+    	            	
     	            	try{
     	            		File inFile = null;
     	            		if(new File(arg).getParent()!=null){//get Path of inFile either by getting the canonical Path from the parent
@@ -270,6 +271,7 @@ public class InputParameterProcessor {
     	            				if(name.endsWith("rma6")|| Files.isSymbolicLink(new File(inFile.getPath()+"/" + name).toPath()))
     	            				 fileNames.add(inFile.getPath()+"/" + name);
     	            		}else if(inFile.isFile()){// is File
+    	            			System.out.println(arg);
     	            			if(arg.endsWith("rma6")||Files.isSymbolicLink(new File(inFile.getPath()).toPath())){ // test if file can be read as if text file that contains names
     	            				log.info(inFile.getPath());
     	            				fileNames.add(inFile.getPath());
@@ -475,7 +477,7 @@ public class InputParameterProcessor {
     	              warning.log(Level.WARNING,argument);
     	            }
     	          }
-    	        if(!commandLine.hasOption("taxa") && behave != Filter.SCAN){//stop if taxa list is missing
+    	        if(!commandLine.hasOption("taxa") && (behave != Filter.SCAN && behave != Filter.ASSIGNMENT)){//stop if taxa list is missing
     	        	warning.log(Level.SEVERE,"No target species provided for filtering");
     	        	System.exit(1);
     	        }//stop if parameters are missing
