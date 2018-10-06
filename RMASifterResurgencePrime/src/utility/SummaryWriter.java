@@ -64,16 +64,20 @@ public class SummaryWriter {
 	}
 	private void setProcessedIds(){
 		HashSet<Integer> pIDs = new HashSet<Integer>();
-		try{
-		for(Future<RMA6Processor> future : processedFiles)
-			if(future.get().getContainedIDs()!=null)
+		String fileName="";
+		for(Future<RMA6Processor> future : processedFiles) {
+			try{
+			if(future.get().getContainedIDs()!=null) {
 				pIDs.addAll(future.get().getContainedIDs());
-		this.processedIDs = pIDs;
-		}catch(InterruptedException ie){
-			warning.log(Level.SEVERE, "Error", ie);
-		}catch(ExecutionException ee){
-			warning.log(Level.SEVERE, "Error", ee);
+				fileName = future.get().getfileName();
+				}
+			}catch(InterruptedException ie){
+			warning.log(Level.SEVERE, "Error in File "+fileName, ie);
+			}catch(ExecutionException ee){
+			warning.log(Level.SEVERE, "Error in File "+fileName, ee);
+			}
 		}
+		this.processedIDs = pIDs;
 	}
 	private void prepareOutput(Filter switcher) {
 		 HashMap<Integer,String> summary = new  HashMap<Integer,String>();

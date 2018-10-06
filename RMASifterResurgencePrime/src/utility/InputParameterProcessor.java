@@ -72,7 +72,7 @@ public class InputParameterProcessor {
 		String tax ="";
 		for(String name : taxNames)
 			tax+=name+"\b";
-			String line="MaltTExtract 1.4\n"
+			String line="MaltTExtract 1.5\n"
 				+ "--input "+input+"\n"
 				+"--taxa "+tax+"\n"
 				+"--output "+outDir+"\n"
@@ -257,31 +257,34 @@ public class InputParameterProcessor {
     	        {
     	        	log.log(Level.INFO,"Input Set to: ");
     	            for(String arg :commandLine.getOptionValues("input")){
-    	            	
-    	            	try{
-    	            		File inFile = null;
-    	            		if(new File(arg).getParent()!=null){//get Path of inFile either by getting the canonical Path from the parent
-    	            			inFile = new File(new File(arg).getParentFile().getCanonicalPath()+"/"+ new File(arg).getName());
-    	            		}else {// or by pathching together the Path
-    	            			inFile = new File(System.getProperty("user.dir")+"/"+arg);
-    	            		}
-    	            		if(inFile.isDirectory()){ // if the file is an directory
-    	            			 log.info(arg);
-    	            			for(String name : inFile.list())//if file ends with RMA6 or is as a soft link at to files
-    	            				if(name.endsWith("rma6")|| Files.isSymbolicLink(new File(inFile.getPath()+"/" + name).toPath()))
-    	            				 fileNames.add(inFile.getPath()+"/" + name);
-    	            		}else if(inFile.isFile()){// is File
-    	            			System.out.println(arg);
-    	            			if(arg.endsWith("rma6")||Files.isSymbolicLink(new File(inFile.getPath()).toPath())){ // test if file can be read as if text file that contains names
-    	            				log.info(inFile.getPath());
-    	            				fileNames.add(inFile.getPath());
-    	            			}else{
-    	            			readFileList(inFile);}
-    	            		}
-    	            	}catch(IOException io){
-    	            		warning.log(Level.SEVERE,"Can't open File", io);
-    	            	}	
-    	            }  
+	    	            if(!arg.startsWith(".")) {
+	    	            	try{
+	    	            		File inFile = null;
+	    	            		if(new File(arg).getParent()!=null){//get Path of inFile either by getting the canonical Path from the parent
+	    	            			inFile = new File(new File(arg).getParentFile().getCanonicalPath()+"/"+ new File(arg).getName());
+	    	            		}else {// or by pathching together the Path
+	    	            			inFile = new File(System.getProperty("user.dir")+"/"+arg);
+	    	            		}
+	    	            		if(inFile.isDirectory()){ // if the file is an directory
+	    	            			 log.info(arg);
+	    	            			for(String name : inFile.list())//if file ends with RMA6 or is as a soft link at to files
+	    	            				if(name.endsWith("rma6")|| Files.isSymbolicLink(new File(inFile.getPath()+"/" + name).toPath()))
+	    	            				 fileNames.add(inFile.getPath()+"/" + name);
+	    	            		}else if(inFile.isFile()){// is File
+	    	            			System.out.println(arg);
+	    	            			if(arg.endsWith("rma6")||Files.isSymbolicLink(new File(inFile.getPath()).toPath())){ // test if file can be read as if text file that contains names
+	    	            				log.info(inFile.getPath());
+	    	            				fileNames.add(inFile.getPath());
+	    	            			}else{
+	    	            			readFileList(inFile);}
+	    	            		}
+	    	            	}catch(IOException io){
+	    	            		warning.log(Level.SEVERE,"Can't open File", io);
+	    	            	}	
+	    	            } else {
+	    	            	warning.log(Level.SEVERE,"not an RMA6 file: "+ arg);
+	    	            } 
+    	           }	
     	        }
     	        
     	        if (commandLine.hasOption("output"))//set output directorty

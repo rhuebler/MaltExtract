@@ -32,7 +32,7 @@ public class ReadDatabaseSummaryWriter {
 		prepareOutput();
 	}
 	private void prepareOutput(){
-		String header = "FileName\t";
+		String header = "FileName";
 		ArrayList<String> output= new ArrayList<String>();
 		fileNames.sort(null);
 		for(int i =1; i<=10; i++) {
