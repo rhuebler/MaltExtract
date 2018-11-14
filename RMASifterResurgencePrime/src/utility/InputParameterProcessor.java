@@ -186,7 +186,10 @@ public class InputParameterProcessor {
 		try {
 			 Scanner	in = new Scanner(f.getCanonicalFile());
 			 while(in.hasNext()){
-				 fileNames.add(in.nextLine());
+				 String line = in.nextLine();
+				 if(line.endsWith("rma6")){
+					 fileNames.add(line);
+				 }
 			 }
 			 in.close();
 		 	}catch (FileNotFoundException e) {
@@ -268,8 +271,9 @@ public class InputParameterProcessor {
 	    	            		if(inFile.isDirectory()){ // if the file is an directory
 	    	            			 log.info(arg);
 	    	            			for(String name : inFile.list())//if file ends with RMA6 or is as a soft link at to files
-	    	            				if(name.endsWith("rma6")|| Files.isSymbolicLink(new File(inFile.getPath()+"/" + name).toPath()))
+	    	            				if(name.endsWith("rma6")|| Files.isSymbolicLink(new File(inFile.getPath()+"/" + name).toPath())) {
 	    	            				 fileNames.add(inFile.getPath()+"/" + name);
+	    	            				}
 	    	            		}else if(inFile.isFile()){// is File
 	    	            			System.out.println(arg);
 	    	            			if(arg.endsWith("rma6")||Files.isSymbolicLink(new File(inFile.getPath()).toPath())){ // test if file can be read as if text file that contains names

@@ -111,7 +111,7 @@ public class RMAExtractor {
 		
 		// run normal mode if neither crawl nor scan are used
 		if( inProcessor.getFileNames().size()==0) {
-			warning.log(Level.SEVERE, "No input files are prvided shutting down");
+			warning.log(Level.SEVERE, "No input files are provided shutting down");
 			System.exit(1);
 		}
 			
