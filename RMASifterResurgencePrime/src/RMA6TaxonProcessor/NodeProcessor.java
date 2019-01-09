@@ -118,13 +118,15 @@ public class NodeProcessor{
 			// use ReadsIterator to get all Reads assigned to MegantaxID and print top percent to file
 			this.fileName =fileName;
 			boolean downsamplingOn = false;
+			int sum=0;
 			try(RMA6File rma6File = new RMA6File(inDir+fileName, "r")){
 				ListOfLongs list = new ListOfLongs();
 				Long location = rma6File.getFooterSectionRMA6().getStartClassification("Taxonomy");
 				if (location != null) {
 				   ClassificationBlockRMA6 classificationBlockRMA6 = new ClassificationBlockRMA6("Taxonomy");
 				   classificationBlockRMA6.read(location, rma6File.getReader());
-				   if (classificationBlockRMA6.getSum(taxID) > 0) {
+				   sum = classificationBlockRMA6.getSum(taxID);
+				   if (sum > 0) {
 					   classificationBlockRMA6.readLocations(location, rma6File.getReader(), taxID, list);
 				   }
 				 }
@@ -175,15 +177,19 @@ public class NodeProcessor{
 					default:
 						ancientProcessor.process(downsamplingOn);
 						defaultProcessor.process(downsamplingOn);
+						ancientProcessor.setAssigned(sum);
+						defaultProcessor.setAssigned(sum);
 						ancientProcessor.clear();
 						defaultProcessor.clear();
 						break;
 					case ANCIENT:	
 						ancientProcessor.process(downsamplingOn);
+						ancientProcessor.setAssigned(sum);
 						ancientProcessor.clear();
 						break;
 					case NON:
 						defaultProcessor.process(downsamplingOn);
+						defaultProcessor.setAssigned(sum);
 						defaultProcessor.clear();
 						break;
 						

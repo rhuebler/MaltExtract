@@ -71,6 +71,7 @@ protected boolean turnOffDestacking = false;
 protected boolean turnOffDeDuping = false;
 protected boolean useAllAlignments = false;
 protected boolean singleStranded = false;
+protected int assigned = 0;
 //constructor
 
 public RMA6TaxonProcessor(Integer id, double pID, NCBI_MapReader reader, boolean verbose, Logger log, Logger warning,boolean wantReads, double topPercent, int maxLength, 
@@ -127,6 +128,9 @@ public RMA6TaxonProcessor(Integer id, double pID, NCBI_MapReader reader, boolean
 	this.singleStranded = singleStranded;
 }
 //setters
+protected void setAssigned(int i) {
+	this.assigned = i;
+}
 protected void setOriginalNumberOfAlignments(int num){
 	this.originalNumberOfAlignments = num;
 }
@@ -266,6 +270,9 @@ public void setFilterLine(boolean downSamplingOn){
 	else	
 		s+="\tOff";
 	this.filterLine = s;
+}
+public String getAssigned() {
+	return taxName+"\t"+assigned;
 }
 public String getFilterLine() {
 	return this.filterLine;

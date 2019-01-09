@@ -97,6 +97,9 @@ public class RMA6OutputProcessor {
 			case ALIGNMENTDISTRIBUTION: header = "Taxon\tReference\tuniquePerReference\tnonStacked\tnonDuplicatesonReference\tTotalAlignmentsOnReference\tReferenceLength";
 										outDir+= "readDist/"+fileName+"_alignmentDist"+".txt";
 									break;
+			case ASSIGNED: header= "Node\tNumberOfAssignedReads";
+			 outDir += "filterInformation/"+fileName+"_assignedReads"+".txt";			
+						break;
 			case COVERAGEHISTOGRAM: header = "Taxon\tReference\t0\t1\t2\t3\t4\t5\t6\t7\t8\t9\t10\thigher";
 									outDir += "coverage/"+fileName+"_coverageHist"+".txt";
 									break;
@@ -163,6 +166,7 @@ public class RMA6OutputProcessor {
 		ArrayList<String> readLengthHistogram = new ArrayList<String>();
 		ArrayList<String> readLengthStatistics = new ArrayList<String>();
 		ArrayList<String> filterInformation = new ArrayList<String>();
+		ArrayList<String> assignedReads = new ArrayList<String>();
 		String dir = "";
 		switch (switcher) {
 		case NON:
@@ -211,7 +215,8 @@ public class RMA6OutputProcessor {
 					percentIdentity.add(taxProcessor.getPercentIdentityHistogram());
 					readDistribution.add(taxProcessor.getReadDistribution());	
 					readLengthHistogram.add(taxProcessor.getReadLengthDistribution());
-					readLengthStatistics.add(taxProcessor.getReadLengthStatistics());	
+					readLengthStatistics.add(taxProcessor.getReadLengthStatistics());
+					assignedReads.add(taxProcessor.getAssigned());
 					if(alignment )
 						writeOutput(taxProcessor.getAlignments(),dir+"/alignments/"+fileName+"/",OutputType.ALIGNMENTS, id);
 					if(reads) {
@@ -221,6 +226,7 @@ public class RMA6OutputProcessor {
 			
 			//write output
 			writeOutput(additionalEntries, dir,OutputType.ADDIDTIONALENTRIES, 0);
+			writeOutput(assignedReads, dir, OutputType.ASSIGNED, 0);
 			writeOutput(readDistribution, dir,OutputType.ALIGNMENTDISTRIBUTION, 0);
 			writeOutput(coveragePositions, dir,OutputType.POS_COVERED, 0);
 			writeOutput(coverageHistogram, dir,OutputType.COVERAGEHISTOGRAM, 0);
@@ -230,6 +236,7 @@ public class RMA6OutputProcessor {
 			writeOutput(percentIdentity, dir,OutputType.PERCENTIDENTITY, 0);
 			writeOutput(readLengthHistogram, dir,OutputType.READLENGTH_DIST, 0);
 			writeOutput(readLengthStatistics, dir, OutputType.READLENGTH_STATISTICS, 0);
+			
 	}
 	public void process(HashMap<Integer,NodeProcessor> processedMap){ // process NodeProcessorts depending on files 
 		switch(behave){ 
