@@ -7,7 +7,7 @@ import RMAAlignment.Alignment;
 
 public class ReferenceMap16S {
 
-	//initialize attributes
+	//initialize  with attributes
 	private ArrayList<Alignment> input;
 	private double coverageDeviation=0.0;
 	private HashMap<Integer,Integer> coverageHistogram;
