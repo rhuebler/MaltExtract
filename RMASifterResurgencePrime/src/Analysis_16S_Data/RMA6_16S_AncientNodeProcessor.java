@@ -10,7 +10,7 @@ import RMAAlignment.CompositionMap;
 import behaviour.Filter;
 import megan.data.IMatchBlock;
 	public class RMA6_16S_AncientNodeProcessor extends RMA6TaxonProcessor{
-			// initialize attributes
+			// initialize attributes here
 			
 			//constructers and set values
 	
