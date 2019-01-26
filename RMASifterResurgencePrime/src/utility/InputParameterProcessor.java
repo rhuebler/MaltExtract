@@ -271,7 +271,7 @@ public class InputParameterProcessor {
 	    	            		if(inFile.isDirectory()){ // if the file is an directory
 	    	            			 log.info(arg);
 	    	            			for(String name : inFile.list())//if file ends with RMA6 or is as a soft link at to files
-	    	            				if(name.endsWith("rma6")|| Files.isSymbolicLink(new File(inFile.getPath()+"/" + name).toPath())) {
+	    	            				if(name.endsWith("rma6")|| name.endsWith("rma") || Files.isSymbolicLink(new File(inFile.getPath()+"/" + name).toPath())) {
 	    	            				 fileNames.add(inFile.getPath()+"/" + name);
 	    	            				}
 	    	            		}else if(inFile.isFile()){// is File
