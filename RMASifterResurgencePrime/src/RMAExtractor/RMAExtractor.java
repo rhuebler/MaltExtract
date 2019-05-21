@@ -85,12 +85,21 @@ public class RMAExtractor {
 		log.log(Level.INFO,inProcessor.GetParameters());
 		
 		log.log(Level.INFO, "Setting up Taxon Name and Taxon ID maps");
-		NCBI_MapReader mapReader = new NCBI_MapReader(inProcessor.getTreePath());
+		NCBI_MapReader mapReader;
+		NCBI_TreeReader treeReader;
+		if(inProcessor.getTreePath()!=null) {
+			mapReader = new NCBI_MapReader(inProcessor.getTreePath());
+			treeReader = new NCBI_TreeReader(inProcessor.getTreePath());
+		}else {
+			mapReader = new NCBI_MapReader();
+			treeReader = new NCBI_TreeReader();
+		}
+		
 		DirectoryCreator dCreator = new DirectoryCreator();
 		dCreator.process(inProcessor.getFilter(),inProcessor.getOutDir(),inProcessor.getBlastHits(),inProcessor.wantReads(), inProcessor.wantMeganSummaries());
 		ArrayList<Integer> taxIDs= new  ArrayList<Integer>();
 		log.log(Level.INFO, "Setting up Phylogenetic Tree");
-		NCBI_TreeReader treeReader = new NCBI_TreeReader(inProcessor.getTreePath());
+		
 		
 		//read in taxa list and convert to numbers
 		if(inProcessor.getTaxas() == Taxas.USER){

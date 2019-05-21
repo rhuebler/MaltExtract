@@ -45,7 +45,7 @@ public class InputParameterProcessor {
 	private double minPIdent = 0;
 	private Filter behave = Filter.SCAN;
 	private Taxas taxas = Taxas.ALL;
-	private String tree_Path = "/projects1/clusterhomes/huebler/RMASifter/RMA_Extractor_Resources/";
+	private String tree_Path;
 	private boolean verbose = false;
 	private Logger log;
 	private Logger warning;
@@ -466,7 +466,7 @@ public class InputParameterProcessor {
     	        	 downsampling = false;
     	        }
     	        if(commandLine.hasOption("h")){////help
-    	        	String header = "MaltExtract beta version 1.3";
+    	        	String header = "MaltExtract beta version 1.5";
     	    	    String footer = "In case you encounter an error drop an email with an useful description to huebler@shh.mpg.de ";
     	    	    HelpFormatter formatter = new HelpFormatter();
     	    	    formatter.setWidth(500);
