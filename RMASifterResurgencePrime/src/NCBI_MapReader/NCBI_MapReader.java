@@ -88,10 +88,10 @@ public class NCBI_MapReader {
 					   BufferedReader buffered = new BufferedReader(reader);
 					   String line;
 					   while((line = buffered.readLine())!=null) {
-						   System.out.println(line);
-							//String[] frags = line.toString().split("\\t");
-//							ncbiNameMap.put(frags[1], Integer.parseInt(frags[0]));
-//							ncbiIDMap.put(Integer.parseInt(frags[0]), frags[1]);
+						  // System.out.println(line);
+							String[] frags = line.toString().split("\\t");
+							ncbiNameMap.put(frags[1], Integer.parseInt(frags[0]));
+							ncbiIDMap.put(Integer.parseInt(frags[0]), frags[1]);
 							// do something with line
 				       }
 					 buffered.close();

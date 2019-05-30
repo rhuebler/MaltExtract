@@ -52,7 +52,7 @@ public class NCBI_TreeReader {
 				   BufferedReader buffered = new BufferedReader(reader);
 				   String line;
 				   while((line = buffered.readLine())!=null) {
-					   System.out.println(line);
+					  // System.out.println(line);
 					   this.ph = Phylogeny.createInstanceFromNhxString(line);
 			       }
 				 buffered.close();
@@ -115,7 +115,16 @@ public class NCBI_TreeReader {
 		results.addAll(positionsToKeep);
 		return results;
 	}   
-	
+		public  ArrayList<Integer> getLeavesIds(){
+			positionsToKeep.clear();
+			PhylogenyNode query = ph.getNode(0);
+			for(PhylogenyNode leaf : query.getAllExternalDescendants()){
+				positionsToKeep.add(Integer.parseInt(leaf.getName()));
+			}
+			ArrayList<Integer> results = new ArrayList<Integer>();
+			   results.addAll(positionsToKeep);
+			   return results;
+		}
 	    public ArrayList<Integer> getLowestContainedIds(Set<Integer> keys){// get all strains of a node
 	    	positionsToKeep.clear();
 			PhylogenyNode query = ph.getNode(0);
