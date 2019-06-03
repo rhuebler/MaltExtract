@@ -1,7 +1,13 @@
 package NCBI_MapReader;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.URL;
+import java.net.URLConnection;
 import java.util.HashMap;
 import java.util.Scanner;
 /**
@@ -12,7 +18,6 @@ import java.util.Scanner;
  * and a map of name to ID
  */
 
-import utility.ResourceFinder;
 public class NCBI_MapReader {
 	/**
 	 * Is used to read the NCBI map fie and generate two hashmaps that 
@@ -27,9 +32,7 @@ public class NCBI_MapReader {
 	 HashMap<String,Integer> ncbiNameToId;
 	 HashMap<Integer,String> ncbiIdToName;
 	public NCBI_MapReader(){// try to locate resources
-		ResourceFinder resources = new ResourceFinder();
-		mapName = resources.getPath("ncbi.map");
-		processNcbiMap(mapName);
+		processFromWeb();
 	}
 	public NCBI_MapReader(String path){// use provided path
 		if(!path.endsWith("/"))
@@ -69,6 +72,36 @@ public class NCBI_MapReader {
 			setNcbiIdToNameMap(ncbiIDMap);
 			}catch(FileNotFoundException ie){
 				ie.printStackTrace();
+			}
+		}
+		public void processFromWeb() {
+			try{
+				HashMap<String,Integer> ncbiNameMap = new HashMap<String,Integer>();
+				HashMap<Integer, String> ncbiIDMap = new HashMap<Integer, String>();
+				//https://github.com/danielhuson/megan-ce/blob/master/resources/files/ncbi.map
+				String location = "https://raw.githubusercontent.com/danielhuson/megan-ce/master/resources/files/ncbi.map";
+				URLConnection conn = new URL(location).openConnection();
+				 conn.setConnectTimeout(90*1000);
+				 conn.setReadTimeout(90*1000);
+				   try (InputStream in = conn.getInputStream()) {
+					   InputStreamReader reader = new  InputStreamReader(in);
+					   BufferedReader buffered = new BufferedReader(reader);
+					   String line;
+					   while((line = buffered.readLine())!=null) {
+						  // System.out.println(line);
+							String[] frags = line.toString().split("\\t");
+							ncbiNameMap.put(frags[1], Integer.parseInt(frags[0]));
+							ncbiIDMap.put(Integer.parseInt(frags[0]), frags[1]);
+							// do something with line
+				       }
+					 buffered.close();
+					setNcbiNameToIdMap(ncbiNameMap);
+					setNcbiIdToNameMap(ncbiIDMap);
+				   }catch(Exception e) {
+					   e.printStackTrace();
+				    }
+			}catch(IOException io) {
+				io.printStackTrace();
 			}
 		}
 	}

@@ -1,6 +1,11 @@
 package NCBI_MapReader;
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.URL;
+import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
@@ -10,7 +15,6 @@ import java.util.Set;
 import org.forester.phylogeny.Phylogeny;
 import org.forester.phylogeny.PhylogenyNode;
 
-import utility.ResourceFinder;
 /**
  * Process NCBI tre File with archeoptrix.jar
  * Process tree find child nodes to input taxID
@@ -34,16 +38,32 @@ public class NCBI_TreeReader {
 	private HashSet<Integer> positionsToKeep = new HashSet<Integer>();
 	private Phylogeny ph;
 	public NCBI_TreeReader(){
-		ResourceFinder resources = new ResourceFinder();
-		treName = resources.getPath("ncbi.tre");//if path isn't provided try to find resources
-		try(Scanner in = new Scanner(new File(treName))){
-		String line = in.nextLine();
-		in.close();
-	    this.ph = Phylogeny.createInstanceFromNhxString(line);
-	    }catch(IOException io){
-	    	io.printStackTrace();
-	    }
+		processFromWeb();
 	}
+	
+	public void processFromWeb() {
+		try{
+			String location =  "https://raw.githubusercontent.com/danielhuson/megan-ce/master/resources/files/ncbi.tre";
+			URLConnection conn = new URL(location).openConnection();
+			 conn.setConnectTimeout(90*1000);
+			 conn.setReadTimeout(90*1000);
+			   try (InputStream in = conn.getInputStream()) {
+				   InputStreamReader reader = new  InputStreamReader(in);
+				   BufferedReader buffered = new BufferedReader(reader);
+				   String line;
+				   while((line = buffered.readLine())!=null) {
+					  // System.out.println(line);
+					   this.ph = Phylogeny.createInstanceFromNhxString(line);
+			       }
+				 buffered.close();
+			   }catch(Exception e) {
+				   e.printStackTrace();
+			    }
+		}catch(IOException io) {
+			io.printStackTrace();
+		}
+	}
+	
 	public NCBI_TreeReader(String path){
 		if(!path.endsWith("/"))
 			path+="/";
@@ -61,9 +81,11 @@ public class NCBI_TreeReader {
 	public NCBI_TreeReader(NCBI_TreeReader copyInstance){
 		this.ph = copyInstance.getPhylogeny();
 	}
+	
 	private Phylogeny getPhylogeny(){
 		return ph;
 	}
+	
 	private ArrayList<Integer> getAssigned( Collection<Integer> children,Set<Integer> keys){// get assinged nodes in files
 		ArrayList<Integer> assigned = new ArrayList<Integer>();
 		if(keys==null)
@@ -73,6 +95,7 @@ public class NCBI_TreeReader {
 				assigned.add(key);
 		return assigned;
 	} 
+	
 	public ArrayList<Integer> getAllStrains(int target, Set<Integer> keys){// get all strains of a node
 		positionsToKeep.clear();
 		PhylogenyNode query = ph.getNode(String.valueOf(target));
@@ -92,6 +115,16 @@ public class NCBI_TreeReader {
 		results.addAll(positionsToKeep);
 		return results;
 	}   
+		public  ArrayList<Integer> getLeavesIds(){
+			positionsToKeep.clear();
+			PhylogenyNode query = ph.getNode(0);
+			for(PhylogenyNode leaf : query.getAllExternalDescendants()){
+				positionsToKeep.add(Integer.parseInt(leaf.getName()));
+			}
+			ArrayList<Integer> results = new ArrayList<Integer>();
+			   results.addAll(positionsToKeep);
+			   return results;
+		}
 	    public ArrayList<Integer> getLowestContainedIds(Set<Integer> keys){// get all strains of a node
 	    	positionsToKeep.clear();
 			PhylogenyNode query = ph.getNode(0);
@@ -117,6 +150,7 @@ public class NCBI_TreeReader {
 		return results;
 	   
 	}
+	    
 		public ArrayList<Integer>  getParents(int target){// get parents of leaves
 			ArrayList<Integer> ids = new ArrayList<Integer>();
 			ids.add(target);
