@@ -132,7 +132,7 @@ public class NodeProcessor{
 				 }
 					// Downsample list if necessary and write log 
 				
-				if(list.size()>10000 && downsample){
+				if(list.size()>100000 && downsample){
 					downsamplingOn = true;
 					warning.log(Level.WARNING,"For " + taxName + " in file "+fileName+ " downsampling was turned on");
 				}

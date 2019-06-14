@@ -91,6 +91,7 @@ public class RMAExtractor {
 			mapReader = new NCBI_MapReader(inProcessor.getTreePath());
 			treeReader = new NCBI_TreeReader(inProcessor.getTreePath());
 		}else {
+			
 			mapReader = new NCBI_MapReader();
 			treeReader = new NCBI_TreeReader();
 		}

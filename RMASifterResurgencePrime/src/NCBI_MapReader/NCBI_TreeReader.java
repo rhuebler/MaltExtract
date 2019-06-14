@@ -43,7 +43,8 @@ public class NCBI_TreeReader {
 	
 	public void processFromWeb() {
 		try{
-			String location =  "https://raw.githubusercontent.com/danielhuson/megan-ce/master/resources/files/ncbi.tre";
+			
+			String location ="https://raw.githubusercontent.com/rhuebler/HOPS/SHH/AMPS/Resources/ncbi.tre";
 			URLConnection conn = new URL(location).openConnection();
 			 conn.setConnectTimeout(90*1000);
 			 conn.setReadTimeout(90*1000);
@@ -52,7 +53,7 @@ public class NCBI_TreeReader {
 				   BufferedReader buffered = new BufferedReader(reader);
 				   String line;
 				   while((line = buffered.readLine())!=null) {
-					  // System.out.println(line);
+					
 					   this.ph = Phylogeny.createInstanceFromNhxString(line);
 			       }
 				 buffered.close();

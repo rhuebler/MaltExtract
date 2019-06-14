@@ -79,7 +79,7 @@ public class NCBI_MapReader {
 				HashMap<String,Integer> ncbiNameMap = new HashMap<String,Integer>();
 				HashMap<Integer, String> ncbiIDMap = new HashMap<Integer, String>();
 				//https://github.com/danielhuson/megan-ce/blob/master/resources/files/ncbi.map
-				String location = "https://raw.githubusercontent.com/danielhuson/megan-ce/master/resources/files/ncbi.map";
+				String location = "https://raw.githubusercontent.com/rhuebler/HOPS/SHH/AMPS/Resources/ncbi.map";
 				URLConnection conn = new URL(location).openConnection();
 				 conn.setConnectTimeout(90*1000);
 				 conn.setReadTimeout(90*1000);
