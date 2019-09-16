@@ -96,7 +96,12 @@ public class NCBI_TreeReader {
 				assigned.add(key);
 		return assigned;
 	} 
-	
+	public ArrayList<Integer> getTaxonomicPath(int target, Set<Integer> keys){
+		ArrayList<Integer> pathIds = new ArrayList<Integer>();
+		pathIds.addAll(getAllStrains(target, keys));
+		pathIds.addAll(getParents(target));
+		return pathIds;
+	}
 	public ArrayList<Integer> getAllStrains(int target, Set<Integer> keys){// get all strains of a node
 		positionsToKeep.clear();
 		PhylogenyNode query = ph.getNode(String.valueOf(target));

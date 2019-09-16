@@ -9,18 +9,19 @@ public class ConcurrentReadDatabaseAnalyzer implements Callable<ReadDatabaseAnal
 	private Logger log ;
 	private Logger warning ;
 	private NCBI_MapReader reader;
+	DatabaseAnalysisMode dbMode;
 	public ConcurrentReadDatabaseAnalyzer(String inDir, String name,
-			Logger log, Logger warning, NCBI_MapReader reader){
+			Logger log, Logger warning, NCBI_MapReader reader, DatabaseAnalysisMode mode){
 		this.inDir = inDir;
 		this.fileName =  name;
 		this.log = log;
 		this.warning = warning;
 		this.reader = reader;
-		
+		this.dbMode = mode;
 	}
 	@Override
 	public ReadDatabaseAnalyzer call() throws Exception {
-		ReadDatabaseAnalyzer analyzer = new ReadDatabaseAnalyzer(inDir, fileName, log, warning, reader);
+		ReadDatabaseAnalyzer analyzer = new ReadDatabaseAnalyzer(inDir, fileName, log, warning, reader, dbMode);
 		
 		// TODO Auto-generated method stub
 		return analyzer;

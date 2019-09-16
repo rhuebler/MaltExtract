@@ -185,7 +185,7 @@ public class RMAExtractor {
 		  for(String fileName : inProcessor.getFileNames()){
 			 File f = new File(fileName);
 			 ConcurrentReadDatabaseAnalyzer task = new ConcurrentReadDatabaseAnalyzer(f.getParent()+"/",
-					 f.getName(), log, warning, mapReader);
+					 f.getName(), log, warning, mapReader, inProcessor.getDatabaseAnalysisMode());
 			 Future<ReadDatabaseAnalyzer> future = executor.submit(task);
 			 analyzerMap.put(fileName,future);
 		  }

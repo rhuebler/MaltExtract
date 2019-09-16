@@ -4,7 +4,10 @@ package utility;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.nio.charset.Charset;
 import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
@@ -20,6 +23,7 @@ import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 
+import DatabaseAnalyzer.DatabaseAnalysisMode;
 import behaviour.Filter;
 import behaviour.Taxas;
 
@@ -58,8 +62,11 @@ public class InputParameterProcessor {
 	private boolean downsampling = true;
 	private boolean useAllAlignments = true;
 	private boolean singleStranded = false;
+	private DatabaseAnalysisMode dbMode = DatabaseAnalysisMode.ONPATH;
 	// constructor
-
+public DatabaseAnalysisMode getDatabaseAnalysisMode() {
+	return this.dbMode;
+}
 	public InputParameterProcessor(String[] params ,Logger log, Logger warning){
 		 this.log = log;
 		 this.warning =  warning;
@@ -169,22 +176,22 @@ public class InputParameterProcessor {
 	public boolean getDeDupOff(){
 		return  deDupOff;
 	}
-	private void readTaxList(File f) throws IOException{
+	private void readTaxList(File f) {
 		try {
-			 Scanner	in = new Scanner(f.getCanonicalFile());
-			 while(in.hasNext()){
-				// taxNames.add(in.nextLine().trim().replace('_', ' '));
-				 
-				 taxNames.add(in.nextLine().trim());
-			 }
-			 in.close();
-		 	}catch (FileNotFoundException e) {
-		 warning.log(Level.WARNING,"File Not Found",e);
+			Path path = Paths.get(f.getCanonicalPath());
+			List<String> lines = Files.readAllLines(path, Charset.forName("UTF8"));
+			for (String line : lines) {
+				taxNames.add(line.toString().trim());
+			  }
+		} catch (IOException ioe) {
+					 warning.log(Level.WARNING,"File not UTF8 encoded");
 		}		
-	}	
+	}
+			
 	private void readFileList(File f) throws IOException{
 		try {
 			 Scanner	in = new Scanner(f.getCanonicalFile());
+			
 			 while(in.hasNext()){
 				 String line = in.nextLine();
 				 if(line.endsWith("rma6")){
@@ -318,7 +325,7 @@ public class InputParameterProcessor {
     	     				if(f.getCanonicalFile().exists()){
     	     					readTaxList(f);
     	     				}else{
-    	     					log.info("No Taxin file specified!!! Using cli as taxon");
+    	     					log.info("No Taxon file specified!!! Using cli as taxon");
 							   log.info("Added Taxon: ");
 							   log.info(tax +" to analysis");
 							   if(tax.contains("_"))
