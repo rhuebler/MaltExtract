@@ -185,12 +185,12 @@ public class RMAExtractor {
 		  for(String fileName : inProcessor.getFileNames()){
 			 File f = new File(fileName);
 			 ConcurrentReadDatabaseAnalyzer task = new ConcurrentReadDatabaseAnalyzer(f.getParent()+"/",
-					 f.getName(), log, warning, mapReader, inProcessor.getDatabaseAnalysisMode());
+					 f.getName(), log, warning, mapReader, inProcessor.getDatabaseAnalysisMode(),treeReader);
 			 Future<ReadDatabaseAnalyzer> future = executor.submit(task);
 			 analyzerMap.put(fileName,future);
 		  }
 		  destroy();
-		  ReadDatabaseSummaryWriter writer = new ReadDatabaseSummaryWriter(analyzerMap, warning, (ArrayList<String>) inProcessor.getFileNames());
+		  ReadDatabaseSummaryWriter writer = new ReadDatabaseSummaryWriter(analyzerMap, warning, (ArrayList<String>) inProcessor.getFileNames(),inProcessor.getDatabaseAnalysisMode());
 		  
 		  log.log(Level.INFO, "Writing Scan Summary File");
 		  writer.write(inProcessor.getOutDir());

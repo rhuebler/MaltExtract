@@ -30,13 +30,14 @@ public class ReadDatabaseAnalyzer {
     private DatabaseAnalysisMode dbMode;
 	// constructor
 	public ReadDatabaseAnalyzer(String inDir, String name,
-			Logger log, Logger warning, NCBI_MapReader reader, DatabaseAnalysisMode mode){
+			Logger log, Logger warning, NCBI_MapReader reader, DatabaseAnalysisMode mode, NCBI_TreeReader treeReader){
 		this.inDir = inDir;
 		this.fileName =  name;
 		this.log = log;
 		this.warning = warning;
 		this.mapReader = reader;
 		this.dbMode = mode;
+		this.treeReader = treeReader;
 		switch(dbMode) {
 			case LIST:
 				process();
@@ -122,29 +123,27 @@ public class ReadDatabaseAnalyzer {
 	private void processSimulatedReads(){
 		try{
 			log.log(Level.INFO, "Scanning File: "+ fileName);
-			ArrayList<NOAOR> noarList= new ArrayList<NOAOR>();
 			String parts[] = fileName.split("_");
-			String part = parts[parts.length-1];
-			int taxID = Integer.parseInt(part.substring(0, part.length()-4));
+        	int taxID= Integer.parseInt(parts[(parts.length-1)].split("\\.")[0]);
 			RMA6File rma6File = new RMA6File(inDir+fileName, "r");
 			Long location = rma6File.getFooterSectionRMA6().getStartClassification("Taxonomy");
 		    if (location != null) {
 		        ClassificationBlockRMA6 cl = new ClassificationBlockRMA6("Taxonomy");
 		        cl.read(location, rma6File.getReader());
-		      //if no taxa list provided use all taxa 
-		        this.keySet = cl.getKeySet();
-		        this.allKeys = cl.getKeySet();
-		        this.readCount = (int) rma6File.getFooterSectionRMA6().getNumberOfReads();// read in all counts
 		      
-		        ArrayList<Integer> onPathIDs = treeReader.getTaxonomicPath(taxID, allKeys);
+		        this.keySet = cl.getKeySet();
+		        //this.allKeys = cl.getKeySet();
+		        this.readCount = (int) rma6File.getFooterSectionRMA6().getNumberOfReads();// read in all counts
+		    
+		        ArrayList<Integer> onPathIDs = treeReader.getTaxonomicPath(taxID, keySet);
+		       
 		        for(int key : keySet){
-		        	if(allKeys.contains(key)) {
-		        		if(onPathIDs.contains(key)) {
-		        			onPath+=cl.getSum(key);
-		        		}else {
-		        			offPath+=cl.getSum(key);
-		        		}
-		        	}		
+		        	if(onPathIDs.contains(key)) {
+		        		onPath+=cl.getSum(key);
+		        	}else {
+		        		offPath+=cl.getSum(key);
+		        	}
+		        		
 		        }
 		        onPath /= readCount;
 		        offPath /= readCount;

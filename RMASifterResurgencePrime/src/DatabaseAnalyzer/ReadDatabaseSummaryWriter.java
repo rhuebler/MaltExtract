@@ -1,5 +1,6 @@
 package DatabaseAnalyzer;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
@@ -25,37 +26,61 @@ public class ReadDatabaseSummaryWriter {
 	private List<String> summary;
 	private Logger warning;
 	private  ArrayList<String> fileNames;
-	public ReadDatabaseSummaryWriter(HashMap<String,Future<ReadDatabaseAnalyzer>> databaseMap,Logger warning, ArrayList<String> fileNames){
+	private DatabaseAnalysisMode mode;
+	public ReadDatabaseSummaryWriter(HashMap<String,Future<ReadDatabaseAnalyzer>> databaseMap,Logger warning, ArrayList<String> fileNames, DatabaseAnalysisMode mode){
 		this.map = databaseMap;
 		this.warning = warning;
 		this.fileNames = fileNames;
+		this.mode = mode;
 		prepareOutput();
 	}
 	private void prepareOutput(){
 		String header = "FileName";
 		ArrayList<String> output= new ArrayList<String>();
 		fileNames.sort(null);
-		for(int i =1; i<=10; i++) {
-			header+="\tNode_"+i;
+		switch(mode) {
+			case LIST:{
+			for(int i =1; i<=10; i++) {
+				header+="\tNode_"+i;
+				}
+			for(String name : fileNames) {
+				if(map.containsKey(name)) {
+					try {
+						output.add(map.get(name).get().getOutput());
+					} catch (InterruptedException | ExecutionException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+				}else {
+					int i=0;
+					String line = "name\t";
+					while(i<10) {
+						line+="NA;NA\t";
+					}
+					output.add(line);
+				}
 			}
-		for(String name : fileNames) {
-			if(map.containsKey(name)) {
-				try {
-					output.add(map.get(name).get().getOutput());
-				} catch (InterruptedException | ExecutionException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
+			output.sort(null);
+			output.add(0,header);
+			break;
+			}
+			case ONPATH:{
+				header+="\tOnPathPercentage\tOffPathPercentage";
+				for(String name : fileNames) {
+					if(map.containsKey(name)) {
+						try {
+							ReadDatabaseAnalyzer analyzer=map.get(name).get();
+							
+							output.add(new File(name).getName()+"\t"+analyzer.getOnPath()+"\t"+analyzer.getOffPath());
+						} catch (InterruptedException | ExecutionException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+					}		
 				}
-			}else {
-				int i=0;
-				String line = "name\t";
-				while(i<10) {
-					line+="NA;NA\t";
-				}
-				output.add(line);
+				break;
 			}
 		}
-		output.sort(null);
 		output.add(0,header);
 		summary = output;
 	}
