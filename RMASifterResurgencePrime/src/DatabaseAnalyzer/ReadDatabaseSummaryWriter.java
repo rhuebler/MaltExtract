@@ -65,13 +65,12 @@ public class ReadDatabaseSummaryWriter {
 			break;
 			}
 			case ONPATH:{
-				header+="\tOnPathPercentage\tOffPathPercentage";
+				header+="\tOnPathPercentageStrict\tOffPathPercentageStrict\tOnPathPercentageRelaxed\tOffPathPercentagRelaxed\tTotalCount";
 				for(String name : fileNames) {
 					if(map.containsKey(name)) {
 						try {
 							ReadDatabaseAnalyzer analyzer=map.get(name).get();
-							
-							output.add(new File(name).getName()+"\t"+analyzer.getOnPath()+"\t"+analyzer.getOffPath());
+							output.add(new File(name).getName()+"\t"+analyzer.getOnPathStrict()+"\t"+analyzer.getOffPathStrict()+"\t"+analyzer.getOnPathRelaxed()+"\t"+analyzer.getOffPathRelaxed()+"\t"+analyzer.getTotalCount());
 						} catch (InterruptedException | ExecutionException e) {
 							// TODO Auto-generated catch block
 							e.printStackTrace();

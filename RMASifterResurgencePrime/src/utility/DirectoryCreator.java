@@ -107,7 +107,10 @@ public class DirectoryCreator {
 					new File(outDir+"/ancient/"+"/reads/").mkdirs();
 				}
 				break;
-				
+				case ASSIGNMENT:{
+					
+					break;
+				}
 				default:
 					System.err.println("Filter no longer supprted use parameter -h for accepted values");
 				break;	

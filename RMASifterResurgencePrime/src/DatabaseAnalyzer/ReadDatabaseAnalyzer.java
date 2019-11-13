@@ -25,9 +25,17 @@ public class ReadDatabaseAnalyzer {
 	private Logger warning;
 	private NCBI_MapReader mapReader;
 	private NCBI_TreeReader treeReader;
-	private  double onPath=0.0;
-    private  double offPath=0.0;
-    private DatabaseAnalysisMode dbMode;
+	private  double onPathStrict=0.0;
+    private  double offPathStrict=0.0;
+	private  double onPathRelaxed=0.0;
+    public void setOnPathRelaxed(double onPathRelaxed) {
+		this.onPathRelaxed = onPathRelaxed;
+	}
+	private  double offPathRelaxed=0.0;
+    public void setOffPathRelaxed(double offPathRelaxed) {
+		this.offPathRelaxed = offPathRelaxed;
+	}
+	private DatabaseAnalysisMode dbMode;
 	// constructor
 	public ReadDatabaseAnalyzer(String inDir, String name,
 			Logger log, Logger warning, NCBI_MapReader reader, DatabaseAnalysisMode mode, NCBI_TreeReader treeReader){
@@ -49,15 +57,22 @@ public class ReadDatabaseAnalyzer {
 		
 		}
 	// getters
-	public double getOnPath() {
-		return this.onPath;
+	public double getOnPathStrict() {
+		return this.onPathStrict;
 	}
-	public double getOffPath() {
-		return this.offPath;
+	public double getOffPathStrict() {
+		return this.offPathStrict;
+	}
+	public double getOnPathRelaxed() {
+		return this.onPathRelaxed;
+	}
+	public double getOffPathRelaxed() {
+		return this.offPathRelaxed;
 	}
 	public int getTotalCount(){
 		return this.readCount;
 	}
+	
 	public Set<Integer> getKeySet(){
 		return this.keySet;
 	}
@@ -122,7 +137,7 @@ public class ReadDatabaseAnalyzer {
 	}
 	private void processSimulatedReads(){
 		try{
-			log.log(Level.INFO, "Scanning File: "+ fileName);
+			log.log(Level.INFO, "Analyzing File: "+ fileName);
 			String parts[] = fileName.split("_");
         	int taxID= Integer.parseInt(parts[(parts.length-1)].split("\\.")[0]);
 			RMA6File rma6File = new RMA6File(inDir+fileName, "r");
@@ -134,25 +149,36 @@ public class ReadDatabaseAnalyzer {
 		        this.keySet = cl.getKeySet();
 		        //this.allKeys = cl.getKeySet();
 		        this.readCount = (int) rma6File.getFooterSectionRMA6().getNumberOfReads();// read in all counts
-		    
+		     
 		        ArrayList<Integer> onPathIDs = treeReader.getTaxonomicPath(taxID, keySet);
 		       
 		        for(int key : keySet){
 		        	if(onPathIDs.contains(key)) {
-		        		onPath+=cl.getSum(key);
+		        		onPathStrict+=cl.getSum(key);
 		        	}else {
-		        		offPath+=cl.getSum(key);
+		        		offPathStrict+=cl.getSum(key);
 		        	}
 		        		
 		        }
-		        onPath /= readCount;
-		        offPath /= readCount;
+		        onPathStrict /= readCount;
+		        offPathStrict /= readCount;
+		        
+		      ArrayList<Integer> onPathIDsRalexed = treeReader.getRelaxedPath(taxID, keySet);
+			  for(int key : keySet){
+				  if(onPathIDsRalexed.contains(key)) {
+		        		onPathRelaxed+=cl.getSum(key);
+		        	}else {
+		        		offPathRelaxed+=cl.getSum(key);
+		        	}
+			  }	  
+			  onPathRelaxed /= readCount;
+		      offPathRelaxed /= readCount;
 		    }else{
 		    	warning.log(Level.SEVERE,fileName+" has no taxonomy block");
 		    }
 			rma6File.close();
 		}catch(IOException io){
-			warning.log(Level.SEVERE,"Cannot open File",io);
+			warning.log(Level.SEVERE,"Cannot open File "+fileName,io);
 		}
 	}
 	

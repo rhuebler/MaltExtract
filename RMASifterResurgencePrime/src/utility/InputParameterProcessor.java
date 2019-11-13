@@ -63,6 +63,7 @@ public class InputParameterProcessor {
 	private boolean useAllAlignments = true;
 	private boolean singleStranded = false;
 	private DatabaseAnalysisMode dbMode = DatabaseAnalysisMode.ONPATH;
+	private String version = "1.7";
 	// constructor
 public DatabaseAnalysisMode getDatabaseAnalysisMode() {
 	return this.dbMode;
@@ -73,18 +74,43 @@ public DatabaseAnalysisMode getDatabaseAnalysisMode() {
 		process(params);	
 	}
 	public String GetParameters() {
+		System.out.println("MaltExtract Version " +version);
 		String input ="";
 		for(String name : fileNames)
 			input+=name+"\b";
 		String tax ="";
 		for(String name : taxNames)
 			tax+=name+"\b";
-			String line="MaltTExtract 1.5\n"
+			String line="MaltExtract 1.7\n"
 				+ "--input "+input+"\n"
 				+"--taxa "+tax+"\n"
 				+"--output "+outDir+"\n"
-				+"--filter "+behave+"\n"
-				+"--top "+topPercent+"\n"
+				+"--filter ";
+				switch(behave) {
+				case NON:
+					line+="default\n";
+					break;
+				case NON_ANCIENT:
+					line+="def_anc\n";
+					break;
+				case ANCIENT:
+					line+="ancient\n";
+					break;
+				case SCAN:
+					line+="scan\n";
+					break;
+				case CRAWL:
+					line+="crawl\n";
+					break;
+				case SRNA:
+					line+="srna\n";
+					break;
+				case ASSIGNMENT:
+					line+="assignment\n";
+					break;
+				}
+				
+				line+="--top "+topPercent+"\n"
 				+"--maxLength "+maxLength+"\n"
 				+"--minPI "+minPIdent+"\n"
 				+"--resources "+tree_Path+"\n"
@@ -213,7 +239,7 @@ public DatabaseAnalysisMode getDatabaseAnalysisMode() {
     	    // long flags
     	    Option option_Threads = Option.builder("p").longOpt("threads").argName("Integer").hasArg().optionalArg(true).desc("How many cores to use?").build();		
     	    Option option_TopPercent = Option.builder("a").longOpt("top").argName("Double").hasArg().optionalArg(true).desc("Use top scoring 0.XX of alignments by defualt 0.01").build();
-    	    Option option_Filter = Option.builder("f").longOpt("filter").argName("String").optionalArg(true).hasArg().desc("Use chosen filter full (def_anc), ancient, default, crawl, scan, srna").build();
+    	    Option option_Filter = Option.builder("f").longOpt("filter").argName("String").optionalArg(true).hasArg().desc("Use chosen filter full (def_anc), ancient, default, crawl, scan, srna,assignment").build();
     	    Option option_MaxLength = Option.builder().longOpt("maxReadLength").argName("Integer").hasArg().optionalArg(true).desc("Set maximum read length").build();
     	    Option option_minPercentIdent = Option.builder().longOpt("minPI").argName("Double").hasArg().optionalArg(true).desc("Set minimum percent identity to XX.X").build(); 
     	    Option option_Help = Option.builder("h").longOpt("help").optionalArg(true).desc("Print Help").build();
@@ -230,6 +256,7 @@ public DatabaseAnalysisMode getDatabaseAnalysisMode() {
     	    Option option_Downsampling = Option.builder().longOpt("downSampOff").optionalArg(true).desc("Turn Off automatic downsampling on nodes with more than 10.000 assigned reads").build();
     	    Option option_UseTopAlignment = Option.builder().longOpt("useTopAlignment").optionalArg(true).desc("Use only the top Alignment per read after filtering").build();
     	    Option option_Single_Stranded = Option.builder().longOpt("singleStranded").optionalArg(true).desc("Switch damage patterns to single stranded mode").build();
+    	    Option option_Version = Option.builder().longOpt("version").optionalArg(true).desc("Display Version").build();
     	    Options options = new Options();
     	    
     	    // add all parameters to the parser
@@ -259,6 +286,7 @@ public DatabaseAnalysisMode getDatabaseAnalysisMode() {
     	    options.addOption(option_Downsampling);
     	    options.addOption(option_UseTopAlignment);
     	    options.addOption(option_Single_Stranded);
+    	    options.addOption(option_Version);
     	    try //evaluate commandline
     	    {
     	        commandLine = parser.parse(options, parameters);
@@ -473,11 +501,11 @@ public DatabaseAnalysisMode getDatabaseAnalysisMode() {
     	        	 downsampling = false;
     	        }
     	        if(commandLine.hasOption("h")){////help
-    	        	String header = "MaltExtract beta version 1.5";
+    	        	String header = "MaltExtract version"+ version;
     	    	    String footer = "In case you encounter an error drop an email with an useful description to huebler@shh.mpg.de ";
     	    	    HelpFormatter formatter = new HelpFormatter();
     	    	    formatter.setWidth(500);
-    	    	    formatter.printHelp("RMAExtractor", header, options, footer, true);   
+    	    	    formatter.printHelp("MaltExtract", header, options, footer, true);   
     	    	    System.exit(0);
     	        }
     	        if(!commandLine.hasOption("h")  && (!commandLine.hasOption("output") || !commandLine.hasOption("input"))){// use if output is missing
@@ -491,6 +519,10 @@ public DatabaseAnalysisMode getDatabaseAnalysisMode() {
     	              warning.log(Level.WARNING,argument);
     	            }
     	          }
+    	        if (commandLine.hasOption("version")) {
+    	        	System.out.println("MaltExtract version " +version);
+    	        	System.exit(0);
+    	        }
     	        if(!commandLine.hasOption("taxa") && (behave != Filter.SCAN && behave != Filter.ASSIGNMENT)){//stop if taxa list is missing
     	        	warning.log(Level.SEVERE,"No target species provided for filtering");
     	        	System.exit(1);

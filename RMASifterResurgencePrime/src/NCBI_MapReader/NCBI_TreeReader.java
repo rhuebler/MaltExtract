@@ -102,6 +102,18 @@ public class NCBI_TreeReader {
 		pathIds.addAll(getParents(target));
 		return pathIds;
 	}
+	
+	public ArrayList<Integer> getRelaxedPath(int target, Set<Integer> keys){
+		int nodeOfInterest = target;
+		ArrayList<Integer> pathIds = new ArrayList<Integer>();
+		PhylogenyNode t = ph.getNode(String.valueOf(target)).getParent();
+		if(t.getName().length()>0) {
+			nodeOfInterest = Integer.parseInt(t.getName());
+		}
+		pathIds.addAll(getAllStrains(nodeOfInterest, keys));
+		pathIds.addAll(getParents(nodeOfInterest));
+		return pathIds;
+	}
 	public ArrayList<Integer> getAllStrains(int target, Set<Integer> keys){// get all strains of a node
 		positionsToKeep.clear();
 		PhylogenyNode query = ph.getNode(String.valueOf(target));
@@ -163,8 +175,10 @@ public class NCBI_TreeReader {
 			int id = target;
 			for(int i = 0; i<ph.getNode(String.valueOf(target)).calculateDepth();i++){
 				PhylogenyNode t = ph.getNode(String.valueOf(id)).getParent();
-				id = Integer.parseInt(t.getName());
-				ids.add(id);
+				if(t.getName().length()>0) {
+					id = Integer.parseInt(t.getName());
+					ids.add(id);
+				}
 			}
 			
 			return ids;
