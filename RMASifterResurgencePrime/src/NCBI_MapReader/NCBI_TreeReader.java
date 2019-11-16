@@ -44,7 +44,7 @@ public class NCBI_TreeReader {
 	public void processFromWeb() {
 		try{
 			
-			String location ="https://raw.githubusercontent.com/rhuebler/HOPS/SHH/AMPS/Resources/ncbi.tre";
+			String location ="https://raw.githubusercontent.com/rhuebler/HOPS/external/Resources/ncbi.tre";
 			URLConnection conn = new URL(location).openConnection();
 			 conn.setConnectTimeout(90*1000);
 			 conn.setReadTimeout(90*1000);
