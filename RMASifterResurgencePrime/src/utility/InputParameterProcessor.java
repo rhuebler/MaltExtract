@@ -74,7 +74,7 @@ public DatabaseAnalysisMode getDatabaseAnalysisMode() {
 		process(params);	
 	}
 	public String GetParameters() {
-		System.out.println("MaltExtract Version " +version);
+		log.log(Level.INFO,"MaltExtract Version " +version);
 		String input ="";
 		for(String name : fileNames)
 			input+=name+"\b";
@@ -126,7 +126,7 @@ public DatabaseAnalysisMode getDatabaseAnalysisMode() {
 				if(minComplexity>0)
 					line+="--minComp "+minComplexity+"\n";
 				if(wantMeganSummaries)
-					line+="--wantMeganSummaries "+"\n";
+					line+="--meganSummary "+"\n";
 				if(destackOff)
 					line+="--destackingOff "+"\n";
 				if(deDupOff)
@@ -310,7 +310,6 @@ public DatabaseAnalysisMode getDatabaseAnalysisMode() {
 	    	            				 fileNames.add(inFile.getPath()+"/" + name);
 	    	            				}
 	    	            		}else if(inFile.isFile()){// is File
-	    	            			System.out.println(arg);
 	    	            			if(arg.endsWith("rma6")||Files.isSymbolicLink(new File(inFile.getPath()).toPath())){ // test if file can be read as if text file that contains names
 	    	            				log.info(inFile.getPath());
 	    	            				fileNames.add(inFile.getPath());
@@ -446,10 +445,18 @@ public DatabaseAnalysisMode getDatabaseAnalysisMode() {
     	        	log.log(Level.INFO, "Use only top ALignment");
     	        }
     	        if(commandLine.hasOption("resources")){
+    	        	if(commandLine.getOptionValue("resources")!=null) {
     	        	File f = new File(commandLine.getOptionValue("resources"));
     	        	if(f.isDirectory()){
     	        		 tree_Path = commandLine.getOptionValue("resources");
+    	        	}else{
+    	        		warning.log(Level.SEVERE,"--resources "+commandLine.getOptionValue("resources")+" is not a directory");
+    	        		System.exit(1);
     	        	}
+    	        	}else{
+    	        		warning.log(Level.SEVERE,"--resources "+commandLine.getOptionValue("resources")+" has to be non null");
+    	        	}
+    	        	
     	        }
     	        if(commandLine.hasOption("minComp")){
     	        	 minComplexity = Double.parseDouble(commandLine.getOptionValue("minComp"));

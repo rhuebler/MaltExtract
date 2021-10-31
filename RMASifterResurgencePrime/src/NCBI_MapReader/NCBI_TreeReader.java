@@ -11,6 +11,8 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Scanner;
 import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.forester.phylogeny.Phylogeny;
 import org.forester.phylogeny.PhylogenyNode;
@@ -34,11 +36,19 @@ public class NCBI_TreeReader {
 	 */
 	
 	private String treName= "";
-	int target;
+	private int target;
 	private HashSet<Integer> positionsToKeep = new HashSet<Integer>();
 	private Phylogeny ph;
-	public NCBI_TreeReader(){
+	private Logger log;
+	private Logger warning;
+	private boolean monoCladic = false;
+	public boolean isMonoCladic() {
+		return this.monoCladic;
+	}
+	public NCBI_TreeReader(Logger log, Logger warning){
 		processFromWeb();
+		this.log = log;
+		this.warning =  warning;
 	}
 	
 	public void processFromWeb() {
@@ -64,11 +74,7 @@ public class NCBI_TreeReader {
 			io.printStackTrace();
 		}
 	}
-	
-	public NCBI_TreeReader(String path){
-		if(!path.endsWith("/"))
-			path+="/";
-		this.treName = path + "ncbi.tre";// if path is provided use path
+	private void processTreeFromFile(){
 		try{
 			Scanner in = new Scanner(new File(treName));
 			String line = in.nextLine();
@@ -77,6 +83,19 @@ public class NCBI_TreeReader {
 		    }catch(IOException io){
 		    	io.printStackTrace();
 		    }
+	}
+	public NCBI_TreeReader(String path, Logger log, Logger warning){
+		this.log = log;
+		this.warning =  warning;
+		if(!path.endsWith("/"))
+			path+="/";
+		this.treName = path + "ncbi.tre";// if path is provided use path
+		if(new File(treName).exists())
+			processTreeFromFile();
+		else {
+			this.log.log(Level.INFO,"Did not find ncbi.tre \n Downloading file from web!");
+			processFromWeb();
+		}
 	}
 	// get files by downloading 
 	public NCBI_TreeReader(NCBI_TreeReader copyInstance){
@@ -89,8 +108,8 @@ public class NCBI_TreeReader {
 	
 	private ArrayList<Integer> getAssigned( Collection<Integer> children,Set<Integer> keys){// get assinged nodes in files
 		ArrayList<Integer> assigned = new ArrayList<Integer>();
-		if(keys==null)
-			System.err.println("Danger empty keys in File");
+		if(keys==null||keys.size()==0)
+			warning.log(Level.SEVERE,"Danger empty keys in File");
 		for(int key : keys)
 			if(children.contains(key))
 				assigned.add(key);
@@ -98,20 +117,35 @@ public class NCBI_TreeReader {
 	} 
 	public ArrayList<Integer> getTaxonomicPath(int target, Set<Integer> keys){
 		ArrayList<Integer> pathIds = new ArrayList<Integer>();
-		pathIds.addAll(getAllStrains(target, keys));
-		pathIds.addAll(getParents(target));
+		try {
+			pathIds.addAll(getAllStrains(target, keys));
+			pathIds.addAll(getParents(target));
+		
+		}catch(NullPointerException iae) {
+			warning.log(Level.SEVERE,"For node: " +target+"\n",iae);
+		}
 		return pathIds;
 	}
 	
 	public ArrayList<Integer> getRelaxedPath(int target, Set<Integer> keys){
 		int nodeOfInterest = target;
 		ArrayList<Integer> pathIds = new ArrayList<Integer>();
-		PhylogenyNode t = ph.getNode(String.valueOf(target)).getParent();
-		if(t.getName().length()>0) {
-			nodeOfInterest = Integer.parseInt(t.getName());
+		try {
+			PhylogenyNode t = ph.getNode(String.valueOf(target)).getParent();
+			if(t.getName().length()>0) {
+				nodeOfInterest = Integer.parseInt(t.getName());
+			}
+			ArrayList<Integer> children = new ArrayList<Integer> ();
+			for(PhylogenyNode node :t.getAllDescendants())
+				children.add(Integer.parseInt(node.getName()));
+			if(getAssigned(children,keys).size() <= 1)
+				monoCladic = true;
+			pathIds.addAll(getAllStrains(nodeOfInterest, keys));
+			pathIds.addAll(getParents(nodeOfInterest));
+		}catch(NullPointerException iae) {
+			
+			warning.log(Level.SEVERE,"For node: " +target+"\n",iae);
 		}
-		pathIds.addAll(getAllStrains(nodeOfInterest, keys));
-		pathIds.addAll(getParents(nodeOfInterest));
 		return pathIds;
 	}
 	public ArrayList<Integer> getAllStrains(int target, Set<Integer> keys){// get all strains of a node
@@ -128,7 +162,8 @@ public class NCBI_TreeReader {
 	    	}
 	      }
 	      positionsToKeep.addAll(getAssigned(children,keys));
-	    }	
+	    }
+	    
 	    ArrayList<Integer> results = new ArrayList<Integer>();
 		results.addAll(positionsToKeep);
 		return results;
@@ -179,8 +214,7 @@ public class NCBI_TreeReader {
 					id = Integer.parseInt(t.getName());
 					ids.add(id);
 				}
-			}
-			
+			}	
 			return ids;
 		}
 }

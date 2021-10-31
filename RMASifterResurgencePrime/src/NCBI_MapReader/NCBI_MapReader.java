@@ -10,6 +10,8 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.util.HashMap;
 import java.util.Scanner;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 /**
  * 
  * @author huebler
@@ -29,16 +31,26 @@ public class NCBI_MapReader {
 	 * @return return two hashmaps with IDs to name and Name to ID
 	 */
 	private String mapName = "";//TODO download file
-	 HashMap<String,Integer> ncbiNameToId;
-	 HashMap<Integer,String> ncbiIdToName;
-	public NCBI_MapReader(){// try to locate resources
+	private HashMap<String,Integer> ncbiNameToId;
+	private HashMap<Integer,String> ncbiIdToName;
+	private Logger log;
+	private Logger warning;
+	public NCBI_MapReader(Logger log, Logger warning){// try to locate resources
 		processFromWeb();
 	}
-	public NCBI_MapReader(String path){// use provided path
+	public NCBI_MapReader(String path,Logger log, Logger warning){// use provided path
+		this.log = log; 
+		this.warning = warning;
 		if(!path.endsWith("/"))
 			path+="/";
 		this.mapName = path + "ncbi.map";
-		processNcbiMap(mapName);
+		if(new File(mapName).exists()) {
+			processNcbiMap(mapName);
+		}else {
+			warning.log(Level.SEVERE,"File not found \nDownloading ncbi.map from web");
+			processFromWeb();
+		}
+		
 	}
 	public HashMap<String,Integer>  getNcbiNameToIdMap(){
 		return this.ncbiNameToId;
@@ -63,8 +75,13 @@ public class NCBI_MapReader {
 			while (in.hasNext()) { // iterates each line in the file
 				String line = in.nextLine();
 				String[] frags = line.split("\\t");
-				ncbiNameMap.put(frags[1], Integer.parseInt(frags[0]));
-				ncbiIDMap.put(Integer.parseInt(frags[0]), frags[1]);
+				if(frags.length>=2) {
+					ncbiNameMap.put(frags[1], Integer.parseInt(frags[0]));
+					ncbiIDMap.put(Integer.parseInt(frags[0]), frags[1]);
+				}else {
+					warning.log(Level.SEVERE,"Too few fragment ncbi.map not in expected format! Shutting Down now");
+					//System.exit(1);
+				}
 				// do something with line
 				}
 			in.close();
@@ -83,15 +100,20 @@ public class NCBI_MapReader {
 				URLConnection conn = new URL(location).openConnection();
 				 conn.setConnectTimeout(90*1000);
 				 conn.setReadTimeout(90*1000);
+				
 				   try (InputStream in = conn.getInputStream()) {
 					   InputStreamReader reader = new  InputStreamReader(in);
 					   BufferedReader buffered = new BufferedReader(reader);
 					   String line;
 					   while((line = buffered.readLine())!=null) {
-						  // System.out.println(line);
 							String[] frags = line.toString().split("\\t");
-							ncbiNameMap.put(frags[1], Integer.parseInt(frags[0]));
-							ncbiIDMap.put(Integer.parseInt(frags[0]), frags[1]);
+							if(frags.length>=2) {
+								ncbiNameMap.put(frags[1], Integer.parseInt(frags[0]));
+								ncbiIDMap.put(Integer.parseInt(frags[0]), frags[1]);
+							}else {
+								warning.log(Level.SEVERE,"Too few fragment ncbi.map not in expected format! Shutting down now");
+								System.exit(1);
+							}
 							// do something with line
 				       }
 					 buffered.close();

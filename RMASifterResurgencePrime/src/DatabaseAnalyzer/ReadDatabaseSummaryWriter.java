@@ -65,15 +65,19 @@ public class ReadDatabaseSummaryWriter {
 			break;
 			}
 			case ONPATH:{
-				header+="\tOnPathPercentageStrict\tOffPathPercentageStrict\tOnPathPercentageRelaxed\tOffPathPercentagRelaxed\tTotalCount";
+				header+="\tOnPathPercentageStrict\tOffPathPercentageStrict\tOnPathPercentageRelaxed\tOffPathPercentagRelaxed\tisMonoCladic\tTotalCount\t"
+						+ "Node_01\tNode_02\tNode_03\tNode_04\tNode_05\tNode_06\tNode_07\tNode_08\tNode_09\tNode_10";
 				for(String name : fileNames) {
 					if(map.containsKey(name)) {
 						try {
 							ReadDatabaseAnalyzer analyzer=map.get(name).get();
-							output.add(new File(name).getName()+"\t"+analyzer.getOnPathStrict()+"\t"+analyzer.getOffPathStrict()+"\t"+analyzer.getOnPathRelaxed()+"\t"+analyzer.getOffPathRelaxed()+"\t"+analyzer.getTotalCount());
-						} catch (InterruptedException | ExecutionException e) {
+							output.add(new File(name).getName()+"\t"+analyzer.getOnPathStrict()+"\t"+analyzer.getOffPathStrict()+"\t"+analyzer.getOnPathRelaxed()+"\t"
+							+analyzer.getOffPathRelaxed()+"\t"+analyzer.isMonoCladic()+"\t"+analyzer.getTotalCount()+"\t"+analyzer.getOffPathNodes());
+						} catch (InterruptedException | NullPointerException | ExecutionException e) {
 							// TODO Auto-generated catch block
+							output.add(new File(name).getName()+"\tNA\tNA\tNA\tNA\tNA\tNA");
 							e.printStackTrace();
+							
 						}
 					}		
 				}

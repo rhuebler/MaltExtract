@@ -115,7 +115,7 @@ public class RMA6Scanner {
 		    }
 			rma6File.close();
 		}catch(IOException io){
-			warning.log(Level.SEVERE,"Cannot open File",io);
+			warning.log(Level.SEVERE,"Cannot open File "+fileName,io);
 		}
 	}
 }

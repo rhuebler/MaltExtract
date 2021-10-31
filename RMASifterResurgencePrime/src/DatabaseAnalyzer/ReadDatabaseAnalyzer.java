@@ -28,10 +28,18 @@ public class ReadDatabaseAnalyzer {
 	private  double onPathStrict=0.0;
     private  double offPathStrict=0.0;
 	private  double onPathRelaxed=0.0;
+	private  double offPathRelaxed=0.0;
+	private boolean monoCladic = false;
+	private String offPathNodes = "NA;NA\tNA;NA\tNA;NA\tNA;NA\tNA;NA\tNA;NA\tNA;NA\tNA;NA\tNA;NA\tNA;NA";
+	public String getOffPathNodes() {
+		return offPathNodes;
+	}
+	public boolean isMonoCladic() {
+		return this.monoCladic;
+	}
     public void setOnPathRelaxed(double onPathRelaxed) {
 		this.onPathRelaxed = onPathRelaxed;
 	}
-	private  double offPathRelaxed=0.0;
     public void setOffPathRelaxed(double offPathRelaxed) {
 		this.offPathRelaxed = offPathRelaxed;
 	}
@@ -45,7 +53,7 @@ public class ReadDatabaseAnalyzer {
 		this.warning = warning;
 		this.mapReader = reader;
 		this.dbMode = mode;
-		this.treeReader = treeReader;
+		this.treeReader = new NCBI_TreeReader(treeReader);
 		switch(dbMode) {
 			case LIST:
 				process();
@@ -92,6 +100,8 @@ public class ReadDatabaseAnalyzer {
 			name = mapReader.getNcbiIdToNameMap().get(taxId).replace(' ', '_').replace('\'', '_').replace('#', '_').replace('$', '_');
 		else if(taxId == 0)
 			name="NA";
+		else if(taxId == -2)
+			name ="unassigned_reads";
 		else
 			name = "unassignedName";
 		return name;
@@ -137,9 +147,12 @@ public class ReadDatabaseAnalyzer {
 	}
 	private void processSimulatedReads(){
 		try{
+			
 			log.log(Level.INFO, "Analyzing File: "+ fileName);
 			String parts[] = fileName.split("_");
-        	int taxID= Integer.parseInt(parts[(parts.length-1)].split("\\.")[0]);
+			int taxID = 0;
+        	taxID= Integer.parseInt(parts[(parts.length-1)].split("\\.")[0]);
+        	//System.out.println(taxID);
 			RMA6File rma6File = new RMA6File(inDir+fileName, "r");
 			Long location = rma6File.getFooterSectionRMA6().getStartClassification("Taxonomy");
 		    if (location != null) {
@@ -150,7 +163,12 @@ public class ReadDatabaseAnalyzer {
 		        //this.allKeys = cl.getKeySet();
 		        this.readCount = (int) rma6File.getFooterSectionRMA6().getNumberOfReads();// read in all counts
 		     
-		        ArrayList<Integer> onPathIDs = treeReader.getTaxonomicPath(taxID, keySet);
+		        ArrayList<Integer> onPathIDs = new ArrayList<Integer>();
+		        if(taxID!=0 && mapReader.getNcbiIdToNameMap().containsKey(taxID)) {
+		        	onPathIDs = treeReader.getTaxonomicPath(taxID, keySet);
+		        }else {
+		        		warning.log(Level.SEVERE,fileName+" does not contain taxID or taxID is not contained in ncbi.map");
+		        		}
 		       
 		        for(int key : keySet){
 		        	if(onPathIDs.contains(key)) {
@@ -163,19 +181,38 @@ public class ReadDatabaseAnalyzer {
 		        onPathStrict /= readCount;
 		        offPathStrict /= readCount;
 		        
-		      ArrayList<Integer> onPathIDsRalexed = treeReader.getRelaxedPath(taxID, keySet);
+		      ArrayList<Integer> onPathIDsRalexed = new  ArrayList<Integer>();
+		      ArrayList<NOAOR> noarList= new ArrayList<NOAOR>();
+		      if(taxID!=0 && mapReader.getNcbiIdToNameMap().containsKey(taxID)) {
+		    	  onPathIDsRalexed = treeReader.getRelaxedPath(taxID, keySet);		        
+		      }else {
+		        	//	warning.log(Level.SEVERE,fileName+" does not contain taxID or tax ID is not contained in ncbi.map");
+		       }
 			  for(int key : keySet){
 				  if(onPathIDsRalexed.contains(key)) {
 		        		onPathRelaxed+=cl.getSum(key);
 		        	}else {
+		        		noarList.add(new NOAOR(cl.getSum(key),null,key));
 		        		offPathRelaxed+=cl.getSum(key);
 		        	}
 			  }	  
 			  onPathRelaxed /= readCount;
 		      offPathRelaxed /= readCount;
+		      NOAORComparator comparator = new NOAORComparator();
+			  noarList.sort(comparator);
+			  String current_offPathNodes = "";
+			  for(int i =0; i< 10; i++) {
+				if(i<noarList.size()) {
+					current_offPathNodes += getName(noarList.get(i).getTaxID())+";"+noarList.get(i).getSize()+"\t";
+				}else{
+					current_offPathNodes += "NA;NA\t";
+				}
+			  }
+			  this.offPathNodes =  current_offPathNodes;
 		    }else{
 		    	warning.log(Level.SEVERE,fileName+" has no taxonomy block");
 		    }
+		    monoCladic = treeReader.isMonoCladic();
 			rma6File.close();
 		}catch(IOException io){
 			warning.log(Level.SEVERE,"Cannot open File "+fileName,io);

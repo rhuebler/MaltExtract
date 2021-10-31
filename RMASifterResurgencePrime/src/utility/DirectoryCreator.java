@@ -15,12 +15,12 @@ public class DirectoryCreator {
  * @param reads
  */
 	public void process(Filter behave, String outDir, boolean hits,boolean reads, boolean wantMeganSummaries) {
-		
+		if(wantMeganSummaries){
+			new File(outDir+"/MeganSummaries/").mkdirs();
+		}
 		switch(behave) {
 			case CRAWL:
-				if(wantMeganSummaries){
-					new File(outDir+"/MeganSummaries/").mkdirs();
-				}
+			
 				new File(outDir+"/crawlResults/").mkdirs();
 				new File(outDir+"/crawlResults/damageMismatch/").mkdirs();
 				new File(outDir+"/crawlResults/readDist/").mkdirs();

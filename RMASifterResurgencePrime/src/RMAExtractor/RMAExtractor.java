@@ -88,14 +88,17 @@ public class RMAExtractor {
 		NCBI_MapReader mapReader;
 		NCBI_TreeReader treeReader;
 		if(inProcessor.getTreePath()!=null) {
-			mapReader = new NCBI_MapReader(inProcessor.getTreePath());
-			treeReader = new NCBI_TreeReader(inProcessor.getTreePath());
+			mapReader = new NCBI_MapReader(inProcessor.getTreePath(), log, warning);
+			treeReader = new NCBI_TreeReader(inProcessor.getTreePath(),log, warning);
 		}else {
 			
-			mapReader = new NCBI_MapReader();
-			treeReader = new NCBI_TreeReader();
+			mapReader = new NCBI_MapReader(log, warning);
+			treeReader = new NCBI_TreeReader(log, warning);
 		}
-		
+		if(mapReader.getNcbiIdToNameMap()==null) {
+			warning.log(Level.SEVERE, "Cannot access Ncbi.map shutting down");
+			System.exit(1);
+		}
 		DirectoryCreator dCreator = new DirectoryCreator();
 		dCreator.process(inProcessor.getFilter(),inProcessor.getOutDir(),inProcessor.getBlastHits(),inProcessor.wantReads(), inProcessor.wantMeganSummaries());
 		ArrayList<Integer> taxIDs= new  ArrayList<Integer>();

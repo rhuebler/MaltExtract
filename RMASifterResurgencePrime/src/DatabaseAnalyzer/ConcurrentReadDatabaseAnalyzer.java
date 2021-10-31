@@ -20,7 +20,7 @@ public class ConcurrentReadDatabaseAnalyzer implements Callable<ReadDatabaseAnal
 		this.warning = warning;
 		this.reader = reader;
 		this.dbMode = mode;
-		this.treeReader = treeReader;
+		this.treeReader = new NCBI_TreeReader(treeReader);
 	}
 	@Override
 	public ReadDatabaseAnalyzer call() throws Exception {
