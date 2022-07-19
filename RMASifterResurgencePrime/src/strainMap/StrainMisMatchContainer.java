@@ -92,7 +92,7 @@ public void processMisMatches(){
 				
 					damDivident = (damDivisor+positionContainer.get("CC"));
 					
-					double d = damDivisor/damDivident;
+					double d = damDivident/damDivisor;
 					damage.put(i, d);
 				}else{
 					double d = 1.0;
